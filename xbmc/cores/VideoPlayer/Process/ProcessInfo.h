@@ -82,6 +82,12 @@ public:
   virtual std::vector<AVPixelFormat> GetRenderFormats();
 
   // player states
+  /*!
+   * @brief Notifies that a seek operation has finished
+   * @param offset - the seek offset
+  */
+  void SeekFinished(int64_t offset);
+
   void SetStateSeeking(bool active);
   bool IsSeeking();
   void SetStateRealtime(bool state);
@@ -110,7 +116,7 @@ public:
   // settings
   CVideoSettings GetVideoSettings();
   void SetVideoSettings(CVideoSettings &settings);
-  CVideoSettingsLocked& UpdateVideoSettings();
+  CVideoSettingsLocked& GetVideoSettingsLocked();
 
 protected:
   CProcessInfo();

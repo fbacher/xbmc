@@ -100,7 +100,7 @@ void CGUISliderControl::Process(unsigned int currentTime, CDirtyRegionList &dirt
   if (infoCode)
   {
     int val;
-    if (CServiceBroker::GetGUI()->GetInfoManager().GetInt(val, infoCode))
+    if (CServiceBroker::GetGUI()->GetInfoManager().GetInt(val, infoCode, INFO::DEFAULT_CONTEXT))
       SetIntValue(val);
   }
 
@@ -391,8 +391,7 @@ void CGUISliderControl::SetPercentage(float percent, RangeSelector selector /* =
 
   float percentLower = selector == RangeSelectorLower ? percent : m_percentValues[0];
   float percentUpper = selector == RangeSelectorUpper ? percent : m_percentValues[1];
-  float oldValues[2] = { m_percentValues[0],m_percentValues[1] };
-
+  const float oldValues[2] = {m_percentValues[0], m_percentValues[1]};
 
   if (!m_rangeSelection || percentLower <= percentUpper)
   {

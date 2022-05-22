@@ -8,7 +8,8 @@
 
 #pragma once
 
-class CAppParamParser;
+#include <memory>
 
-extern "C" int XBMC_Run(bool renderGUI, const CAppParamParser &params);
+class CAppParams;
 
+extern "C" int XBMC_Run(bool renderGUI, const std::shared_ptr<CAppParams>& params);

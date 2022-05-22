@@ -8,6 +8,7 @@
 
 #pragma once
 
+// clang-format off
 #define PLAYER_HAS_MEDIA              1
 #define PLAYER_HAS_AUDIO              2
 #define PLAYER_HAS_VIDEO              3
@@ -35,7 +36,7 @@
 #define PLAYER_TIME                  27
 #define PLAYER_TIME_REMAINING        28
 #define PLAYER_DURATION              29
-// unused 30
+#define PLAYER_HASPERFORMEDSEEK      30
 #define PLAYER_SHOWINFO              31
 #define PLAYER_VOLUME                32
 #define PLAYER_MUTED                 33
@@ -222,6 +223,8 @@
 #define MUSICPLAYER_CONTENT         246
 #define MUSICPLAYER_ISMULTIDISC     247
 
+// Videoplayer infolabels
+#define VIDEOPLAYER_HDR_TYPE          249
 // Keep videoplayer infolabels that work with offset and position together
 #define VIDEOPLAYER_TITLE             250
 #define VIDEOPLAYER_GENRE             251
@@ -253,11 +256,11 @@
 #define VIDEOPLAYER_USER_RATING       277
 #define VIDEOPLAYER_DBID              278
 #define VIDEOPLAYER_TVSHOWDBID        279
-#define VIDEOPLAYER_HDR_TYPE          280
+#define VIDEOPLAYER_ART               280
 
 // Range of videoplayer infolabels that work with offset and position
 #define VIDEOPLAYER_OFFSET_POSITION_FIRST VIDEOPLAYER_TITLE
-#define VIDEOPLAYER_OFFSET_POSITION_LAST VIDEOPLAYER_TVSHOWDBID
+#define VIDEOPLAYER_OFFSET_POSITION_LAST VIDEOPLAYER_ART
 
 #define VIDEOPLAYER_AUDIO_BITRATE     281
 #define VIDEOPLAYER_VIDEO_BITRATE     282
@@ -394,6 +397,7 @@
 #define INTEGER_LESS_OR_EQUAL       454
 #define INTEGER_EVEN                455
 #define INTEGER_ODD                 456
+#define INTEGER_VALUEOF             457
 
 #define SKIN_BOOL                   600
 #define SKIN_STRING                 601
@@ -403,6 +407,7 @@
 #define SKIN_HAS_THEME              606
 #define SKIN_ASPECT_RATIO           607
 #define SKIN_FONT                   608
+#define SKIN_INTEGER 609
 
 #define SYSTEM_IS_SCREENSAVER_INHIBITED 641
 #define SYSTEM_ADDON_UPDATE_COUNT   642
@@ -720,6 +725,11 @@
 #define PLAYER_PROCESS_AUDIOBITSPERSAMPLE (PLAYER_PROCESS + 11)
 #define PLAYER_PROCESS_VIDEOSCANTYPE (PLAYER_PROCESS + 12)
 
+#define ADDON_INFOS                 1600
+#define ADDON_SETTING_STRING        (ADDON_INFOS)
+#define ADDON_SETTING_BOOL          (ADDON_INFOS + 1)
+#define ADDON_SETTING_INT           (ADDON_INFOS + 2)
+
 #define WINDOW_PROPERTY             9993
 #define WINDOW_IS_VISIBLE           9995
 #define WINDOW_NEXT                 9996
@@ -970,3 +980,4 @@
 #define INFOFLAG_LISTITEM_ABSOLUTE    (static_cast<uint32_t>(1 << 27))  // Absolute ListItem lookups
 #define INFOFLAG_LISTITEM_NOWRAP      (static_cast<uint32_t>(1 << 28))  // Do not wrap ListItem lookups
 #define INFOFLAG_LISTITEM_CONTAINER   (static_cast<uint32_t>(1 << 29))  // Lookup the item in given container
+// clang-format on

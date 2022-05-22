@@ -1,17 +1,5 @@
 # Android packaging
 
-find_program(AAPT_EXECUTABLE aapt PATHS ${SDK_BUILDTOOLS_PATH})
-if(NOT AAPT_EXECUTABLE)
-  message(FATAL_ERROR "Could NOT find aapt executable")
-endif()
-find_program(D8_EXECUTABLE d8 PATHS ${SDK_BUILDTOOLS_PATH})
-if(NOT D8_EXECUTABLE)
-  find_program(DX_EXECUTABLE dx PATHS ${SDK_BUILDTOOLS_PATH})
-  if(NOT DX_EXECUTABLE)
-    message(FATAL_ERROR "Could NOT find dx or d8 executable")
-  endif()
-endif()
-
 if(CMAKE_BUILD_TYPE STREQUAL Debug)
   set(ANDROID_DEBUGGABLE true)
 else()
@@ -83,6 +71,7 @@ set(package_files strings.xml
                   src/interfaces/XBMCNsdManagerDiscoveryListener.java
                   src/interfaces/XBMCMediaDrmOnEventListener.java
                   src/interfaces/XBMCDisplayManagerDisplayListener.java
+                  src/interfaces/XBMCSpeechRecognitionListener.java
                   src/model/TVEpisode.java
                   src/model/Movie.java
                   src/model/TVShow.java
@@ -160,9 +149,9 @@ add_bundle_file(${SMBCLIENT_LIBRARY} ${libdir} "")
 if(CPU MATCHES i686)
   set(CPU x86)
 endif()
-foreach(target apk obb apk-unsigned apk-obb apk-obb-unsigned apk-noobb apk-clean apk-sign)
+foreach(target apk obb apk-obb apk-clean)
   add_custom_target(${target}
-      COMMAND PATH=${NATIVEPREFIX}/bin:$ENV{PATH} ${CMAKE_MAKE_PROGRAM}
+      COMMAND env PATH=${NATIVEPREFIX}/bin:$ENV{PATH} ${CMAKE_MAKE_PROGRAM}
               -C ${CMAKE_BINARY_DIR}/tools/android/packaging
               CMAKE_SOURCE_DIR=${CMAKE_SOURCE_DIR}
               CC=${CMAKE_C_COMPILER}
@@ -174,11 +163,9 @@ foreach(target apk obb apk-unsigned apk-obb apk-obb-unsigned apk-noobb apk-clean
               NDKROOT=${NDKROOT}
               SDKROOT=${SDKROOT}
               STRIP=${CMAKE_STRIP}
-              AAPT=${AAPT_EXECUTABLE}
-              DX=${DX_EXECUTABLE}
-              D8=${D8_EXECUTABLE}
               ${target}
       WORKING_DIRECTORY ${CMAKE_BINARY_DIR}/tools/android/packaging
+      VERBATIM
   )
   if(NOT target STREQUAL apk-clean)
     add_dependencies(${target} bundle)

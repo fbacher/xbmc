@@ -73,14 +73,14 @@ void CGUIDialogSeekBar::FrameMove()
 
 int CGUIDialogSeekBar::GetProgress() const
 {
-  CGUIInfoManager& infoMgr = CServiceBroker::GetGUI()->GetInfoManager();
+  const CGUIInfoManager& infoMgr = CServiceBroker::GetGUI()->GetInfoManager();
 
   int progress = 0;
 
   if (g_application.GetAppPlayer().GetSeekHandler().GetSeekSize() != 0)
-    infoMgr.GetInt(progress, PLAYER_SEEKBAR);
+    infoMgr.GetInt(progress, PLAYER_SEEKBAR, INFO::DEFAULT_CONTEXT);
   else
-    infoMgr.GetInt(progress, PLAYER_PROGRESS);
+    infoMgr.GetInt(progress, PLAYER_PROGRESS, INFO::DEFAULT_CONTEXT);
 
   return progress;
 }
@@ -90,13 +90,13 @@ int CGUIDialogSeekBar::GetEpgEventProgress() const
   CGUIInfoManager& infoMgr = CServiceBroker::GetGUI()->GetInfoManager();
 
   int progress = 0;
-  infoMgr.GetInt(progress, PVR_EPG_EVENT_PROGRESS);
+  infoMgr.GetInt(progress, PVR_EPG_EVENT_PROGRESS, INFO::DEFAULT_CONTEXT);
 
   int seekSize = g_application.GetAppPlayer().GetSeekHandler().GetSeekSize();
   if (seekSize != 0)
   {
     int total = 0;
-    infoMgr.GetInt(total, PVR_EPG_EVENT_DURATION);
+    infoMgr.GetInt(total, PVR_EPG_EVENT_DURATION, INFO::DEFAULT_CONTEXT);
 
     float totalTime = static_cast<float>(total);
     if (totalTime == 0.0f)
@@ -113,10 +113,10 @@ int CGUIDialogSeekBar::GetEpgEventProgress() const
 
 int CGUIDialogSeekBar::GetTimeshiftProgress() const
 {
-  CGUIInfoManager& infoMgr = CServiceBroker::GetGUI()->GetInfoManager();
+  const CGUIInfoManager& infoMgr = CServiceBroker::GetGUI()->GetInfoManager();
 
   int progress = 0;
-  infoMgr.GetInt(progress, PVR_TIMESHIFT_SEEKBAR);
+  infoMgr.GetInt(progress, PVR_TIMESHIFT_SEEKBAR, INFO::DEFAULT_CONTEXT);
 
   return progress;
 }

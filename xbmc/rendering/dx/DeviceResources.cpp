@@ -134,6 +134,11 @@ void DX::DeviceResources::GetAdapterDesc(DXGI_ADAPTER_DESC* desc) const
 {
   if (m_adapter)
     m_adapter->GetDesc(desc);
+
+  // GetDesc() returns VendorId == 0 in Xbox however, we need to know that
+  // GPU is AMD to apply workarounds in DXVA.cpp CheckCompatibility() same as desktop
+  if (CSysInfo::GetWindowsDeviceFamily() == CSysInfo::Xbox)
+    desc->VendorId = PCIV_AMD;
 }
 
 void DX::DeviceResources::GetDisplayMode(DXGI_MODE_DESC* mode) const
@@ -603,6 +608,14 @@ void DX::DeviceResources::ResizeBuffers()
     HDR_STATUS hdrStatus = CWIN32Util::GetWindowsHDRStatus();
     const bool isHdrEnabled = (hdrStatus == HDR_STATUS::HDR_ON);
     bool use10bit = (hdrStatus != HDR_STATUS::HDR_UNSUPPORTED);
+
+    DXGI_ADAPTER_DESC ad = {};
+    GetAdapterDesc(&ad);
+
+    // Some AMD graphics has issues with 10 bit in SDR.
+    // Enabled by default only in Intel and NVIDIA with latest drivers/hardware
+    if (m_d3dFeatureLevel < D3D_FEATURE_LEVEL_12_1 || ad.VendorId == PCIV_AMD)
+      use10bit = false;
 
     // 0 = Auto | 1 = Never | 2 = Always
     int use10bitSetting = CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(

@@ -46,7 +46,7 @@ static float currentRefreshRate()
   if (window)
   {
     float preferredRate = window.getAttributes().getpreferredRefreshRate();
-    if (preferredRate > 20.0f && preferredRate < 70.0f)
+    if (preferredRate > 20.0f)
     {
       CLog::Log(LOGINFO, "CAndroidUtils: Preferred refresh rate: {:f}", preferredRate);
       return preferredRate;
@@ -57,7 +57,7 @@ static float currentRefreshRate()
       if (display)
       {
         float reportedRate = display.getRefreshRate();
-        if (reportedRate > 20.0f && reportedRate < 70.0f)
+        if (reportedRate > 20.0f)
         {
           CLog::Log(LOGINFO, "CAndroidUtils: Current display refresh rate: {:f}", reportedRate);
           return reportedRate;
@@ -93,7 +93,7 @@ static void fetchDisplayModes()
         s_res_cur_displayMode.fRefreshRate = m.getRefreshRate();
         s_res_cur_displayMode.dwFlags= D3DPRESENTFLAG_PROGRESSIVE;
         s_res_cur_displayMode.bFullScreen   = true;
-        s_res_cur_displayMode.iSubtitles    = (int)(0.965 * s_res_cur_displayMode.iHeight);
+        s_res_cur_displayMode.iSubtitles = s_res_cur_displayMode.iHeight;
         s_res_cur_displayMode.fPixelRatio   = 1.0f;
         s_res_cur_displayMode.strMode = StringUtils::Format(
             "{}x{} @ {:.6f}{} - Full Screen", s_res_cur_displayMode.iScreenWidth,
@@ -113,7 +113,7 @@ static void fetchDisplayModes()
           res.fRefreshRate = m.getRefreshRate();
           res.dwFlags= D3DPRESENTFLAG_PROGRESSIVE;
           res.bFullScreen   = true;
-          res.iSubtitles    = (int)(0.965 * res.iHeight);
+          res.iSubtitles = res.iHeight;
           res.fPixelRatio   = 1.0f;
           res.strMode = StringUtils::Format("{}x{} @ {:.6f}{} - Full Screen", res.iScreenWidth,
                                             res.iScreenHeight, res.fRefreshRate,
@@ -248,7 +248,7 @@ bool CAndroidUtils::GetNativeResolution(RESOLUTION_INFO* res) const
     res->iScreenWidth  = res->iWidth;
     res->iScreenHeight = res->iHeight;
   }
-  res->iSubtitles    = (int)(0.965 * res->iHeight);
+  res->iSubtitles = res->iHeight;
   res->strMode =
       StringUtils::Format("{}x{} @ {:.6f}{} - Full Screen", res->iScreenWidth, res->iScreenHeight,
                           res->fRefreshRate, res->dwFlags & D3DPRESENTFLAG_INTERLACED ? "i" : "");
@@ -290,7 +290,7 @@ bool CAndroidUtils::ProbeResolutions(std::vector<RESOLUTION_INFO>& resolutions)
       {
         res.iWidth = std::min(res.iWidth, m_width);
         res.iHeight = std::min(res.iHeight, m_height);
-        res.iSubtitles = static_cast<int>(0.965 * res.iHeight);
+        res.iSubtitles = res.iHeight;
       }
       resolutions.push_back(res);
     }
@@ -317,7 +317,7 @@ bool CAndroidUtils::ProbeResolutions(std::vector<RESOLUTION_INFO>& resolutions)
       {
         for (unsigned int i = 0; i < refreshRates.size(); i++)
         {
-          if (refreshRates[i] < 20.0f || refreshRates[i] > 70.0f)
+          if (refreshRates[i] < 20.0f)
             continue;
           cur_res.fRefreshRate = refreshRates[i];
           cur_res.strMode = StringUtils::Format(

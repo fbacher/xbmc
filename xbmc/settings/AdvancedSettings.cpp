@@ -8,8 +8,7 @@
 
 #include "AdvancedSettings.h"
 
-#include "AppParamParser.h"
-#include "Application.h"
+#include "AppParams.h"
 #include "LangInfo.h"
 #include "ServiceBroker.h"
 #include "filesystem/File.h"
@@ -86,11 +85,28 @@ void CAdvancedSettings::OnSettingChanged(const std::shared_ptr<const CSetting>& 
     SetDebugMode(std::static_pointer_cast<const CSettingBool>(setting)->GetValue());
 }
 
-void CAdvancedSettings::Initialize(const CAppParamParser &params, CSettingsManager& settingsMgr)
+void CAdvancedSettings::Initialize(CSettingsManager& settingsMgr)
 {
   Initialize();
 
-  params.SetAdvancedSettings(*this);
+  const auto params = CServiceBroker::GetAppParams();
+
+  if (params->GetLogLevel() == LOG_LEVEL_DEBUG)
+  {
+    m_logLevel = LOG_LEVEL_DEBUG;
+    m_logLevelHint = LOG_LEVEL_DEBUG;
+    CServiceBroker::GetLogging().SetLogLevel(LOG_LEVEL_DEBUG);
+  }
+
+  const std::string& settingsFile = params->GetSettingsFile();
+  if (!settingsFile.empty())
+    AddSettingsFile(settingsFile);
+
+  if (params->IsStartFullScreen())
+    m_startFullScreen = true;
+
+  if (params->IsStandAlone())
+    m_handleMounting = true;
 
   settingsMgr.RegisterSettingsHandler(this, true);
   std::set<std::string> settingSet;
@@ -177,7 +193,7 @@ void CAdvancedSettings::Initialize()
   m_cddbAddress = "gnudb.gnudb.org";
   m_addSourceOnTop = false;
 
-  m_handleMounting = g_application.IsStandAlone();
+  m_handleMounting = CServiceBroker::GetAppParams()->IsStandAlone();
 
   m_fullScreenOnMovieStart = true;
   m_cachePath = "special://temp/";
@@ -433,8 +449,6 @@ void CAdvancedSettings::Initialize()
   m_stereoscopicregex_sbs = "[-. _]h?sbs[-. _]";
   m_stereoscopicregex_tab = "[-. _]h?tab[-. _]";
 
-  m_videoSubtitleVerticalMargin = -1;
-
   m_logLevelHint = m_logLevel = LOG_LEVEL_NORMAL;
 
   m_openGlDebugging = false;
@@ -591,7 +605,6 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
   pElement = pRootElement->FirstChildElement("video");
   if (pElement)
   {
-    XMLUtils::GetInt(pElement, "subtitleverticalmargin", m_videoSubtitleVerticalMargin);
     XMLUtils::GetString(pElement, "stereoscopicregex3d", m_stereoscopicregex_3d);
     XMLUtils::GetString(pElement, "stereoscopicregexsbs", m_stereoscopicregex_sbs);
     XMLUtils::GetString(pElement, "stereoscopicregextab", m_stereoscopicregex_tab);

@@ -52,10 +52,8 @@ using namespace PVR;
 using namespace std::chrono_literals;
 
 CGUIWindowPVRGuideBase::CGUIWindowPVRGuideBase(bool bRadio, int id, const std::string& xmlFile)
-  : CGUIWindowPVRBase(bRadio, id, xmlFile), m_bChannelSelectionRestored(false)
+  : CGUIWindowPVRBase(bRadio, id, xmlFile)
 {
-  m_bRefreshTimelineItems = false;
-  m_bSyncRefreshTimelineItems = false;
 }
 
 CGUIWindowPVRGuideBase::~CGUIWindowPVRGuideBase()
@@ -693,17 +691,18 @@ bool CGUIWindowPVRGuideBase::RefreshTimelineItems()
       if (!group)
         return false;
 
-      CDateTime startDate(group->GetFirstEPGDate());
-      CDateTime endDate(group->GetLastEPGDate());
-      const CDateTime currentDate(CDateTime::GetCurrentDateTime().GetAsUTCDateTime());
+      CPVREpgContainer& epgContainer = CServiceBroker::GetPVRManager().EpgContainer();
+
+      const std::pair<CDateTime, CDateTime> dates = epgContainer.GetFirstAndLastEPGDate();
+      CDateTime startDate = dates.first;
+      CDateTime endDate = dates.second;
+      const CDateTime currentDate = CDateTime::GetUTCDateTime();
 
       if (!startDate.IsValid())
         startDate = currentDate;
 
       if (!endDate.IsValid() || endDate < startDate)
         endDate = startDate;
-
-      CPVREpgContainer& epgContainer = CServiceBroker::GetPVRManager().EpgContainer();
 
       // limit start to past days to display
       const int iPastDays = epgContainer.GetPastDaysToDisplay();
@@ -755,7 +754,7 @@ bool CGUIWindowPVRGuideBase::GotoEnd()
 
 bool CGUIWindowPVRGuideBase::GotoCurrentProgramme()
 {
-  CPVRManager& mgr = CServiceBroker::GetPVRManager();
+  const CPVRManager& mgr = CServiceBroker::GetPVRManager();
   std::shared_ptr<CPVRChannel> channel = mgr.PlaybackState()->GetPlayingChannel();
 
   if (!channel)
@@ -822,7 +821,7 @@ bool CGUIWindowPVRGuideBase::GotoLastChannel()
 
 bool CGUIWindowPVRGuideBase::GotoPlayingChannel()
 {
-  CPVRManager& mgr = CServiceBroker::GetPVRManager();
+  const CPVRManager& mgr = CServiceBroker::GetPVRManager();
   std::shared_ptr<CPVRChannel> channel = mgr.PlaybackState()->GetPlayingChannel();
 
   if (!channel)

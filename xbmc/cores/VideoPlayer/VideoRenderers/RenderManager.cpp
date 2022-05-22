@@ -139,7 +139,11 @@ bool CRenderManager::Configure(const VideoPicture& picture, float fps, unsigned 
     m_orientation = orientation;
     m_stereomode = picture.stereoMode;
     m_NumberBuffers  = buffers;
-    m_renderState = STATE_CONFIGURING;
+    if (m_renderState == STATE_UNCONFIGURED)
+      m_renderState = STATE_CONFIGURING;
+    else
+      m_renderState = STATE_RECONFIGURING;
+
     m_stateEvent.Reset();
     m_clockSync.Reset();
     m_dvdClock.SetVsyncAdjust(0);
@@ -220,7 +224,13 @@ bool CRenderManager::Configure()
       m_free.push_back(i);
 
     m_bRenderGUI = true;
-    m_bTriggerUpdateResolution = true;
+
+    if (m_renderState == STATE_CONFIGURING ||
+        (CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(
+             CSettings::SETTING_VIDEOPLAYER_ADJUSTREFRESHRATE) == ADJUST_REFRESHRATE_ALWAYS))
+    {
+      m_bTriggerUpdateResolution = true;
+    }
     m_presentstep = PRESENT_IDLE;
     m_presentpts = DVD_NOPTS_VALUE;
     m_lateframes = -1;
@@ -229,6 +239,7 @@ bool CRenderManager::Configure()
     m_renderDebug = false;
     m_clockSync.Reset();
     m_dvdClock.SetVsyncAdjust(0);
+    m_overlays.Reset();
     m_overlays.SetStereoMode(m_stereomode);
 
     m_renderState = STATE_CONFIGURED;
@@ -291,7 +302,7 @@ void CRenderManager::FrameMove()
 
     if (m_renderState == STATE_UNCONFIGURED)
       return;
-    else if (m_renderState == STATE_CONFIGURING)
+    else if (m_renderState == STATE_CONFIGURING || m_renderState == STATE_RECONFIGURING)
     {
       lock.unlock();
       if (!Configure())
@@ -397,7 +408,7 @@ void CRenderManager::UnInit()
 
   std::unique_lock<CCriticalSection> lock(m_statelock);
 
-  m_overlays.Flush();
+  m_overlays.UnInit();
   m_debugRenderer.Dispose();
 
   DeleteRenderer();
@@ -771,8 +782,7 @@ void CRenderManager::Render(bool clear, DWORD flags, DWORD alpha, bool gui)
     }
   }
 
-
-  SPresent& m = m_Queue[m_presentsource];
+  const SPresent& m = m_Queue[m_presentsource];
 
   {
     std::unique_lock<CCriticalSection> lock(m_presentlock);
@@ -832,7 +842,7 @@ bool CRenderManager::IsVideoLayer()
 /* simple present method */
 void CRenderManager::PresentSingle(bool clear, DWORD flags, DWORD alpha)
 {
-  SPresent& m = m_Queue[m_presentsource];
+  const SPresent& m = m_Queue[m_presentsource];
 
   if (m.presentfield == FS_BOT)
     m_pRenderer->RenderUpdate(m_presentsource, m_presentsourcePast, clear, flags | RENDER_FLAG_BOT, alpha);
@@ -846,7 +856,7 @@ void CRenderManager::PresentSingle(bool clear, DWORD flags, DWORD alpha)
  * we just render the two fields right after eachother */
 void CRenderManager::PresentFields(bool clear, DWORD flags, DWORD alpha)
 {
-  SPresent& m = m_Queue[m_presentsource];
+  const SPresent& m = m_Queue[m_presentsource];
 
   if(m_presentstep == PRESENT_FRAME)
   {
@@ -866,7 +876,7 @@ void CRenderManager::PresentFields(bool clear, DWORD flags, DWORD alpha)
 
 void CRenderManager::PresentBlend(bool clear, DWORD flags, DWORD alpha)
 {
-  SPresent& m = m_Queue[m_presentsource];
+  const SPresent& m = m_Queue[m_presentsource];
 
   if( m.presentfield == FS_BOT )
   {
@@ -946,6 +956,11 @@ void CRenderManager::ToggleDebugVideo()
   m_renderDebug = isEnabled;
   m_debugTimer.SetExpired();
   m_renderDebugVideo = true;
+}
+
+void CRenderManager::SetSubtitleVerticalPosition(int value, bool save)
+{
+  m_overlays.SetSubtitleVerticalPosition(value, save);
 }
 
 bool CRenderManager::AddVideoPicture(const VideoPicture& picture, volatile std::atomic_bool& bStop, EINTERLACEMETHOD deintMethod, bool wait)

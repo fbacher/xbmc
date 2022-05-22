@@ -113,8 +113,7 @@ bool CServiceManager::InitStageOne()
   return true;
 }
 
-bool CServiceManager::InitStageTwo(const CAppParamParser& params,
-                                   const std::string& profilesUserDataFolder)
+bool CServiceManager::InitStageTwo(const std::string& profilesUserDataFolder)
 {
   // Initialize the addon database (must be before the addon manager is init'd)
   m_databaseManager.reset(new CDatabaseManager);
@@ -150,7 +149,7 @@ bool CServiceManager::InitStageTwo(const CAppParamParser& params,
   m_contextMenuManager.reset(new CContextMenuManager(*m_addonMgr));
 
   m_gameControllerManager.reset(new GAME::CControllerManager);
-  m_inputManager.reset(new CInputManager(params));
+  m_inputManager.reset(new CInputManager());
   m_inputManager->InitializeInputs();
 
   m_peripherals.reset(new PERIPHERALS::CPeripherals(*m_inputManager, *m_gameControllerManager));
@@ -222,6 +221,8 @@ void CServiceManager::DeinitStageThree()
   m_contextMenuManager->Deinit();
   m_gameServices.reset();
   m_peripherals->Clear();
+
+  m_Platform->DeinitStageThree();
 }
 
 void CServiceManager::DeinitStageTwo()
@@ -250,11 +251,12 @@ void CServiceManager::DeinitStageTwo()
   m_repositoryUpdater.reset();
   m_binaryAddonManager.reset();
   m_addonMgr.reset();
-  m_Platform.reset();
   m_databaseManager.reset();
 
   m_mediaManager->Stop();
   m_mediaManager.reset();
+
+  m_Platform->DeinitStageTwo();
 }
 
 void CServiceManager::DeinitStageOne()
@@ -267,6 +269,9 @@ void CServiceManager::DeinitStageOne()
   CScriptInvocationManager::GetInstance().UnregisterLanguageInvocationHandler(m_XBPython.get());
   m_XBPython.reset();
 #endif
+
+  m_Platform->DeinitStageOne();
+  m_Platform.reset();
 }
 
 #if defined(HAS_FILESYSTEM_SMB)

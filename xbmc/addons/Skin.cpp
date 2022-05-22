@@ -26,11 +26,13 @@
 #include "settings/lib/Setting.h"
 #include "settings/lib/SettingDefinitions.h"
 #include "threads/Timer.h"
-#include "utils/log.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
-#include "utils/XMLUtils.h"
 #include "utils/Variant.h"
+#include "utils/XMLUtils.h"
+#include "utils/log.h"
+
+#include <charconv>
 
 #define XML_SETTINGS      "settings"
 #define XML_SETTING       "setting"
@@ -588,6 +590,18 @@ int CSkinInfo::TranslateString(const std::string &setting)
   return number;
 }
 
+int CSkinInfo::GetInt(int setting) const
+{
+  const std::string settingValue = GetString(setting);
+  if (settingValue.empty())
+  {
+    return -1;
+  }
+  int settingValueInt{-1};
+  std::from_chars(settingValue.data(), settingValue.data() + settingValue.size(), settingValueInt);
+  return settingValueInt;
+}
+
 const std::string& CSkinInfo::GetString(int setting) const
 {
   const auto& it = m_strings.find(setting);
@@ -653,6 +667,34 @@ void CSkinInfo::SetBool(int setting, bool set)
 
   CLog::Log(LOGFATAL, "{}: unknown setting ({}) requested", __FUNCTION__, setting);
   assert(false);
+}
+
+std::set<CSkinSettingPtr> CSkinInfo::GetSkinSettings() const
+{
+  std::set<CSkinSettingPtr> settings;
+
+  for (const auto& setting : m_settings)
+    settings.insert(setting.second);
+
+  return settings;
+}
+
+CSkinSettingPtr CSkinInfo::GetSkinSetting(const std::string& settingId)
+{
+  const auto& it = m_settings.find(settingId);
+  if (it != m_settings.end())
+    return it->second;
+
+  return nullptr;
+}
+
+std::shared_ptr<const CSkinSetting> CSkinInfo::GetSkinSetting(const std::string& settingId) const
+{
+  const auto& it = m_settings.find(settingId);
+  if (it != m_settings.end())
+    return it->second;
+
+  return nullptr;
 }
 
 void CSkinInfo::Reset(const std::string &setting)
@@ -753,6 +795,7 @@ bool CSkinInfo::SettingsFromXML(const CXBMCTinyXML &doc, bool loadDefaults /* = 
     return false;
   }
 
+  m_settings.clear();
   m_strings.clear();
   m_bools.clear();
 
@@ -761,9 +804,17 @@ bool CSkinInfo::SettingsFromXML(const CXBMCTinyXML &doc, bool loadDefaults /* = 
   for (const auto& setting : settings)
   {
     if (setting->GetType() == "string")
-      m_strings.insert(std::pair<int, CSkinSettingStringPtr>(number++, std::dynamic_pointer_cast<CSkinSettingString>(setting)));
+    {
+      m_settings.insert(std::make_pair(setting->name, setting));
+      m_strings.insert(
+          std::make_pair(number++, std::dynamic_pointer_cast<CSkinSettingString>(setting)));
+    }
     else if (setting->GetType() == "bool")
-      m_bools.insert(std::pair<int, CSkinSettingBoolPtr>(number++, std::dynamic_pointer_cast<CSkinSettingBool>(setting)));
+    {
+      m_settings.insert(std::make_pair(setting->name, setting));
+      m_bools.insert(
+          std::make_pair(number++, std::dynamic_pointer_cast<CSkinSettingBool>(setting)));
+    }
     else
       CLog::Log(LOGWARNING, "CSkinInfo: ignoring setting of unknown type \"{}\"",
                 setting->GetType());

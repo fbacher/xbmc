@@ -39,6 +39,7 @@
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
+#include <algorithm>
 #include <memory>
 #include <mutex>
 #include <string>
@@ -150,13 +151,11 @@ void CPVRManagerJobQueue::AppendJob(CPVRJob* job)
   std::unique_lock<CCriticalSection> lock(m_critSection);
 
   // check for another pending job of given type...
-  for (CPVRJob* updateJob : m_pendingUpdates)
+  if (std::any_of(m_pendingUpdates.cbegin(), m_pendingUpdates.cend(),
+                  [job](CPVRJob* updateJob) { return updateJob->GetType() == job->GetType(); }))
   {
-    if (updateJob->GetType() == job->GetType())
-    {
-      delete job;
-      return;
-    }
+    delete job;
+    return;
   }
 
   m_pendingUpdates.push_back(job);
@@ -608,10 +607,10 @@ bool CPVRManager::SetWakeupCommand()
   const std::string strWakeupCommand(m_settings.GetStringValue(CSettings::SETTING_PVRPOWERMANAGEMENT_SETWAKEUPCMD));
   if (!strWakeupCommand.empty() && m_timers)
   {
-    time_t iWakeupTime;
     const CDateTime nextEvent = m_timers->GetNextEventTime();
     if (nextEvent.IsValid())
     {
+      time_t iWakeupTime;
       nextEvent.GetAsTime(iWakeupTime);
 
       std::string strExecCommand = StringUtils::Format("{} {}", strWakeupCommand, iWakeupTime);
@@ -684,25 +683,13 @@ bool CPVRManager::UpdateComponents(std::vector<std::shared_ptr<CPVRClient>>& kno
                                    ManagerState stateToCheck,
                                    const std::unique_ptr<CPVRGUIProgressHandler>& progressHandler)
 {
-  // find clients which disappeared since last check and remove them from known clients
-  for (auto it = knownClients.begin(); it != knownClients.end();)
-  {
-    if ((*it)->IgnoreClient())
-    {
-      it = knownClients.erase(it);
-      CLog::LogFC(LOGDEBUG, LOGPVR,
-                  "PVR client '{}' disconnected. Erasing from list of known clients.", (*it)->ID());
-    }
-    else
-      ++it;
-  }
-
   // find clients which appeared since last check and update them
   CPVRClientMap clientMap;
   m_addons->GetCreatedClients(clientMap);
   if (clientMap.empty())
   {
     CLog::LogFC(LOGDEBUG, LOGPVR, "All created PVR clients gone!");
+    knownClients.clear(); // start over
     return false;
   }
 
@@ -717,10 +704,10 @@ bool CPVRManager::UpdateComponents(std::vector<std::shared_ptr<CPVRClient>>& kno
       continue;
     }
 
-    if (knownClients.empty() || std::find_if(knownClients.cbegin(), knownClients.cend(),
+    if (knownClients.empty() || std::none_of(knownClients.cbegin(), knownClients.cend(),
                                              [&entry](const std::shared_ptr<CPVRClient>& client) {
-                                               return entry.first == client->GetID();
-                                             }) == knownClients.cend())
+                                               return client->GetID() == entry.first;
+                                             }))
     {
       knownClients.emplace_back(entry.second);
       newClients.emplace_back(entry.second);

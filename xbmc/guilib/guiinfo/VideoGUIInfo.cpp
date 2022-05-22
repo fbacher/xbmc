@@ -102,6 +102,9 @@ bool CVideoGUIInfo::GetLabel(std::string& value, const CFileItem *item, int cont
       /////////////////////////////////////////////////////////////////////////////////////////////
       // PLAYER_* / VIDEOPLAYER_* / LISTITEM_*
       /////////////////////////////////////////////////////////////////////////////////////////////
+      case VIDEOPLAYER_ART:
+        value = item->GetArt(info.GetData3());
+        return true;
       case PLAYER_PATH:
       case PLAYER_FILENAME:
       case PLAYER_FILEPATH:
@@ -602,7 +605,8 @@ bool CVideoGUIInfo::GetLabel(std::string& value, const CFileItem *item, int cont
 
 bool CVideoGUIInfo::GetPlaylistInfo(std::string& value, const CGUIInfo& info) const
 {
-  PLAYLIST::CPlayList& playlist = CServiceBroker::GetPlaylistPlayer().GetPlaylist(PLAYLIST_VIDEO);
+  const PLAYLIST::CPlayList& playlist =
+      CServiceBroker::GetPlaylistPlayer().GetPlaylist(PLAYLIST_VIDEO);
   if (playlist.size() < 1)
     return false;
 
@@ -636,6 +640,11 @@ bool CVideoGUIInfo::GetPlaylistInfo(std::string& value, const CGUIInfo& info) co
   else if (info.m_info == VIDEOPLAYER_COVER)
   {
     value = playlistItem->GetArt("thumb");
+    return true;
+  }
+  else if (info.m_info == VIDEOPLAYER_ART)
+  {
+    value = playlistItem->GetArt(info.GetData3());
     return true;
   }
 

@@ -8,7 +8,6 @@
 
 #include "WIN32Util.h"
 
-#include "Application.h"
 #include "CompileInfo.h"
 #include "ServiceBroker.h"
 #include "Util.h"
@@ -363,7 +362,7 @@ std::string CWIN32Util::GetSystemPath()
 #endif
 }
 
-std::string CWIN32Util::GetProfilePath()
+std::string CWIN32Util::GetProfilePath(const bool platformDirectories)
 {
   std::string strProfilePath;
 #ifdef TARGET_WINDOWS_STORE
@@ -372,7 +371,7 @@ std::string CWIN32Util::GetProfilePath()
 #else
   std::string strHomePath = CUtil::GetHomePath();
 
-  if(g_application.PlatformDirectoriesEnabled())
+  if (platformDirectories)
     strProfilePath = URIUtils::AddFileToFolder(GetSpecialFolder(CSIDL_APPDATA|CSIDL_FLAG_CREATE), CCompileInfo::GetAppName());
   else
     strProfilePath = URIUtils::AddFileToFolder(strHomePath , "portable_data");
@@ -1172,71 +1171,6 @@ void CWIN32Util::CropSource(CRect& src, CRect& dst, CRect target, UINT rotation 
   dst.y1 = floor(dst.y1);
   dst.x2 = ceil(dst.x2);
   dst.y2 = ceil(dst.y2);
-}
-
-// detect if a drive is a usb device
-// code taken from http://banderlogi.blogspot.com/2011/06/enum-drive-letters-attached-for-usb.html
-
-bool CWIN32Util::IsUsbDevice(const std::wstring &strWdrive)
-{
-  if (strWdrive.size() < 2)
-    return false;
-
-#ifdef TARGET_WINDOWS_STORE
-  bool result = false;
-
-  auto removables = winrt::Windows::Storage::KnownFolders::RemovableDevices();
-  auto vector = Wait(removables.GetFoldersAsync());
-  auto strdrive = KODI::PLATFORM::WINDOWS::FromW(strWdrive);
-  for (const auto& device : vector)
-  {
-    auto path = KODI::PLATFORM::WINDOWS::FromW(device.Path().c_str());
-    if (StringUtils::StartsWith(path, strdrive))
-    {
-      // looks like drive is removable
-      result = true;
-    }
-  }
-  return false;
-#else
-  std::wstring strWDevicePath = StringUtils::Format(L"\\\\.\\{}", strWdrive.substr(0, 2));
-
-  HANDLE deviceHandle = CreateFileW(
-    strWDevicePath.c_str(),
-   0,                // no access to the drive
-   FILE_SHARE_READ | // share mode
-   FILE_SHARE_WRITE,
-   NULL,             // default security attributes
-   OPEN_EXISTING,    // disposition
-   0,                // file attributes
-   NULL);            // do not copy file attributes
-
-  if(deviceHandle == INVALID_HANDLE_VALUE)
-    return false;
-
-  // setup query
-  STORAGE_PROPERTY_QUERY query = {};
-  query.PropertyId = StorageDeviceProperty;
-  query.QueryType = PropertyStandardQuery;
-
-  // issue query
-  DWORD bytes;
-  STORAGE_DEVICE_DESCRIPTOR devd;
-  STORAGE_BUS_TYPE busType = BusTypeUnknown;
-
-  if (DeviceIoControl(deviceHandle,
-   IOCTL_STORAGE_QUERY_PROPERTY,
-   &query, sizeof(query),
-   &devd, sizeof(devd),
-   &bytes, NULL))
-  {
-   busType = devd.BusType;
-  }
-
-  CloseHandle(deviceHandle);
-
-  return BusTypeUsb == busType;
-#endif
 }
 
 std::string CWIN32Util::WUSysMsg(DWORD dwError)

@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2005-2018 Team Kodi
+ *  Copyright (C) 2005-2022 Team Kodi
  *  This file is part of Kodi - https://kodi.tv
  *
  *  SPDX-License-Identifier: GPL-2.0-or-later
@@ -13,6 +13,7 @@
 #include "DVDDemuxers/DVDDemux.h"
 #include "DVDInputStream.h"
 #include "DVDInputStreamFile.h"
+#include "DVDStateSerializer.h"
 #include "DllDvdNav.h"
 #include "utils/Geometry.h"
 
@@ -123,11 +124,25 @@ protected:
 
   int ProcessBlock(uint8_t* buffer, int* read);
 
+  /*! \brief Get the color and alpha of a given button
+   * \param button - the button id
+   * \param[in,out] alpha - the alpha of the button
+   * \param[in,out] color - the color of the button
+   * \return true if the operation (obtaining data) succeeded, false otherwise
+   */
+  bool GetButtonColorAndAlpha(int button, int alpha[2][4], int color[2][4]);
+
   static void SetAudioStreamName(AudioStreamInfo &info, const audio_attr_t &audio_attributes);
   static void SetSubtitleStreamName(SubtitleStreamInfo &info, const subp_attr_t &subp_attributes);
 
   int GetAngleCount();
   void GetVideoResolution(uint32_t * width, uint32_t * height);
+
+  /*! \brief Provided a pod DVDState struct, fill it with the current dvdnav state
+  * \param[in,out] dvdstate the DVD state struct to be filled
+  * \return true if it was possible to fill the state struct based on the current dvdnav state, false otherwise
+  */
+  bool FillDVDState(DVDState& dvdstate);
 
   DllDvdNav m_dll;
   bool m_bCheckButtons;
@@ -161,5 +176,8 @@ protected:
   int m_lastevent;
 
   std::map<int, std::map<int, int64_t>> m_mapTitleChapters;
+
+  /*! DVD state serializer handler */
+  CDVDStateSerializer m_dvdStateSerializer;
 };
 

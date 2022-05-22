@@ -65,8 +65,6 @@ public:
   static constexpr auto SETTING_SCREENSAVER_TIME = "screensaver.time";
   static constexpr auto SETTING_SCREENSAVER_USEMUSICVISINSTEAD = "screensaver.usemusicvisinstead";
   static constexpr auto SETTING_SCREENSAVER_USEDIMONPAUSE = "screensaver.usedimonpause";
-  static constexpr auto SETTING_OSD_AUTOCLOSEVIDEOOSD = "osd.autoclosevideoosd";
-  static constexpr auto SETTING_OSD_AUTOCLOSEVIDEOOSDTIME = "osd.autoclosevideoosdtime";
   static constexpr auto SETTING_WINDOW_WIDTH = "window.width";
   static constexpr auto SETTING_WINDOW_HEIGHT = "window.height";
   static constexpr auto SETTING_VIDEOLIBRARY_SHOWUNWATCHEDPLOTS = "videolibrary.showunwatchedplots";
@@ -157,6 +155,7 @@ public:
   static constexpr auto SETTING_SUBTITLES_SHADOWSIZE = "subtitles.shadowsize";
   static constexpr auto SETTING_SUBTITLES_BGCOLOR = "subtitles.bgcolorpick";
   static constexpr auto SETTING_SUBTITLES_BGOPACITY = "subtitles.bgopacity";
+  static constexpr auto SETTING_SUBTITLES_MARGINVERTICAL = "subtitles.marginvertical";
   static constexpr auto SETTING_SUBTITLES_CHARSET = "subtitles.charset";
   static constexpr auto SETTING_SUBTITLES_OVERRIDEFONTS = "subtitles.overridefonts";
   static constexpr auto SETTING_SUBTITLES_OVERRIDESTYLES = "subtitles.overridestyles";
@@ -377,6 +376,7 @@ public:
   static constexpr auto SETTING_AUDIOOUTPUT_STREAMSILENCE = "audiooutput.streamsilence";
   static constexpr auto SETTING_AUDIOOUTPUT_STREAMNOISE = "audiooutput.streamnoise";
   static constexpr auto SETTING_AUDIOOUTPUT_GUISOUNDMODE = "audiooutput.guisoundmode";
+  static constexpr auto SETTING_AUDIOOUTPUT_GUISOUNDVOLUME = "audiooutput.guisoundvolume";
   static constexpr auto SETTING_AUDIOOUTPUT_PASSTHROUGH = "audiooutput.passthrough";
   static constexpr auto SETTING_AUDIOOUTPUT_PASSTHROUGHDEVICE = "audiooutput.passthroughdevice";
   static constexpr auto SETTING_AUDIOOUTPUT_AC3PASSTHROUGH = "audiooutput.ac3passthrough";

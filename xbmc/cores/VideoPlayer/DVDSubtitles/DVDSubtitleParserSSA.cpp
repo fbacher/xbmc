@@ -9,7 +9,11 @@
 #include "DVDSubtitleParserSSA.h"
 
 #include "DVDCodecs/Overlay/DVDOverlaySSA.h"
+#include "ServiceBroker.h"
 #include "cores/VideoPlayer/Interface/TimingConstants.h"
+#include "settings/SubtitlesSettings.h"
+
+using namespace KODI;
 
 CDVDSubtitleParserSSA::CDVDSubtitleParserSSA(std::unique_ptr<CDVDSubtitleStream>&& pStream,
                                              const std::string& strFile)
@@ -37,6 +41,9 @@ bool CDVDSubtitleParserSSA::Open(CDVDStreamInfo& hints)
   CDVDOverlaySSA* overlay = new CDVDOverlaySSA(m_libass);
   overlay->iPTSStartTime = 0.0;
   overlay->iPTSStopTime = DVD_NOPTS_VALUE;
+  auto overrideStyles{SUBTITLES::CSubtitlesSettings::GetInstance().GetOverrideStyles()};
+  overlay->SetForcedMargins(overrideStyles != SUBTITLES::OverrideStyles::STYLES_POSITIONS &&
+                            overrideStyles != SUBTITLES::OverrideStyles::POSITIONS);
   m_collection.Add(overlay);
 
   return true;

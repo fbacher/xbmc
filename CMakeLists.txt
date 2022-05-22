@@ -39,7 +39,7 @@ include(cmake/scripts/common/ArchSetup.cmake)
 include(cmake/scripts/common/Macros.cmake)
 include(cmake/scripts/common/ProjectMacros.cmake)
 core_find_versions()
-include(cmake/scripts/${CORE_SYSTEM_NAME}/PathSetup.cmake)
+include(cmake/scripts/common/PathSetup.cmake)
 include(cmake/scripts/common/CompilerSettings.cmake)
 include(ExternalProject)
 
@@ -392,7 +392,7 @@ else()
 endif()
 
 # testing
-if(CORE_HOST_IS_TARGET AND ENABLE_TESTING)
+if(HOST_CAN_EXECUTE_TARGET AND ENABLE_TESTING)
   find_package(Gtest)
 
   copy_files_from_filelist_to_buildtree(${CMAKE_SOURCE_DIR}/cmake/installdata/test-reference-data.txt NO_INSTALL)

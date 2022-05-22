@@ -467,6 +467,13 @@ std::vector<AVPixelFormat> CProcessInfo::GetRenderFormats()
 //******************************************************************************
 // player states
 //******************************************************************************
+void CProcessInfo::SeekFinished(int64_t offset)
+{
+  std::unique_lock<CCriticalSection> lock(m_stateSection);
+  if (m_dataCache)
+    m_dataCache->SeekFinished(offset);
+}
+
 void CProcessInfo::SetStateSeeking(bool active)
 {
   std::unique_lock<CCriticalSection> lock(m_renderSection);
@@ -669,7 +676,7 @@ CVideoSettings CProcessInfo::GetVideoSettings()
   return m_videoSettings;
 }
 
-CVideoSettingsLocked& CProcessInfo::UpdateVideoSettings()
+CVideoSettingsLocked& CProcessInfo::GetVideoSettingsLocked()
 {
   std::unique_lock<CCriticalSection> lock(m_settingsSection);
   return *m_videoSettingsLocked;

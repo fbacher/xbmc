@@ -44,7 +44,7 @@ public:
   static size_t GetSystemMemorySize();
 
   static std::string GetSystemPath();
-  static std::string GetProfilePath();
+  static std::string GetProfilePath(const bool platformDirectories);
   static std::string UncToSmb(const std::string &strPath);
   static std::string SmbToUnc(const std::string &strPath);
   static bool AddExtraLongPathPrefix(std::wstring& path);
@@ -71,8 +71,6 @@ public:
   static bool GetFocussedProcess(std::string &strProcessFile);
 #endif // TARGET_WINDOWS_DESKTOP
   static void CropSource(CRect& src, CRect& dst, CRect target, UINT rotation = 0);
-
-  static bool IsUsbDevice(const std::wstring &strWdrive);
 
   static std::string WUSysMsg(DWORD dwError);
   static bool SetThreadLocalLocale(bool enable = true);

@@ -24,7 +24,6 @@
 #define CACHE_BUFFER_MODE_NONE 3
 #define CACHE_BUFFER_MODE_NETWORK 4
 
-class CAppParamParser;
 class CProfileManager;
 class CSettingsManager;
 class CVariant;
@@ -115,7 +114,7 @@ class CAdvancedSettings : public ISettingCallback, public ISettingsHandler
 
     void OnSettingChanged(const std::shared_ptr<const CSetting>& setting) override;
 
-    void Initialize(const CAppParamParser &params, CSettingsManager& settingsMgr);
+    void Initialize(CSettingsManager& settingsMgr);
     void Uninitialize(CSettingsManager& settingsMgr);
     bool Initialized() const { return m_initialized; }
     void AddSettingsFile(const std::string &filename);
@@ -375,11 +374,6 @@ class CAdvancedSettings : public ISettingCallback, public ISettingsHandler
     std::string m_stereoscopicregex_3d;
     std::string m_stereoscopicregex_sbs;
     std::string m_stereoscopicregex_tab;
-
-    /*! \brief Change the default vertical margin of the subtitle,
-        in order to be applied to applied to all types of subtitle position.
-    */
-    int m_videoSubtitleVerticalMargin;
 
     bool m_openGlDebugging;
 

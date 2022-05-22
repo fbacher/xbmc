@@ -8,8 +8,9 @@
 
 #import "IOSEAGLView.h"
 
+#include "AppEnvironment.h"
 #include "AppInboundProtocol.h"
-#include "AppParamParser.h"
+#include "AppParams.h"
 #include "Application.h"
 #import "IOSScreenManager.h"
 #include "ServiceBroker.h"
@@ -337,13 +338,6 @@
     NSConditionLock* myLock = arg;
     [myLock lock];
 
-    CAppParamParser appParamParser;
-#ifdef _DEBUG
-    appParamParser.SetLogLevel(LOG_LEVEL_DEBUG);
-#else
-    appParamParser.SetLogLevel(LOG_LEVEL_NORMAL);
-#endif
-
     // Prevent child processes from becoming zombies on exit if not waited upon. See also Util::Command
     struct sigaction sa;
     memset(&sa, 0, sizeof(sa));
@@ -353,7 +347,15 @@
 
     setlocale(LC_NUMERIC, "C");
 
-    if (!g_application.Create(appParamParser))
+    const auto params = std::make_shared<CAppParams>();
+#ifdef _DEBUG
+    params->SetLogLevel(LOG_LEVEL_DEBUG);
+#else
+    params->SetLogLevel(LOG_LEVEL_NORMAL);
+#endif
+    CAppEnvironment::SetUp(params);
+
+    if (!g_application.Create())
     {
       readyToRun = false;
       ELOG(@"%sUnable to create application", __PRETTY_FUNCTION__);
@@ -383,7 +385,7 @@
       {
         @autoreleasepool
         {
-          g_application.Run(CAppParamParser());
+          g_application.Run();
         }
       }
       catch (...)
@@ -391,6 +393,8 @@
         ELOG(@"%sException caught on main loop. Exiting", __PRETTY_FUNCTION__);
       }
     }
+
+    CAppEnvironment::TearDown();
 
     // signal we are dead
     [myLock unlockWithCondition:TRUE];

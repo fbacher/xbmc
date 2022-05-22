@@ -8,7 +8,8 @@
 
 #import "platform/darwin/tvos/XBMCController.h"
 
-#include "AppParamParser.h"
+#include "AppEnvironment.h"
+#include "AppParams.h"
 #include "Application.h"
 #include "CompileInfo.h"
 #include "FileItem.h"
@@ -380,8 +381,9 @@ int KODI_Run(bool renderGUI)
 {
   int status = -1;
 
-  CAppParamParser appParamParser; //! @todo : proper params
-  if (!g_application.Create(appParamParser))
+  CAppEnvironment::SetUp(std::make_shared<CAppParams>()); //! @todo : proper params
+
+  if (!g_application.Create())
   {
     CLog::Log(LOGERROR, "ERROR: Unable to create application. Exiting");
     return status;
@@ -422,13 +424,15 @@ int KODI_Run(bool renderGUI)
 
   try
   {
-    status = g_application.Run(appParamParser);
+    status = g_application.Run();
   }
   catch (...)
   {
     CLog::Log(LOGERROR, "ERROR: Exception caught on main loop. Exiting");
     status = -1;
   }
+
+  CAppEnvironment::TearDown();
 
   return status;
 }

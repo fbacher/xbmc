@@ -16,6 +16,8 @@
 
 #include <vector>
 
+using namespace KODI;
+
 CSubtitleParserWebVTT::CSubtitleParserWebVTT(std::unique_ptr<CDVDSubtitleStream>&& pStream,
                                              const std::string& strFile)
   : CDVDSubtitleParserText(std::move(pStream), strFile, "WebVTT Subtitle Parser")
@@ -60,7 +62,7 @@ bool CSubtitleParserWebVTT::Open(CDVDStreamInfo& hints)
   // Send decoded lines to the renderer
   for (auto& subData : subtitleList)
   {
-    KODI::SUBTITLES::subtitleOpts opts;
+    SUBTITLES::STYLE::subtitleOpts opts;
     opts.useMargins = subData.useMargins;
     opts.marginLeft = subData.marginLeft;
     opts.marginRight = subData.marginRight;
@@ -70,7 +72,7 @@ bool CSubtitleParserWebVTT::Open(CDVDStreamInfo& hints)
   }
 
   CDVDOverlay* overlay = CreateOverlay();
-  overlay->SetForcedMargins(true);
+  overlay->SetForcedMargins(m_webvttHandler.IsForcedMargins());
   m_collection.Add(overlay);
 
   return true;

@@ -29,6 +29,8 @@
 #include "utils/log.h"
 
 #include <algorithm>
+#include <array>
+#include <charconv>
 #include <cmath>
 #include <functional>
 #include <iterator>
@@ -130,6 +132,52 @@ typedef struct
 ///
 /// -----------------------------------------------------------------------------
 
+/// \page modules__infolabels_boolean_conditions
+/// \subsection modules__infolabels_boolean_conditions_Addon Addon
+/// \table_start
+///   \table_h3{ Labels, Type, Description }
+///   \table_row3{   <b>`Addon.SettingStr(addon_id\,setting_id)`</b>,
+///                  \anchor Addon_SettingString
+///                  _string_,
+///     @return The string value of the setting `setting_id` belonging to the addon with the id `addon_id`.
+///     @param addon_id - the id of the addon
+///     @param setting_id - the addon setting
+///     <p><hr>
+///     @skinning_v20 **[New Infolabel]** \link Addon_SettingString `Addon.SettingStr(addon_id\,setting_id)`\endlink
+///     <p>
+///   }
+///   \table_row3{   <b>`Addon.SettingBool(addon_id\,setting_id)`</b>,
+///                  \anchor Addon_SettingBool
+///                  _boolean_,
+///     @return **True** if the setting `setting_id` belonging to the addon with the id `addon_id` is **True**\, **False** otherwise.
+///     @note The provided setting with `setting_id` must be a boolean setting type. Otherwise it will return the boolean info
+///     default value (which is **False**).
+///     @param addon_id - the id of the addon
+///     @param setting_id - the addon setting
+///     <p><hr>
+///     @skinning_v20 **[New Boolean Condition]** \link Addon_SettingBool `Addon.SettingBool(addon_id\,setting_id)`\endlink
+///     <p>
+///   }
+///   \table_row3{   <b>`Addon.SettingInt(addon_id\,setting_id)`</b>,
+///                  \anchor Addon_SettingInt
+///                  _integer_,
+///     @return The integer value of the setting `setting_id` belong to the addon with the id `addon_id`.
+///     @note The provided setting with `setting_id` must be an integer setting type. Otherwise it will return the integer info
+///     default value (which is 0).
+///     @param addon_id - the id of the addon
+///     @param setting_id - the addon setting
+///     <p><hr>
+///     @skinning_v20 **[New Integer Info]** \link Addon_SettingInt `Addon.SettingInt(addon_id\,setting_id)`\endlink
+///     <p>
+///   }
+/// \table_end
+///
+/// -----------------------------------------------------------------------------
+const infomap addons[] = {
+    {"settingstr", ADDON_SETTING_STRING},
+    {"settingbool", ADDON_SETTING_BOOL},
+    {"settingint", ADDON_SETTING_INT},
+};
 
 /// \page modules__infolabels_boolean_conditions
 /// \subsection modules__infolabels_boolean_conditions_String String
@@ -215,20 +263,33 @@ const infomap string_bools[] =   {{ "isempty",          STRING_IS_EMPTY },
                                   { "endswith",         STRING_ENDS_WITH },
                                   { "contains",         STRING_CONTAINS }};
 
-
 /// \page modules__infolabels_boolean_conditions
 /// \subsection modules__infolabels_boolean_conditions_Integer Integer
 /// \table_start
 ///   \table_h3{ Labels, Type, Description }
+///   \table_row3{   <b>`Integer.ValueOf(number)`</b>,
+///                  \anchor Integer_ValueOf
+///                  _integer_,
+///     @return An integer info label that represents the provided number
+///     @param number - the number to compute
+///     @note **Example:** `Integer.ValueOf(4)` will be evaluated to 4.
+///     @note Will return -1 if not able to convert the provided value to an integer. **Example**: `Integer.ValueOf(some string)` will evaluate to -1
+///     as the provided argument is not an integer.
+///     <p><hr>
+///     @skinning_v20 **[New InfoLabel]** \link Integer_ValueOf `Integer.ValueOf(number)`\endlink
+///     <p>
+///   }
 ///   \table_row3{   <b>`Integer.IsEqual(info\,number)`</b>,
 ///                  \anchor Integer_IsEqual
 ///                  _boolean_,
 ///     @return **True** if the value of the infolabel is equal to the supplied number.
 ///     @param info - infolabel
-///     @param number - number to compare
+///     @param number - number or integer infolabel to compare
 ///     @note **Example:** `Integer.IsEqual(ListItem.Year\,2000)`
 ///     <p><hr>
 ///     @skinning_v17 **[New Boolean Condition]** \link Integer_IsEqual `Integer.IsEqual(info\,number)`\endlink
+///     @skinning_v20 \link Integer_IsEqual `Integer.IsEqual(info\,number)`\endlink now supports comparisons against other integer infos
+///     and not just fixed number values.
 ///     <p>
 ///   }
 ///   \table_row3{   <b>`Integer.IsGreater(info\,number)`</b>,
@@ -236,10 +297,12 @@ const infomap string_bools[] =   {{ "isempty",          STRING_IS_EMPTY },
 ///                  _boolean_,
 ///     @return **True** if the value of the infolabel is greater than to the supplied number.
 ///     @param info - infolabel
-///     @param number - number to compare
+///     @param number - number or integer infolabel to compare
 ///     @note **Example:** `Integer.IsGreater(ListItem.Year\,2000)`
 ///     <p><hr>
 ///     @skinning_v17 **[New Boolean Condition]** \link Integer_IsGreater `Integer.IsGreater(info\,number)`\endlink
+///     @skinning_v20 \link Integer_IsGreater `Integer.IsGreater(info\,number)`\endlink now supports comparisons against other integer infos
+///     and not just fixed number values.
 ///     <p>
 ///   }
 ///   \table_row3{   <b>`Integer.IsGreaterOrEqual(info\,number)`</b>,
@@ -247,10 +310,13 @@ const infomap string_bools[] =   {{ "isempty",          STRING_IS_EMPTY },
 ///                  _boolean_,
 ///     @return **True** if the value of the infolabel is greater or equal to the supplied number.
 ///     @param info - infolabel
-///     @param number - number to compare
+///     @param number - number or integer infolabel to compare
 ///     @note **Example:** `Integer.IsGreaterOrEqual(ListItem.Year\,2000)`
+///     @note **Example2:** `Integer.IsGreaterOrEqual(Container(x).ListItem(1).Year\,Container(x).ListItem(2).Year)`
 ///     <p><hr>
 ///     @skinning_v17 **[New Boolean Condition]** \link Integer_IsGreaterOrEqual `Integer.IsGreaterOrEqual(info\,number)`\endlink
+///     @skinning_v20 \link Integer_IsGreaterOrEqual `Integer.IsGreaterOrEqual(info\,number)`\endlink now supports comparisons against other integer infos
+///     and not just fixed number values.
 ///     <p>
 ///   }
 ///   \table_row3{   <b>`Integer.IsLess(info\,number)`</b>,
@@ -258,10 +324,12 @@ const infomap string_bools[] =   {{ "isempty",          STRING_IS_EMPTY },
 ///                  _boolean_,
 ///     @return **True** if the value of the infolabel is less than the supplied number.
 ///     @param info - infolabel
-///     @param number - number to compare
+///     @param number - number or integer infolabel to compare
 ///     @note **Example:** `Integer.IsLess(ListItem.Year\,2000)`
 ///     <p><hr>
 ///     @skinning_v17 **[New Boolean Condition]** \link Integer_IsLess `Integer.IsLess(info\,number)`\endlink
+///     @skinning_v20 \link Integer_IsLess `Integer.IsLess(info\,number)`\endlink now supports comparisons against other integer infos
+///     and not just fixed number values.
 ///     <p>
 ///   }
 ///   \table_row3{   <b>`Integer.IsLessOrEqual(info\,number)`</b>,
@@ -269,10 +337,12 @@ const infomap string_bools[] =   {{ "isempty",          STRING_IS_EMPTY },
 ///                  _boolean_,
 ///     @return **True** if the value of the infolabel is less or equal to the supplied number.
 ///     @param info - infolabel
-///     @param number - number to compare
+///     @param number - number or integer infolabel to compare
 ///     @note **Example:** `Integer.IsLessOrEqual(ListItem.Year\,2000)`
 ///     <p><hr>
 ///     @skinning_v17 **[New Boolean Condition]** \link Integer_IsLessOrEqual `Integer.IsLessOrEqual(info\,number)`\endlink
+///     @skinning_v20 \link Integer_IsLessOrEqual `Integer.IsLessOrEqual(info\,number)`\endlink now supports comparisons against other integer infos
+///     and not just fixed number values.
 ///     <p>
 ///   }
 ///   \table_row3{   <b>`Integer.IsEven(info)`</b>,
@@ -298,7 +368,6 @@ const infomap string_bools[] =   {{ "isempty",          STRING_IS_EMPTY },
 /// \table_end
 ///
 /// -----------------------------------------------------------------------------
-
 
 const infomap integer_bools[] =  {{ "isequal",          INTEGER_IS_EQUAL },
                                   { "isgreater",        INTEGER_GREATER_THAN },
@@ -856,9 +925,18 @@ const infomap player_labels[] = {{"hasmedia", PLAYER_HAS_MEDIA},
 ///     while still making it clear they can have any value.
 ///     <p>
 ///   }
+///   \table_row3{   <b>`Player.HasPerformedSeek(interval)`</b>,
+///                  \anchor Player_HasPerformedSeek
+///                  _boolean_,
+///     @return **True** if the Player has performed a seek operation in the last provided second `interval`\, **False** otherwise.
+///     @param interval - the time interval (in seconds)
+///     <p><hr>
+///     @skinning_v20 **[New Boolean Condition]** \link Player_HasPerformedSeek `Player.HasPerformedSeek(interval)`\endlink
+///     <p>
+///   }
 
-
-const infomap player_param[] =   {{ "art",              PLAYER_ITEM_ART }};
+const infomap player_param[] = {{"art", PLAYER_ITEM_ART},
+                                {"hasperformedseek", PLAYER_HASPERFORMEDSEEK}};
 
 /// \page modules__infolabels_boolean_conditions
 ///   \table_row3{   <b>`Player.SeekTime`</b>,
@@ -3240,6 +3318,35 @@ const infomap musicplayer[] =    {{ "title",            MUSICPLAYER_TITLE },
 ///     @skinning_v19 **[New Infolabel]** \link VideoPlayer_Position_mpaa `VideoPlayer.position(number).mpaa`\endlink
 ///     <p>
 ///   }
+///   \table_row3{   <b>`VideoPlayer.Art(type)`</b>,
+///                  \anchor VideoPlayer_art
+///                  _string_,
+///     @return The art path for the requested arttype and for the currently playing video.
+///     @param type - can virtually be anything\, refers to the art type keyword in the art map (poster\, fanart\, banner\, thumb\, etc)
+///     <p><hr>
+///     @skinning_v20 **[New Infolabel]** \link VideoPlayer_art `VideoPlayer.Art(type)`\endlink
+///     <p>
+///   }
+///   \table_row3{   <b>`VideoPlayer.offset(number).Art(type)`</b>,
+///                  \anchor VideoPlayer_Offset_art
+///                  _string_,
+///     @return The art path for the requested arttype and for the video which has an offset `number` with respect to the currently playing video.
+///     @param number - the offset with respect to the start of the playlist
+///     @param type - can virtually be anything\, refers to the art type keyword in the art map (poster\, fanart\, banner\, thumb\, etc)
+///     <p><hr>
+///     @skinning_v20 **[New Infolabel]** \link VideoPlayer_Offset_mpaa `VideoPlayer.offset(number).Art(type)`\endlink
+///     <p>
+///   }
+///   \table_row3{   <b>`VideoPlayer.position(number).Art(type)`</b>,
+///                  \anchor VideoPlayer_position_art
+///                  _string_,
+///     @return The art path for the requested arttype and for the video which has an offset `number` with respect to the start of the playlist.
+///     @param number - the offset with respect to the start of the playlist
+///     @param type - can virtually be anything\, refers to the art type keyword in the art map (poster\, fanart\, banner\, thumb\, etc)
+///     <p><hr>
+///     @skinning_v20 **[New Infolabel]** \link VideoPlayer_position_art `VideoPlayer.position(number).Art(type)`\endlink
+///     <p>
+///   }
 ///   \table_row3{   <b>`VideoPlayer.IMDBNumber`</b>,
 ///                  \anchor VideoPlayer_IMDBNumber
 ///                  _string_,
@@ -3776,10 +3883,12 @@ const infomap musicplayer[] =    {{ "title",            MUSICPLAYER_TITLE },
 ///     @return String containing the name of the detected HDR type or empty if not HDR. See \ref StreamHdrType for the list of possible values.
 ///     <p><hr>
 ///     @skinning_v20 **[New Infolabel]** \link VideoPlayer_HdrType `VideoPlayer.HdrType`\endlink
+///     <p>
 ///   }
 /// \table_end
 ///
 /// -----------------------------------------------------------------------------
+// clang-format off
 const infomap videoplayer[] =    {{ "title",            VIDEOPLAYER_TITLE },
                                   { "genre",            VIDEOPLAYER_GENRE },
                                   { "country",          VIDEOPLAYER_COUNTRY },
@@ -3851,7 +3960,9 @@ const infomap videoplayer[] =    {{ "title",            VIDEOPLAYER_TITLE },
                                   { "tvshowdbid",       VIDEOPLAYER_TVSHOWDBID },
                                   { "audiostreamcount", VIDEOPLAYER_AUDIOSTREAMCOUNT },
                                   { "hdrtype",          VIDEOPLAYER_HDR_TYPE },
+                                  { "art",              VIDEOPLAYER_ART},
 };
+// clang-format on
 
 /// \page modules__infolabels_boolean_conditions
 /// \subsection modules__infolabels_boolean_conditions_RetroPlayer RetroPlayer
@@ -7034,6 +7145,39 @@ const infomap fanart_labels[] =  {{ "color1",           FANART_COLOR1 },
 /// \subsection modules__infolabels_boolean_conditions_Skin Skin
 /// \table_start
 ///   \table_h3{ Labels, Type, Description }
+///   \table_row3{   <b>`Skin.HasSetting(setting)`</b>,
+///                  \anchor Skin_HasSetting
+///                  _boolean_,
+///     @param setting - the requested skin setting
+///     @return **True** if the requested skin setting is true\, false otherwise.
+///     @sa \link Skin_SetBool `Skin.SetBool(setting[\,value])`
+///     <p>
+///   }
+///   \table_row3{   <b>`Skin.String(setting)`</b>,
+///                  \anchor Skin_StringValue
+///                  _string_,
+///     @param setting - the requested skin setting
+///     @return The value of the requested string setting (as a string)
+///     @sa \link Skin_SetString `Skin.SetString(setting[\,value])`\endlink
+///     <p>
+///   }
+///   \table_row3{   <b>`Skin.String(setting[\,value])`</b>,
+///                  \anchor Skin_StringCompare
+///                  _boolean_,
+///     @param setting - the requested skin setting
+///     @param value [opt] - the string value to compare the requested setting to
+///     @return **True** if the setting value equals the provided value\, false otherwise.
+///     @sa \link Skin_SetString `Skin.SetString(setting[\,value])`\endlink
+///     <p>
+///   }
+///   \table_row3{   <b>`Skin.HasTheme(theme)`</b>,
+///                  \anchor Skin_HasTheme
+///                  _boolean_,
+///     @param theme - the requested skin theme
+///     @return **True** if the requested theme is enabled\, false otherwise.
+///     @sa \link Skin_CycleTheme `Skin.Theme()`\endlink and \link Skin_CurrentTheme `Skin.CurrentTheme`\endlink.
+///     <p>
+///   }
 ///   \table_row3{   <b>`Skin.CurrentTheme`</b>,
 ///                  \anchor Skin_CurrentTheme
 ///                  _string_,
@@ -7058,6 +7202,15 @@ const infomap fanart_labels[] =  {{ "color1",           FANART_COLOR1 },
 ///     @return the current fontset from `Font.xml`.
 ///     <p><hr>
 ///     @skinning_v18 **[New Infolabel]** \link Skin_Font `Skin.Font`\endlink
+///     <p>
+///   }
+///   \table_row3{   <b>`Skin.Numeric(settingid)`</b>,
+///                  \anchor Skin_Numeric
+///                  _integer_,
+///     @return return the setting value as an integer/numeric value.
+///     @sa \link Skin_SetNumeric `Skin.SetNumeric(settingid)`\endlink
+///     <p><hr>
+///     @skinning_v20 **[New Infolabel]** \link Skin_Numeric `Skin.Numeric(settingid)`\endlink
 ///     <p>
 ///   }
 /// \table_end
@@ -9734,7 +9887,7 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
           {
             int data1 = TranslateSingleString(prop.param(0), listItemDependent);
             // pipe our original string through the localize parsing then make it lowercase (picks up $LBRACKET etc.)
-            std::string label = CGUIInfoLabel::GetLabel(prop.param(1));
+            std::string label = CGUIInfoLabel::GetLabel(prop.param(1), INFO::DEFAULT_CONTEXT);
             StringUtils::ToLower(label);
             // 'true', 'false', 'yes', 'no' are valid strings, do not resolve them to SYSTEM_ALWAYS_TRUE or SYSTEM_ALWAYS_FALSE
             if (label != "true" && label != "false" && label != "yes" && label != "no")
@@ -9750,13 +9903,34 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
     }
     if (cat.name == "integer")
     {
+      if (prop.name == "valueof")
+      {
+        int value = -1;
+        std::from_chars(prop.param(0).data(), prop.param(0).data() + prop.param(0).size(), value);
+        return AddMultiInfo(CGUIInfo(INTEGER_VALUEOF, value));
+      }
+
       for (const infomap& integer_bool : integer_bools)
       {
         if (prop.name == integer_bool.str)
         {
-          int data1 = TranslateSingleString(prop.param(0), listItemDependent);
-          int data2 = atoi(prop.param(1).c_str());
-          return AddMultiInfo(CGUIInfo(integer_bool.val, data1, data2));
+          std::array<int, 2> data = {-1, -1};
+          for (size_t i = 0; i < data.size(); i++)
+          {
+            std::from_chars_result result = std::from_chars(
+                prop.param(i).data(), prop.param(i).data() + prop.param(i).size(), data.at(i));
+            if (result.ec == std::errc::invalid_argument)
+            {
+              // could not translate provided value to int, translate the info string
+              data.at(i) = TranslateSingleString(prop.param(i), listItemDependent);
+            }
+            else
+            {
+              // conversion succeeded, integer value provided - translate it to an Integer.ValueOf() info.
+              data.at(i) = AddMultiInfo(CGUIInfo(INTEGER_VALUEOF, data.at(i)));
+            }
+          }
+          return AddMultiInfo(CGUIInfo(integer_bool.val, data.at(0), data.at(1)));
         }
       }
     }
@@ -9787,6 +9961,14 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
           if (prop.name == i.str)
             return AddMultiInfo(CGUIInfo(i.val, prop.param()));
         }
+      }
+    }
+    else if (cat.name == "addon")
+    {
+      for (const infomap& i : addons)
+      {
+        if (prop.name == i.str && prop.num_params() == 2)
+          return AddMultiInfo(CGUIInfo(i.val, prop.param(0), prop.param(1)));
       }
     }
     else if (cat.name == "weather")
@@ -9853,7 +10035,7 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
           int infoLabel = TranslateSingleString(param, listItemDependent);
           if (infoLabel > 0)
             return AddMultiInfo(CGUIInfo(SYSTEM_ADDON_TITLE, infoLabel, 0));
-          std::string label = CGUIInfoLabel::GetLabel(param);
+          std::string label = CGUIInfoLabel::GetLabel(param, INFO::DEFAULT_CONTEXT);
           StringUtils::ToLower(label);
           return AddMultiInfo(CGUIInfo(SYSTEM_ADDON_TITLE, label, 1));
         }
@@ -9862,7 +10044,7 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
           int infoLabel = TranslateSingleString(param, listItemDependent);
           if (infoLabel > 0)
             return AddMultiInfo(CGUIInfo(SYSTEM_ADDON_ICON, infoLabel, 0));
-          std::string label = CGUIInfoLabel::GetLabel(param);
+          std::string label = CGUIInfoLabel::GetLabel(param, INFO::DEFAULT_CONTEXT);
           StringUtils::ToLower(label);
           return AddMultiInfo(CGUIInfo(SYSTEM_ADDON_ICON, label, 1));
         }
@@ -9871,7 +10053,7 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
           int infoLabel = TranslateSingleString(param, listItemDependent);
           if (infoLabel > 0)
             return AddMultiInfo(CGUIInfo(SYSTEM_ADDON_VERSION, infoLabel, 0));
-          std::string label = CGUIInfoLabel::GetLabel(param);
+          std::string label = CGUIInfoLabel::GetLabel(param, INFO::DEFAULT_CONTEXT);
           StringUtils::ToLower(label);
           return AddMultiInfo(CGUIInfo(SYSTEM_ADDON_VERSION, label, 1));
         }
@@ -9985,6 +10167,10 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
       {
         return AddMultiInfo(CGUIInfo(VIDEOPLAYER_UNIQUEID, prop.param(), 0));
       }
+      if (prop.name == "art" && prop.num_params() > 0)
+      {
+        return AddMultiInfo(CGUIInfo(VIDEOPLAYER_ART, prop.param(), 0));
+      }
       return TranslateVideoPlayerString(prop.name);
     }
     else if (cat.name == "retroplayer")
@@ -10078,7 +10264,12 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
           else
             return AddMultiInfo(CGUIInfo(SKIN_STRING, CSkinSettings::GetInstance().TranslateString(prop.param(0))));
         }
-        if (prop.name == "hassetting")
+        else if (prop.name == "numeric")
+        {
+          return AddMultiInfo(
+              CGUIInfo(SKIN_INTEGER, CSkinSettings::GetInstance().TranslateString(prop.param(0))));
+        }
+        else if (prop.name == "hassetting")
           return AddMultiInfo(CGUIInfo(SKIN_BOOL, CSkinSettings::GetInstance().TranslateBool(prop.param(0))));
         else if (prop.name == "hastheme")
           return AddMultiInfo(CGUIInfo(SKIN_HAS_THEME, prop.param(0)));
@@ -10218,13 +10409,18 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
       {
         int position = atoi(info[1].param().c_str());
         int value = TranslateVideoPlayerString(info[2].name); // videoplayer.position(foo).bar
-        return AddMultiInfo(CGUIInfo(value, 2, position)); // 2 => absolute (0 used for not set)
+        // additional param for the requested infolabel, e.g. VideoPlayer.Position(1).Art(poster): art is the value, poster is the param
+        const std::string& param = info[2].param();
+        return AddMultiInfo(
+            CGUIInfo(value, 2, position, param)); // 2 => absolute (0 used for not set)
       }
       else if (info[1].name == "offset")
       {
         int position = atoi(info[1].param().c_str());
         int value = TranslateVideoPlayerString(info[2].name); // videoplayer.offset(foo).bar
-        return AddMultiInfo(CGUIInfo(value, 1, position)); // 1 => relative
+        // additional param for the requested infolabel, e.g. VideoPlayer.Offset(1).Art(poster): art is the value, poster is the param
+        const std::string& param = info[2].param();
+        return AddMultiInfo(CGUIInfo(value, 1, position, param)); // 1 => relative
       }
     }
     else if (info[0].name == "player")
@@ -10409,7 +10605,7 @@ std::string CGUIInfoManager::GetLabel(int info, int contextWindow, std::string *
 {
   if (info >= CONDITIONAL_LABEL_START && info <= CONDITIONAL_LABEL_END)
   {
-    return GetSkinVariableString(info, false);
+    return GetSkinVariableString(info, contextWindow, false);
   }
   else if (info >= MULTI_INFO_START && info <= MULTI_INFO_END)
   {
@@ -10474,7 +10670,7 @@ bool CGUIInfoManager::EvaluateBool(const std::string &expression, int contextWin
 {
   INFO::InfoPtr info = Register(expression, contextWindow);
   if (info)
-    return info->Get(item.get());
+    return info->Get(contextWindow, item.get());
   return false;
 }
 
@@ -10501,7 +10697,7 @@ bool CGUIInfoManager::GetBool(int condition1, int contextWindow, const CGUIListI
   {
     // default: use integer value different from 0 as true
     int val;
-    bReturn = GetInt(val, condition) && val != 0;
+    bReturn = GetInt(val, condition, DEFAULT_CONTEXT) && val != 0;
   }
 
   return (condition1 < 0) ? !bReturn : bReturn;
@@ -10606,38 +10802,44 @@ bool CGUIInfoManager::GetMultiInfoBool(const CGUIInfo &info, int contextWindow, 
       case INTEGER_EVEN:
       case INTEGER_ODD:
         {
-          int integer = 0;
-          if (!GetInt(integer, info.GetData1(), contextWindow, item))
-          {
-            std::string value;
-            if (item && item->IsFileItem() && IsListItemInfo(info.GetData1()))
-              value = GetItemImage(item, contextWindow, info.GetData1());
-            else
-              value = GetImage(info.GetData1(), contextWindow);
+          auto getIntValue = [this, &item, &contextWindow](int infoNum) {
+            int intValue = 0;
+            if (!GetInt(intValue, infoNum, contextWindow, item))
+            {
+              std::string value;
+              if (item && item->IsFileItem() && IsListItemInfo(infoNum))
+                value = GetItemImage(item, contextWindow, infoNum);
+              else
+                value = GetImage(infoNum, contextWindow);
 
-            // Handle the case when a value contains time separator (:). This makes Integer.IsGreater
-            // useful for Player.Time* members without adding a separate set of members returning time in seconds
-            if (value.find_first_of( ':' ) != value.npos)
-              integer = StringUtils::TimeStringToSeconds(value);
-            else
-              integer = atoi(value.c_str());
-          }
+              // Handle the case when a value contains time separator (:). This makes Integer.IsGreater
+              // useful for Player.Time* members without adding a separate set of members returning time in seconds
+              if (value.find_first_of(':') != value.npos)
+                intValue = StringUtils::TimeStringToSeconds(value);
+              else
+                std::from_chars(value.data(), value.data() + value.size(), intValue);
+            }
+            return intValue;
+          };
+
+          int leftIntValue = getIntValue(info.GetData1());
+          int rightIntValue = getIntValue(info.GetData2());
 
           // compare
           if (condition == INTEGER_IS_EQUAL)
-            bReturn = integer == info.GetData2();
+            bReturn = leftIntValue == rightIntValue;
           else if (condition == INTEGER_GREATER_THAN)
-            bReturn = integer > info.GetData2();
+            bReturn = leftIntValue > rightIntValue;
           else if (condition == INTEGER_GREATER_OR_EQUAL)
-            bReturn = integer >= info.GetData2();
+            bReturn = leftIntValue >= rightIntValue;
           else if (condition == INTEGER_LESS_THAN)
-            bReturn = integer < info.GetData2();
+            bReturn = leftIntValue < rightIntValue;
           else if (condition == INTEGER_LESS_OR_EQUAL)
-            bReturn = integer <= info.GetData2();
+            bReturn = leftIntValue <= rightIntValue;
           else if (condition == INTEGER_EVEN)
-            bReturn = integer % 2 == 0;
+            bReturn = leftIntValue % 2 == 0;
           else if (condition == INTEGER_ODD)
-            bReturn = integer % 2 != 0;
+            bReturn = leftIntValue % 2 != 0;
         }
         break;
     }
@@ -10647,7 +10849,12 @@ bool CGUIInfoManager::GetMultiInfoBool(const CGUIInfo &info, int contextWindow, 
 
 bool CGUIInfoManager::GetMultiInfoInt(int &value, const CGUIInfo &info, int contextWindow, const CGUIListItem *item) const
 {
-  if (info.m_info >= LISTITEM_START && info.m_info <= LISTITEM_END)
+  if (info.m_info == INTEGER_VALUEOF)
+  {
+    value = info.GetData1();
+    return true;
+  }
+  else if (info.m_info >= LISTITEM_START && info.m_info <= LISTITEM_END)
   {
     CGUIListItemPtr itemPtr;
     if (!item)
@@ -10717,7 +10924,7 @@ std::string CGUIInfoManager::GetImage(int info, int contextWindow, std::string *
 {
   if (info >= CONDITIONAL_LABEL_START && info <= CONDITIONAL_LABEL_END)
   {
-    return GetSkinVariableString(info, true);
+    return GetSkinVariableString(info, contextWindow, true);
   }
   else if (info >= MULTI_INFO_START && info <= MULTI_INFO_END)
   {
@@ -10872,7 +11079,7 @@ std::string CGUIInfoManager::GetMultiInfoItemLabel(const CFileItem *item, int co
 
   if (info.m_info >= CONDITIONAL_LABEL_START && info.m_info <= CONDITIONAL_LABEL_END)
   {
-    return GetSkinVariableString(info.m_info, false, item);
+    return GetSkinVariableString(info.m_info, contextWindow, false, item);
   }
   else if (info.m_info >= MULTI_INFO_START && info.m_info <= MULTI_INFO_END)
   {
@@ -10996,7 +11203,7 @@ std::string CGUIInfoManager::GetMultiInfoItemImage(const CFileItem *item, int co
 {
   if (info.m_info >= CONDITIONAL_LABEL_START && info.m_info <= CONDITIONAL_LABEL_END)
   {
-    return GetSkinVariableString(info.m_info, true, item);
+    return GetSkinVariableString(info.m_info, contextWindow, true, item);
   }
   else if (info.m_info >= MULTI_INFO_START && info.m_info <= MULTI_INFO_END)
   {
@@ -11093,12 +11300,13 @@ int CGUIInfoManager::TranslateSkinVariableString(const std::string& name, int co
 }
 
 std::string CGUIInfoManager::GetSkinVariableString(int info,
+                                                   int contextWindow,
                                                    bool preferImage /*= false*/,
-                                                   const CGUIListItem *item /*= nullptr*/) const
+                                                   const CGUIListItem* item /*= nullptr*/) const
 {
   info -= CONDITIONAL_LABEL_START;
   if (info >= 0 && info < static_cast<int>(m_skinVariableStrings.size()))
-    return m_skinVariableStrings[info].GetValue(preferImage, item);
+    return m_skinVariableStrings[info].GetValue(contextWindow, preferImage, item);
 
   return "";
 }
@@ -11107,7 +11315,7 @@ bool CGUIInfoManager::ConditionsChangedValues(const std::map<INFO::InfoPtr, bool
 {
   for (std::map<INFO::InfoPtr, bool>::const_iterator it = map.begin() ; it != map.end() ; ++it)
   {
-    if (it->first->Get() != it->second)
+    if (it->first->Get(INFO::DEFAULT_CONTEXT) != it->second)
       return true;
   }
   return false;
@@ -11128,7 +11336,7 @@ void CGUIInfoManager::OnApplicationMessage(KODI::MESSAGING::ThreadMessage* pMsg)
     {
       auto infoLabels = static_cast<std::vector<std::string>*>(pMsg->lpVoid);
       for (auto& param : pMsg->params)
-        infoLabels->emplace_back(GetLabel(TranslateString(param)));
+        infoLabels->emplace_back(GetLabel(TranslateString(param), DEFAULT_CONTEXT));
     }
   }
   break;
@@ -11139,7 +11347,7 @@ void CGUIInfoManager::OnApplicationMessage(KODI::MESSAGING::ThreadMessage* pMsg)
     {
       auto infoLabels = static_cast<std::vector<bool>*>(pMsg->lpVoid);
       for (auto& param : pMsg->params)
-        infoLabels->push_back(EvaluateBool(param));
+        infoLabels->push_back(EvaluateBool(param, DEFAULT_CONTEXT));
     }
   }
   break;

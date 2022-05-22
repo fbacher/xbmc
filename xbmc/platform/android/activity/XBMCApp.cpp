@@ -9,7 +9,7 @@
 #include "XBMCApp.h"
 
 #include "AndroidKey.h"
-#include "AppParamParser.h"
+#include "AppParams.h"
 #include "Application.h"
 #include "CompileInfo.h"
 #include "guilib/GUIWindowManager.h"
@@ -107,6 +107,7 @@
 
 using namespace ANNOUNCEMENT;
 using namespace jni;
+using namespace KODI::GUILIB;
 using namespace std::chrono_literals;
 
 std::shared_ptr<CNativeWindow> CNativeWindow::CreateFromSurface(CJNISurfaceHolder holder)
@@ -243,7 +244,7 @@ void CXBMCApp::onStart()
     m_activityManager =
         std::make_unique<CJNIActivityManager>(getSystemService(CJNIContext::ACTIVITY_SERVICE));
     m_inputHandler.setDPI(GetDPI());
-    RegisterDisplayListener();
+    runNativeOnUiThread(RegisterDisplayListenerCallback, nullptr);
   }
 }
 
@@ -385,13 +386,13 @@ void CXBMCApp::onLostFocus()
   m_hasFocus = false;
 }
 
-void CXBMCApp::RegisterDisplayListener()
+void CXBMCApp::RegisterDisplayListenerCallback(void*)
 {
   CJNIDisplayManager displayManager(getSystemService("display"));
   if (displayManager)
   {
     android_printf("CXBMCApp: installing DisplayManager::DisplayListener");
-    displayManager.registerDisplayListener(m_displayListener.get_raw());
+    displayManager.registerDisplayListener(CXBMCApp::Get().getDisplayListener());
   }
 }
 
@@ -553,8 +554,7 @@ void CXBMCApp::run()
   m_firstrun = false;
   android_printf(" => running XBMC_Run...");
 
-  CAppParamParser appParamParser;
-  status = XBMC_Run(true, appParamParser);
+  status = XBMC_Run(true, std::make_shared<CAppParams>());
   android_printf(" => XBMC_Run finished with %d", status);
 }
 
@@ -587,10 +587,11 @@ bool CXBMCApp::SetBuffersGeometry(int width, int height, int format)
 #include "threads/Event.h"
 #include <time.h>
 
-void CXBMCApp::SetRefreshRateCallback(CVariant* rateVariant)
+void CXBMCApp::SetRefreshRateCallback(void* rateVariant)
 {
-  float rate = rateVariant->asFloat();
-  delete rateVariant;
+  CVariant* rateV = static_cast<CVariant*>(rateVariant);
+  float rate = rateV->asFloat();
+  delete rateV;
 
   CJNIWindow window = getWindow();
   if (window)
@@ -609,11 +610,12 @@ void CXBMCApp::SetRefreshRateCallback(CVariant* rateVariant)
   CXBMCApp::Get().m_displayChangeEvent.Set();
 }
 
-void CXBMCApp::SetDisplayModeCallback(CVariant* variant)
+void CXBMCApp::SetDisplayModeCallback(void* modeVariant)
 {
-  int mode = (*variant)["mode"].asInteger();
-  float rate = (*variant)["rate"].asFloat();
-  delete variant;
+  CVariant* modeV = static_cast<CVariant*>(modeVariant);
+  int mode = (*modeV)["mode"].asInteger();
+  float rate = (*modeV)["rate"].asFloat();
+  delete modeV;
 
   CJNIWindow window = getWindow();
   if (window)
@@ -730,29 +732,34 @@ void CXBMCApp::UpdateSessionMetadata()
   CGUIInfoManager& infoMgr = CServiceBroker::GetGUI()->GetInfoManager();
   CJNIMediaMetadataBuilder builder;
   builder
-      .putString(CJNIMediaMetadata::METADATA_KEY_DISPLAY_TITLE, infoMgr.GetLabel(PLAYER_TITLE))
-      .putString(CJNIMediaMetadata::METADATA_KEY_TITLE, infoMgr.GetLabel(PLAYER_TITLE))
-      .putLong(CJNIMediaMetadata::METADATA_KEY_DURATION, g_application.GetAppPlayer().GetTotalTime())
-//      .putString(CJNIMediaMetadata::METADATA_KEY_ART_URI, thumb)
-//      .putString(CJNIMediaMetadata::METADATA_KEY_DISPLAY_ICON_URI, thumb)
-//      .putString(CJNIMediaMetadata::METADATA_KEY_ALBUM_ART_URI, thumb)
+      .putString(CJNIMediaMetadata::METADATA_KEY_DISPLAY_TITLE,
+                 infoMgr.GetLabel(PLAYER_TITLE, INFO::DEFAULT_CONTEXT))
+      .putString(CJNIMediaMetadata::METADATA_KEY_TITLE,
+                 infoMgr.GetLabel(PLAYER_TITLE, INFO::DEFAULT_CONTEXT))
+      .putLong(CJNIMediaMetadata::METADATA_KEY_DURATION,
+               g_application.GetAppPlayer().GetTotalTime())
+      //      .putString(CJNIMediaMetadata::METADATA_KEY_ART_URI, thumb)
+      //      .putString(CJNIMediaMetadata::METADATA_KEY_DISPLAY_ICON_URI, thumb)
+      //      .putString(CJNIMediaMetadata::METADATA_KEY_ALBUM_ART_URI, thumb)
       ;
 
   std::string thumb;
   if (m_playback_state & PLAYBACK_STATE_VIDEO)
   {
     builder
-        .putString(CJNIMediaMetadata::METADATA_KEY_DISPLAY_SUBTITLE, infoMgr.GetLabel(VIDEOPLAYER_TAGLINE))
-        .putString(CJNIMediaMetadata::METADATA_KEY_ARTIST, infoMgr.GetLabel(VIDEOPLAYER_DIRECTOR))
-        ;
+        .putString(CJNIMediaMetadata::METADATA_KEY_DISPLAY_SUBTITLE,
+                   infoMgr.GetLabel(VIDEOPLAYER_TAGLINE, INFO::DEFAULT_CONTEXT))
+        .putString(CJNIMediaMetadata::METADATA_KEY_ARTIST,
+                   infoMgr.GetLabel(VIDEOPLAYER_DIRECTOR, INFO::DEFAULT_CONTEXT));
     thumb = infoMgr.GetImage(VIDEOPLAYER_COVER, -1);
   }
   else if (m_playback_state & PLAYBACK_STATE_AUDIO)
   {
     builder
-        .putString(CJNIMediaMetadata::METADATA_KEY_DISPLAY_SUBTITLE, infoMgr.GetLabel(MUSICPLAYER_ARTIST))
-        .putString(CJNIMediaMetadata::METADATA_KEY_ARTIST, infoMgr.GetLabel(MUSICPLAYER_ARTIST))
-        ;
+        .putString(CJNIMediaMetadata::METADATA_KEY_DISPLAY_SUBTITLE,
+                   infoMgr.GetLabel(MUSICPLAYER_ARTIST, INFO::DEFAULT_CONTEXT))
+        .putString(CJNIMediaMetadata::METADATA_KEY_ARTIST,
+                   infoMgr.GetLabel(MUSICPLAYER_ARTIST, INFO::DEFAULT_CONTEXT));
     thumb = infoMgr.GetImage(MUSICPLAYER_COVER, -1);
   }
   bool needrecaching = false;
@@ -968,16 +975,26 @@ bool CXBMCApp::GetExternalStorage(std::string &path, const std::string &type /* 
 
 bool CXBMCApp::GetStorageUsage(const std::string &path, std::string &usage)
 {
-#define PATH_MAXLEN 50
+#define PATH_MAXLEN 38
 
   if (path.empty())
   {
     std::ostringstream fmt;
-    fmt.width(PATH_MAXLEN);  fmt << std::left  << "Filesystem";
-    fmt.width(12);  fmt << std::right << "Size";
-    fmt.width(12);  fmt << "Used";
-    fmt.width(12);  fmt << "Avail";
-    fmt.width(12);  fmt << "Use %";
+
+    fmt.width(PATH_MAXLEN);
+    fmt << std::left << "Filesystem";
+
+    fmt.width(12);
+    fmt << std::right << "Size";
+
+    fmt.width(12);
+    fmt << "Used";
+
+    fmt.width(12);
+    fmt << "Avail";
+
+    fmt.width(12);
+    fmt << "Use %";
 
     usage = fmt.str();
     return false;
@@ -997,14 +1014,26 @@ bool CXBMCApp::GetStorageUsage(const std::string &path, std::string &usage)
   float usedPercentage = usedSize / totalSize * 100;
 
   std::ostringstream fmt;
+
   fmt << std::fixed;
   fmt.precision(1);
-  fmt.width(PATH_MAXLEN);  fmt << std::left  << (path.size() < PATH_MAXLEN-1 ? path : StringUtils::Left(path, PATH_MAXLEN-4) + "...");
-  fmt.width(12);  fmt << std::right << totalSize << "G"; // size in GB
-  fmt.width(12);  fmt << usedSize << "G"; // used in GB
-  fmt.width(12);  fmt << freeSize << "G"; // free
+
+  fmt.width(PATH_MAXLEN);
+  fmt << std::left
+      << (path.size() < PATH_MAXLEN - 1 ? path : StringUtils::Left(path, PATH_MAXLEN - 4) + "...");
+
+  fmt.width(11);
+  fmt << std::right << totalSize << "G";
+
+  fmt.width(11);
+  fmt << usedSize << "G";
+
+  fmt.width(11);
+  fmt << freeSize << "G";
+
   fmt.precision(0);
-  fmt.width(12);  fmt << usedPercentage << "%"; // percentage used
+  fmt.width(11);
+  fmt << usedPercentage << "%";
 
   usage = fmt.str();
   return true;
@@ -1255,18 +1284,6 @@ void CXBMCApp::onNewIntent(CJNIIntent intent)
 
 void CXBMCApp::onActivityResult(int requestCode, int resultCode, CJNIIntent resultData)
 {
-  std::unique_lock<CCriticalSection> lock(m_activityResultMutex);
-  for (auto it = m_activityResultEvents.begin(); it != m_activityResultEvents.end(); ++it)
-  {
-    if ((*it)->GetRequestCode() == requestCode)
-    {
-      (*it)->SetResultCode(resultCode);
-      (*it)->SetResultData(resultData);
-      (*it)->Set();
-      m_activityResultEvents.erase(it);
-      break;
-    }
-  }
 }
 
 void CXBMCApp::onVisibleBehindCanceled()
@@ -1284,36 +1301,6 @@ void CXBMCApp::onVisibleBehindCanceled()
       CServiceBroker::GetAppMessenger()->PostMsg(TMSG_GUI_ACTION, WINDOW_INVALID, -1,
                                                  static_cast<void*>(new CAction(ACTION_PAUSE)));
   }
-}
-
-int CXBMCApp::WaitForActivityResult(const CJNIIntent &intent, int requestCode, CJNIIntent &result)
-{
-  int ret = 0;
-  CActivityResultEvent* event = new CActivityResultEvent(requestCode);
-  {
-    std::unique_lock<CCriticalSection> lock(m_activityResultMutex);
-    m_activityResultEvents.emplace_back(event);
-  }
-  startActivityForResult(intent, requestCode);
-  if (event->Wait())
-  {
-    result = event->GetResultData();
-    ret = event->GetResultCode();
-  }
-
-  // delete from m_activityResultEvents map before deleting the event
-  std::unique_lock<CCriticalSection> lock(m_activityResultMutex);
-  for (auto it = m_activityResultEvents.begin(); it != m_activityResultEvents.end(); ++it)
-  {
-    if ((*it)->GetRequestCode() == requestCode)
-    {
-      m_activityResultEvents.erase(it);
-      break;
-    }
-  }
-
-  delete event;
-  return ret;
 }
 
 void CXBMCApp::onVolumeChanged(int volume)

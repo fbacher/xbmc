@@ -19,7 +19,7 @@ function(addstep_autoreconf module_name)
   ExternalProject_Add_Step(${module_name} autoreconf
                                   DEPENDEES download update patch
                                   DEPENDERS configure
-                                  COMMAND PATH=${NATIVEPREFIX}/bin:$ENV{PATH} autoreconf -vif
+                                  COMMAND ${CMAKE_COMMAND} -E env PATH=${NATIVEPREFIX}/bin:$ENV{PATH} autoreconf -vif
                                   WORKING_DIRECTORY <SOURCE_DIR>)
 endfunction()
 
@@ -77,7 +77,7 @@ else()
   set(DEPENDS_TARGETS_DIR ${CMAKE_SOURCE_DIR}/tools/depends/target)
   foreach(dvdlib ${dvdlibs})
 
-    get_archive_name(${dvdlib})
+    get_versionfile_data(${dvdlib})
     string(TOUPPER ${dvdlib} DVDLIB)
 
     # allow user to override the download URL with a local tarball

@@ -36,6 +36,11 @@ AC_ARG_ENABLE([ccache],
   [use_ccache=no],
   [use_ccache=yes])
 
+AC_ARG_WITH([linker],
+  [AS_HELP_STRING([--with-linker],
+  [specify linker to use.])],
+  [use_linker=$withval])
+
 AC_ARG_WITH([toolchain],
   [AS_HELP_STRING([--with-toolchain],
   [specify path to toolchain. Auto set for android. Defaults to xcode root for darwin, /usr for linux])],
@@ -95,6 +100,11 @@ AC_ARG_WITH([rendersystem],
   [render system to use])],
   [app_rendersystem=$withval])
 
+AC_ARG_WITH([windowsystem],
+  [AS_HELP_STRING([--with-windowsystem],
+  [Windowing system to use])],
+  [app_winsystem=$withval])
+
 AC_ARG_WITH([target-cflags],
   [AS_HELP_STRING([--with-target-cflags],
   [C compiler flags (target)])],
@@ -133,6 +143,10 @@ fi
 AC_PATH_PROG(TAR,tar,"no")
 if test "x$TAR" = "xno" ; then
   AC_MSG_ERROR("Missing program: tar")
+fi
+
+if test "x$use_linker" = "x" ; then
+  use_linker=ld
 fi
 
 if test "$use_debug" = "yes"; then
@@ -262,7 +276,7 @@ else
 fi
 
 AC_PATH_TOOL([RANLIB], [${platform_tool_prefix}ranlib],, $PATH_FOR_HOST)
-AC_PATH_TOOL([LD], [${platform_tool_prefix}ld],, $PATH_FOR_HOST)
+AC_PATH_TOOL([LD], [${use_linker}],, $PATH_FOR_HOST)
 AC_PATH_TOOL([AR], [${platform_tool_prefix}ar],, $PATH_FOR_HOST)
 AC_PATH_TOOL([READELF], [${platform_tool_prefix}readelf],, $PATH_FOR_HOST)
 AC_PATH_TOOL([STRIP], [${platform_tool_prefix}strip],, $PATH_FOR_HOST)
@@ -271,6 +285,10 @@ AC_PATH_TOOL([NM], [${platform_tool_prefix}nm],, $PATH_FOR_HOST)
 AC_PATH_TOOL([OBJDUMP], [${platform_tool_prefix}objdump],, $PATH_FOR_HOST)
 AC_PATH_TOOL([CC],[$platform_cc],,$PATH_FOR_HOST)
 AC_PATH_TOOL([CXX],[$platform_cxx],,$PATH_FOR_HOST)
+
+if test "x$LD" = "x"; then
+  AC_MSG_ERROR(No linker found with name ${use_linker}. You may want to provide using --with-linker=<linker>)
+fi
 
 case $build in
   *darwin*)
@@ -423,6 +441,16 @@ case $host in
         fi
 
         target_minver="10.13"
+
+        # check provided window system is valid_sdk
+        # if no window system supplied, default to SDL for now.
+        if test -n "$app_winsystem"; then
+          if test "$app_winsystem" != "native" && test "$app_winsystem" != "sdl"; then
+            AC_MSG_ERROR(Window system must be native or sdl)
+          fi
+        else
+          app_winsystem=sdl
+        fi
       ;;
       aarch64-apple-darwin*)
         MC_CHECK_NOT_CPU([$use_cpu], "*86")
@@ -433,6 +461,7 @@ case $host in
           ;;
           osx)
             target_minver="11.0"
+            app_winsystem=native
           ;;
           *)
             AC_MSG_ERROR(invalid platform for architecture ($host))
@@ -553,34 +582,18 @@ if test "$platform_os" == "android"; then
   SORT_PARAMS=""
   sort -V /dev/null > /dev/null 2>&1 && SORT_PARAMS="-V"
   build_tools_path=$use_sdk_path/tools:$use_sdk_path/platform-tools:$use_sdk_path/build-tools/`ls $use_sdk_path/build-tools | sort $SORT_PARAMS | tail -n 1`
-
-  AC_PATH_PROG(AAPT,aapt,"no",$build_tools_path)
-  if test "x$AAPT" = "xno" ; then
-    AC_MSG_ERROR("Missing program: aapt")
-  fi
-
-  AC_PATH_PROG(D8,d8,"no",$build_tools_path)
-  if test "x$D8" = "xno" ; then
-    AC_PATH_PROG(DX,dx,"no",$build_tools_path)
-    if test "x$DX" = "xno" ; then
-      AC_MSG_ERROR("Missing program: dx or d8")
-    fi
-  fi
-
-  AC_PATH_PROG(ZIPALIGN,zipalign,"no",$build_tools_path)
-  if test "x$ZIPALIGN" = "xno" ; then
-    AC_MSG_ERROR("Missing program: zipalign")
-  fi
 fi
 
-# darwin needs unzip/zip in Codesign.command
+# darwin needs unzip in Codesign.command
 if test "$platform_os" = "android" || test "$platform_os" = "osx" || test "$platform_os" = "darwin_embedded"; then
   AC_CHECK_PROG(HAVE_UNZIP,unzip,"yes","no",)
   if test "x$HAVE_UNZIP" = "xno"; then
     AC_MSG_ERROR("Missing program: unzip")
   fi
 fi
-if test "$platform_os" = "osx" || test "$platform_os" = "darwin_embedded"; then
+# darwin needs zip in Codesign.command
+# android needs zip in tools/android/packaging/Makefile sharedobb target
+if test "$platform_os" = "android" || test "$platform_os" = "osx" || test "$platform_os" = "darwin_embedded"; then
   AC_CHECK_PROG(HAVE_ZIP,zip,"yes","no",)
   if test "x$HAVE_ZIP" = "xno"; then
     AC_MSG_ERROR("Missing program: zip")
@@ -702,6 +715,7 @@ AC_SUBST(use_gplv3)
 AC_SUBST(use_ccache)
 AC_SUBST(host_includes)
 AC_SUBST(app_rendersystem)
+AC_SUBST(app_winsystem)
 AC_SUBST(ffmpeg_options)
 
 AC_OUTPUT
