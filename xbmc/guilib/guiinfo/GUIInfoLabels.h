@@ -27,7 +27,7 @@
 #define PLAYER_FORWARDING_16x        16
 #define PLAYER_FORWARDING_32x        17
 #define PLAYER_CACHING               20
-#define PLAYER_DISPLAY_AFTER_SEEK    21
+// unused id 21
 #define PLAYER_PROGRESS              22
 #define PLAYER_SEEKBAR               23
 #define PLAYER_SEEKTIME              24
@@ -408,6 +408,8 @@
 #define SKIN_ASPECT_RATIO           607
 #define SKIN_FONT                   608
 #define SKIN_INTEGER 609
+#define SKIN_TIMER_IS_RUNNING 610
+#define SKIN_TIMER_ELAPSEDSECS 611
 
 #define SYSTEM_IS_SCREENSAVER_INHIBITED 641
 #define SYSTEM_ADDON_UPDATE_COUNT   642

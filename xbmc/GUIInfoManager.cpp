@@ -866,7 +866,6 @@ const infomap player_labels[] = {{"hasmedia", PLAYER_HAS_MEDIA},
                                  {"forwarding8x", PLAYER_FORWARDING_8x},
                                  {"forwarding16x", PLAYER_FORWARDING_16x},
                                  {"forwarding32x", PLAYER_FORWARDING_32x},
-                                 {"displayafterseek", PLAYER_DISPLAY_AFTER_SEEK},
                                  {"caching", PLAYER_CACHING},
                                  {"seekbar", PLAYER_SEEKBAR},
                                  {"seeking", PLAYER_SEEKING},
@@ -7213,6 +7212,24 @@ const infomap fanart_labels[] =  {{ "color1",           FANART_COLOR1 },
 ///     @skinning_v20 **[New Infolabel]** \link Skin_Numeric `Skin.Numeric(settingid)`\endlink
 ///     <p>
 ///   }
+///   \table_row3{   <b>`Skin.TimerElapsedSecs(timer)`</b>,
+///                  \anchor Skin_TimerElapsedSecs
+///                  _integer_ \, _string_,
+///     @return The elapsed time in seconds for the provided `timer`.
+///     @param timer - the timer name
+///     <p><hr>
+///     @skinning_v20 **[New Infolabel]** \link Skin_TimerElapsedSecs `Skin.TimerElapsedSecs(timer)`\endlink
+///     <p>
+///   }
+///   \table_row3{   <b>`Skin.TimerIsRunning(timer)`</b>,
+///                  \anchor Skin_TimerIsRunning
+///                  _boolean_,
+///     @return **True** if the given `timer` is active\, false otherwise.
+///     @param timer - the timer name
+///     <p><hr>
+///     @skinning_v20 **[New Infolabel]** \link Skin_TimerIsRunning `Skin.TimerIsRunning(timer)`\endlink
+///     <p>
+///   }
 /// \table_end
 ///
 /// -----------------------------------------------------------------------------
@@ -9675,9 +9692,13 @@ const infomap slideshow[] =      {{ "ispaused",               SLIDESHOW_ISPAUSED
 ///
 /// -----------------------------------------------------------------------------
 
-
 /// \page modules__infolabels_boolean_conditions
 /// \section modules_rm_infolabels_booleans Additional revision history for Infolabels and Boolean Conditions
+/// <hr>
+/// \subsection modules_rm_infolabels_booleans_v20 Kodi v20 (Nexus)
+/// @skinning_v20 **[Removed Boolean conditions]** The following boolean conditions have been removed:
+///   - `Player.DisplayAfterSeek` - use \link Player_HasPerformedSeek `Player.HasPerformedSeek(interval)`\endlink instead
+///
 /// <hr>
 /// \subsection modules_rm_infolabels_booleans_v19 Kodi v19 (Matrix)
 /// @skinning_v19 **[Removed Infolabels]** The following infolabels have been removed:
@@ -10273,6 +10294,10 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
           return AddMultiInfo(CGUIInfo(SKIN_BOOL, CSkinSettings::GetInstance().TranslateBool(prop.param(0))));
         else if (prop.name == "hastheme")
           return AddMultiInfo(CGUIInfo(SKIN_HAS_THEME, prop.param(0)));
+        else if (prop.name == "timerisrunning")
+          return AddMultiInfo(CGUIInfo(SKIN_TIMER_IS_RUNNING, prop.param(0)));
+        else if (prop.name == "timerelapsedsecs")
+          return AddMultiInfo(CGUIInfo(SKIN_TIMER_ELAPSEDSECS, prop.param(0)));
       }
     }
     else if (cat.name == "window")
@@ -10664,6 +10689,12 @@ INFO::InfoPtr CGUIInfoManager::Register(const std::string &expression, int conte
     res.first->get()->Initialize();
 
   return *(res.first);
+}
+
+void CGUIInfoManager::UnRegister(INFO::InfoPtr expression)
+{
+  std::unique_lock<CCriticalSection> lock(m_critInfo);
+  m_bools.erase(expression);
 }
 
 bool CGUIInfoManager::EvaluateBool(const std::string &expression, int contextWindow /* = 0 */, const CGUIListItemPtr &item /* = nullptr */)
