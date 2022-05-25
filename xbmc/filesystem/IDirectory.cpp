@@ -102,7 +102,7 @@ void IDirectory::SetMask(const std::string& strMask)
 {
   m_strFileMask = strMask;
   // ensure it's completed with a | so that filtering is easy.
-  StringUtils::ToLower(m_strFileMask);
+  StringUtils::FoldCase(m_strFileMask);
   if (m_strFileMask.size() && m_strFileMask[m_strFileMask.size() - 1] != '|')
     m_strFileMask += '|';
 }

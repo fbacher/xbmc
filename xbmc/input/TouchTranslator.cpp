@@ -149,7 +149,7 @@ unsigned int CTouchTranslator::TranslateTouchCommand(const TiXmlElement* pButton
     return ACTION_NONE;
 
   std::string strTouchCommand = szButton;
-  StringUtils::ToLower(strTouchCommand);
+  StringUtils::FoldCase(strTouchCommand);
 
   // Handle direction
   const char* attrVal = pButton->Attribute("direction");

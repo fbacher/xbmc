@@ -254,7 +254,7 @@ bool CDVDDemuxFFmpeg::Open(const std::shared_ptr<CDVDInputStream>& pInput, bool 
   if (m_pInput->GetContent().length() > 0)
   {
     std::string content = m_pInput->GetContent();
-    StringUtils::ToLower(content);
+    StringUtils::FoldCase(content);
 
     /* check if we can get a hint from content */
     if (content.compare("video/x-vobsub") == 0)
@@ -370,7 +370,7 @@ bool CDVDDemuxFFmpeg::Open(const std::shared_ptr<CDVDInputStream>& pInput, bool 
       m_ioContext->seekable = 0;
 
     std::string content = m_pInput->GetContent();
-    StringUtils::ToLower(content);
+    StringUtils::FoldCase(content);
     if (StringUtils::StartsWith(content, "audio/l16"))
       iformat = av_find_input_format("s16be");
 
@@ -790,7 +790,7 @@ AVDictionary* CDVDDemuxFFmpeg::GetFFMpegOptionsFromInput()
     for(std::map<std::string, std::string>::const_iterator it = protocolOptions.begin(); it != protocolOptions.end(); ++it)
     {
       std::string name = it->first;
-      StringUtils::ToLower(name);
+      StringUtils::FoldCase(name);
       const std::string &value = it->second;
 
       // set any of these ffmpeg options
@@ -957,7 +957,7 @@ AVDictionary* CDVDDemuxFFmpeg::GetFFMpegOptionsFromInput()
         for (size_t i = 1; i < opts.size(); ++i)
         {
           std::vector<std::string> value = StringUtils::Split(opts[i], "=", 2);
-          StringUtils::ToLower(value[0]);
+          StringUtils::FoldCase(value[0]);
           auto it = optionmap.find(value[0]);
           if (it != optionmap.end())
           {
@@ -2445,7 +2445,7 @@ void CDVDDemuxFFmpeg::GetL16Parameters(int &channels, int &samplerate)
   std::string content;
   if (XFILE::CCurlFile::GetContentType(m_pInput->GetURL(), content))
   {
-    StringUtils::ToLower(content);
+    StringUtils::FoldCase(content);
     const size_t len = content.length();
     size_t pos = content.find(';');
     while (pos < len)

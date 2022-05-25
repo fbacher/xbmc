@@ -2191,9 +2191,11 @@ bool CMusicInfoScanner::AddLocalArtwork(std::map<std::string, std::string>& art,
     // Strip media name
     if (!mediaName.empty() && StringUtils::StartsWith(strCandidate, mediaName))
       strCandidate.erase(0, mediaName.length());
-    StringUtils::ToLower(strCandidate);
+    StringUtils::FoldCase(strCandidate);
     // Skip files already used as "thumb"
     // Typically folder.jpg but can be from multiple confgurable file names
+	
+	// TODO: Unicode- Verify that this works
     if (std::find(thumbs.begin(), thumbs.end(), strCandidate) != thumbs.end())
       continue;
     // Grab and strip file extension

@@ -248,7 +248,7 @@ void CScraperParser::ParseExpression(const std::string& input, std::string& dest
     int iCompare = -1;
     pExpression->QueryIntAttribute("compare",&iCompare);
     if (iCompare > -1)
-      StringUtils::ToLower(m_param[iCompare-1]);
+      StringUtils::FoldCase(m_param[iCompare-1]);
     std::string curInput = input;
     for (int iBuf=0;iBuf<MAX_SCRAPER_BUFFERS;++iBuf)
     {
@@ -309,7 +309,7 @@ void CScraperParser::ParseExpression(const std::string& input, std::string& dest
         if (iCompare > -1)
         {
           std::string strResultNoCase = strResult;
-          StringUtils::ToLower(strResultNoCase);
+          StringUtils::FoldCase(strResultNoCase);
           if (strResultNoCase.find(m_param[iCompare-1]) != std::string::npos)
             dest += strResult;
         }

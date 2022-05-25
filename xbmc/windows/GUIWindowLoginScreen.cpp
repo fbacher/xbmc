@@ -126,7 +126,7 @@ bool CGUIWindowLoginScreen::OnAction(const CAction &action)
   if (action.GetID() == ACTION_BUILT_IN_FUNCTION)
   {
     std::string actionName = action.GetName();
-    StringUtils::ToLower(actionName);
+    StringUtils::FoldCase(actionName);
     if ((actionName.find("shutdown") != std::string::npos) &&
         CServiceBroker::GetPVRManager().GUIActions()->CanSystemPowerdown())
       CBuiltins::GetInstance().Execute(action.GetName());

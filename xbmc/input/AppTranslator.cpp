@@ -54,7 +54,7 @@ uint32_t CAppTranslator::TranslateAppCommand(const std::string& szButton)
 {
 #ifdef TARGET_WINDOWS
   std::string strAppCommand = szButton;
-  StringUtils::ToLower(strAppCommand);
+  StringUtils::FoldCase(strAppCommand);
 
   auto it = AppCommands.find(strAppCommand);
   if (it != AppCommands.end())

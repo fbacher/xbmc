@@ -600,7 +600,7 @@ namespace XBMCAddon
       XBMC_TRACE;
       SingleLockWithDelayGuard gslock(CServiceBroker::GetWinSystem()->GetGfxContext(),languageHook);
       std::string lowerKey = key;
-      StringUtils::ToLower(lowerKey);
+      StringUtils::FoldCase(lowerKey);
 
       ref(window)->SetProperty(lowerKey, value);
     }
@@ -610,7 +610,7 @@ namespace XBMCAddon
       XBMC_TRACE;
       SingleLockWithDelayGuard gslock(CServiceBroker::GetWinSystem()->GetGfxContext(),languageHook);
       std::string lowerKey = key;
-      StringUtils::ToLower(lowerKey);
+      StringUtils::FoldCase(lowerKey);
       std::string value = ref(window)->GetProperty(lowerKey).asString();
       return value;
     }
@@ -622,7 +622,7 @@ namespace XBMCAddon
       SingleLockWithDelayGuard gslock(CServiceBroker::GetWinSystem()->GetGfxContext(),languageHook);
 
       std::string lowerKey = key;
-      StringUtils::ToLower(lowerKey);
+      StringUtils::FoldCase(lowerKey);
       ref(window)->SetProperty(lowerKey, "");
     }
 

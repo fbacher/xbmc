@@ -41,7 +41,7 @@ std::string CMusicDatabaseFile::TranslateUrl(const CURL& url)
   if (!musicDatabase.GetSong(idSong, song))
     return "";
 
-  StringUtils::ToLower(strExtension);
+  StringUtils::FoldCase(strExtension);
   if (!URIUtils::HasExtension(song.strFileName, strExtension))
     return "";
 

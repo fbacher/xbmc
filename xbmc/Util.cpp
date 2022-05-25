@@ -1383,21 +1383,23 @@ void CUtil::ForceForwardSlashes(std::string& strPath)
 
 double CUtil::AlbumRelevance(const std::string& strAlbumTemp1, const std::string& strAlbum1, const std::string& strArtistTemp1, const std::string& strArtist1)
 {
+	// TODO: Unicode Need fuzzy search
+
   // case-insensitive fuzzy string comparison on the album and artist for relevance
   // weighting is identical, both album and artist are 50% of the total relevance
   // a missing artist means the maximum relevance can only be 0.50
   std::string strAlbumTemp = strAlbumTemp1;
-  StringUtils::ToLower(strAlbumTemp);
+  StringUtils::FoldCase(strAlbumTemp);
   std::string strAlbum = strAlbum1;
-  StringUtils::ToLower(strAlbum);
+  StringUtils::FoldCase(strAlbum);
   double fAlbumPercentage = fstrcmp(strAlbumTemp.c_str(), strAlbum.c_str());
   double fArtistPercentage = 0.0;
   if (!strArtist1.empty())
   {
     std::string strArtistTemp = strArtistTemp1;
-    StringUtils::ToLower(strArtistTemp);
+    StringUtils::FoldCase(strArtistTemp);
     std::string strArtist = strArtist1;
-    StringUtils::ToLower(strArtist);
+    StringUtils::FoldCase(strArtist);
     fArtistPercentage = fstrcmp(strArtistTemp.c_str(), strArtist.c_str());
   }
   double fRelevance = fAlbumPercentage * 0.5 + fArtistPercentage * 0.5;
@@ -1776,7 +1778,7 @@ std::string CUtil::ResolveExecutablePath()
 
   std::string appName = CCompileInfo::GetAppName();
   std::string libName = "lib" + appName + ".so";
-  StringUtils::ToLower(libName);
+  StringUtils::FoldCase(libName);
   strExecutablePath += "/" + libName;
 #else
   /* Get our PID and build the name of the link in /proc */
@@ -2093,7 +2095,7 @@ ExternalStreamInfo CUtil::GetExternalStreamDetailsFromFilename(const std::string
     {
       // try to recognize a flag
       std::string flag_tmp(*it);
-      StringUtils::ToLower(flag_tmp);
+      StringUtils::FoldCase(flag_tmp);
       if (!flag_tmp.compare("none"))
       {
         info.flag |= StreamFlags::FLAG_NONE;

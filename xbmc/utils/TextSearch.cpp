@@ -27,8 +27,16 @@ bool CTextSearch::Search(const std::string &strHaystack) const
     return false;
 
   std::string strSearch(strHaystack);
+  
+  // TODO: Unicode- Searching is probably more complicated with
+  // multiple languages than this code can handle. For now, using
+  // FoldCase instead of ToLower since FoldCase is better at
+  // normalizing strings than ToLower. ToLower can behave in 
+  // interesting ways in other languages (Turkic "I" problem
+  // comes to mind).
+  
   if (!m_bCaseSensitive)
-    StringUtils::ToLower(strSearch);
+    StringUtils::FoldCase(strSearch); // TODO: fpf Verify
 
   /* check whether any of the NOT terms matches and return false if there's a match */
   for (unsigned int iNotPtr = 0; iNotPtr < m_NOT.size(); iNotPtr++)
@@ -90,7 +98,7 @@ void CTextSearch::ExtractSearchTerms(const std::string &strSearchTerm, TextSearc
   StringUtils::Trim(strParsedSearchTerm);
 
   if (!m_bCaseSensitive)
-    StringUtils::ToLower(strParsedSearchTerm);
+    StringUtils::FoldCase(strParsedSearchTerm);
 
   bool bNextAND(defaultSearchMode == SEARCH_DEFAULT_AND);
   bool bNextOR(defaultSearchMode == SEARCH_DEFAULT_OR);

@@ -93,6 +93,9 @@ NPT_String
 GetMimeType(const char* filename,
             const PLT_HttpRequestContext* context /* = NULL */)
 {
+		// TODO: Unicode - If these string values can be non-ASCII, then need to use StringUtils
+	  // instead of NPT_STRING operations. Should check throughout upnp code.
+
     NPT_String ext = URIUtils::GetExtension(filename).c_str();
     ext.TrimLeft('.');
     ext = ext.ToLowercase();

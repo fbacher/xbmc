@@ -159,7 +159,7 @@ bool CSettingsComponent::InitDirectoriesLinux(bool bPlatformDirectories)
   std::string appPath;
   std::string appName = CCompileInfo::GetAppName();
   std::string dotLowerAppName = "." + appName;
-  StringUtils::ToLower(dotLowerAppName);
+  StringUtils::FoldCase(dotLowerAppName);
   const char* envAppHome = "KODI_HOME";
   const char* envAppBinHome = "KODI_BIN_HOME";
   const char* envAppTemp = "KODI_TEMP";
@@ -300,7 +300,7 @@ bool CSettingsComponent::InitDirectoriesOSX(bool bPlatformDirectories)
 #endif
 
     std::string dotLowerAppName = "." + appName;
-    StringUtils::ToLower(dotLowerAppName);
+    StringUtils::FoldCase(dotLowerAppName);
     // location for temp files
 #if defined(TARGET_DARWIN_EMBEDDED)
     std::string strTempPath = URIUtils::AddFileToFolder(

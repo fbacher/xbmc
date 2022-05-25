@@ -70,7 +70,7 @@ bool CKeyboardLayout::Load(const TiXmlElement* element)
     if (strModifiers != NULL)
     {
       std::string modifiers = strModifiers;
-      StringUtils::ToLower(modifiers);
+      StringUtils::FoldCase(modifiers);
 
       std::vector<std::string> variants = StringUtils::Split(modifiers, ",");
       for (const auto& itv : variants)

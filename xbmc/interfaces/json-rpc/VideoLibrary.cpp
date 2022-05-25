@@ -431,7 +431,7 @@ JSONRPC_STATUS CVideoLibrary::GetInProgressTVShows(const std::string &method, IT
 JSONRPC_STATUS CVideoLibrary::GetGenres(const std::string &method, ITransportLayer *transport, IClient *client, const CVariant &parameterObject, CVariant &result)
 {
   std::string media = parameterObject["type"].asString();
-  StringUtils::ToLower(media);
+  StringUtils::FoldCase(media);
   int idContent = -1;
 
   std::string strPath = "videodb://";
@@ -472,7 +472,7 @@ JSONRPC_STATUS CVideoLibrary::GetGenres(const std::string &method, ITransportLay
 JSONRPC_STATUS CVideoLibrary::GetTags(const std::string &method, ITransportLayer *transport, IClient *client, const CVariant &parameterObject, CVariant &result)
 {
   std::string media = parameterObject["type"].asString();
-  StringUtils::ToLower(media);
+  StringUtils::FoldCase(media);
   int idContent = -1;
 
   std::string strPath = "videodb://";
@@ -568,7 +568,7 @@ JSONRPC_STATUS CVideoLibrary::GetAvailableArt(const std::string& method, ITransp
     return InternalError;
 
   std::string artType = parameterObject["arttype"].asString();
-  StringUtils::ToLower(artType);
+  StringUtils::FoldCase(artType);
 
   CVideoDatabase videodatabase;
   if (!videodatabase.Open())

@@ -14,6 +14,14 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_SOURCE_DIR}/cmake/modules)
 if(DEPENDS_DIR)
   list(APPEND CMAKE_PREFIX_PATH ${DEPENDS_DIR})
 endif()
+# set(ICU4C_INCLUDE /usr/local/include/icu4c)
+# If libicu is installed (Ubuntu, libicu-dev)
+# Remember, the includes are all from unicode directory.
+#set(ICU4C_INCLUDE /usr/include)
+# If icu is downloaded to arbitrary location
+set(ICU4C_INCLUDE /scratch/frank/Source/icu4c-71_1-Ubuntu20.04-x64/icu/usr/local/include)
+#set(ICU4C_INCLUDE ${CMAKE_BINARY_DIR}/build/include)
+
 
 # Set CORE_BUILD_DIR
 set(CORE_BUILD_DIR build)
@@ -39,13 +47,13 @@ include(cmake/scripts/common/ArchSetup.cmake)
 include(cmake/scripts/common/Macros.cmake)
 include(cmake/scripts/common/ProjectMacros.cmake)
 core_find_versions()
-include(cmake/scripts/common/PathSetup.cmake)
+include(cmake/scripts/${CORE_SYSTEM_NAME}/PathSetup.cmake)
 include(cmake/scripts/common/CompilerSettings.cmake)
 include(ExternalProject)
 
 
 # general
-option(VERBOSE            "Enable verbose output?" OFF)
+option(VERBOSE            "Enable verbose output?" ON)
 option(ENABLE_CLANGTIDY   "Enable clang-tidy support?" OFF)
 option(ENABLE_CPPCHECK    "Enable cppcheck support?" OFF)
 option(ENABLE_DVDCSS      "Enable libdvdcss support?" ON)
@@ -58,7 +66,7 @@ option(ENABLE_TESTING     "Enable testing support?" ON)
 
 option(ENABLE_INTERNAL_CROSSGUID "Enable internal crossguid?" ON)
 # use ffmpeg from depends or system
-option(ENABLE_INTERNAL_FFMPEG "Enable internal ffmpeg?" OFF)
+option(ENABLE_INTERNAL_FFMPEG "Enable internal ffmpeg?" ON)
 option(ENABLE_INTERNAL_RapidJSON "Enable internal rapidjson?" ON)
 
 if(UNIX)
@@ -106,7 +114,8 @@ set(INCLUDES ${CMAKE_SOURCE_DIR}
              ${CMAKE_SOURCE_DIR}/xbmc/${PLATFORM_DIR}
              ${CMAKE_SOURCE_DIR}/xbmc/cores/VideoPlayer
              ${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}
-             ${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/include)
+             ${CMAKE_BINARY_DIR}/${CORE_BUILD_DIR}/include
+             ${ICU4C_INCLUDE})
 
 if (NOT PLATFORMDEFS_DIR STREQUAL "")
   list(APPEND INCLUDES ${CMAKE_SOURCE_DIR}/xbmc/${PLATFORMDEFS_DIR})
@@ -354,6 +363,15 @@ if(WIN32)
 endif()
 
 # main binary
+# If libicu-dev installed on Ubuntu
+set(ICU4C_LIB "/scratch/frank/Source/icu4c-71_1-Ubuntu20.04-x64/icu/usr/local/lib")
+#set(ICU4C_LIB ${CMAKE_INSTALL_PREFIX}/lib)
+target_link_libraries(lib${APP_NAME_LC} PUBLIC
+ 					${ICU4C_LIB}/libicudata.so
+                    ${ICU4C_LIB}/libicui18n.so
+                    ${ICU4C_LIB}/libicuio.so
+                    ${ICU4C_LIB}/libicutu.so
+                    ${ICU4C_LIB}/libicuuc.so)             
 if(NOT CORE_SYSTEM_NAME STREQUAL android)
   if(CORE_SYSTEM_NAME STREQUAL windowsstore)
     winstore_add_target_properties(${APP_NAME_LC})

@@ -1240,8 +1240,6 @@ bool CDecoder::Open(AVCodecContext* avctx, AVCodecContext* mainctx, enum AVPixel
                "Current available video memory ({} MB) is insufficient 4K video decoding (DXVA2) "
                "using {} surfaces. Decoder surfaces has been limited to 16.", videoMem / MB, m_refs);
     m_refs = 16;
-  }
-
   if (!OpenDecoder())
   {
     m_bufferPool.reset();

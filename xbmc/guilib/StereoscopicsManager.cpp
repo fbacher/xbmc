@@ -355,8 +355,8 @@ CAction CStereoscopicsManager::ConvertActionCommandToAction(const std::string &c
 {
   std::string cmd = command;
   std::string para = parameter;
-  StringUtils::ToLower(cmd);
-  StringUtils::ToLower(para);
+  StringUtils::FoldCase(cmd);
+  StringUtils::FoldCase(para);
   if (cmd == "setstereomode")
   {
     int actionId = -1;

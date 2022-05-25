@@ -139,7 +139,7 @@ TEST_F(TestRegExpLog, DumpOvector)
   XFILE::CFile file;
 
   std::string appName = CCompileInfo::GetAppName();
-  StringUtils::ToLower(appName);
+  StringUtils::FoldCase(appName);
   logfile = CSpecialProtocol::TranslatePath("special://temp/") + appName + ".log";
   CServiceBroker::GetLogging().Initialize(
       CSpecialProtocol::TranslatePath("special://temp/").c_str());

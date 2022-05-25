@@ -474,7 +474,7 @@ bool CXBMCApp::EnableWakeLock(bool on)
   if (!m_wakeLock)
   {
     std::string appName = CCompileInfo::GetAppName();
-    StringUtils::ToLower(appName);
+    StringUtils::FoldCase(appName);
     std::string className = CCompileInfo::GetPackage();
     // SCREEN_BRIGHT_WAKE_LOCK is marked as deprecated but there is no real alternatives for now
     m_wakeLock =
@@ -1394,7 +1394,7 @@ void CXBMCApp::SetupEnv()
   setenv("KODI_ANDROID_APK", getPackageResourcePath().c_str(), 0);
 
   std::string appName = CCompileInfo::GetAppName();
-  StringUtils::ToLower(appName);
+  StringUtils::FoldCase(appName);
   std::string className = CCompileInfo::GetPackage();
 
   std::string cacheDir = getCacheDir().getAbsolutePath();
@@ -1449,7 +1449,7 @@ std::string CXBMCApp::GetFilenameFromIntent(const CJNIIntent &intent)
     if (!data)
       return ret;
     std::string scheme = data.getScheme();
-    StringUtils::ToLower(scheme);
+    StringUtils::FoldCase(scheme);
     if (scheme == "content")
     {
       std::vector<std::string> filePathColumn;

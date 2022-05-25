@@ -10,6 +10,7 @@
 // python.h should always be included first before any other includes
 #include <mutex>
 #include <Python.h>
+#include <pyconfig.h>
 // clang-format on
 
 #include "XBPython.h"
@@ -516,6 +517,19 @@ bool XBPython::OnScriptInitialized(ILanguageInvoker* invoker)
       CEnvironment::putenv("PYTHONCASEOK=1");
 #endif
 #endif
+
+    PyPreConfig preConfig;
+       PyStatus status;
+       PyPreConfig_InitPythonConfig(&preConfig);
+
+       // Guarantee that at a minimum, the encoding of filesystem names is utf8
+       // Make sure that C/C++ locale is configured before calling this.
+
+       preConfig.utf8_mode = 1;
+       status = Py_PreInitialize(&preConfig);
+
+       if (PyStatus_Exception(status)){
+       }
 
     Py_Initialize();
 

@@ -69,7 +69,7 @@ std::string CDigest::TypeToString(Type type)
 CDigest::Type CDigest::TypeFromString(std::string const& type)
 {
   std::string typeLower{type};
-  StringUtils::ToLower(typeLower);
+  StringUtils::FoldCase(typeLower);
   if (type == "md5")
   {
     return Type::MD5;

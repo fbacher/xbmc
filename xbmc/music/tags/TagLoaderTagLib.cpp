@@ -1021,7 +1021,7 @@ std::vector<std::string> CTagLoaderTagLib::SplitMBID(const std::vector<std::stri
   // MBIDs to make sure we hit them all...
   std::vector<std::string> ret;
   std::string value = values[0];
-  StringUtils::ToLower(value);
+  StringUtils::FoldCase(value);
   CRegExp reg;
   if (reg.RegComp("([[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12})"))
   {
@@ -1194,7 +1194,7 @@ bool CTagLoaderTagLib::Load(const std::string& strFileName, CMusicInfoTag& tag, 
       return false;
   }
 
-  StringUtils::ToLower(strExtension);
+  StringUtils::FoldCase(strExtension);
   TagLibVFSStream*           stream = new TagLibVFSStream(strFileName, true);
   if (!stream)
   {

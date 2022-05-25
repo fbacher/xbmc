@@ -99,7 +99,7 @@ bool CSettingControlSpinner::SetFormat(const std::string &format)
     return false;
 
   m_format = format;
-  StringUtils::ToLower(m_format);
+  StringUtils::FoldCase(m_format);
 
   return true;
 }
@@ -127,7 +127,7 @@ bool CSettingControlEdit::SetFormat(const std::string &format)
     return false;
 
   m_format = format;
-  StringUtils::ToLower(m_format);
+  StringUtils::FoldCase(m_format);
 
   return true;
 }
@@ -224,7 +224,7 @@ bool CSettingControlButton::SetFormat(const std::string &format)
     return false;
 
   m_format = format;
-  StringUtils::ToLower(m_format);
+  StringUtils::FoldCase(m_format);
 
   return true;
 }
@@ -249,7 +249,7 @@ bool CSettingControlList::SetFormat(const std::string &format)
     return false;
 
   m_format = format;
-  StringUtils::ToLower(m_format);
+  StringUtils::FoldCase(m_format);
 
   return true;
 }
@@ -281,7 +281,7 @@ bool CSettingControlSlider::SetFormat(const std::string &format)
     return false;
 
   m_format = format;
-  StringUtils::ToLower(m_format);
+  StringUtils::FoldCase(m_format);
   m_formatString = GetDefaultFormatString();
 
   return true;
@@ -343,7 +343,7 @@ bool CSettingControlRange::SetFormat(const std::string &format)
     return false;
 
   m_format = format;
-  StringUtils::ToLower(m_format);
+  StringUtils::FoldCase(m_format);
 
   return true;
 }

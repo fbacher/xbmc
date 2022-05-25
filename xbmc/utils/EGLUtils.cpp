@@ -14,6 +14,7 @@
 #include "log.h"
 #include "settings/AdvancedSettings.h"
 #include "settings/SettingsComponent.h"
+#include "Unicode.h"
 
 #include <map>
 
@@ -126,7 +127,8 @@ std::set<std::string> CEGLUtils::GetClientExtensions()
     return {};
   }
   std::set<std::string> result;
-  StringUtils::SplitTo(std::inserter(result, result.begin()), extensions, " ");
+  std::string delimiter = std::string("");
+  Unicode::SplitTo(std::inserter(result, result.begin()), extensions, delimiter);
   return result;
 }
 
@@ -138,7 +140,8 @@ std::set<std::string> CEGLUtils::GetExtensions(EGLDisplay eglDisplay)
     throw std::runtime_error("Could not query EGL for extensions");
   }
   std::set<std::string> result;
-  StringUtils::SplitTo(std::inserter(result, result.begin()), extensions, " ");
+  std::string delimiter = std::string("");
+  Unicode::SplitTo(std::inserter(result, result.begin()), extensions, delimiter);
   return result;
 }
 

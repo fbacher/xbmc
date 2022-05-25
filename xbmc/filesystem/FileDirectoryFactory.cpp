@@ -64,7 +64,7 @@ IFileDirectory* CFileDirectoryFactory::Create(const CURL& url, CFileItem* pItem,
 
   // Get file extensions to find addon related to it.
   std::string strExtension = URIUtils::GetExtension(url);
-  StringUtils::ToLower(strExtension);
+  StringUtils::FoldCase(strExtension);
 
   if (!strExtension.empty() && CServiceBroker::IsBinaryAddonCacheUp())
   {

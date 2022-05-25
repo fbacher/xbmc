@@ -146,7 +146,7 @@ public:
   static PeripheralType GetTypeFromString(const std::string& strType)
   {
     std::string strTypeLowerCase(strType);
-    StringUtils::ToLower(strTypeLowerCase);
+    StringUtils::FoldCase(strTypeLowerCase);
 
     if (strTypeLowerCase == "bluetooth")
       return PERIPHERAL_BLUETOOTH;
@@ -204,7 +204,7 @@ public:
   static PeripheralBusType GetBusTypeFromString(const std::string& strType)
   {
     std::string strTypeLowerCase(strType);
-    StringUtils::ToLower(strTypeLowerCase);
+    StringUtils::FoldCase(strTypeLowerCase);
 
     if (strTypeLowerCase == "usb")
       return PERIPHERAL_BUS_USB;
@@ -267,7 +267,7 @@ public:
   static PeripheralFeature GetFeatureTypeFromString(const std::string& strType)
   {
     std::string strTypeLowerCase(strType);
-    StringUtils::ToLower(strTypeLowerCase);
+    StringUtils::FoldCase(strTypeLowerCase);
 
     if (strTypeLowerCase == "hid")
       return FEATURE_HID;

@@ -816,7 +816,7 @@ void CCurlFile::ParseAndCorrectUrl(CURL &url2)
     if (url2.HasProtocolOption("auth"))
     {
       m_ftpauth = url2.GetProtocolOption("auth");
-      StringUtils::ToLower(m_ftpauth);
+      StringUtils::FoldCase(m_ftpauth);
       if(m_ftpauth.empty())
         m_ftpauth = "any";
     }
@@ -869,13 +869,13 @@ void CCurlFile::ParseAndCorrectUrl(CURL &url2)
       for (const auto& it : options)
       {
         std::string name = it.first;
-        StringUtils::ToLower(name);
+        StringUtils::FoldCase(name);
         const std::string& value = it.second;
 
         if (name == "auth")
         {
           m_httpauth = value;
-          StringUtils::ToLower(m_httpauth);
+          StringUtils::FoldCase(m_httpauth);
           if(m_httpauth.empty())
             m_httpauth = "any";
         }

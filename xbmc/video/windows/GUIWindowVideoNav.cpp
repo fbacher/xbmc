@@ -1169,7 +1169,7 @@ bool CGUIWindowVideoNav::OnClick(int iItem, const std::string &player)
 
 std::string CGUIWindowVideoNav::GetStartFolder(const std::string &dir)
 {
-  std::string lower(dir); StringUtils::ToLower(lower);
+  std::string lower(dir); StringUtils::FoldCase(lower);
   if (lower == "moviegenres")
     return "videodb://movies/genres/";
   else if (lower == "movietitles")

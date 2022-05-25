@@ -31,7 +31,7 @@ namespace ADDON
                          "0.0.0" :
                          [&version] {
                              auto versionLowerCase = std::string(version);
-                             StringUtils::ToLower(versionLowerCase);
+                             StringUtils::FoldCase(versionLowerCase);
                              return versionLowerCase;
                          }())
   {

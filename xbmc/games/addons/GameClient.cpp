@@ -66,7 +66,7 @@ std::string NormalizeExtension(const std::string& strExtension)
 
   if (!ext.empty() && ext != EXTENSION_WILDCARD)
   {
-    StringUtils::ToLower(ext);
+    StringUtils::FoldCase(ext);
 
     if (ext[0] != '.')
       ext.insert(0, ".");

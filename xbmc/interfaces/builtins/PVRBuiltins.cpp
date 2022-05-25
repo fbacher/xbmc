@@ -113,7 +113,7 @@ int EpgGridControl(const std::vector<std::string>& params)
   }
 
   std::string param(params[0]);
-  StringUtils::ToLower(param);
+  StringUtils::FoldCase(param);
 
   if (param == "firstprogramme")
   {

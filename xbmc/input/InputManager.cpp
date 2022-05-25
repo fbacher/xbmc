@@ -676,7 +676,7 @@ bool CInputManager::AlwaysProcess(const CAction& action)
     std::string builtInFunction;
     std::vector<std::string> params;
     CUtil::SplitExecFunction(action.GetName(), builtInFunction, params);
-    StringUtils::ToLower(builtInFunction);
+    StringUtils::FoldCase(builtInFunction);
 
     // should this button be handled normally or just cancel the screensaver?
     if (builtInFunction == "powerdown" || builtInFunction == "reboot" ||

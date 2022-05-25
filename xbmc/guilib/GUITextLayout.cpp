@@ -14,6 +14,7 @@
 #include "GUIFont.h"
 #include "utils/CharsetConverter.h"
 #include "utils/StringUtils.h"
+#include "utils/log.h"
 
 CGUIString::CGUIString(iString start, iString end, bool carriageReturn)
 {
@@ -495,7 +496,7 @@ void CGUITextLayout::ParseText(const std::wstring& text,
     }
 
     if (newStyle || colorTagChange || newLine || tabs)
-    { // we have a new style or a new color, so format up the previous segment
+    { // we have a new style or a new color, so format up the previous Unicode segment
       std::wstring subText = text.substr(startPos, endPos - startPos);
       if (currentStyle & FONT_STYLE_UPPERCASE)
         StringUtils::ToUpper(subText);
@@ -519,7 +520,7 @@ void CGUITextLayout::ParseText(const std::wstring& text,
     }
     pos = text.find(L'[', pos);
   }
-  // now grab the remainder of the string
+  // now grab the remainder of the Unicode string
   std::wstring subText = text.substr(startPos);
   if (currentStyle & FONT_STYLE_UPPERCASE)
     StringUtils::ToUpper(subText);

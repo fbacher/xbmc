@@ -100,6 +100,8 @@ bool URIUtils::HasExtension(const std::string& strFileName, const std::string& s
   std::string::const_reverse_iterator itExtensions = strExtensions.rbegin();
   while (itExtensions != strExtensions.rend())
   {
+  	// TODO: Unicode- Change to use FoldCase
+
     // Iterate backwards over strFileName until we hit a '.' or a mismatch
     for (std::string::const_reverse_iterator itFileName = strFileName.rbegin();
          itFileName != strFileName.rend() && itExtensions != strExtensions.rend() &&
@@ -746,7 +748,7 @@ bool URIUtils::IsHD(const std::string& strFileName)
 bool URIUtils::IsDVD(const std::string& strFile)
 {
   std::string strFileLow = strFile;
-  StringUtils::ToLower(strFileLow);
+  StringUtils::FoldCase(strFileLow);
   if (strFileLow.find("video_ts.ifo") != std::string::npos && IsOnDVD(strFile))
     return true;
 
@@ -1076,6 +1078,11 @@ bool URIUtils::IsNetworkFilesystem(const std::string& strPath)
 
   return false;
 }
+
+  // Check for "internet" streaming protocols/filesystems
+
+  // "Normal" network filesystems
+
 
 bool URIUtils::IsUPnP(const std::string& strFile)
 {

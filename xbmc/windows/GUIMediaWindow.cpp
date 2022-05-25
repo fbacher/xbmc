@@ -1394,7 +1394,7 @@ void CGUIMediaWindow::GetDirectoryHistoryString(const CFileItem* pItem, std::str
     strHistoryString = RemoveParameterFromPath(strHistoryString, "filter");
 
   URIUtils::RemoveSlashAtEnd(strHistoryString);
-  StringUtils::ToLower(strHistoryString);
+  StringUtils::FoldCase(strHistoryString);
 }
 
 /*!
@@ -2022,7 +2022,7 @@ bool CGUIMediaWindow::GetFilteredItems(const std::string &filter, CFileItemList 
 
   std::string trimmedFilter(filter);
   StringUtils::TrimLeft(trimmedFilter);
-  StringUtils::ToLower(trimmedFilter);
+  StringUtils::FoldCase(trimmedFilter);
 
   if (trimmedFilter.empty())
     return result;
@@ -2053,7 +2053,7 @@ bool CGUIMediaWindow::GetFilteredItems(const std::string &filter, CFileItemList 
     if (numericMatch)
       StringUtils::WordToDigits(match);
 
-    size_t pos = StringUtils::FindWords(match.c_str(), trimmedFilter.c_str());
+    size_t pos = StringUtils::FindWords(match, trimmedFilter);
     if (pos != std::string::npos)
       filteredItems.Add(item);
   }
@@ -2081,7 +2081,7 @@ bool CGUIMediaWindow::GetAdvanceFilteredItems(CFileItemList &items)
   for (int j = 0; j < resultItems.Size(); j++)
   {
     std::string itemPath = CURL(resultItems[j]->GetPath()).GetWithoutOptions();
-    StringUtils::ToLower(itemPath);
+    StringUtils::FoldCase(itemPath);
 
     lookup[itemPath] = resultItems[j];
   }
@@ -2102,7 +2102,7 @@ bool CGUIMediaWindow::GetAdvanceFilteredItems(CFileItemList &items)
     // by comparing their paths (but ignoring any special
     // options because they differ from filter to filter)
     std::string path = CURL(item->GetPath()).GetWithoutOptions();
-    StringUtils::ToLower(path);
+    StringUtils::FoldCase(path);
 
     std::map<std::string, CFileItemPtr>::iterator itItem = lookup.find(path);
     if (itItem != lookup.end())

@@ -53,7 +53,7 @@ uint32_t CMouseTranslator::TranslateCommand(const TiXmlElement* pButton)
     std::string szKey = pButton->ValueStr();
     if (!szKey.empty())
     {
-      StringUtils::ToLower(szKey);
+      StringUtils::FoldCase(szKey);
 
       auto it = MouseKeys.find(szKey);
       if (it != MouseKeys.end())

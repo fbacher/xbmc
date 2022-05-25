@@ -9814,7 +9814,7 @@ void CGUIInfoManager::SplitInfoString(const std::string &infoString, std::vector
     {
       if (!property.empty()) // add our property and parameters
       {
-        StringUtils::ToLower(property);
+        StringUtils::FoldCase(property);
         info.emplace_back(Property(property, param));
       }
       property.clear();
@@ -9832,7 +9832,7 @@ void CGUIInfoManager::SplitInfoString(const std::string &infoString, std::vector
 
   if (!property.empty())
   {
-    StringUtils::ToLower(property);
+    StringUtils::FoldCase(property);
     info.emplace_back(Property(property, param));
   }
 }
@@ -9888,7 +9888,7 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
             int data1 = TranslateSingleString(prop.param(0), listItemDependent);
             // pipe our original string through the localize parsing then make it lowercase (picks up $LBRACKET etc.)
             std::string label = CGUIInfoLabel::GetLabel(prop.param(1), INFO::DEFAULT_CONTEXT);
-            StringUtils::ToLower(label);
+            StringUtils::FoldCase(label);
             // 'true', 'false', 'yes', 'no' are valid strings, do not resolve them to SYSTEM_ALWAYS_TRUE or SYSTEM_ALWAYS_FALSE
             if (label != "true" && label != "false" && label != "yes" && label != "no")
             {
@@ -10008,7 +10008,7 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
         if (prop.name == "getbool")
         {
           std::string paramCopy = param;
-          StringUtils::ToLower(paramCopy);
+          StringUtils::FoldCase(paramCopy);
           return AddMultiInfo(CGUIInfo(SYSTEM_GET_BOOL, paramCopy));
         }
         for (const infomap& i : system_param)
@@ -10036,7 +10036,7 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
           if (infoLabel > 0)
             return AddMultiInfo(CGUIInfo(SYSTEM_ADDON_TITLE, infoLabel, 0));
           std::string label = CGUIInfoLabel::GetLabel(param, INFO::DEFAULT_CONTEXT);
-          StringUtils::ToLower(label);
+          StringUtils::FoldCase(label);
           return AddMultiInfo(CGUIInfo(SYSTEM_ADDON_TITLE, label, 1));
         }
         else if (prop.name == "addonicon")
@@ -10045,7 +10045,7 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
           if (infoLabel > 0)
             return AddMultiInfo(CGUIInfo(SYSTEM_ADDON_ICON, infoLabel, 0));
           std::string label = CGUIInfoLabel::GetLabel(param, INFO::DEFAULT_CONTEXT);
-          StringUtils::ToLower(label);
+          StringUtils::FoldCase(label);
           return AddMultiInfo(CGUIInfo(SYSTEM_ADDON_ICON, label, 1));
         }
         else if (prop.name == "addonversion")
@@ -10054,7 +10054,7 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
           if (infoLabel > 0)
             return AddMultiInfo(CGUIInfo(SYSTEM_ADDON_VERSION, infoLabel, 0));
           std::string label = CGUIInfoLabel::GetLabel(param, INFO::DEFAULT_CONTEXT);
-          StringUtils::ToLower(label);
+          StringUtils::FoldCase(label);
           return AddMultiInfo(CGUIInfo(SYSTEM_ADDON_VERSION, label, 1));
         }
         else if (prop.name == "idletime")
@@ -10102,7 +10102,7 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
       else if (prop.name == "hascontent" && prop.num_params())
       {
         std::string cat = prop.param(0);
-        StringUtils::ToLower(cat);
+        StringUtils::FoldCase(cat);
         if (cat == "music")
           return LIBRARY_HAS_MUSIC;
         else if (cat == "video")
@@ -10127,7 +10127,7 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
       else if (prop.name == "hasnode" && prop.num_params())
       {
         std::string node = prop.param(0);
-        StringUtils::ToLower(node);
+        StringUtils::FoldCase(node);
         return AddMultiInfo(CGUIInfo(LIBRARY_HAS_NODE, prop.param(), 0));
       }
     }
@@ -10775,14 +10775,14 @@ bool CGUIInfoManager::GetMultiInfoBool(const CGUIInfo &info, int contextWindow, 
           { // conditional string
             compare = info.GetData3();
           }
-          StringUtils::ToLower(compare);
+          StringUtils::FoldCase(compare);
 
           std::string label;
           if (item && item->IsFileItem() && IsListItemInfo(info.GetData1()))
             label = GetItemImage(item, contextWindow, info.GetData1());
           else
             label = GetImage(info.GetData1(), contextWindow);
-          StringUtils::ToLower(label);
+          StringUtils::FoldCase(label);
 
           if (condition == STRING_STARTS_WITH)
             bReturn = StringUtils::StartsWith(label, compare);

@@ -3260,9 +3260,9 @@ std::string CFileItem::GetUserMusicThumb(bool alwaysCheckRemote /* = false */, b
         StringUtils::Replace(folderThumb1, strFileName, name + ext);
         if (CFile::Exists(folderThumb1)) // Folder.JPG
           return folderThumb1;
-
+        
         folderThumb1 = folderThumb;
-        StringUtils::ToLower(ext);
+        StringUtils::FoldCase(ext);
         StringUtils::Replace(folderThumb1, strFileName, name + ext);
         if (CFile::Exists(folderThumb1)) // Folder.jpg
           return folderThumb1;

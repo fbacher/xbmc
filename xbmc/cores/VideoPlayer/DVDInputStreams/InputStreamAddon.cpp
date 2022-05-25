@@ -390,7 +390,7 @@ KODI_HANDLE CInputStreamAddon::cb_get_stream_transfer(KODI_HANDLE handle,
   if (stream->m_streamType != INPUTSTREAM_TYPE_TELETEXT &&
       stream->m_streamType != INPUTSTREAM_TYPE_RDS)
   {
-    StringUtils::ToLower(codecName);
+    StringUtils::FoldCase(codecName);
     codec = avcodec_find_decoder_by_name(codecName.c_str());
     if (!codec)
       return nullptr;

@@ -970,11 +970,13 @@ std::vector<CScraperUrl> CScraper::FindMovie(XFILE::CCurlFile &fcurl,
 
         // calculate the relevance of this hit
         std::string sCompareTitle = scurlMovie.GetTitle();
-        StringUtils::ToLower(sCompareTitle);
+        StringUtils::FoldCase(sCompareTitle);
         std::string sMatchTitle = sTitle;
-        StringUtils::ToLower(sMatchTitle);
+        StringUtils::FoldCase(sMatchTitle);
 
         /*
+         * TODO: Need Unicode fuzzy compare
+         *
          * Identify the best match by performing a fuzzy string compare on the search term and
          * the result. Additionally, use the year (if available) to further refine the best match.
          * An exact match scores 1, a match off by a year scores 0.5 (release dates can vary between

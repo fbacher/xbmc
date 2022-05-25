@@ -54,7 +54,7 @@ CMediaCodecDecoderFilterManager::CMediaCodecDecoderFilterManager()
         flags = 0;
     }
     std::string tmp(codecname);
-    StringUtils::ToLower(tmp);
+    StringUtils::FoldCase(tmp);
     int minheight = 0;
     if (tmp.find("mpeg4") != std::string::npos)
       minheight = 720;

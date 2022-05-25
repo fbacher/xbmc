@@ -79,7 +79,7 @@ bool CBuiltins::HasCommand(const std::string& execString)
   std::string function;
   std::vector<std::string> parameters;
   CUtil::SplitExecFunction(execString, function, parameters);
-  StringUtils::ToLower(function);
+  StringUtils::FoldCase(function);
 
   if (CServiceBroker::GetInputManager().HasBuiltin(function))
     return true;
@@ -99,7 +99,7 @@ bool CBuiltins::IsSystemPowerdownCommand(const std::string& execString)
   std::string execute;
   std::vector<std::string> params;
   CUtil::SplitExecFunction(execString, execute, params);
-  StringUtils::ToLower(execute);
+  StringUtils::FoldCase(execute);
 
   // Check if action is resulting in system powerdown.
   if (execute == "reboot"    ||
@@ -145,7 +145,7 @@ int CBuiltins::Execute(const std::string& execString)
   std::string execute;
   std::vector<std::string> params;
   CUtil::SplitExecFunction(execString, execute, params);
-  StringUtils::ToLower(execute);
+  StringUtils::FoldCase(execute);
 
   const auto& it = m_command.find(execute);
   if (it != m_command.end())

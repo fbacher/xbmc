@@ -304,7 +304,7 @@ CRepository::DirInfo CRepository::ParseDirConfiguration(const CAddonExtensions& 
   }
 
   std::string hashStr = configuration.GetValue("hashes").asString();
-  StringUtils::ToLower(hashStr);
+  StringUtils::FoldCase(hashStr);
   if (hashStr == "true")
   {
     // Deprecated alias

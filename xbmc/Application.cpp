@@ -3763,7 +3763,7 @@ void CApplication::PrintStartupLog()
   m_ServiceManager->GetNetwork().GetHostName(hostname);
   CLog::Log(LOGINFO, "Local hostname: {}", hostname);
   std::string lowerAppName = CCompileInfo::GetAppName();
-  StringUtils::ToLower(lowerAppName);
+  StringUtils::FoldCase(lowerAppName);
   CLog::Log(LOGINFO, "Log File is located: {}.log",
             CSpecialProtocol::TranslatePath("special://logpath/" + lowerAppName));
   CRegExp::LogCheckUtf8Support();

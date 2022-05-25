@@ -890,6 +890,17 @@ void CWebVTTHandler::ConvertSubtitle(std::string& text)
   while ((pos = m_tagsRegex.RegFind(text.c_str(), pos)) >= 0)
   {
     std::string fullTag = m_tagsRegex.GetMatch(0);
+
+    // TODO: if text is non-ASCII, then length can change with ToLower or FoldCase
+    // This will cause text.erase to fail. If ASCII and ToLower is correct,
+    // then probably want to pass plain C locale, or ASCII icu::Locale so
+    // that current language does not mess with characters, like Turkic
+    // (and others) can do.
+
+    if (StringUtils::containsNonAscii(fullTag)) {
+      CLog::Log(LOGWARNING, "CWebVTTHandler::ConvertSubtitle fullTag is non-ASCII: {}\n", fullTag);
+    }
+
     StringUtils::ToLower(fullTag);
     // Get tag name only (e.g. full tag is "</c>", tagName will be "c")
     std::string tagName = m_tagsRegex.GetMatch(1);

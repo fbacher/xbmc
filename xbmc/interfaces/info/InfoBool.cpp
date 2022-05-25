@@ -20,6 +20,6 @@ namespace INFO
       m_refreshCounter(0),
       m_parentRefreshCounter(refreshCounter)
   {
-    StringUtils::ToLower(m_expression);
+    StringUtils::FoldCase(m_expression);
   }
 }

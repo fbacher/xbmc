@@ -144,11 +144,16 @@ void CDirectoryHistory::DumpPathHistory()
               m_vecPathHistory[i].m_strFilterPath);
 }
 
-std::string CDirectoryHistory::preparePath(const std::string &strDirectory, bool tolower /* = true */)
+std::string CDirectoryHistory::preparePath(const std::string &strDirectory, bool foldCase /* = true */)
 {
+  // Use FoldCase instead of ToLower because case folding is more
+  // normalizing. ToLower tries to preserve language rules, whereas
+  // FoldCase ignores locale. In particular, folding does not have the
+  // 'Turkic "I" problem'. It also strips insignificant accents, etc.
+  
   std::string strDir = strDirectory;
-  if (tolower)
-    StringUtils::ToLower(strDir);
+  if (foldCase)
+    StringUtils::FoldCase(strDir);
 
   URIUtils::RemoveSlashAtEnd(strDir);
 

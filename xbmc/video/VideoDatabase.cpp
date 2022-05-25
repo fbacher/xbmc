@@ -8097,7 +8097,7 @@ ScraperPtr CVideoDatabase::GetScraperForPath(const std::string& strPath, SScanSe
 
       // try and ascertain scraper for this path
       std::string strcontent = m_pDS->fv("path.strContent").get_asString();
-      StringUtils::ToLower(strcontent);
+      StringUtils::FoldCase(strcontent);
       content = TranslateContent(strcontent);
 
       //FIXME paths stored should not have empty strContent
@@ -8141,7 +8141,7 @@ ScraperPtr CVideoDatabase::GetScraperForPath(const std::string& strPath, SScanSe
         {
           settings.m_allExtAudio = m_pDS->fv("path.allAudio").get_asBool();
           std::string strcontent = m_pDS->fv("path.strContent").get_asString();
-          StringUtils::ToLower(strcontent);
+          StringUtils::FoldCase(strcontent);
           if (m_pDS->fv("path.exclude").get_asBool())
           {
             settings.exclude = true;

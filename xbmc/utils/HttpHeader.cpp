@@ -32,6 +32,8 @@ void CHttpHeader::Parse(const std::string& strData)
   // If current line is NOT started from whitespace char, then previously stored (and completed) m_lastHeaderLine is parsed and current line is assigned to m_lastHeaderLine (to be parsed later)
   while (pos < len)
   {
+  	// TODO: Unicode 0x0a could appear in middle of a multi-byte character
+
     size_t lineEnd = strData.find('\x0a', pos); // use '\x0a' instead of '\n' to be platform independent
 
     if (lineEnd == std::string::npos)
@@ -76,7 +78,7 @@ bool CHttpHeader::ParseLine(const std::string& headerLine)
     std::string strValue(headerLine, valueStart + 1);
 
     StringUtils::Trim(strParam, m_whitespaceChars);
-    StringUtils::ToLower(strParam);
+    StringUtils::FoldCase(strParam);
 
     StringUtils::Trim(strValue, m_whitespaceChars);
 
@@ -94,7 +96,7 @@ bool CHttpHeader::ParseLine(const std::string& headerLine)
 void CHttpHeader::AddParam(const std::string& param, const std::string& value, const bool overwrite /*= false*/)
 {
   std::string paramLower(param);
-  StringUtils::ToLower(paramLower);
+  StringUtils::FoldCase(paramLower);
   StringUtils::Trim(paramLower, m_whitespaceChars);
   if (paramLower.empty())
     return;
@@ -123,7 +125,7 @@ void CHttpHeader::AddParam(const std::string& param, const std::string& value, c
 std::string CHttpHeader::GetValue(const std::string& strParam) const
 {
   std::string paramLower(strParam);
-  StringUtils::ToLower(paramLower);
+  StringUtils::FoldCase(paramLower);
 
   return GetValueRaw(paramLower);
 }
@@ -142,7 +144,7 @@ std::string CHttpHeader::GetValueRaw(const std::string& strParam) const
 
 std::vector<std::string> CHttpHeader::GetValues(std::string strParam) const
 {
-  StringUtils::ToLower(strParam);
+  StringUtils::FoldCase(strParam);
   std::vector<std::string> values;
 
   for (HeaderParams::const_iterator iter = m_params.begin(); iter != m_params.end(); ++iter)
