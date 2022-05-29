@@ -1103,12 +1103,15 @@ void CGUIBaseContainer::UpdateScrollByLetter()
   {
     CGUIListItemPtr item = m_items[i];
     // The letter offset jumping is only for ASCII characters at present, and
-    // our checks are all done in uppercase
+    // our checks are all done in uppercase.
+    // To avoid problems with "Turkic I" use caseless compare (which is locale
+    // independent).
+
     std::string nextLetter;
     std::wstring character = item->GetSortLabel().substr(0, 1);
-    StringUtils::ToUpper(character);
     g_charsetConverter.wToUTF8(character, nextLetter);
-    if (currentMatch != nextLetter)
+
+    if (! StringUtils::EqualsNoCase(currentMatch, nextLetter))
     {
       currentMatch = nextLetter;
       m_letterOffsets.emplace_back(static_cast<int>(i), currentMatch);
