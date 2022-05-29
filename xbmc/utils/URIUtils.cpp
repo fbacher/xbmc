@@ -139,7 +139,13 @@ void URIUtils::RemoveExtension(std::string& strFileName)
   if (period != std::string::npos && strFileName[period] == '.')
   {
     std::string strExtension = strFileName.substr(period);
-    StringUtils::ToLower(strExtension);
+	
+	// TODO: Unicode, verify
+	
+    if (StringUtils::containsNonAscii(strExtension)) {
+      CLog::Log(LOGWARNING, "URIUtils::RemoveExtension strExtension contains non-ASCII: {}", strExtension);
+    }
+    StringUtils::ToLower(strExtension, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
     strExtension += "|";
 
     std::string strFileMask;

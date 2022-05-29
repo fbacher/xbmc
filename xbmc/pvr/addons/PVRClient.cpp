@@ -2078,7 +2078,10 @@ public:
       return retVal;
 
     std::string strUpperCodecName = strCodecName;
-    StringUtils::ToUpper(strUpperCodecName);
+    if (StringUtils::containsNonAscii(strUpperCodecName)) {
+      CLog::Log(LOGWARNING, "CCodecIds::GetCodecByName strCodecName contains non-ASCII: {}", strCodecName);
+    }
+    StringUtils::ToUpper(strUpperCodecName, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues);
 
     std::map<std::string, PVR_CODEC>::const_iterator it = m_lookup.find(strUpperCodecName);
     if (it != m_lookup.end())
@@ -2102,7 +2105,10 @@ private:
         tmp.codec_id = codec->id;
 
         std::string strUpperCodecName = codec->name;
-        StringUtils::ToUpper(strUpperCodecName);
+        if (StringUtils::containsNonAscii(strUpperCodecName)) {
+          CLog::Log(LOGWARNING, "CCodecIds::CCodecIds strCodecName contains non-ASCII: {}", strUpperCodecName);
+        }
+        StringUtils::ToUpper(strUpperCodecName, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues);
 
         m_lookup.insert(std::make_pair(strUpperCodecName, tmp));
       }

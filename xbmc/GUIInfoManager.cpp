@@ -11196,9 +11196,30 @@ std::string CGUIInfoManager::GetMultiInfoItemLabel(const CFileItem *item, int co
       }
       case LISTITEM_SORT_LETTER:
       {
+        // This is a bit messy for some languages:
+        // characters (grapheme) may be more than one codepoint. Normalization
+        // might help a bit.
+        // Upper case may result in more than one grapheme. Underlying
+        // code wants one. Will have to learn by experience
+
         std::string letter;
-        std::wstring character(1, item->GetSortLabel()[0]);
-        StringUtils::ToUpper(character);
+        std::wstring label = std::wstring(item->GetSortLabel());
+
+        // This normalizer breaks the accents, etc. into separate codepoints
+        // Most important codepoint is first
+        // TODO: Unicode fpf Test. Decide what behavior is wanted. Ex: Greek Tau looks a lot like T
+        //       it is undoubtedly more than one byte. Should the user expect it to map to a T?
+        //       Should user need to use extended key codes to enter? What happens if this is a
+        //       "foreign" movie to the user (what would someone speaking English expect to
+        //       type? Perhaps a "T" for Tau makes sense. How is this accomplished?
+
+        StringUtils::ToUpper(label);
+
+        // FOLD_CASE_DEFAULT only impacts case-folding normalizer. Here a no-op
+
+        StringUtils::Normalize(label, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFKD);
+
+        std::wstring character = label.substr(0, 1);
         g_charsetConverter.wToUTF8(character, letter);
         return letter;
       }

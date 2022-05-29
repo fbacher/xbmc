@@ -3248,14 +3248,26 @@ std::string CFileItem::GetUserMusicThumb(bool alwaysCheckRemote /* = false */, b
         std::string folderThumb1 = folderThumb;
         name.erase(period);
         ext = strFileName.substr(period);
-        StringUtils::ToUpper(ext);
+		
+		// TODO: Unicode, verify. Is this really needed?
+		
+        if (StringUtils::containsNonAscii(ext)) {
+          CLog::Log(LOGWARNING, "CFileItem::GetUserMusicThumb ext contains non-ASCII: {}", ext);
+        }
+        StringUtils::ToUpper(ext, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
         StringUtils::Replace(folderThumb1, strFileName, name + ext);
         if (CFile::Exists(folderThumb1)) // folder.JPG
           return folderThumb1;
 
         folderThumb1 = folderThumb;
         std::string firstletter = name.substr(0, 1);
-        StringUtils::ToUpper(firstletter);
+		
+		// TODO: Unicode, verify. Is this really needed?
+		
+        if (StringUtils::containsNonAscii(firstletter)) {
+          CLog::Log(LOGWARNING, "CFileItem::GetUserMusicThumb firstletter contains non-ASCII: {}", firstletter);
+        }
+        StringUtils::ToUpper(firstletter, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
         name.replace(0, 1, firstletter);
         StringUtils::Replace(folderThumb1, strFileName, name + ext);
         if (CFile::Exists(folderThumb1)) // Folder.JPG

@@ -14,6 +14,7 @@
 #include "guilib/guiinfo/GUIInfoLabels.h"
 #include "utils/Archive.h"
 #include "utils/CharsetConverter.h"
+#include "utils/log.h"
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
@@ -131,7 +132,13 @@ bool CPictureInfoTag::Load(const std::string &path)
 
   // Get file extensions to find addon related to it.
   std::string strExtension = URIUtils::GetExtension(path);
-  StringUtils::ToLower(strExtension);
+
+  // TODO: Unicode, looks like trouble
+
+  if (StringUtils::containsNonAscii(strExtension)) {
+       CLog::Log(LOGWARNING, "CPictureInfoTag::Load strExtension contains non-ASCII: {}", strExtension);
+     }
+  StringUtils::ToLower(strExtension, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
   if (!strExtension.empty() && CServiceBroker::IsBinaryAddonCacheUp())
   {
     // Load via available image decoder addons

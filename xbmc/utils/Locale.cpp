@@ -8,6 +8,7 @@
 
 #include "Locale.h"
 
+#include "utils/log.h"
 #include "utils/StringUtils.h"
 
 const CLocale CLocale::Empty;
@@ -96,7 +97,13 @@ std::string CLocale::ToStringLC() const
     return "";
 
   std::string locale = ToString();
-  StringUtils::ToLower(locale);
+  
+  // TODO: Unicode Verify
+  
+  if (StringUtils::containsNonAscii(locale)) {
+       CLog::Log(LOGWARNING, "CLocale::ToStringLC locale contains non-ASCII: {}", locale);
+     }
+  StringUtils::ToLower(locale, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
 
   return locale;
 }
@@ -240,13 +247,25 @@ bool CLocale::ParseLocale(const std::string &locale, std::string &language, std:
   if (pos != std::string::npos)
   {
     territory = tmp.substr(pos + 1);
-    StringUtils::ToUpper(territory);
+  
+     // TODO: Unicode Verify
+  
+    if (StringUtils::containsNonAscii(territory)) {
+      CLog::Log(LOGWARNING, "CLocale::ParseLocale territory contains non-ASCII: {}", territory);
+    }
+    StringUtils::ToUpper(territory, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
     tmp = tmp.substr(0, pos);
   }
 
   // what remains is the language
   language = tmp;
-  StringUtils::ToLower(language);
+    
+  // TODO: Unicode Verify
+  
+  if (StringUtils::containsNonAscii(language)) {
+       CLog::Log(LOGWARNING, "CLocale::ParseLocale language contains non-ASCII: {}", language);
+     }
+  StringUtils::ToLower(language, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
 
   return CheckValidity(language, territory, codeset, modifier);
 }
@@ -256,8 +275,17 @@ void CLocale::Initialize()
   m_valid = CheckValidity(m_language, m_territory, m_codeset, m_modifier);
   if (m_valid)
   {
-    StringUtils::ToLower(m_language);
-    StringUtils::ToUpper(m_territory);
+    
+    // TODO: Unicode Verify
+  
+    if (StringUtils::containsNonAscii(m_language)) {
+      CLog::Log(LOGWARNING, " CLocale::Initialize m_language contains non-ASCII: {}", m_language);
+    }
+    if (StringUtils::containsNonAscii(m_territory)) {
+      CLog::Log(LOGWARNING, " CLocale::Initialize m_territory contains non-ASCII: {}", m_territory);
+    }
+    StringUtils::ToLower(m_language, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
+    StringUtils::ToUpper(m_territory, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
   }
 }
 

@@ -7,7 +7,8 @@
  */
 
 #include "HttpHeader.h"
-
+#include "unicode/locid.h"
+#include "utils/log.h"
 #include "utils/StringUtils.h"
 
 // header white space characters according to RFC 2616
@@ -32,8 +33,6 @@ void CHttpHeader::Parse(const std::string& strData)
   // If current line is NOT started from whitespace char, then previously stored (and completed) m_lastHeaderLine is parsed and current line is assigned to m_lastHeaderLine (to be parsed later)
   while (pos < len)
   {
-  	// TODO: Unicode 0x0a could appear in middle of a multi-byte character
-
     size_t lineEnd = strData.find('\x0a', pos); // use '\x0a' instead of '\n' to be platform independent
 
     if (lineEnd == std::string::npos)
@@ -186,7 +185,12 @@ std::string CHttpHeader::GetCharset(void) const
   if (strValue.empty())
     return strValue;
 
-  StringUtils::ToUpper(strValue);
+  // TODO: Unicode Verify
+  
+  if (StringUtils::containsNonAscii(strValue)) {
+    CLog::Log(LOGWARNING, "CHttpHeader::GetCharset strValue contains non-ASCII: {}", strValue);
+  }
+  StringUtils::ToUpper(strValue, icu::Locale::getEnglish());
   const size_t len = strValue.length();
 
   // extract charset value from 'contenttype/contentsubtype;pram1=param1Val ; charset=XXXX\t;param2=param2Val'
