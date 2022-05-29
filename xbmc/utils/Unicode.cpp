@@ -3,6 +3,7 @@
 //#include <stdlib.h>
 #include <sstream>
 #include <locale>
+#include <limits.h>
 #include <codecvt>
 #include <algorithm>
 #include <iostream>
@@ -2273,6 +2274,60 @@ bool Unicode::Contains(const std::string &str, const std::vector<std::string> &k
   return false;
 }
 
+thread_local icu::Collator* myCollator = nullptr;
+
+bool Unicode::InitializeCollator(std::locale locale, bool normalize /* = false */ ) {
+  icu::Locale icuLocale = Unicode::getICULocale(locale);
+  Unicode::InitializeCollator(icuLocale, normalize);
+}
+
+bool Unicode::InitializeCollator(icu::Locale icuLocale, bool normalize /* = false */)
+{
+  UErrorCode status = U_ZERO_ERROR;
+  icu::UnicodeString dispName;
+  if (myCollator != nullptr)
+  {
+    free(myCollator);
+  }
+  std::string localeId = Unicode::getICULocaleId(icuLocale);
+  CLog::Log(LOGINFO, "Collate locale: {}", localeId);
+
+  myCollator = icu::Collator::createInstance(icuLocale, status);
+  if (U_FAILURE(status))
+  {
+    icuLocale.getDisplayName(dispName);
+    CLog::Log(LOGWARNING, "Failed to create the collator for : \"{}\"\n", toString(dispName));
+    return false;
+  }
+  // Go with default Normalization (off). Some free normalization
+  // is still performed. Even with it on, you should do some
+  // extra normalization up-front to handle certain
+  // locales/codepoints. See the documentation for UCOL_NORMALIZATION_MODE
+  // for a hint.
+
+  status = U_ZERO_ERROR;
+
+  if (normalize)
+    myCollator->setAttribute(UCOL_NORMALIZATION_MODE, UCOL_ON, status);
+  else
+    myCollator->setAttribute(UCOL_NORMALIZATION_MODE, UCOL_OFF, status);
+  if (U_FAILURE(status))
+  {
+    icuLocale.getDisplayName(dispName);
+    CLog::Log(LOGWARNING, "Failed to set normalization for the collator: \"{}\"\n",
+        toString(dispName));
+    return false;
+  }
+  myCollator->setAttribute(UCOL_NUMERIC_COLLATION, UCOL_ON, status);
+  if (U_FAILURE(status))
+  {
+    icuLocale.getDisplayName(dispName);
+    CLog::Log(LOGWARNING, "Failed to set numeric collation: \"{}\"\n", toString(dispName));
+    return false;
+  }
+  return true;
+}
+
 /**
  * Experimental Collation function aimed at being equivalent to StringUtils::AlphaNumericCompare
  * but using ICU. The ICU should be superior. Need to do performance tests.
@@ -2291,62 +2346,20 @@ bool Unicode::Contains(const std::string &str, const std::vector<std::string> &k
  * https://unicode-org.github.io/icu/userguide/collation/faq.html
  *
  */
-int32_t Unicode::Collate(const std::wstring &left, const std::wstring &right,
-    const icu::Locale icuLocale, const bool normalize)
+int32_t Unicode::Collate(const std::wstring &left, const std::wstring &right)
 {
 
   // TODO: Unicode. Not multi-threaded. Need to open and close collator for each use. This will require
   // higher-level setup/teardown, probably in SortUtils. Can "safe clone" to make work in
   // multi-thread environment. See https://unicode-org.github.io/icu/userguide/collation/architecture.html
 
-  static std::string localeId = "none";
-  static bool wasNormalized = false;  // Doesn't matter
-  static icu::Collator* myCollator = nullptr;
   UErrorCode status = U_ZERO_ERROR;
-  icu::UnicodeString dispName;
 
-  std::string newLocaleId = Unicode::getICULocaleId(icuLocale);
-  if (newLocaleId != localeId or (normalize != wasNormalized))
+  if (myCollator == nullptr)
   {
-    CLog::Log(LOGINFO, "Collate locale: %s", localeId);
-    if (myCollator != nullptr)
-    {
-      free(myCollator);
+      CLog::Log(LOGWARNING, "Collator NOT configured\n");
+      return INT_MIN;
     }
-    localeId = newLocaleId;
-    wasNormalized = normalize;
-    myCollator = icu::Collator::createInstance(icuLocale, status);
-    if (U_FAILURE(status))
-    {
-      icuLocale.getDisplayName(dispName);
-      CLog::Log(LOGWARNING, "Failed to create the collator for : \"%s\"\n", toString(dispName));
-      return -1234;
-    }
-    // Go with default Normalization (off). Some free normalization
-    // is still performed. Even with it on, you should do some
-    // extra normalization up-front to handle certain
-    // locales/codepoints. See the documentation for UCOL_NORMALIZATION_MODE
-    // for a hint.
-
-    status = U_ZERO_ERROR;
-
-    if (normalize)
-      myCollator->setAttribute(UCOL_NORMALIZATION_MODE, UCOL_ON, status);
-    else
-      myCollator->setAttribute(UCOL_NORMALIZATION_MODE, UCOL_OFF, status);
-    if (U_FAILURE(status))
-    {
-      icuLocale.getDisplayName(dispName);
-      CLog::Log(LOGWARNING, "Failed to set normalization for the collator: \"%s\"\n",
-          toString(dispName));
-    }
-    myCollator->setAttribute(UCOL_NUMERIC_COLLATION, UCOL_ON, status);
-    if (U_FAILURE(status))
-    {
-      icuLocale.getDisplayName(dispName);
-      CLog::Log(LOGWARNING, "Failed to set numeric collation: \"%s\"\n", toString(dispName));
-    }
-  }
 
   // Stack based memory. A bit tedious. There must be a way to do this in a template,
   // or not so awful Macro.

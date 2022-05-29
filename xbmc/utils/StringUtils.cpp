@@ -12,6 +12,9 @@
 //  Purpose:   ATL split string utility
 //  Author:    Paul J. Weiss
 //
+//  Major modifications by Frank Feuerbacher to utilize icu4c Unicode library
+//  to resolve issues discovered in Kodi 19 Matrix (Unicode and Python 3 support)
+//
 //  Modified to use J O'Leary's std::string class by kraqh3d
 //
 //------------------------------------------------------------------------
@@ -38,13 +41,13 @@
 #include <inttypes.h>
 #include <iomanip>
 #include <math.h>
+#include <memory.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-
 #include <fstrcmp.h>
-#include <memory.h>
+
 #include <unicode/utf8.h>
 #include "utils/log.h"
 
@@ -166,7 +169,7 @@ void StringUtils::ToUpper(std::string &str, const icu::Locale &locale) {
 }
 
 void StringUtils::ToUpper(std::string &str, const std::locale &locale) {
-	icu::Locale icuLocale = Unicode::getDefaultICULocale();
+  icu::Locale icuLocale = Unicode::getICULocale(locale);
   return StringUtils::ToUpper(str, icuLocale);
 }
 
@@ -182,7 +185,7 @@ void StringUtils::ToUpper(std::wstring &str, const std::locale &locale) {
 	if (str.length() == 0)
 		return;
 
-	icu::Locale icuLocale = Unicode::getDefaultICULocale();
+  icu::Locale icuLocale = Unicode::getICULocale(locale);
   StringUtils::ToUpper(str, icuLocale);
 }
 
@@ -201,7 +204,8 @@ void StringUtils::ToUpper(std::wstring &str) {
 	if (str.length() == 0)
 		return;
 
-	StringUtils::ToUpper(str, g_langInfo.GetSystemLocale());
+  icu::Locale icuLocale = Unicode::getDefaultICULocale();
+	StringUtils::ToUpper(str, icuLocale);
 }
 
 /**
@@ -209,7 +213,7 @@ void StringUtils::ToUpper(std::wstring &str) {
  * TODO: fix this
  */
 void StringUtils::ToLower(std::string &str, const std::locale &locale) {
-	icu::Locale icuLocale = Unicode::getDefaultICULocale();
+  icu::Locale icuLocale = Unicode::getICULocale(locale);
 	return StringUtils::ToLower(str, icuLocale);
 }
 
@@ -227,7 +231,7 @@ void StringUtils::ToLower(std::string &str, const icu::Locale &locale) {
 }
 
 void StringUtils::ToLower(std::wstring &str, const std::locale &locale) {
-	icu::Locale icuLocale = Unicode::getDefaultICULocale();
+  icu::Locale icuLocale = Unicode::getICULocale(locale);
   return StringUtils::ToLower(str, icuLocale);
 }
 
@@ -243,12 +247,13 @@ void StringUtils::ToLower(std::wstring &str, const icu::Locale &locale) {
 }
 
 void StringUtils::ToLower(std::string &str) {
-	return StringUtils::ToLower(str, g_langInfo.GetSystemLocale());
+  icu::Locale icuLocale = Unicode::getDefaultICULocale();
+	return StringUtils::ToLower(str, icuLocale);
 }
 
 void StringUtils::ToLower(std::wstring &str) {
-	return StringUtils::ToLower(str, g_langInfo.GetSystemLocale());
-}
+  icu::Locale icuLocale = Unicode::getDefaultICULocale();
+  return StringUtils::ToLower(str, icuLocale);}
 
 void StringUtils::FoldCase(std::string &str, const StringOptions opt /*  = StringOptions::FOLD_CASE_DEFAULT */) {
 	if (str.length() == 0)
@@ -273,7 +278,7 @@ void StringUtils::ToCapitalize(std::wstring &str, const icu::Locale &locale) {
 }
 
 void StringUtils::ToCapitalize(std::wstring &str, const std::locale &locale) {
-	icu::Locale icuLocale = Unicode::getDefaultICULocale();
+	icu::Locale icuLocale = Unicode::getICULocale(locale);
   return StringUtils::ToCapitalize(str, icuLocale);
 }
 
@@ -285,18 +290,20 @@ void StringUtils::ToCapitalize(std::string &str, const icu::Locale &locale) {
 }
 
 void StringUtils::ToCapitalize(std::string &str, const std::locale &locale) {
-	icu::Locale icuLocale = Unicode::getDefaultICULocale();
+  icu::Locale icuLocale = Unicode::getICULocale(locale);
   StringUtils::ToCapitalize(str, icuLocale);
 	return;
 }
 
 void StringUtils::ToCapitalize(std::wstring &str) {
-	StringUtils::ToCapitalize(str, g_langInfo.GetSystemLocale());
+  icu::Locale icuLocale = Unicode::getDefaultICULocale();
+	StringUtils::ToCapitalize(str, icuLocale);
 	return;
 }
 
 void StringUtils::ToCapitalize(std::string &str) {
-	StringUtils::ToCapitalize(str, g_langInfo.GetSystemLocale());
+  icu::Locale icuLocale = Unicode::getDefaultICULocale();
+	StringUtils::ToCapitalize(str, icuLocale);
 	return;
 }
 
@@ -1177,23 +1184,15 @@ static const uint16_t* const planemap[256] = {
 };
 // clang-format on
 
-int32_t StringUtils::Collate(const std::wstring &left, const std::wstring &right,
-		const bool normalize /* = false */) {
-	icu::Locale icuLocale = Unicode::getDefaultICULocale();
-	return StringUtils::Collate(left, right, icuLocale, normalize);
+bool StringUtils::InitializeCollator(bool normalize /* = false */)
+{
+  return Unicode::InitializeCollator(Unicode::getDefaultICULocale(), normalize);
 }
 
-int32_t StringUtils::Collate(const std::wstring &left, const std::wstring &right,
-		std::locale locale,	const bool normalize /* = false */) {
-	icu::Locale icuLocale = Unicode::getDefaultICULocale();
-  return StringUtils::Collate(left, right, icuLocale, normalize);
+int32_t StringUtils::Collate(const std::wstring &left, const std::wstring &right)
+{
+	return Unicode::Collate(left, right);
 }
-
-int32_t StringUtils::Collate(const std::wstring &left, const std::wstring &right,
-		icu::Locale locale, const bool normalize /* = false */) {
-	return Unicode::Collate(left, right, locale, normalize);
-}
-
 
 static wchar_t GetCollationWeight(const wchar_t &r) {
 	// Lookup the "weight" of a UTF8 char, equivalent lowercase ascii letter, in the plane map,
@@ -1216,8 +1215,7 @@ static wchar_t GetCollationWeight(const wchar_t &r) {
 // returns negative if left < right, positive if left > right
 // and 0 if they are identical.
 // See also the equivalent StringUtils::AlphaNumericCollation() for UFT8 data
-int64_t StringUtils::AlphaNumericCompare(const wchar_t *left,
-		const wchar_t *right) {
+int64_t StringUtils::AlphaNumericCompare(const wchar_t *left, const wchar_t *right) {
 #ifdef USE_ICU_COLLATOR
 	int64_t result = StringUtils::Collate(left, right);
   // CLog::Log(LOGINFO, "StringUtils::AlphaNumericCompare Collate left: {} right: {} result: {}\n",
@@ -1763,28 +1761,6 @@ std::string StringUtils::ToHexadecimal(const std::string& in)
   }
   return ss.str();
 }
-
-/*
- * Keeping this regex prototype for now. (It is incomplete. It doesn't handle
- * some of the unusual word separator rules yet.)
- *
-size_t StringUtils::FindWordsz(const std::string& str, const std::string& word) {
-  // Needs work to match original behavior.
-
-
-	std::string match = std::string("(\\Q" + word + "\\E)");  // word to match, protected from regex interpretation
-	//std::string match = std::string("(^|\\s)(" + word + ")");  // word to match, protected from regex interpretation
-
-	std::string pattern = std::string("(?:(?:^|\\s)");
-	pattern += match; // If string begins with match, we are done.
-	pattern += ")|(?:(?:\\s*)+" + match +   // Or if match follows leading whitespace, we are done.
-	//		")|(?:(?:\\s++)*" + match + ")";   // Or, if match occurs anywhere after whitespace.
-	// pattern += "(?:(?:\\s+)" + match + ")";   // Or, if match occurs anywhere after whitespace.
-size_t index = Unicode::regexFind(str, pattern, (uint32_t) myRegexpFlag::UREGEX_CASE_INSENSITIVE | (uint32_t) myRegexpFlag::UREGEX_ERROR_ON_UNKNOWN_ESCAPES); //  | (uint32_t) RegexpFlag::UREGEX_UWORD);
-return index;
-}
-*/
-
 
 size_t StringUtils::FindWords(const std::string& str, const std::string& wordLowerCase) {
 

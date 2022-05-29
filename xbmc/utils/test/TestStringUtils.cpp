@@ -429,6 +429,7 @@ TEST(TestStringUtils, Replace) {
 TEST(TestStringUtils, StartsWith) {
 	std::string refstr = "test";
 
+	// TODO: Test with FoldCase option
 	EXPECT_FALSE(StringUtils::StartsWithNoCase(refstr, "x"));
 
 	EXPECT_TRUE(StringUtils::StartsWith(refstr, "te"));
@@ -447,6 +448,8 @@ TEST(TestStringUtils, EndsWith) {
 }
 
 TEST(TestStringUtils, EndsWithNoCase) {
+  // TODO: Test with FoldCase option
+
 	std::string refstr = "test";
 	EXPECT_FALSE(StringUtils::EndsWithNoCase(refstr, "x"));
 	EXPECT_TRUE(StringUtils::EndsWithNoCase(refstr, "sT"));

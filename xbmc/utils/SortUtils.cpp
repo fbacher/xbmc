@@ -995,8 +995,11 @@ void SortUtils::Sort(SortBy sortBy, SortOrder sortOrder, SortAttribute attribute
         item->insert(std::pair<Field, CVariant>(FieldSort, CVariant(sortLabel)));
       }
 
-      // Do the sorting
-      std::stable_sort(items.begin(), items.end(), getSorter(sortOrder, attributes));
+      if (StringUtils::InitializeCollator(false)) // Used by ICU Collator
+      {
+        // Do the sorting
+        std::stable_sort(items.begin(), items.end(), getSorter(sortOrder, attributes));
+      }
     }
   }
 
@@ -1034,8 +1037,11 @@ void SortUtils::Sort(SortBy sortBy, SortOrder sortOrder, SortAttribute attribute
         (*item)->insert(std::pair<Field, CVariant>(FieldSort, CVariant(sortLabel)));
       }
 
-      // Do the sorting
-      std::stable_sort(items.begin(), items.end(), getSorterIndirect(sortOrder, attributes));
+      if  (StringUtils::InitializeCollator(false)) // Used by ICU Collator
+      {
+        // Do the sorting
+        std::stable_sort(items.begin(), items.end(), getSorterIndirect(sortOrder, attributes));
+      }
     }
   }
 

@@ -411,8 +411,17 @@ public:
   static int8_t strcmp(const std::string &s1, size_t s1_start, size_t s1_length,
       const std::string &s2, size_t s2_start, size_t s2_length, const bool normalize = false);
 
-  static int32_t Collate(const std::wstring &left, const std::wstring &right,
-      const icu::Locale locale, const bool normalize);
+  // Go with default Normalization (off). Some free normalization
+    // is still performed. Even with it on, you should do some
+    // extra normalization up-front to handle certain
+    // locales/codepoints. See the documentation for UCOL_NORMALIZATION_MODE
+    // for a hint.
+
+  static bool InitializeCollator(std::locale locale, bool normalize = false);
+
+  static bool InitializeCollator(icu::Locale icuLocale, bool normalize = false );
+
+  static int32_t Collate(const std::wstring &left, const std::wstring &right);
 
   static int w_strcasecmp(const std::wstring &s1, const std::wstring &s2,
       const StringOptions options, const bool normalize = false);

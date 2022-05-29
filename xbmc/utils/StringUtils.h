@@ -15,24 +15,22 @@
 //  Purpose:   ATL split string utility
 //  Author:    Paul J. Weiss
 //
-//  Modified to support J O'Leary's std::string class by kraqh3d
+//  Major modifications by Frank Feuerbacher to utilize icu4c Unicode library
+//  to resolve issues discovered in Kodi 19 Matrix (Unicode and Python 3 support)
+//
+//  Modified to use J O'Leary's std::string class by kraqh3d
 //
 //------------------------------------------------------------------------
+
 
 // TODO: Move to make/cmake file
 // USE_ICU_COLLATOR chooses between ICU and legacy Kodi collation
 
 #define USE_ICU_COLLATOR 1
 #include <stdarg.h>   // others depend on this
-//#include <stdint.h>
 #include <string>
-//#include <vector>
-//#include <set>
-//#include <iterator>
 #include <sstream>
 #include <iostream>
-//#include <locale>
-// #include "utils/log.h"
 
 // workaround for broken [[deprecated]] in coverity
 #if defined(__COVERITY__)
@@ -46,22 +44,23 @@
 #endif
 
 #include "LangInfo.h"
-#include "XBDateTime.h"
 #include "utils/params_check_macros.h"
 #include "Unicode.h"
+#include "XBDateTime.h"
 
-/*! \brief  C-processor Token string-ification
-
-The following macros can be used to stringify definitions to
-C style strings.
-
-Example:
-
-#define foo 4
-DEF_TO_STR_NAME(foo)  // outputs "foo"
-DEF_TO_STR_VALUE(foo) // outputs "4"
-
-*/
+/*!
+ * \brief  C-processor Token string-ification
+ *
+ * The following macros can be used to stringify definitions to
+ * C style strings.
+ *
+ * Example:
+ *
+ * #define foo 4
+ * DEF_TO_STR_NAME(foo)  // outputs "foo"
+ * DEF_TO_STR_VALUE(foo) // outputs "4"
+ *
+ */
 
 #define DEF_TO_STR_NAME(x) #x
 #define DEF_TO_STR_VALUE(x) DEF_TO_STR_NAME(x)
@@ -166,12 +165,13 @@ public:
    */
 
 
-  /*! \brief Get a formatted string similar to sprintf
-
-  \param fmt Format of the resulting string
-  \param ... variable number of value type arguments
-  \return Formatted string
-  */
+  /*!
+   * \brief Get a formatted string similar to sprintf
+   *
+   * \param fmt Format of the resulting string
+   * \param ... variable number of value type arguments
+   * \return Formatted string
+   */
   template<typename... Args>
   static std::string Format(const std::string& fmt, Args&&... args)
   {
@@ -184,15 +184,13 @@ public:
 
   }
 
-  /*! \brief Get a formatted string similar to sprintf
+  /*!
+   *  \brief Get a formatted wstring similar to sprintf
    *
-   * wstring version of StringUtils::Format
-
-
-  \param fmt Format of the resulting string
-  \param ... variable number of value type arguments
-  \return Formatted string
-  */
+   * \param fmt Format of the resulting string
+   * \param ... variable number of value type arguments
+   * \return Formatted string
+   */
   template<typename... Args>
   static std::wstring Format(const std::wstring& fmt, Args&&... args)
   {
@@ -202,67 +200,72 @@ public:
 
     return ::fmt::format(fmt, EnumToInt(std::forward<Args>(args))...);
     // Can NOT call CLog::Log due to recursion!
-
   }
 
   static std::string FormatV(PRINTF_FORMAT_STRING const char *fmt, va_list args);
   static std::wstring FormatV(PRINTF_FORMAT_STRING const wchar_t *fmt, va_list args);
 
-  /*! \brief Converts a string to Upper case according to locale.
-
-  Conversion rules determined by the locale
-
-  \param str string to change case on
-  \param locale describes what and how to change case
-  \return Formatted string
-  */
+  /*!
+   * \brief Converts a string to Upper case according to locale.
+   *
+   * Note: The length of the string can change, depending upon the underlying
+   * icu::locale.
+   *
+   * \param str string to change case on
+   * \param locale the underlying icu::Locale is created using the language,
+   *        country, etc. from this locale
+   */
   static void ToUpper(std::string &str, const std::locale& locale);
 
-  /*! \brief Converts a string to Upper case according to locale.
-
-  Conversion rules determined by the locale
-
-  \param str string to change case on
-  \param locale
-  \return Formatted string
-  */
+  /*!
+   * \brief Converts a string to Upper case according to locale.
+   *
+   * Note: the length of the string can change, depending upon locale.
+   *
+   * \param str string to change case on
+   * \param locale controls the conversion rules
+   */
   static void ToUpper(std::string &str, const icu::Locale& locale);
 
-  /*! \brief Converts a string to Upper case using LangInfo::GetSystemLocale.
-
-  Conversion rules determined by SystemLocale
-
-  \param str string to change case on
-  */
+  /*!
+   * \brief Converts a string to Upper case using LangInfo::GetSystemLocale
+   *
+   * Note: the length of the string can change, depending upon locale.
+   *
+   * \param str string to change case on
+   */
   static void ToUpper(std::string &str);
 
-  /*! \brief Converts a string to Upper case according to locale.
-
-  Conversion rules determined by the locale
-
-  \param str wstring to change case on
-  \param locale
-  */
-
+  /*!
+   * \brief Converts a wstring to Upper case according to locale.
+   *
+   * Note: The length of the string can change, depending upon the underlying
+   * icu::locale.
+   *
+   * \param str string to change case on
+   * \param locale the underlying icu::Locale is created using the language,
+   *        country, etc. from this locale
+   */
   static void ToUpper(std::wstring &str, const std::locale& locale);
 
-
-  /*! \brief Converts a string to Upper case according to locale.
-
-  Conversion rules determined by the locale
-
-  \param str wstring to change case on
-  \param locale
-  */
+  /*!
+   * \brief Converts a wstring to Upper case according to locale.
+   *
+   * Note: the length of the string can change, depending upon locale.
+   *
+   * \param str string to change case on
+   * \param locale controls the conversion rules
+   */
 
   static void ToUpper(std::wstring &str, const icu::Locale& locale);
 
-  /*! \brief Converts a string to Upper case using LangInfo::GetSystemLocale
-
-  Conversion rules determined by SystemLocale
-
-  \param str wstring to change case on
-  */
+  /*!
+   * \brief Converts a wstring to Upper case using LangInfo::GetSystemLocale
+   *
+   * Note: the length of the string can change, depending upon locale.
+   *
+   * \param str string to change case on
+   */
   static void ToUpper(std::wstring &str);
 
 
@@ -605,18 +608,13 @@ public:
 
    static int Compare(const std::string &str1, const std::string &str2);
 
-   /**
-    * So far have not found any reference to any of the Collate methods, other than
-    * TestStringUtils.
-    */
-   static int32_t Collate(const std::wstring &left, const std::wstring &right,
-   		std::locale locale, const bool normalize = false);
+   static bool InitializeCollator(bool normalize = false);
 
-   static int32_t Collate(const std::wstring &left, const std::wstring &right,
-  		 const bool normalize = false);
+   static int32_t Collate(const std::wstring &left, const std::wstring &right);
 
-   static int32_t Collate(const std::wstring &left, const std::wstring &right,
-   		icu::Locale locale, const bool normalize = false);
+   static int32_t Collate(const wchar_t *left, const wchar_t *right) {
+     return StringUtils::Collate(std::wstring(left), std::wstring(right));
+   }
 
    static int CompareNoCase(const std::wstring &str1, const std::wstring &str2,
    		StringOptions opt = StringOptions::FOLD_CASE_DEFAULT , const bool normalize = false);
