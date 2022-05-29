@@ -45,7 +45,7 @@ bool CDVDSubtitleParserSami::Open(CDVDStreamInfo& hints)
   std::string strClassID;
   strFileName = URIUtils::GetFileName(m_filename);
 
-  // TODO: Using ToLower is frequently a mistake, especially for file names
+  // TODO: Unicode fpf Using ToLower is frequently a mistake, especially for file names
   // Changed all ToLower to FoldCase
 
   StringUtils::FoldCase(strFileName);
