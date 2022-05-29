@@ -41,6 +41,7 @@
 #include "utils/MemUtils.h"
 #include "utils/StringUtils.h"
 #include "utils/SystemInfo.h"
+#include "utils/Unicode.h"
 #include "utils/XTimeUtils.h"
 #include "utils/log.h"
 
@@ -97,7 +98,6 @@ namespace XBMCAddon
       std::string execute;
       std::vector<std::string> params;
       CUtil::SplitExecFunction(function, execute, params);
-      StringUtils::ToLower(execute);
       if (StringUtils::EqualsNoCase(execute, "activatewindow") ||
           StringUtils::EqualsNoCase(execute, "closedialog"))
       {
@@ -169,12 +169,143 @@ namespace XBMCAddon
       return label;
     }
 
+	String utf8_fold(const std::string &src, const int options) {
+		return Unicode::utf8Fold(src, options);
+	}
+
     String getSkinDir()
     {
       XBMC_TRACE;
       return CServiceBroker::GetSettingsComponent()->GetSettings()->GetString(CSettings::SETTING_LOOKANDFEEL_SKIN);
     }
 
+std::vector<Tuple<String, String>> getICULanguage(std::vector<String>& propertyNames)
+{
+  // I would have much preferred to return a Dictionary, but I'm not 
+  // yet skilled enough to extend swig Dictionary for output
+  
+  XBMC_TRACE;
+  std::vector<Tuple<String, String>> result = std::vector<Tuple<String, String>>();
+  icu::Locale currentLocale = Unicode::getDefaultICULocale();
+  for (auto propertyName : propertyNames)
+  {
+    String value;
+    if (propertyName == xbmc::LOCALE_LANGUAGE_ISO_639_1)
+    {
+      value = std::string(currentLocale.getLanguage());
+    }
+    else if (propertyName == xbmc::LOCALE_LANGUAGE_ISO_639_2)
+    {
+      value = std::string(currentLocale.getISO3Language());
+    }
+    else if (propertyName == xbmc::LOCALE_LANGUAGE_ISO_639_2)
+    {
+      value = std::string(currentLocale.getScript());
+    }
+    else if (propertyName == xbmc::LOCALE_COUNTRY_ISO_3166_1_ALPHA_2)
+    {
+      value = std::string(currentLocale.getCountry());
+    }
+    else if (propertyName == xbmc::LOCALE_COUNTRY_ISO_3166_1_ALPHA_3)
+    {
+      value = std::string(currentLocale.getISO3Country());
+    }
+    else if (propertyName == xbmc::LOCALE_SCRIPT_ISO_15924)
+    {
+      value = std::string(currentLocale.getScript());
+    }
+    else if (propertyName == xbmc::LOCALE_PROGRAMATIC_NAME)
+    {
+      value = std::string(currentLocale.getName());
+    }
+    else if (propertyName == xbmc::LOCALE_SHORT_PROGRAMATIC_NAME)
+    {
+      value = std::string(currentLocale.getBaseName());
+    }
+    else if (propertyName == xbmc::LOCALE_VARIANT)
+    {
+      value = std::string(currentLocale.getVariant());
+    }
+    else if (propertyName == xbmc::LOCALE_WINDOWS_LCID)
+    {
+      value = std::to_string(currentLocale.getLCID());
+    }
+    else if (propertyName == xbmc::LOCALE_TRANSLATED_LANGUAGE_NAME)
+    {
+      icu::UnicodeString lang = icu::UnicodeString();
+      currentLocale.getDisplayLanguage(lang);
+      value = String();
+      lang.toUTF8String(value);
+    }
+    else if (propertyName == xbmc::LOCALE_ENGLISH_LANGUAGE_NAME)
+    {
+      icu::UnicodeString lang = icu::UnicodeString();
+      currentLocale.getDisplayLanguage(icu::Locale::getEnglish(), lang);
+      value = String();
+      lang.toUTF8String(value);
+    }
+    else if (propertyName == xbmc::LOCALE_TRANSLATED_COUNTRY)
+    {
+      icu::UnicodeString country = icu::UnicodeString();
+      currentLocale.getDisplayCountry(country);
+      value = String();
+      country.toUTF8String(value);
+    }
+    else if (propertyName == xbmc::LOCALE_ENGLISH_COUNTRY)
+    {
+      icu::UnicodeString country = icu::UnicodeString();
+      currentLocale.getDisplayCountry(icu::Locale::getEnglish(), country);
+      value = String();
+      country.toUTF8String(value);
+    }
+    else if (propertyName == xbmc::LOCALE_TRANSLATED_VARIANT)
+    {
+      icu::UnicodeString variant = icu::UnicodeString();
+      currentLocale.getDisplayVariant(variant);
+      value = String();
+      variant.toUTF8String(value);
+    }
+    else if (propertyName == xbmc::LOCALE_ENGLISH_VARIANT)
+    {
+      icu::UnicodeString variant = icu::UnicodeString();
+      currentLocale.getDisplayVariant(icu::Locale::getEnglish(),variant);
+      value = String();
+      variant.toUTF8String(value);
+    }
+    else if (propertyName == xbmc::LOCALE_TRANSLATED_NAME)
+    {
+      icu::UnicodeString name = icu::UnicodeString();
+      currentLocale.getDisplayName(name);
+      value = String();
+      name.toUTF8String(value);
+
+    }
+    else if (propertyName == xbmc::LOCALE_ENGLISH_NAME)
+    {
+      icu::UnicodeString name = icu::UnicodeString();
+      currentLocale.getDisplayCountry(icu::Locale::getEnglish(), name);
+      value = String();
+      name.toUTF8String(value);
+    }
+
+    Tuple<String, String> entry = Tuple<String, String>(propertyName, value);
+    result.push_back(entry);
+  }
+  return result;
+}
+
+    /*
+     * TODO: This appears to be a bit buggy and has not-fully documented behavior. The fix is complicated
+     *       and would require careful review and research to ensure dependent code is not harmed.
+     *       *** It is possible that some of the odd behaviors occurred due to the "Turkic-I" patch
+     *
+     *       Instead, implemented getICULanguage, above.
+     *
+     *       Some of the issues:
+     *         - Sometimes, when you ask for language code & region, only the region ("-US") is returned
+     *         - If a ISO language code, it may return the region instead, if it can't find the language
+     *         - There is no control whether the region/country (ISO 3166) is 2 or 3 chars long
+     */
     String getLanguage(int format /* = CLangCodeExpander::ENGLISH_NAME */, bool region /*= false*/)
     {
       XBMC_TRACE;
@@ -191,34 +322,30 @@ namespace XBMCAddon
           }
           return lang;
         }
-      case CLangCodeExpander::ISO_639_1:
+      case CLangCodeExpander::ISO_639_1: // Two-letter language code
         {
-          std::string langCode;
-          g_LangCodeExpander.ConvertToISO6391(lang, langCode);
+          std::string iso_639_1_code;
+          g_LangCodeExpander.ConvertToISO6391(lang, iso_639_1_code);
           if (region)
-          {
-            std::string region = g_langInfo.GetRegionLocale();
-            std::string region2Code;
-            g_LangCodeExpander.ConvertToISO6391(region, region2Code);
-            region2Code = "-" + region2Code;
-            return (langCode += region2Code);
-          }
-          return langCode;
+             {
+               std::string region = g_langInfo.GetRegionLocale(); // iso_3166 alpha-2 2 letter country code
+               region = "-" + region;
+               return (iso_639_1_code += region);
+             }
+          return iso_639_1_code;
         }
-      case CLangCodeExpander::ISO_639_2:
+      case CLangCodeExpander::ISO_639_2: // Three letter language code
         {
-          std::string langCode;
-          g_LangCodeExpander.ConvertToISO6392B(lang, langCode);
+          std::string iso_639_2_code;
+          g_LangCodeExpander.ConvertToISO6392B(lang, iso_639_2_code);
           if (region)
           {
-            std::string region = g_langInfo.GetRegionLocale();
-            std::string region3Code;
-            g_LangCodeExpander.ConvertToISO6392B(region, region3Code);
-            region3Code = "-" + region3Code;
-            return (langCode += region3Code);
+            std::string region = g_langInfo.GetRegionLocale(); // iso_3166 alpha-2 2 letter country code
+            region = "-" + region;
+            return (iso_639_2_code += region);
           }
 
-          return langCode;
+          return iso_639_2_code;
         }
       default:
         return "";
