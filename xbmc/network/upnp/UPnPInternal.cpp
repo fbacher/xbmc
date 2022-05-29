@@ -93,8 +93,7 @@ NPT_String
 GetMimeType(const char* filename,
             const PLT_HttpRequestContext* context /* = NULL */)
 {
-		// TODO: Unicode - If these string values can be non-ASCII, then need to use StringUtils
-	  // instead of NPT_STRING operations. Should check throughout upnp code.
+	  // NPT ONLY works with ASCII.
 
     NPT_String ext = URIUtils::GetExtension(filename).c_str();
     ext.TrimLeft('.');
@@ -119,6 +118,8 @@ GetMimeType(const CFileItem& item,
 
     if (URIUtils::IsStack(path))
         path = XFILE::CStackDirectory::GetFirstStackedFile(path);
+
+    // NPT ONLY works with ASCII
 
     NPT_String ext = URIUtils::GetExtension(path).c_str();
     ext.TrimLeft('.');
@@ -951,6 +952,8 @@ PopulateTagFromObject(CVideoInfoTag&         tag,
 CFileItemPtr BuildObject(PLT_MediaObject* entry,
                          UPnPService      upnp_service /* = UPnPServiceNone */)
 {
+  // NPT ONLY works with ASCII
+
   NPT_String ObjectClass = entry->m_ObjectClass.type.ToLowercase();
 
   CFileItemPtr pItem(new CFileItem((const char*)entry->m_Title));
