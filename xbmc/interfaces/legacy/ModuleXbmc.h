@@ -26,23 +26,23 @@ namespace XBMCAddon
 #endif
 #endif /* DOXYGEN_SHOULD_SKIP_THIS */
 
-static constexpr String LOCALE_LANGUAGE_ISO_639_1 = "language_iso_639_1";
-static constexpr String LOCALE_LANGUAGE_ISO_639_2 = "language_iso_639_2";
-static constexpr String LOCALE_COUNTRY_ISO_3166_1_ALPHA_2 = "country_iso_3166_1_alpha_2";
-static constexpr String LOCALE_COUNTRY_ISO_3166_1_ALPHA_3 = "country_iso_3166_1_alpha_3";
-static constexpr String LOCALE_SCRIPT_ISO_15924 = "script_iso_15924";
-static constexpr String LOCALE_VARIANT = "variant";
-static constexpr String LOCALE_PROGRAMATIC_NAME = "programatic_name";
-static constexpr String LOCALE_SHORT_PROGRAMATIC_NAME = "short_programatic_name";
-static constexpr String LOCALE_WINDOWS_LCID = "windows_lcid";
-static constexpr String LOCALE_TRANSLATED_LANGUAGE_NAME = "translated_language_name";
-static constexpr String LOCALE_ENGLISH_LANGUAGE_NAME = "english_language_name";
-static constexpr String LOCALE_TRANSLATED_COUNTRY = "translated_country";
-static constexpr String LOCALE_ENGLISH_COUNTRY = "english_country";
-static constexpr String LOCALE_TRANSLATED_VARIANT = "translated_variant";
-static constexpr String LOCALE_ENGLISH_VARIANT = "english_variant";
-static constexpr String LOCALE_TRANSLATED_NAME = "translated_name";
-static constexpr String LOCALE_ENGLISH_NAME = "english_name";
+static const String LOCALE_LANGUAGE_ISO_639_1 = "language_iso_639_1";
+static const String LOCALE_LANGUAGE_ISO_639_2 = "language_iso_639_2";
+static const String LOCALE_COUNTRY_ISO_3166_1_ALPHA_2 = "country_iso_3166_1_alpha_2";
+static const String LOCALE_COUNTRY_ISO_3166_1_ALPHA_3 = "country_iso_3166_1_alpha_3";
+static const String LOCALE_SCRIPT_ISO_15924 = "script_iso_15924";
+static const String LOCALE_VARIANT = "variant";
+static const String LOCALE_PROGRAMATIC_NAME = "programatic_name";
+static const String LOCALE_SHORT_PROGRAMATIC_NAME = "short_programatic_name";
+static const String LOCALE_WINDOWS_LCID = "windows_lcid";
+static const String LOCALE_TRANSLATED_LANGUAGE_NAME = "translated_language_name";
+static const String LOCALE_ENGLISH_LANGUAGE_NAME = "english_language_name";
+static const String LOCALE_TRANSLATED_COUNTRY = "translated_country";
+static const String LOCALE_ENGLISH_COUNTRY = "english_country";
+static const String LOCALE_TRANSLATED_VARIANT = "translated_variant";
+static const String LOCALE_ENGLISH_VARIANT = "english_variant";
+static const String LOCALE_TRANSLATED_NAME = "translated_name";
+static const String LOCALE_ENGLISH_NAME = "english_name";
 
     ///
     /// \defgroup python_xbmc Library - xbmc
