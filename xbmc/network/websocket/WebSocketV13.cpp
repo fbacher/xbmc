@@ -48,7 +48,7 @@ bool CWebSocketV13::Handshake(const char* data, size_t length, std::string &resp
   // The request must be GET
   value = header.getMethod();
   if (value == NULL ||
-      StringUtils::CompareNoCase(value, WS_HTTP_METHOD, strlen(WS_HTTP_METHOD)) != 0)
+      StringUtils::StartsWithNoCase(value, WS_HTTP_METHOD))
   {
     CLog::Log(LOGINFO, "WebSocket [RFC6455]: invalid HTTP method received (GET expected)");
     return false;
@@ -85,8 +85,7 @@ bool CWebSocketV13::Handshake(const char* data, size_t length, std::string &resp
 
   // There must be a "Upgrade" header with the value "websocket"
   value = header.getValue(WS_HEADER_UPGRADE_LC);
-  if (value == NULL || StringUtils::CompareNoCase(value, WS_HEADER_UPGRADE_VALUE,
-                                                  strlen(WS_HEADER_UPGRADE_VALUE)) != 0)
+  if (value == NULL || ! StringUtils::StartsWithNoCase(value, WS_HEADER_UPGRADE_VALUE))
   {
     CLog::Log(LOGINFO, "WebSocket [RFC6455]: invalid \"{}\" received", WS_HEADER_UPGRADE);
     return true;

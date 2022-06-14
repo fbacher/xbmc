@@ -276,6 +276,12 @@ void URIUtils::GetCommonPath(std::string& strParent, const std::string& strPath)
 {
   // find the common path of parent and path
   unsigned int j = 1;
+
+  // TODO: Unicode Recode to take into account multi-byte characters in paths.
+  //       Truncating utf-8 strings at arbitrary points results in malformed characters.
+  //       Perhaps this does not matter if your are looking for exact match, but
+  //       it would be better to use something like "StartsWithNoCase" if possible.
+
   while (j <= std::min(strParent.size(), strPath.size()) &&
          StringUtils::CompareNoCase(strParent, strPath, j) == 0)
     j++;

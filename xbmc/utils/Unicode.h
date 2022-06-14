@@ -474,8 +474,12 @@ public:
       const std::string &s2, size_t s2_start, size_t s2_length, const StringOptions options,
       const bool normalize = false);
 
-  static bool endsWith(const std::string &s1, const std::string &s2);
-  static bool endsWithNoCase(const std::string &s1, const std::string &s2,
+  static bool StartsWith(const std::string &s1, const std::string &s2);
+   static bool StartsWithNoCase(const std::string &s1, const std::string &s2,
+       const StringOptions options);
+
+  static bool EndsWith(const std::string &s1, const std::string &s2);
+  static bool EndsWithNoCase(const std::string &s1, const std::string &s2,
       const StringOptions options);
 
   /*!

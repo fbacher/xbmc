@@ -1339,17 +1339,35 @@ int8_t Unicode::strcmp(const std::string &s1, size_t s1_start, size_t s1_length,
   return result;
 }
 
-bool Unicode::endsWith(const std::string &s1, const std::string &s2)
+
+bool Unicode::StartsWith(const std::string &s1, const std::string &s2)
+{
+  icu::UnicodeString uString1 = Unicode::toUnicodeString(s1);
+  icu::UnicodeString uString2 = Unicode::toUnicodeString(s2);
+  return uString1.startsWith(uString2);
+}
+
+bool Unicode::StartsWithNoCase(const std::string &s1, const std::string &s2,
+    const StringOptions options)
+{
+  icu::UnicodeString uString1 = Unicode::toUnicodeString(s1);
+  icu::UnicodeString uString2 = Unicode::toUnicodeString(s2);
+  uString1.foldCase(to_underlying(options));
+  uString2.foldCase(to_underlying(options));
+
+  UBool result = uString1.startsWith(uString2);
+  return result;
+}
+bool Unicode::EndsWith(const std::string &s1, const std::string &s2)
 {
   icu::UnicodeString uString1 = Unicode::toUnicodeString(s1);
   icu::UnicodeString uString2 = Unicode::toUnicodeString(s2);
   return uString1.endsWith(uString2);
 }
 
-bool Unicode::endsWithNoCase(const std::string &s1, const std::string &s2,
+bool Unicode::EndsWithNoCase(const std::string &s1, const std::string &s2,
     const StringOptions options)
 {
-
   icu::UnicodeString uString1 = Unicode::toUnicodeString(s1);
   icu::UnicodeString uString2 = Unicode::toUnicodeString(s2);
   uString1.foldCase(to_underlying(options));

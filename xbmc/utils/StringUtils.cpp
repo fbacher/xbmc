@@ -442,16 +442,26 @@ int StringUtils::Compare(const std::string &str1, const std::string &str2) {
 	return rc;
 }
 
-
 int StringUtils::CompareNoCase(const std::wstring &str1, const std::wstring &str2,
 		StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */ , const bool normalize /* = false */) {
 
 	int rc = Unicode::w_strcasecmp(str1, str2, opt, normalize);
 	return rc;
 }
+int StringUtils::CompareNoCase(const std::string &str1, const std::string &str2,
+    StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */ , const bool normalize /* = false */) {
+  int rc = Unicode::utf8_strcasecmp(str1, str2, opt, normalize);
+  return rc;
+}
+
+int StringUtils::CompareNoCase(const char *s1, const char *s2, StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */, const bool normalize /* = false */) {
+  std::string str1 = std::string(s1);
+  std::string str2 = std::string(s2);
+  return StringUtils::CompareNoCase(str1, str2, opt, normalize);
+}
 
 int StringUtils::CompareNoCase(const std::string &str1, const std::string &str2,
-		size_t n /* = 0 */, StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */ , const bool normalize /* = false */) {
+		size_t n, StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */ , const bool normalize /* = false */) {
 
 	// TODO: value of 'n' is questionable in Unicode environment.
 	if (n == 0)
@@ -466,7 +476,7 @@ int StringUtils::CompareNoCase(const std::string &str1, const std::string &str2,
     }
     if (containsNonAscii(str2))
     {
-        CLog::Log(LOGWARNING, "StringUtils::CompareNoCase str1 contains non-ASCII: {}", str2);
+        CLog::Log(LOGWARNING, "StringUtils::CompareNoCase str2 contains non-ASCII: {}", str2);
     }
 	}
 
@@ -711,12 +721,7 @@ int StringUtils::Replace(std::wstring &str, const std::wstring &oldStr,
 }
 
 bool StringUtils::StartsWith(const std::string &str1, const std::string &str2) {
-   //std::cout << "StartsWith str1: " << str1 << " str2: " << str2 << std::endl;
-	int diff = Unicode::strcmp(str1, 0, str2.length(), str2, 0,
-			str2.length());
-   //std::cout << "StartsWith str1: " << str1 << " str2: " << str2 << "compare: "
-		//	<< diff << std::endl;
-	return diff == 0;
+	return Unicode::StartsWith(str1, str2);
 }
 
 bool StringUtils::StartsWith(const std::string &str1, const char *s2) {
@@ -727,8 +732,8 @@ bool StringUtils::StartsWith(const char *s1, const char *s2) {
 	return StartsWith(std::string(s1), std::string(s2));
 }
 
-bool StringUtils::StartsWithNoCase(const std::string &str1,
-		const std::string &str2, StringOptions opt) {
+bool StringUtils::StartsWithNoCase(const std::string &str1, const std::string &str2, StringOptions opt)
+{
 	if (str1.length() == 0  and str2.length() == 0)
 		return true;
 
@@ -738,9 +743,7 @@ bool StringUtils::StartsWithNoCase(const std::string &str1,
 	// In general, different lengths don't tell you if Unicode strings are
 	// different.
 
-	int diff = Unicode::utf8_strcasecmp(str1, 0, str2.length(), str2, 0,
-			str2.length(), opt);
-	return diff == 0;
+	return Unicode::StartsWithNoCase(str1, str2, opt);
 }
 
 bool StringUtils::StartsWithNoCase(const std::string &str1, const char *s2, StringOptions opt) {
@@ -752,12 +755,7 @@ bool StringUtils::StartsWithNoCase(const char *s1, const char *s2, StringOptions
 }
 
 bool StringUtils::EndsWith(const std::string &str1, const std::string &str2) {
-   //std::cout << "Enter EndsWith str1: " << str1 << " str2: " << str2
-		//	<< std::endl;
-	const bool result = Unicode::endsWith(str1, str2);
-   //std::cout << "EndsWith str1: " << str1 << " str2: " << str2 << "result: "
-		//	<< result << std::endl;
-
+	const bool result = Unicode::EndsWith(str1, str2);
 	return result;
 }
 
@@ -766,14 +764,8 @@ bool StringUtils::EndsWith(const std::string &str1, const char *s2) {
 	return EndsWith(str1, str2);
 }
 
-bool StringUtils::EndsWithNoCase(const std::string &str1,
-		const std::string &str2, StringOptions opt) {
-	//std::cout << "EndsWithNoCase str1: " << str1 << " str2: " << str2
-	//		<< std::endl;
-	bool result = Unicode::endsWithNoCase(str1, str2, opt);
-	//std::cout << "EndsWithNoCase str1: " << str1 << " str2: " << str2
-	//		<< "result: " << result << std::endl;
-
+bool StringUtils::EndsWithNoCase(const std::string &str1, const std::string &str2, StringOptions opt) {
+	bool result = Unicode::EndsWithNoCase(str1, str2, opt);
 	return result;
 }
 

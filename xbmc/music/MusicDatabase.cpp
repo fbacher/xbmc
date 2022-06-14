@@ -12199,10 +12199,10 @@ void CMusicDatabase::ImportFromXML(const std::string& xmlFile, CGUIDialogProgres
     // Count the number of artists, albums and songs
     while (entry)
     {
-      if (StringUtils::CompareNoCase(entry->Value(), "artist", 6) == 0 ||
-          StringUtils::CompareNoCase(entry->Value(), "album", 5) == 0)
+      if (StringUtils::StartsWithNoCase(entry->Value(), "artist")||
+          StringUtils::StartsWithNoCase(entry->Value(), "album"))
         total++;
-      else if (StringUtils::CompareNoCase(entry->Value(), "song", 4) == 0)
+      else if (StringUtils::StartsWithNoCase(entry->Value(), "song"))
         songtotal++;
 
       entry = entry->NextSiblingElement();
@@ -12213,7 +12213,7 @@ void CMusicDatabase::ImportFromXML(const std::string& xmlFile, CGUIDialogProgres
     while (entry)
     {
       std::string strTitle;
-      if (StringUtils::CompareNoCase(entry->Value(), "artist", 6) == 0)
+      if (StringUtils::StartsWithNoCase(entry->Value(), "artist"))
       {
         CArtist importedArtist;
         importedArtist.Load(entry);
@@ -12233,7 +12233,7 @@ void CMusicDatabase::ImportFromXML(const std::string& xmlFile, CGUIDialogProgres
                     __FUNCTION__, importedArtist.strArtist);
         current++;
       }
-      else if (StringUtils::CompareNoCase(entry->Value(), "album", 5) == 0)
+      else if (StringUtils::StartsWithNoCase(entry->Value(), "album"))
       {
         CAlbum importedAlbum;
         importedAlbum.Load(entry);
@@ -12330,7 +12330,7 @@ bool CMusicDatabase::ImportSongHistory(const std::string& xmlFile,
       float fRating = 0.0;
       int iVotes;
       std::string strSQLSong;
-      if (StringUtils::CompareNoCase(entry->Value(), "song", 4) == 0)
+      if (StringUtils::StartsWithNoCase(entry->Value(), "song"))
       {
         XMLUtils::GetString(entry, "artistdesc", strArtistDisp);
         XMLUtils::GetString(entry, "title", strTitle);

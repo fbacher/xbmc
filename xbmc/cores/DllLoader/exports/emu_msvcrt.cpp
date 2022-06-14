@@ -1848,7 +1848,7 @@ extern "C"
             if (dll__environ[i] != NULL)
             {
               // we only support overwriting the old values
-              if (StringUtils::CompareNoCase(dll__environ[i], var, strlen(var)) == 0)
+              if (StringUtils::StartsWith(dll__environ[i], var))
               {
                 // free it first
                 free(dll__environ[i]);

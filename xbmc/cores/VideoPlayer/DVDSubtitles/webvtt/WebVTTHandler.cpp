@@ -459,7 +459,7 @@ void CWebVTTHandler::DecodeLine(std::string line, std::vector<subtitleData>* sub
         auto colorInfo =
             std::find_if(m_CSSColors.begin(), m_CSSColors.end(),
                          [&](const std::pair<std::string, UTILS::COLOR::ColorInfo>& item) {
-                           return StringUtils::CompareNoCase(item.first, colorName) == 0;
+                           return StringUtils::EqualsNoCase(item.first, colorName);
                          });
         if (colorInfo != m_CSSColors.end())
         {

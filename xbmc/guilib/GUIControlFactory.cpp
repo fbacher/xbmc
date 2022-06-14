@@ -194,7 +194,7 @@ bool CGUIControlFactory::GetDimension(const TiXmlNode *pRootNode, const char* st
 {
   const TiXmlElement* pNode = pRootNode->FirstChildElement(strTag);
   if (!pNode || !pNode->FirstChild()) return false;
-  if (0 == StringUtils::CompareNoCase("auto", pNode->FirstChild()->Value(), 4))
+  if (StringUtils::StartsWithNoCase(pNode->FirstChild()->Value(), "auto"))
   { // auto-width - at least min must be set
     value = ParsePosition(pNode->Attribute("max"), parentSize);
     min = ParsePosition(pNode->Attribute("min"), parentSize);
@@ -353,7 +353,7 @@ bool CGUIControlFactory::GetTexture(const TiXmlNode* pRootNode, const char* strT
   image.diffuse = XMLUtils::GetAttribute(pNode, "diffuse");
   image.diffuseColor.Parse(XMLUtils::GetAttribute(pNode, "colordiffuse"), 0);
   const char *background = pNode->Attribute("background");
-  if (background && StringUtils::CompareNoCase(background, "true", 4) == 0)
+  if (background && StringUtils::StartsWithNoCase(background, "true"))
     image.useLarge = true;
   image.filename = pNode->FirstChild() ? pNode->FirstChild()->Value() : "";
   return true;
@@ -833,7 +833,7 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
   if (XMLUtils::GetInt(pControlNode, "defaultcontrol", defaultControl))
   {
     const char *always = pControlNode->FirstChildElement("defaultcontrol")->Attribute("always");
-    if (always && StringUtils::CompareNoCase(always, "true", 4) == 0)
+    if (always && StringUtils::StartsWithNoCase(always, "true"))
       defaultAlways = true;
   }
   XMLUtils::GetInt(pControlNode, "pagecontrol", pageControl);

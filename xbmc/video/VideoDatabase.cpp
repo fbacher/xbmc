@@ -10430,9 +10430,9 @@ void CVideoDatabase::ImportFromXML(const std::string &path)
     // first count the number of items...
     while (movie)
     {
-      if (StringUtils::CompareNoCase(movie->Value(), MediaTypeMovie, 5) == 0 ||
-          StringUtils::CompareNoCase(movie->Value(), MediaTypeTvShow, 6) == 0 ||
-          StringUtils::CompareNoCase(movie->Value(), MediaTypeMusicVideo, 10) == 0)
+      if (StringUtils::StartsWithNoCase(movie->Value(), MediaTypeMovie) ||
+          StringUtils::StartsWithNoCase(movie->Value(), MediaTypeTvShow) ||
+          StringUtils::StartsWithNoCase(movie->Value(), MediaTypeMusicVideo))
         total++;
       movie = movie->NextSiblingElement();
     }
@@ -10476,7 +10476,7 @@ void CVideoDatabase::ImportFromXML(const std::string &path)
     while (movie)
     {
       CVideoInfoTag info;
-      if (StringUtils::CompareNoCase(movie->Value(), MediaTypeMovie, 5) == 0)
+      if (StringUtils::StartsWithNoCase(movie->Value(), MediaTypeMovie))
       {
         info.Load(movie);
         CFileItem item(info);
@@ -10510,7 +10510,7 @@ void CVideoDatabase::ImportFromXML(const std::string &path)
         scanner.AddVideo(&item, CONTENT_MOVIES, useFolders, true, NULL, true);
         current++;
       }
-      else if (StringUtils::CompareNoCase(movie->Value(), MediaTypeMusicVideo, 10) == 0)
+      else if (StringUtils::StartsWithNoCase(movie->Value(), MediaTypeMusicVideo))
       {
         info.Load(movie);
         CFileItem item(info);
@@ -10525,7 +10525,7 @@ void CVideoDatabase::ImportFromXML(const std::string &path)
         scanner.AddVideo(&item, CONTENT_MUSICVIDEOS, useFolders, true, NULL, true);
         current++;
       }
-      else if (StringUtils::CompareNoCase(movie->Value(), MediaTypeTvShow, 6) == 0)
+      else if (StringUtils::StartsWithNoCase(movie->Value(), MediaTypeTvShow))
       {
         // load the TV show in.  NOTE: This deletes all episodes under the TV Show, which may not be
         // what we desire.  It may make better sense to only delete (or even better, update) the show information

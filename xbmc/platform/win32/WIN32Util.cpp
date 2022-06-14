@@ -986,7 +986,7 @@ extern "C" {
     for (; n1 != NULL; n1 = n2, n2 = NULL) {
       for (i = 0; i < c; i++, n1++) {
         len = strlen(*n1);
-        if (StringUtils::CompareNoCase(*n1, (const char*)bp, len) == 0)
+        if (StringUtils::StartsWithNoCase((const char*)bp, *n1))
         {
           *tgt = i;
           return bp + len;

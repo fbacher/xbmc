@@ -40,8 +40,8 @@ bool CDVDInputStreamFFmpeg::Open()
 
   m_aborted = false;
 
-  if (StringUtils::CompareNoCase(m_item.GetDynPath(), "udp://", 6) == 0 ||
-      StringUtils::CompareNoCase(m_item.GetDynPath(), "rtp://", 6) == 0)
+  if (StringUtils::StartsWithNoCase(m_item.GetDynPath(), "udp://") == 0 ||
+      StringUtils::StartsWithNoCase(m_item.GetDynPath(), "rtp://") == 0)
   {
     m_realtime = true;
   }

@@ -810,7 +810,6 @@ public:
      return StringUtils::Collate(std::wstring(left), std::wstring(right));
    }
 
-
    /*!
     * \brief Performs a bit-wise comparison of two wstrings, after case folding each.
     *
@@ -839,6 +838,65 @@ public:
    		StringOptions opt = StringOptions::FOLD_CASE_DEFAULT , const bool normalize = false);
 
    /*!
+     * \brief Performs a bit-wise comparison of two strings, after case folding each.
+     *
+     * Logically equivalent to Compare(FoldCase(str1, opt)), FoldCase(str2, opt))
+     * or, if normalize == true: Compare(NFD(FoldCase(NFD(str1))), NFD(FoldCase(NFD(str2))))
+     * (NFD is a type of normalization)
+     *
+     * Note: When normalization = true, the string comparison is done incrementally
+     * as the strings are normalized and folded. Otherwise, case folding is applied
+     * to the entire string first.
+     *
+     * Note In most cases normalization should not be required, using normalize
+     * should yield better results for those cases.
+     *
+     * \param str1 one of the strings to compare
+     * \param str2 one of the strings to compare
+     * \param opt StringOptions to apply. Generally leave at the default value
+     * \param normalize Controls whether normalization is performed before and after
+     *        case folding
+     * \return The result of bitwise character comparison:
+     * < 0 if the characters str1 are bitwise less than the characters in str2,
+     * = 0 if str1 contains the same characters as str2,
+     * > 0 if the characters in str1 are bitwise greater than the characters in str2.
+     */
+    static int CompareNoCase(const std::string& str1, const std::string& str2,
+       StringOptions opt = StringOptions::FOLD_CASE_DEFAULT, const bool normalize = false);
+
+    // TODO: Review issues with truncating length of multi-byte strings.
+
+    /*!
+     * \brief Performs a bit-wise comparison of two strings, after case folding each.
+     *
+     * Logically equivalent to Compare(FoldCase(s1, opt)), FoldCase(s2, opt))
+     * or, if normalize == true: Compare(NFD(FoldCase(NFD(s1))), NFD(FoldCase(NFD(s2))))
+     * (NFD is a type of normalization)
+     *
+     * NOTE: Limiting the number of bytes to compare via the option n may produce
+     *       unexpected results for multi-byte characters.
+     *
+     * Note: When normalization = true, the string comparison is done incrementally
+     * as the strings are normalized and folded. Otherwise, case folding is applied
+     * to the entire string first.
+     *
+     * Note In most cases normalization should not be required, using normalize
+     * should yield better results for those cases.
+     *
+     * \param s1 one of the strings to compare
+     * \param s2 one of the strings to compare
+     * \param opt StringOptions to apply. Generally leave at the default value
+     * \param normalize Controls whether normalization is performed before and after
+     *        case folding
+     * \return The result of bitwise character comparison:
+     * < 0 if the characters s1 are bitwise less than the characters in s2,
+     * = 0 if s1 contains the same characters as s2,
+     * > 0 if the characters in s1 are bitwise greater than the characters in s2.
+     */
+   static int CompareNoCase(const char* s1, const char* s2,
+       StringOptions opt = StringOptions::FOLD_CASE_DEFAULT, const bool normalize = false);
+
+   /*!
     * \brief Performs a bit-wise comparison of two strings, after case folding each.
     *
     * Logically equivalent to Compare(FoldCase(str1, opt)), FoldCase(str2, opt))
@@ -863,7 +921,8 @@ public:
     * = 0 if str1 contains the same characters as str2,
     * > 0 if the characters in str1 are bitwise greater than the characters in str2.
     */
-   static int CompareNoCase(const std::string& str1, const std::string& str2, size_t n = 0,
+   [[deprecated("StartsWith/EndsWith may be better choices. Multibyte characters, case folding and byte lengths don't mix.") ]]
+   static int CompareNoCase(const std::string& str1, const std::string& str2, size_t n,
   	 	StringOptions opt = StringOptions::FOLD_CASE_DEFAULT, const bool normalize = false);
 
    // TODO: Review issues with truncating length of multi-byte strings.
@@ -896,7 +955,9 @@ public:
     * = 0 if s1 contains the same characters as s2,
     * > 0 if the characters in s1 are bitwise greater than the characters in s2.
     */
-  static int CompareNoCase(const char* s1, const char* s2, size_t n = 0,
+
+  [[deprecated("StartsWith/EndsWith may be better choices. Multibyte characters, case folding and byte lengths don't mix.") ]]
+  static int CompareNoCase(const char* s1, const char* s2, size_t n,
   		StringOptions opt = StringOptions::FOLD_CASE_DEFAULT, const bool normalize = false);
 
   // TODO: consider renaming to ParseInt

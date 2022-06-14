@@ -79,7 +79,7 @@ void CGUIStaticItem::UpdateProperties(int contextWindow)
   {
     const GUIINFO::CGUIInfoLabel& info = i.first;
     const std::string& name = i.second;
-    bool preferTexture = StringUtils::CompareNoCase("label", name, 5) != 0;
+    bool preferTexture = ! StringUtils::CompareNoCase(name, "label");
     const std::string& value(info.GetLabel(contextWindow, preferTexture));
     if (StringUtils::EqualsNoCase(name, "label"))
       SetLabel(value);

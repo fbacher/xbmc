@@ -54,11 +54,11 @@ CDVDSubtitleParser* CDVDFactorySubtitle::CreateParser(std::string& strFile)
       {
         return new CDVDSubtitleParserVplayer(std::move(pStream), strFile);
       }
-      else if (!StringUtils::CompareNoCase(line, "!: This is a Sub Station Alpha v", 32) ||
-               !StringUtils::CompareNoCase(line, "ScriptType: v4.00", 17) ||
-               !StringUtils::CompareNoCase(line, "Dialogue: Marked", 16) ||
-               !StringUtils::CompareNoCase(line, "Dialogue: ", 10) ||
-               !StringUtils::CompareNoCase(line, "[Events]", 8))
+      else if (StringUtils::StartsWithNoCase(line, "!: This is a Sub Station Alpha v") ||
+               StringUtils::StartsWithNoCase(line, "ScriptType: v4.00") ||
+               StringUtils::StartsWithNoCase(line, "Dialogue: Marked") ||
+               StringUtils::StartsWithNoCase(line, "Dialogue: ") ||
+               StringUtils::StartsWithNoCase(line, "[Events]"))
       {
         return new CDVDSubtitleParserSSA(std::move(pStream), strFile);
       }
@@ -66,7 +66,7 @@ CDVDSubtitleParser* CDVDFactorySubtitle::CreateParser(std::string& strFile)
       {
         return new CDVDSubtitleParserSami(std::move(pStream), strFile);
       }
-      else if (!StringUtils::CompareNoCase(line, "WEBVTT", 6))
+      else if (StringUtils::StartsWithNoCase(line, "WEBVTT"))
       {
         return new CSubtitleParserWebVTT(std::move(pStream), strFile);
       }
