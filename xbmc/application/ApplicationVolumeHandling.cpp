@@ -16,7 +16,12 @@
 #include "guilib/GUIWindowManager.h"
 #include "interfaces/AnnouncementManager.h"
 #include "peripherals/Peripherals.h"
+#include "settings/Settings.h"
+#include "settings/lib/Setting.h"
 #include "utils/Variant.h"
+#include "utils/XMLUtils.h"
+
+#include <tinyxml.h>
 
 CApplicationVolumeHandling::CApplicationVolumeHandling(CApplicationPlayer& appPlayer)
   : m_appPlayer(appPlayer)
@@ -128,4 +133,68 @@ void CApplicationVolumeHandling::SetVolume(float iValue, bool isPercentage)
 
   SetHardwareVolume(hardwareVolume);
   VolumeChanged();
+}
+
+void CApplicationVolumeHandling::CacheReplayGainSettings(const CSettings& settings)
+{
+  // initialize m_replayGainSettings
+  m_replayGainSettings.iType = settings.GetInt(CSettings::SETTING_MUSICPLAYER_REPLAYGAINTYPE);
+  m_replayGainSettings.iPreAmp = settings.GetInt(CSettings::SETTING_MUSICPLAYER_REPLAYGAINPREAMP);
+  m_replayGainSettings.iNoGainPreAmp =
+      settings.GetInt(CSettings::SETTING_MUSICPLAYER_REPLAYGAINNOGAINPREAMP);
+  m_replayGainSettings.bAvoidClipping =
+      settings.GetBool(CSettings::SETTING_MUSICPLAYER_REPLAYGAINAVOIDCLIPPING);
+}
+
+bool CApplicationVolumeHandling::Load(const TiXmlNode* settings)
+{
+  if (!settings)
+    return false;
+
+  const TiXmlElement* audioElement = settings->FirstChildElement("audio");
+  if (audioElement)
+  {
+    XMLUtils::GetBoolean(audioElement, "mute", m_muted);
+    if (!XMLUtils::GetFloat(audioElement, "fvolumelevel", m_volumeLevel, VOLUME_MINIMUM,
+                            VOLUME_MAXIMUM))
+      m_volumeLevel = VOLUME_MAXIMUM;
+  }
+
+  return true;
+}
+
+bool CApplicationVolumeHandling::Save(TiXmlNode* settings) const
+{
+  if (!settings)
+    return false;
+
+  TiXmlElement volumeNode("audio");
+  TiXmlNode* audioNode = settings->InsertEndChild(volumeNode);
+  if (!audioNode)
+    return false;
+
+  XMLUtils::SetBoolean(audioNode, "mute", m_muted);
+  XMLUtils::SetFloat(audioNode, "fvolumelevel", m_volumeLevel);
+
+  return true;
+}
+
+bool CApplicationVolumeHandling::OnSettingChanged(const CSetting& setting)
+{
+  const std::string& settingId = setting.GetId();
+
+  if (StringUtils::EqualsNoCase(settingId, CSettings::SETTING_MUSICPLAYER_REPLAYGAINTYPE))
+    m_replayGainSettings.iType = static_cast<const CSettingInt&>(setting).GetValue();
+  else if (StringUtils::EqualsNoCase(settingId, CSettings::SETTING_MUSICPLAYER_REPLAYGAINPREAMP))
+    m_replayGainSettings.iPreAmp = static_cast<const CSettingInt&>(setting).GetValue();
+  else if (StringUtils::EqualsNoCase(settingId,
+                                     CSettings::SETTING_MUSICPLAYER_REPLAYGAINNOGAINPREAMP))
+    m_replayGainSettings.iNoGainPreAmp = static_cast<const CSettingInt&>(setting).GetValue();
+  else if (StringUtils::EqualsNoCase(settingId,
+                                     CSettings::SETTING_MUSICPLAYER_REPLAYGAINAVOIDCLIPPING))
+    m_replayGainSettings.bAvoidClipping = static_cast<const CSettingBool&>(setting).GetValue();
+  else
+    return false;
+
+  return true;
 }

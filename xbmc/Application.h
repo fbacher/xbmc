@@ -11,20 +11,16 @@
 #include "ApplicationPlayer.h"
 #include "ApplicationStackHelper.h"
 #include "ServiceManager.h"
+#include "application/ApplicationActionListeners.h"
 #include "application/ApplicationPlayerCallback.h"
 #include "application/ApplicationPowerHandling.h"
+#include "application/ApplicationSettingsHandling.h"
 #include "application/ApplicationSkinHandling.h"
 #include "application/ApplicationVolumeHandling.h"
 #include "cores/IPlayerCallback.h"
 #include "guilib/IMsgTargetCallback.h"
 #include "guilib/IWindowManagerCallback.h"
 #include "messaging/IMessageTarget.h"
-#include "settings/ISubSettings.h"
-#include "settings/lib/ISettingCallback.h"
-#include "settings/lib/ISettingsHandler.h"
-#if !defined(TARGET_WINDOWS) && defined(HAS_DVD_DRIVE)
-#include "storage/DetectDVDType.h"
-#endif
 #include "threads/SystemClock.h"
 #include "threads/Thread.h"
 #include "utils/GlobalsHandling.h"
@@ -47,7 +43,6 @@ class CSeekHandler;
 class CInertialScrollingHandler;
 class CSplash;
 class CBookmark;
-class IActionListener;
 class CGUIComponent;
 class CAppInboundProtocol;
 class CSettingsComponent;
@@ -89,16 +84,6 @@ namespace MUSIC_INFO
   class CMusicInfoScanner;
 }
 
-// replay gain settings struct for quick access by the player multiple
-// times per second (saves doing settings lookup)
-struct ReplayGainSettings
-{
-  int iPreAmp;
-  int iNoGainPreAmp;
-  int iType;
-  bool bAvoidClipping;
-};
-
 enum StartupAction
 {
   STARTUP_ACTION_NONE = 0,
@@ -117,12 +102,11 @@ enum
 
 class CApplication : public IWindowManagerCallback,
                      public IMsgTargetCallback,
-                     public ISettingCallback,
-                     public ISettingsHandler,
-                     public ISubSettings,
                      public KODI::MESSAGING::IMessageTarget,
+                     public CApplicationActionListeners,
                      public CApplicationPlayerCallback,
                      public CApplicationPowerHandling,
+                     public CApplicationSettingsHandling,
                      public CApplicationSkinHandling,
                      public CApplicationVolumeHandling
 {
@@ -156,11 +140,11 @@ public:
   const std::string& CurrentFile();
   CFileItem& CurrentFileItem();
   std::shared_ptr<CFileItem> CurrentFileItemPtr();
-  CFileItem& CurrentUnstackedItem();
+  const CFileItem& CurrentUnstackedItem();
   bool OnMessage(CGUIMessage& message) override;
   CApplicationPlayer& GetAppPlayer();
   std::string GetCurrentPlayer();
-  CApplicationStackHelper& GetAppStackHelper();
+  const CApplicationStackHelper& GetAppStackHelper() const;
 
   int  GetMessageMask() override;
   void OnApplicationMessage(KODI::MESSAGING::ThreadMessage* pMsg) override;
@@ -222,20 +206,7 @@ public:
   bool SetLanguage(const std::string &strLanguage);
   bool LoadLanguage(bool reload);
 
-  ReplayGainSettings& GetReplayGainSettings() { return m_replayGainSettings; }
-
   void SetLoggingIn(bool switchingProfiles);
-
-  /*!
-   \brief Register an action listener.
-   \param listener The listener to register
-   */
-  void RegisterActionListener(IActionListener *listener);
-  /*!
-   \brief Unregister an action listener.
-   \param listener The listener to unregister
-   */
-  void UnregisterActionListener(IActionListener *listener);
 
   std::unique_ptr<CServiceManager> m_ServiceManager;
 
@@ -251,25 +222,10 @@ public:
 
 protected:
   bool OnSettingsSaving() const override;
-  bool Load(const TiXmlNode *settings) override;
-  bool Save(TiXmlNode *settings) const override;
-  void OnSettingChanged(const std::shared_ptr<const CSetting>& setting) override;
-  void OnSettingAction(const std::shared_ptr<const CSetting>& setting) override;
-  bool OnSettingUpdate(const std::shared_ptr<CSetting>& setting,
-                       const char* oldSettingId,
-                       const TiXmlNode* oldSettingNode) override;
-
   void PlaybackCleanup();
 
   // inbound protocol
   bool OnEvent(XBMC_Event& newEvent);
-
-  /*!
-   \brief Delegates the action to all registered action handlers.
-   \param action The action
-   \return true, if the action was taken by one of the action listener.
-   */
-  bool NotifyActionListeners(const CAction &action) const;
 
   std::shared_ptr<ANNOUNCEMENT::CAnnouncementManager> m_pAnnouncementManager;
   std::unique_ptr<CGUIComponent> m_pGUI;
@@ -278,8 +234,6 @@ protected:
   std::shared_ptr<CAppInboundProtocol> m_pAppPort;
   std::deque<XBMC_Event> m_portEvents;
   CCriticalSection m_portSection;
-
-  bool m_ignoreSkinSettingChanges = false;
 
 #if defined(TARGET_DARWIN_IOS)
   friend class CWinEventsIOS;
@@ -312,8 +266,6 @@ protected:
 
   CInertialScrollingHandler *m_pInertialScrollingHandler;
 
-  ReplayGainSettings m_replayGainSettings;
-  std::vector<IActionListener *> m_actionListeners;
   std::vector<ADDON::AddonInfoPtr>
       m_incompatibleAddons; /*!< Result of addon migration (incompatible addon infos) */
 
@@ -324,9 +276,6 @@ public:
 private:
   void PrintStartupLog();
   void ResetCurrentItem();
-
-  void RegisterSettings();
-  void UnregisterSettings();
 
   mutable CCriticalSection m_critSection; /*!< critical section for all changes to this class, except for changes to triggers */
 

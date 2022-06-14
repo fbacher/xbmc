@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.12)
 if(WIN32)
-  # Version 3.15 is required to use "PREPEND" for dependencies
-  cmake_minimum_required(VERSION 3.15)
+  # Version 3.20 is required for multi-config generator expressions to work
+  cmake_minimum_required(VERSION 3.20)
 endif()
 project(kodi LANGUAGES CXX C ASM)
 
@@ -50,7 +50,7 @@ core_find_versions()
 include(cmake/scripts/${CORE_SYSTEM_NAME}/PathSetup.cmake)
 include(cmake/scripts/common/CompilerSettings.cmake)
 include(ExternalProject)
-
+include(CMakeDependentOption)
 
 # general
 option(VERBOSE            "Enable verbose output?" ON)
@@ -64,11 +64,14 @@ option(ENABLE_OPTICAL     "Enable optical support?" ON)
 option(ENABLE_PYTHON      "Enable python support?" ON)
 option(ENABLE_TESTING     "Enable testing support?" ON)
 
+# Internal Depends - supported on all platforms
 option(ENABLE_INTERNAL_CROSSGUID "Enable internal crossguid?" ON)
 # use ffmpeg from depends or system
 option(ENABLE_INTERNAL_FFMPEG "Enable internal ffmpeg?" ON)
 option(ENABLE_INTERNAL_RapidJSON "Enable internal rapidjson?" ON)
+cmake_dependent_option(ENABLE_INTERNAL_TAGLIB "Enable internal taglib?" OFF "DEFINED USE_INTERNAL_LIBS;NOT USE_INTERNAL_LIBS" ON)
 
+# Internal Depends - supported on UNIX platforms
 if(UNIX)
   option(FFMPEG_PATH        "Path to external ffmpeg?" "")
   option(ENABLE_INTERNAL_FMT "Enable internal fmt?" OFF)
@@ -78,9 +81,12 @@ if(UNIX)
   option(ENABLE_INTERNAL_GTEST "Enable internal gtest?" OFF)
   option(ENABLE_INTERNAL_UDFREAD "Enable internal udfread?" OFF)
   option(ENABLE_INTERNAL_SPDLOG "Enable internal spdlog?" OFF)
+
+  if(ENABLE_INTERNAL_SPDLOG)
+    set(ENABLE_INTERNAL_FMT ON CACHE BOOL "" FORCE)
+  endif()
 endif()
 # prefer kissfft from xbmc/contrib but let use system one on unices
-include(CMakeDependentOption)
 cmake_dependent_option(ENABLE_INTERNAL_KISSFFT "Enable internal kissfft?" ON "UNIX" ON)
 # System options
 if(NOT WIN32)
@@ -89,6 +95,7 @@ if(NOT WIN32)
 endif()
 if(CORE_SYSTEM_NAME STREQUAL linux)
   option(ENABLE_EVENTCLIENTS    "Enable event clients support?" OFF)
+  option(ADDONS_CONFIGURE_AT_STARTUP "Configure binary addons at startup?" ON)
 endif()
 
 # set scope of INTERNAL_DEPS
@@ -264,7 +271,7 @@ list(APPEND install_data ${ADDON_INSTALL_DATA})
 add_library(compileinfo OBJECT ${CORE_BUILD_DIR}/xbmc/CompileInfo.cpp)
 set_target_properties(compileinfo PROPERTIES FOLDER "Build Utilities")
 target_compile_options(compileinfo PRIVATE "${SYSTEM_DEFINES} ${ARCH_DEFINES}")
-add_dependencies(compileinfo fmt)
+add_dependencies(compileinfo fmt::fmt)
 
 if(NOT MSVC)
   target_compile_options(compileinfo PUBLIC ${CORE_COMPILE_OPTIONS})

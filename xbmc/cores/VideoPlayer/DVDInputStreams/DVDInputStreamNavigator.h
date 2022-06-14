@@ -15,6 +15,7 @@
 #include "DVDInputStreamFile.h"
 #include "DVDStateSerializer.h"
 #include "DllDvdNav.h"
+#include "cores/MenuType.h"
 #include "utils/Geometry.h"
 
 #include <string>
@@ -65,7 +66,12 @@ public:
   void OnDown() override;
   void OnLeft() override;
   void OnRight() override;
-  void OnMenu() override;
+
+  /*! \brief Open the Menu
+  * \return true if the menu is successfully opened, false otherwise
+  */
+  bool OnMenu() override;
+
   void OnBack() override;
   void OnNext() override;
   void OnPrevious() override;
@@ -76,7 +82,12 @@ public:
   int GetTotalButtons() override;
   bool GetCurrentButtonInfo(CDVDOverlaySpu* pOverlayPicture, CDVDDemuxSPU* pSPU, int iButtonType /* 0 = selection, 1 = action (clicked)*/);
 
-  bool HasMenu() override { return true; }
+  /*!
+   * \brief Get the supported menu type
+   * \return The supported menu type
+  */
+  MenuType GetSupportedMenuType() override { return MenuType::NATIVE; }
+
   bool IsInMenu() override { return m_bInMenu; }
   double GetTimeStampCorrection() override { return (double)(m_iVobUnitCorrection * 1000) / 90; }
 
@@ -123,14 +134,6 @@ public:
 protected:
 
   int ProcessBlock(uint8_t* buffer, int* read);
-
-  /*! \brief Get the color and alpha of a given button
-   * \param button - the button id
-   * \param[in,out] alpha - the alpha of the button
-   * \param[in,out] color - the color of the button
-   * \return true if the operation (obtaining data) succeeded, false otherwise
-   */
-  bool GetButtonColorAndAlpha(int button, int alpha[2][4], int color[2][4]);
 
   static void SetAudioStreamName(AudioStreamInfo &info, const audio_attr_t &audio_attributes);
   static void SetSubtitleStreamName(SubtitleStreamInfo &info, const subp_attr_t &subp_attributes);
