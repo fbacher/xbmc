@@ -1603,9 +1603,9 @@ extern "C"
   //SLOW CODE SHOULD BE REVISED
   int dll_stat(const char *path, struct stat *buffer)
   {
-    if (!StringUtils::CompareNoCase(path, "shout://", 8)) // don't stat shoutcast
+    if (StringUtils::StartsWithNoCase(path, "shout://")) // don't stat shoutcast
       return -1;
-    if (!StringUtils::CompareNoCase(path, "mms://", 6)) // don't stat mms
+    if (StringUtils::StartsWithNoCase(path, "mms://")) // don't stat mms
       return -1;
 
 #ifdef TARGET_POSIX
@@ -1647,9 +1647,9 @@ extern "C"
 
   int dll_stat64(const char *path, struct __stat64 *buffer)
   {
-    if (!StringUtils::CompareNoCase(path, "shout://", 8)) // don't stat shoutcast
+    if (StringUtils::StartsWithNoCase(path, "shout://")) // don't stat shoutcast
       return -1;
-    if (!StringUtils::CompareNoCase(path, "mms://", 6)) // don't stat mms
+    if (StringUtils::StartsWithNoCase(path, "mms://")) // don't stat mms
       return -1;
 
 #ifdef TARGET_POSIX
@@ -1899,7 +1899,7 @@ extern "C"
       {
         if (dll__environ[i])
         {
-          if (StringUtils::CompareNoCase(dll__environ[i], szKey, strlen(szKey)) == 0)
+          if (StringUtils::StartsWithNoCase(dll__environ[i], szKey))
           {
             // found it
             value = dll__environ[i] + strlen(szKey) + 1;
