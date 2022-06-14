@@ -1,28 +1,23 @@
 #pragma once
 
 //#include <locale>
-#include <string>
-#include <vector>
-#include <type_traits>
+
+#include <bits/stdint-intn.h>
+#include <bits/stdint-uintn.h>
+#include <stddef.h>
+#include <tuple>
 #include <unicode/locid.h>
-//#include <stdio.h>
-//#include <stdlib.h>
-//#include <iostream>
-#include <stdint.h>
-//#include <vector>
-//#include <set>
-//#include <iterator>
-//#include <algorithm>
-//#include <exception>
-//#include <stdexcept>
-//#include <unicode/brkiter.h>
-//#include <unicode/utypes.h>
-//#include <unicode/putil.h>
+#include <unicode/platform.h>
+#include <unicode/stringpiece.h>
+#include <unicode/umachine.h>
 #include <unicode/unistr.h>
-#include <unicode/ustring.h>
-//#include <unicode/stringoptions.h>
-//#include <unicode/uregex.h>
-#include <unicode/regex.h>
+#include <unicode/utypes.h>
+#include <unicode/uversion.h>
+#include <climits>
+#include <iterator>
+#include <string>
+#include <type_traits>
+#include <vector>
 
 template<typename E>
 constexpr auto to_underlying(E e) noexcept
@@ -39,37 +34,42 @@ enum class StringOptions : uint32_t
 {
 
   /**
+   * Normalization see: https://unicode.org/reports/tr15/#Norm_Forms
+   *
    * Fold character case according to ICU rules:
    * Strip insignificant accents, translate chars to more simple equivalents (German sharp-s),
    * etc.
    *
-   * FOLD_CASE_DEFAULT is mostly used to 'normalize' strings before using
-   them as keywords/map indexes, etc. A particular problem is the behavior
-   of "The Turkic I". FOLD_CASE_DEFAULT is effective at
-   eliminating this problem. Below are the four "I" characters in
-   Turkic and the result of FoldCase for each. The primary
-   thing to keep in mind is that ASCII i and I fold normally while
-   Turkic İ and ı fold into characters other than ASCII i or I.
-   ToLower would change ASCII I/i to Turkic chars in a manner
-   that would break maps/lookups.
-
+   * FOLD_CASE_DEFAULT causes FoldCase to behave similar to ToLower for the "en" locale
+   * FOLD_CASE_SPECIAL_I causes FoldCase to behave similar to ToLower for the "tr_TR" locale.
    *
-   *  FOLD_CASE_DEFAULT
-   * I (\u0049) -> i (\u0069)
-   * İ (\u0130) -> i̇ (\u0069 \u0307)
-   * i (\u0069) -> i (\u0069)
-   * ı (\u0131) -> ı (\u0131)
+   * Case folding also ignores insignificant differences in strings (some accent marks,
+   * etc.).
+   *
+   * Locale                    Unicode                                      Unicode
+   *                           codepoint                                    (hex 32-bit codepoint(s))
+   * en_US I (Dotless I)       \u0049 -> i (Dotted small I)                 \u0069
+   * tr_TR I (Dotless I)       \u0049 -> ı (Dotless small I)                \u0131
+   * FOLD1 I (Dotless I)       \u0049 -> i (Dotted small I)                 \u0069
+   * FOLD2 I (Dotless I)       \u0049 -> ı (Dotless small I)                \u0131
+   *
+   * en_US i (Dotted small I)  \u0069 -> i (Dotted small I)                 \u0069
+   * tr_TR i (Dotted small I)  \u0069 -> i (Dotted small I)                 \u0069
+   * FOLD1 i (Dotted small I)  \u0069 -> i (Dotted small I)                 \u0069
+   * FOLD2 i (Dotted small I)  \u0069 -> i (Dotted small I)                 \u0069
+   *
+   * en_US İ (Dotted I)        \u0130 -> i̇ (Dotted small I + Combining dot) \u0069 \u0307
+   * tr_TR İ (Dotted I)        \u0130 -> i (Dotted small I)                 \u0069
+   * FOLD1 İ (Dotted I)        \u0130 -> i̇ (Dotted small I + Combining dot) \u0069 \u0307
+   * FOLD2 İ (Dotted I)        \u0130 -> i (Dotted small I)                 \u0069
+   *
+   * en_US ı (Dotless small I) \u0131 -> ı (Dotless small I)                \u0131
+   * tr_TR ı (Dotless small I) \u0131 -> ı (Dotless small I)                \u0131
+   * FOLD1 ı (Dotless small I) \u0131 -> ı (Dotless small I)                \u0131
+   * FOLD2 ı (Dotless small I) \u0131 -> ı (Dotless small I)                \u0131
+   *
    */
   FOLD_CASE_DEFAULT = 0, // U_FOLD_CASE_DEFAULT,
-
-  /**
-   * FOLD_CASE_EXCLUDE_SPECIAL_I
-   * I (\u0049) -> ı (\u0131)
-   * i (\u0069) -> i (\u0069)
-   * İ (\u0130) -> i (\u0069)
-   * ı (\u0131) -> ı (\u0131)
-   *
-   */
   FOLD_CASE_EXCLUDE_SPECIAL_I = 1, // U_FOLD_CASE_EXCLUDE_SPECIAL_I
 
   /**
@@ -341,69 +341,103 @@ public:
 
   static const std::string getICULocaleId(icu::Locale locale);
 
-  /*! \brief Folds the case of a string.
-
-   Primarily meant to be used from Python since Python's FoldCase (and other methods)
-   suffer from the "Turkic I" problem. This function allows for experimentation to
-   determine the best way to handle the Turkic I.
-
-   By it's nature, this function is subject to change or removal. Use toFold instead.
-
-   \param str string to fold.
-   \param options fine tunes case folding behavior. For most situations, leave at 0
-   \returns utf-8 folded value of str
-
-   Notes: length and number of bytes in string may change during folding/normalization
-
-   See StringOptions for the values to use for options as well as descriptions.
+  /*!
+   *  \brief Folds the case of a string, independent of Locale.
+   *
+   * Similar to ToLower except in addition, insignificant accents are stripped
+   * and other transformations are made (such as German sharp-S is converted to ss).
+   * The transformation is independent of locale.
+   *
+   * \param str string to fold (not modified).
+   * \param opt StringOptions to fine-tune behavior. For most purposes, leave at
+   *            default value, 0 (same as FOLD_CASE_DEFAULT)
+   * \return UTF-8 folded string
+   *
+   * Notes: length and number of bytes in string may change during folding/normalization
+   *
+   * When FOLD_CASE_DEFAULT is used, the Turkic Dotted I and Dotless
+   * i follow the "en" locale rules for ToLower.
+   *
+   * DEVELOPERS who use non-ASCII keywords should be aware that it may not
+   * always work as expected. Testing is important.
+   *
+   * Changes will have to be made to keywords that don't work as expected. One solution is
+   * to try to always use lower-case in the first place.
+   *
+   * See StringOptions for the numeric values to use for options as well as descriptions.
+   * StringOptions is not used directly so that this API can be by used by Python.
    */
 
   static const std::string utf8Fold(const std::string &src, const int32_t options);
 
-  /*! \brief Folds the case of a string in place.
-
-   Case Folding is used in non-ASCII environments in a manner similar to toLower for ASCII.
-   In particular, it is heavily used to 'normalize' strings to remove variations in case,
-   accent marks and other changes (German sharp-S into 'ss') for use in maps.
-   ToLower can not be used in these circumstances.
-
-   \param src string to fold.
-   \param options fine tunes case folding behavior. For most situations, leave at default
-   value
-   \return src
-
-   Notes: length and number of bytes in src may change during folding/normalization
-   */
+  /*!
+    *  \brief Folds the case of a string, independent of Locale.
+    *
+    * Similar to ToLower except in addition, insignificant accents are stripped
+    * and other transformations are made (such as German sharp-S is converted to ss).
+    * The transformation is independent of locale.
+    *
+    * \param str string to fold in place.
+    * \param opt StringOptions to fine-tune behavior. For most purposes, leave at
+    *            default value, 0 (same as FOLD_CASE_DEFAULT)
+    * \return UTF-8 src.
+    *
+    * Notes: length and number of bytes in string may change during folding/normalization
+    *
+    * When FOLD_CASE_DEFAULT is used, the Turkic Dotted I and Dotless
+    * i follow the "en" locale rules for ToLower.
+    *
+    * DEVELOPERS who use non-ASCII keywords should be aware that it may not
+    * always work as expected. Testing is important.
+    *
+    * Changes will have to be made to keywords that don't work as expected. One solution is
+    * to try to always use lower-case in the first place.
+    *
+    * See StringOptions for the more details.
+    */
 
   static const std::wstring toFold(std::wstring &src, const StringOptions options);
 
-  /*! \brief Folds the case of a string.
-
-   Case Folding is used in non-ASCII environments in a manner similar to toLower for ASCII.
-   In particular, it is heavily used to 'normalize' strings to remove variations in case,
-   accent marks and other changes (German sharp-S into 'ss') for use in maps.
-   ToLower can not be used in these circumstances.
-
-   \param src string to fold in place
-   \param options fine tunes case folding behavior. For most situations, leave at default
-   value
-   \return src
-
-   Notes: length and number of bytes in src may change during folding/normalization
+  /*!
+   *  \brief Folds the case of a wstring, independent of Locale.
+   *
+   * Similar to ToLower except in addition, insignificant accents are stripped
+   * and other transformations are made (such as German sharp-S is converted to ss).
+   * The transformation is independent of locale.
+   *
+   * \param str string to fold in place.
+   * \param opt StringOptions to fine-tune behavior. For most purposes, leave at
+   *            default value, 0 (same as FOLD_CASE_DEFAULT)
+   * \return UTF-8 src.
+   *
+   * Notes: length and number of bytes in string may change during folding/normalization
+   *
+   * When FOLD_CASE_DEFAULT is used, the Turkic Dotted I and Dotless
+   * i follow the "en" locale rules for ToLower.
+   *
+   * DEVELOPERS who use non-ASCII keywords should be aware that it may not
+   * always work as expected. Testing is important.
+   *
+   * Changes will have to be made to keywords that don't work as expected. One solution is
+   * to try to always use lower-case in the first place.
+   *
+   * See StringOptions for the more details.
    */
 
   static const std::string toFold(std::string &src, const StringOptions options);
 
-  static const std::wstring normalize(std::wstring &src, const StringOptions option,
+  static const std::wstring normalize(const std::wstring &src, const StringOptions option,
       const NormalizerType normalizerType = NormalizerType::NFKC);
 
-  static const std::string normalize(std::string &src, const StringOptions options,
+  static const std::string normalize(const std::string &src, const StringOptions options,
       const NormalizerType normalizerType = NormalizerType::NFKC);
 
   static const std::string toUpper(const std::string &src, const icu::Locale &locale);
   static const std::string toLower(const std::string &src, const icu::Locale &locale);
-  static const std::string toTitle(const std::string &src, const icu::Locale &locale);
+  static const std::string toCapitalize(const std::string &src, const icu::Locale &locale);
+  static const std::wstring toCapitalize(const std::wstring &src, const icu::Locale &locale);
   static const std::wstring toTitle(const std::wstring &src, const icu::Locale &locale);
+  static const std::string toTitle(const std::string &src, const icu::Locale &locale);
 
   static int8_t strcmp(const std::wstring &s1, size_t s1_start, size_t s1_length,
       const std::wstring &s2, size_t s2_start, size_t s2_length, const bool normalize = false);
@@ -412,14 +446,14 @@ public:
       const std::string &s2, size_t s2_start, size_t s2_length, const bool normalize = false);
 
   // Go with default Normalization (off). Some free normalization
-    // is still performed. Even with it on, you should do some
-    // extra normalization up-front to handle certain
-    // locales/codepoints. See the documentation for UCOL_NORMALIZATION_MODE
-    // for a hint.
+  // is still performed. Even with it on, you should do some
+  // extra normalization up-front to handle certain
+  // locales/codepoints. See the documentation for UCOL_NORMALIZATION_MODE
+  // for a hint.
 
   static bool InitializeCollator(std::locale locale, bool normalize = false);
 
-  static bool InitializeCollator(icu::Locale icuLocale, bool normalize = false );
+  static bool InitializeCollator(icu::Locale icuLocale, bool normalize = false);
 
   static int32_t Collate(const std::wstring &left, const std::wstring &right);
 
@@ -444,34 +478,91 @@ public:
   static bool endsWithNoCase(const std::string &s1, const std::string &s2,
       const StringOptions options);
 
-  static const std::string substr(const std::string &str, size_t pos = 0, size_t len =
-      std::string::npos);
-  static std::string& trim(std::string &str);
-  static std::string& trimLeft(std::string &str);
-  static std::string& trimLeft(std::string &str, std::string deleteChars);
+  /*!
+   * \brief Get the leftmost side of a UTF-8 string, limited by character count
+   *
+   * Unicode characters are of variable byte length. This function's
+   * parameters are based on characters and NOT bytes.
+   *
+   * \param str to get a substring of
+   * \param charCount if > 0 maximum number of characters to keep from left end
+   *                  if < 0 number of characters to remove from right end
+   * \return leftmost characters of string, length determined by charCount
+   *
+   */
 
-  static std::string& trimRight(std::string &str);
-  static std::string& trimRight(std::string &str, std::string deleteChars);
+  static std::string Left(const std::string &str, const int charCount, const icu::Locale icuLocale);
 
-  static std::string& trim(std::string &str, const std::string &deleteChars, const bool trimStart,
+  /*!
+   *  \brief Get a substring of a UTF-8 string
+   *
+   * Unicode characters are of variable byte length. This function's
+   * parameters are based on characters and NOT bytes.
+   *
+   * \param str string to extract substring from
+   * \param startCharIndex leftmost character of substring [0 based]
+   * \param charCount maximum number of characters to include in substring
+   * \return substring of str, beginning with character 'firstCharIndex',
+   *         length determined by charCount
+   */
+  static std::string Mid(const std::string &str, const int startCharIndex, const int charCount = INT_MAX);
+
+  /*!
+   *  \brief Get the rightmost count characters of a string
+   *
+   * Unicode characters are of variable byte length. This function's
+   * parameters are based on characters and NOT bytes.
+   *
+   * \param str to extract substring from
+   * \param charCount if > 0 maximum number of characters to keep from left end
+   *                  if < 0 number of characters to remove from right end
+   * \return rightmost count characters of str, length determined by charCount
+   *
+   * TODO: Unicode - No apparent users requiring count to be bytes
+   */
+  static std::string Right(const std::string &str, const int charCount);
+
+  static size_t getCodeUnitIndex(const std::string &str, size_t startOffset, size_t charCount,
+      const bool forward, const bool left, icu::Locale icuLocale = nullptr);
+  /*!
+   * \brief return a substring of a string
+   *
+   * \param str string to extract substring from
+   * \param firstCharIndex character of substring [0 based]
+   *                  if > 0 then index measured from beginning of string
+   *                  if < 0 then index measured from end of string
+   * \param charCount if > 0 maximum number of characters to keep left end
+   *                  if < 0 number of characters to remove from right end
+   * \return substring of str, beginning with character 'first', length determined by charCount
+   * /
+  static const std::string substr(const std::string &str, int32_t startCharIndex,
+      int32_t numChars);
+  */
+  static std::string Trim(const std::string &str);
+  static std::string TrimLeft(const std::string &str);
+  static std::string TrimLeft(const std::string &str, const std::string deleteChars);
+
+  static std::string TrimRight(const std::string &str);
+  static std::string TrimRight(const std::string &str, const std::string deleteChars);
+
+  static std::string Trim(const std::string &str, const std::string &deleteChars, const bool trimStart,
       const bool trimEnd);
-  static std::string getDigits(const std::string &str);
 
   static std::vector<std::string> SplitMulti(const std::vector<std::string> &input,
-      const std::vector<std::string> &delimiters, size_t iMaxStrings, RegexpFlag flags =
-          RegexpFlag::UREGEX_LITERAL);
+      const std::vector<std::string> &delimiters, const size_t iMaxStrings, const int flags =
+          to_underlying(RegexpFlag::UREGEX_LITERAL));
 
-  static std::string& findCountAndReplace(std::string &src, const std::string &oldText,
-      const std::string &newText, int &changes);
+  static std::tuple<std::string, int> FindCountAndReplace(const std::string &src, const std::string &oldText,
+      const std::string &newText);
 
   /**
-   * Returns std::string::npos if word not found in str
+   * Returns true of the given word is find in str, using a caseless search.
    */
-  static size_t FindWords(const std::string &str, const std::string &word);
+  static size_t FindWord(const std::string &str, const std::string &word);
   /*
    * Replaces every occurrence of oldText with newText within the string.
    * Does not return account. Should be more efficient than
-   * findCountAndReplace.
+   * FindCountAndReplace.
    *
    */
 
@@ -508,7 +599,7 @@ public:
    *
    */
 
-  static size_t regexFind(const std::string &str, const std::string pattern, RegexpFlag flags);
+  static size_t regexFind(const std::string &str, const std::string pattern, const int flags);
 
   /*
    * Regular expression patterns for this lib can be found at:
@@ -517,11 +608,11 @@ public:
    * flags:  See enum RegexpFlag in uregex.h
    *
    */
-  static std::string& regexReplaceAll(std::string &str, const std::string pattern,
-      const std::string replace, RegexpFlag flags);
+  static std::string RegexReplaceAll(const std::string &str, const std::string pattern,
+      const std::string replace, const int flags);
 
   static int32_t countOccurances(const std::string &strInput, const std::string &strFind,
-      const RegexpFlag flags);
+      const int flags);
 
   /*! \brief Splits the given input string using the given delimiter into separate strings.
 
@@ -599,7 +690,7 @@ public:
    */
   template<typename OutputIt>
   static OutputIt SplitTo(OutputIt d_first, const std::string &input, const std::string &delimiter,
-      unsigned int iMaxStrings = 0, RegexpFlag flags = RegexpFlag::UREGEX_LITERAL)
+      unsigned int iMaxStrings = 0, int flags = to_underlying(RegexpFlag::UREGEX_LITERAL))
   {
     // This is regex based. A simpler, faster one can be derived from unistr.h using u_strFindFirst and friends
 
@@ -673,7 +764,7 @@ private:
    * \return A size a bit larger than wchar_length, plus 200.
    */
 
-  static size_t getUCharFomWcharBufferSize(size_t wchar_length, size_t scale);
+  static size_t getWcharToUCharBufferSize(size_t wchar_length, size_t scale);
 
   /**
    * Calculates the maximum number of UChars (UTF-16) required by a UTF-8
@@ -741,17 +832,17 @@ private:
    */
   static size_t getWCharBufferSize(size_t uchar_length, size_t scale);
 
-  static UChar* utf8_to_UChar(const std::string &src, UChar *buffer, size_t bufferSize,
+  static UChar* StringToUChar(const std::string &src, UChar *buffer, size_t bufferSize,
       int32_t &destLength, const size_t src_offset = 0,
       const size_t src_length = std::string::npos);
 
-  static UChar* utf8_to_UChar(const char *src, UChar *buffer, size_t bufferSize,
+  static UChar* StringToUChar(const char *src, UChar *buffer, size_t bufferSize,
       int32_t &destLength, const size_t length = std::string::npos);
 
   static UChar* wchar_to_UChar(const wchar_t *src, UChar *buffer, size_t bufferSize,
       int32_t &destLength, const size_t length = std::string::npos);
 
-  static std::string UChar_to_UTF8(const UChar *u_str, char *buffer, size_t bufferSize,
+  static std::string UCharToString(const UChar *u_str, char *buffer, size_t bufferSize,
       int32_t &destLength, const size_t u_str_length);
 
   static wchar_t* UChar_to_wchar(const UChar *u_str, wchar_t *buffer, size_t bufferSize,
@@ -786,20 +877,19 @@ private:
   static void normalize(const icu::StringPiece strPiece, icu::CheckedArrayByteSink &sink,
       UErrorCode &status, const int32_t options, const NormalizerType normalizerType);
 
-  static icu::UnicodeString& kTrim(icu::UnicodeString &str, const icu::UnicodeString &deleteChars,
+  static icu::UnicodeString Trim(const icu::UnicodeString &str, const icu::UnicodeString &deleteChars,
       const bool trimStart, const bool trimEnd);
 
-  static icu::UnicodeString& kTrim(icu::UnicodeString &str, const bool trimStart,
+  static icu::UnicodeString Trim(const icu::UnicodeString &str, const bool trimStart,
       const bool trimEnd);
 
-  static icu::UnicodeString& findCountAndReplace(icu::UnicodeString &kSrc,
-      const icu::UnicodeString &kOldText, const icu::UnicodeString &kNewText, int &changes);
+  static std::tuple<icu::UnicodeString, int> FindCountAndReplace(const icu::UnicodeString &kSrc,
+      const icu::UnicodeString &kOldText, const icu::UnicodeString &kNewText);
 
-  static icu::UnicodeString&
-  findCountAndReplace(icu::UnicodeString &srcText, const int32_t start, const int32_t length,
+  static std::tuple<icu::UnicodeString, int>
+  FindCountAndReplace(const icu::UnicodeString &srcText, const int32_t start, const int32_t length,
       const icu::UnicodeString &oldText, const int32_t oldStart, const int32_t oldLength,
-      const icu::UnicodeString &newText, const int32_t newStart, const int32_t newLength,
-      int32_t &changes);
+      const icu::UnicodeString &newText, const int32_t newStart, const int32_t newLength);
 
   /*
    * Regular expression patterns for this lib can be found at:
@@ -808,26 +898,17 @@ private:
    * flags:  See enum RegexpFlag in uregex.h
    *
    */
-  icu::UnicodeString& regexReplaceAll(icu::UnicodeString &kString,
-      const icu::UnicodeString kPattern, const icu::UnicodeString kReplace, RegexpFlag flags);
+  icu::UnicodeString RegexReplaceAll(const icu::UnicodeString &kString,
+      const icu::UnicodeString kPattern, const icu::UnicodeString kReplace, const int flags);
 
   template<typename OutputIt>
   static OutputIt SplitTo(OutputIt d_first, const icu::UnicodeString &kInput,
-      const icu::UnicodeString &kDelimiter, unsigned int iMaxStrings = 0, RegexpFlag flags =
-          RegexpFlag::UREGEX_LITERAL);
+      const icu::UnicodeString &kDelimiter, unsigned int iMaxStrings = 0, const int flags =
+          to_underlying(RegexpFlag::UREGEX_LITERAL));
 
   static std::vector<icu::UnicodeString> SplitMulti(const std::vector<icu::UnicodeString> &input,
-      const std::vector<icu::UnicodeString> &delimiters, size_t iMaxStrings = 0, RegexpFlag flags =
-          RegexpFlag::UREGEX_LITERAL);
+      const std::vector<icu::UnicodeString> &delimiters, size_t iMaxStrings = 0, const int flags =
+          to_underlying(RegexpFlag::UREGEX_LITERAL));
 
 };
-
-/*
- class UnicodeException: public std::exception {
- public:
- const char* what() {
- return "Unicode Exception";
- }
- };
- */
 

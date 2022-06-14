@@ -2022,7 +2022,6 @@ bool CGUIMediaWindow::GetFilteredItems(const std::string &filter, CFileItemList 
 
   std::string trimmedFilter(filter);
   StringUtils::TrimLeft(trimmedFilter);
-  StringUtils::FoldCase(trimmedFilter);
 
   if (trimmedFilter.empty())
     return result;
@@ -2053,8 +2052,7 @@ bool CGUIMediaWindow::GetFilteredItems(const std::string &filter, CFileItemList 
     if (numericMatch)
       StringUtils::WordToDigits(match);
 
-    size_t pos = StringUtils::FindWords(match, trimmedFilter);
-    if (pos != std::string::npos)
+    if (StringUtils::FindWord(match, trimmedFilter) != std::string::npos)
       filteredItems.Add(item);
   }
 

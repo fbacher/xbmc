@@ -32,6 +32,7 @@
 #include "CharsetConverter.h"
 #include "LangInfo.h"
 #include "StringUtils.h"
+#include <tuple>
 #include "Util.h"
 
 #include <algorithm>
@@ -270,97 +271,106 @@ void StringUtils::FoldCase(std::wstring &str, const StringOptions opt /*  = Stri
 	return;
 }
 
-void StringUtils::ToCapitalize(std::wstring &str, const icu::Locale &locale) {
-	std::wstring result = Unicode::toTitle(str, locale);
-	// TODO: Eliminate swap
-	str.swap(result);
-	return;
+void StringUtils::ToCapitalize(std::wstring &str, const icu::Locale &icuLocale) {
+#ifdef USE_TO_TITLE_FOR_CAPITALIZE
+  Unicode::toTitle(str, icuLocale);
+#else
+  std::wstring result = Unicode::toCapitalize(str, icuLocale);
+  // TODO: Eliminate swap
+  str.swap(result);
+#endif
+  return;
 }
 
 void StringUtils::ToCapitalize(std::wstring &str, const std::locale &locale) {
 	icu::Locale icuLocale = Unicode::getICULocale(locale);
-  return StringUtils::ToCapitalize(str, icuLocale);
+#ifdef USE_TO_TITLE_FOR_CAPITALIZE
+  Unicode::toTitle(str, icuLocale);
+#else
+ return StringUtils::ToCapitalize(str, icuLocale);
+#endif
 }
 
 void StringUtils::ToCapitalize(std::string &str, const icu::Locale &locale) {
-		std::string result = Unicode::toTitle(str, locale);
-	   //std::cout << "ToCapitalize in: " << str << " out: " << result << std::endl;
-		str.swap(result);
+#ifdef USE_TO_TITLE_FOR_CAPITALIZE
+  Unicode::toTitle(str, locale);
+#else
+  std::string result = Unicode::toCapitalize(str, locale);
+	str.swap(result);
+#endif
 		return;
 }
 
 void StringUtils::ToCapitalize(std::string &str, const std::locale &locale) {
   icu::Locale icuLocale = Unicode::getICULocale(locale);
+#ifdef USE_TO_TITLE_FOR_CAPITALIZE
+  Unicode::toTitle(str, icuLocale);
+#else
   StringUtils::ToCapitalize(str, icuLocale);
+#endif
 	return;
 }
 
 void StringUtils::ToCapitalize(std::wstring &str) {
   icu::Locale icuLocale = Unicode::getDefaultICULocale();
+#ifdef USE_TO_TITLE_FOR_CAPITALIZE
+  Unicode::toTitle(str, icuLocale);
+#else
 	StringUtils::ToCapitalize(str, icuLocale);
+#endif
 	return;
 }
 
 void StringUtils::ToCapitalize(std::string &str) {
   icu::Locale icuLocale = Unicode::getDefaultICULocale();
-	StringUtils::ToCapitalize(str, icuLocale);
+#ifdef USE_TO_TITLE_FOR_CAPITALIZE
+  Unicode::toTitle(str, icuLocale);
+#else
+  StringUtils::ToCapitalize(str, icuLocale);
+#endif
 	return;
 }
 
 void StringUtils::TitleCase(std::wstring &str, const std::locale &locale)
 {
-
+  icu::Locale icuLocale = Unicode::getICULocale(locale);
+  std::wstring result = Unicode::toTitle(str, icuLocale);
+  str.swap(result);
+  return;
 }
 
 void StringUtils::TitleCase(std::wstring &str) {
-
+  icu::Locale icuLocale = Unicode::getDefaultICULocale();
+  std::wstring result = Unicode::toTitle(str, icuLocale);
+  str.swap(result);
+  return;
 }
 
 void StringUtils::TitleCase(std::string &str, const std::locale &locale) {
-
+  icu::Locale icuLocale = Unicode::getICULocale(locale);
+  std::string result = Unicode::toTitle(str, icuLocale);
+  str.swap(result);
+  return;
 }
 
 void StringUtils::TitleCase(std::string &str) {
-
+  icu::Locale icuLocale = Unicode::getDefaultICULocale();
+  std::string result = Unicode::toTitle(str, icuLocale);
+  str.swap(result);
+  return;
 }
 
-/*! \brief Normalizes a wstring.
-
- There are multiple Normalizations that can be performed on Unicode. Fortunately
- normalization is not needed in many situations. An introduction can be found
- at: https://unicode-org.github.io/icu/userguide/transforms/normalization/
-
- \param str string to normalize in-place
- \param options fine tunes behavior. See StringOptions. Frequently can leave
- at default value.
- \param normalizerType select the appropriate normalizer for the job
- \return src
- */
-
-const std::wstring StringUtils::Normalize(std::wstring &src,
-		const StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */,
-		const NormalizerType normalizerType) {
-	return Unicode::normalize(src, opt, normalizerType);
-}
-/*! \brief Normalizes a string.
-
- There are multiple Normalizations that can be performed on Unicode. Fortunately
- normalization is not needed in many situations. An introduction can be found
- at: https://unicode-org.github.io/icu/userguide/transforms/normalization/
-
- \param str string to normalize in-place
- \param options fine tunes behavior. See StringOptions. Frequently can leave
- at default value.
- \param normalizerType select the appropriate normalizer for the job
- \return src
- */
-
-const std::string StringUtils::Normalize(std::string &src,
+const std::wstring StringUtils::Normalize(const std::wstring &src,
 		const StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */,
 		const NormalizerType normalizerType) {
 	return Unicode::normalize(src, opt, normalizerType);
 }
 
+const std::string StringUtils::Normalize(const std::string &src,
+		const StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */,
+		const NormalizerType normalizerType) {
+	return Unicode::normalize(src, opt, normalizerType);
+}
 
 bool StringUtils::Equals(const std::string &str1, const std::string &str2) {
 	int8_t rc = Unicode::strcmp(str1, 0, str1.length(), str2, 0, str2.length());
@@ -445,7 +455,20 @@ int StringUtils::CompareNoCase(const std::string &str1, const std::string &str2,
 
 	// TODO: value of 'n' is questionable in Unicode environment.
 	if (n == 0)
+	{
 		n = std::string::npos;
+	}
+	else
+	{
+    if (containsNonAscii(str1))
+    {
+      CLog::Log(LOGWARNING, "StringUtils::CompareNoCase str1 contains non-ASCII: {}", str1);
+    }
+    if (containsNonAscii(str2))
+    {
+        CLog::Log(LOGWARNING, "StringUtils::CompareNoCase str1 contains non-ASCII: {}", str2);
+    }
+	}
 
 	int rc = Unicode::utf8_strcasecmp(str1, str2, n, opt, normalize);
 	// std::cout << "CompareNoCase 1 str1: " << str1 << " str2: " << str2 << " n: " << n
@@ -456,120 +479,98 @@ int StringUtils::CompareNoCase(const std::string &str1, const std::string &str2,
 
 int StringUtils::CompareNoCase(const char *s1, const char *s2,
 		size_t n /* = 0 */, StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */, const bool normalize /* = false */) {
+
+
 	std::string str1 = std::string(s1);
 	std::string str2 = std::string(s2);
 	return StringUtils::CompareNoCase(str1, str2, n, opt, normalize);
 }
 
-std::string StringUtils::Left(const std::string &str, size_t count) {
-	count = std::max((size_t) 0, std::min(count, str.size()));
-
-	std::string result = Unicode::substr(str, 0, count);
-   //std::cout << "substr 1 str: " << str << " len: " << count << " result: "
-	//		<< result << std::endl;
+std::string StringUtils::Left(const std::string &str, const int charCount) {
+	std::string result = Unicode::Left(str, charCount, Unicode::getDefaultICULocale());
 
 	return result;
 }
 
-std::string StringUtils::Mid(const std::string &str, size_t first,
-		size_t count /* = string::npos */) {
-   //std::cout << "substr 2 str: " << str << " first: " << first << " len: "
-		//	<< count << std::endl;
+std::string StringUtils::Left(const std::string &str, const int charCount, const icu::Locale& icuLocale) {
+  std::string result = Unicode::Left(str, charCount, icuLocale);
 
-	// If overflow occurs, then (first + count) < first
-	size_t end = first + count;
-	if (end > str.size() or end < first) // TODO: Verify with original
-		// Change to copy to end of string
-		count = str.size() - first;
+  return result;
+}
 
-	if (first > str.size() or count == 0) // TODO: Verify with original
-		return std::string();
-
-	assert(first + count <= str.size()); // Does not catch overflow
-	assert(first + count >= first); // Overflow
-
-	std::string result = Unicode::substr(str, first, count);
-   //std::cout << "substr 2 str: " << str << " first: " << first << " len: "
-		//	<< count << " result: " << result << std::endl;
-
+std::string StringUtils::Mid(const std::string &str, const int firstCharIndex,
+		const int charCount /* = INT_MAX */) {
+	std::string result = Unicode::Mid(str, firstCharIndex, charCount);
 	return result;
 }
 
-std::string StringUtils::Right(const std::string &str, size_t count) {
-   //std::cout << "substr 3 str: " << str << " len: " << count << std::endl;
-	count = std::max((size_t) 0, std::min(count, str.size()));
-	size_t start = str.size() - count;
-	std::string result = Unicode::substr(str, start, count);
-	// std::cout << "substr 3 str: " << str << " start: " << start << " len: "
-	//		<< count << " result: " << result << std::endl;
+
+std::string StringUtils::Right(const std::string &str, const int charCount) {
+	std::string result = Unicode::Right(str, charCount);
 	return result;
 }
 
 std::string& StringUtils::Trim(std::string &str) {
-	Unicode::trim(str);
-	// std::cout << "trim 1 str: " << str << std::endl;
+	std::string result = Unicode::Trim(str);
+	str.swap(result);
 	return str;
 }
 
 std::string& StringUtils::Trim(std::string &str, const char *const chars) {
-	std::string orig = std::string(str);
 	std::string delChars = std::string(chars);
-	Unicode::trim(str, delChars, true, true);
+	std::string result = Unicode::Trim(str, delChars, true, true);
 	 //+CLog::Log(LOGINFO, "StringUtils::Trim str: {} delChars: {} result: {}\n",
 	//+		 orig, delChars, str);
-
+  str.swap(result);
 	return str;
 }
 
 std::string& StringUtils::TrimLeft(std::string &str) {
 	std::string orig = std::string(str);
-	Unicode::trimLeft(str);
+	std::string result = Unicode::TrimLeft(str);
 	 //+ CLog::Log(LOGINFO, "StringUtils::TrimLeft str: {} result: {}\n", orig, str);
+
+	str.swap(result);
 	 return str;
 }
 
 std::string& StringUtils::TrimLeft(std::string &str, const char *const chars) {
-	std::string orig = std::string(str);
 	std::string delChars = std::string(chars);
-	Unicode::trim(str, delChars, true, false);
-	 //+CLog::Log(LOGINFO, "StringUtils::TrimLeft str: '{}' delChars: '{}' result: '{}'\n", orig, chars, str);
-
+	std::string result = Unicode::Trim(str, delChars, true, false);
+	str.swap(result);
 	return str;
 }
 
 std::string& StringUtils::TrimRight(std::string &str) {
-	std::string orig = std::string(str);
-	Unicode::trimRight(str);
-	// std::cout << "TrimRight 1 in: " << orig << " out: " << str << std::endl;
-
+	std::string result = Unicode::TrimRight(str);
+  str.swap(result);
 	return str;
 }
 
 std::string& StringUtils::TrimRight(std::string &str, const char *const chars) {
-	std::string orig = std::string(str);
 	std::string delChars = std::string(chars);
-	Unicode::trim(str, delChars, false, true);
-
-	 //+ CLog::Log(LOGINFO, "StringUtils::TrimRight str: {} delChars: {} result: {}\n",
-	 //+		 orig, chars, str);
-
+	std::string result = Unicode::Trim(str, delChars, false, true);
+  str.swap(result);
 	return str;
 }
 
-int StringUtils::ReturnDigits(const std::string &str) {
-	/*
-	 * TODO: Unicode Speed up this awful function.
-	 *
-	 * This is a highly specialized, poorly defined function. It is most likely equivalent to
-	 * atoi(str.trim()), but requires more research to be sure. It is written such that every
-	 * digit in a string is concatenated together and then turned into an int.
-	 */
-   //std::cout << "ReturnDigits in: " << str << std::endl;
-
-	std::string digits = Unicode::getDigits(str);
-
-   //std::cout << "ReturnDigits in: " << str << " out: " << digits << std::endl;
-	return atoi(digits.c_str());
+int StringUtils::ReturnDigits(const std::string &str)
+{
+  std::stringstream ss;
+  bool digitFound = false;
+  for (const auto& character : str)
+  {
+    if (isdigit(character))
+    {
+      digitFound = true;
+      ss << character;
+    }
+    else if (digitFound)
+    {
+      break;
+    }
+  }
+  return atoi(ss.str().c_str());
 }
 
 
@@ -607,8 +608,8 @@ std::string& StringUtils::FindAndReplace(std::string &str, const char * oldText,
  *
  */
 std::string StringUtils::RegexReplaceAll(std::string &str, const std::string pattern,
-		const std::string newStr, RegexpFlag flags)  {
-	 std::string result = Unicode::regexReplaceAll(str, pattern, newStr, flags);
+		const std::string newStr, const int flags)  {
+	 std::string result = Unicode::RegexReplaceAll(str, pattern, newStr, flags);
 		//CLog::Log(LOGINFO, "StringUtils::RegexReplaceAll\n");
 
 	 //+CLog::Log(LOGINFO, "StringUtils::RegexReplaceAll str: {} pattern: {} newStr: {} result: {}\n",
@@ -650,7 +651,6 @@ std::string& StringUtils::RemoveDuplicatedSpacesAndTabs(std::string& str)
 /**
  * Replaces every occurrence of oldchar with newChar in str.
  *
- * BROKEN for non-ASCII oldChar & newChar
  */
 int StringUtils::Replace(std::string &str, char oldChar, char newChar) {
 	if (not isascii(oldChar)) {
@@ -669,19 +669,18 @@ int StringUtils::Replace(std::string &str, char oldChar, char newChar) {
 /**
  * Replaces every occurrence of oldStr with newStr in str. Not regex based.
  */
-int StringUtils::Replace(std::string &str, const std::string &oldStr,
-		const std::string &newStr) {
+int StringUtils::Replace(std::string &str, const std::string &oldStr, const std::string &newStr) {
 	std::string orig = str;
-	int changes = 0; // A count of how many changes of oldStr to newStr were made.
 	if (oldStr.empty() or str.empty())
 		return 0;
 
    // Called by Log.CLog!
    
-   //std::cout << "Replace in: " << str << " oldStr: " << oldStr << " newStr: " << newStr << std::endl;
-	Unicode::findCountAndReplace(str, oldStr, newStr, changes);
-   //std::cout << " out: " << str << std::endl;
+	std::tuple<std::string, int> result = Unicode::FindCountAndReplace(str, oldStr, newStr);
 
+	std::string resultStr = std::get<0> (result);
+	str.swap(resultStr);
+	int changes = std::get<1> (result);
 	return changes;
 }
 
@@ -730,7 +729,6 @@ bool StringUtils::StartsWith(const char *s1, const char *s2) {
 
 bool StringUtils::StartsWithNoCase(const std::string &str1,
 		const std::string &str2, StringOptions opt) {
-	// std::cout << "Enter StartsWithNoCase str1: " << str1 << " str2: " << str2 << std::endl;
 	if (str1.length() == 0  and str2.length() == 0)
 		return true;
 
@@ -742,7 +740,6 @@ bool StringUtils::StartsWithNoCase(const std::string &str1,
 
 	int diff = Unicode::utf8_strcasecmp(str1, 0, str2.length(), str2, 0,
 			str2.length(), opt);
-	// std::cout << "StartsWithNoCase str1: " << str1 << " str2: " << str2 << "compare: " << diff << std::endl;
 	return diff == 0;
 }
 
@@ -794,7 +791,7 @@ std::vector<std::string> StringUtils::Split(const std::string &input,
 	std::vector < std::string > result = std::vector<std::string>();
 	if (not (input.empty() or delimiter.empty())) {
 		Unicode::SplitTo(std::back_inserter(result), input, delimiter, iMaxStrings,
-										 RegexpFlag::UREGEX_LITERAL);
+		    to_underlying(RegexpFlag::UREGEX_LITERAL));
 	}
 	else {
 		if (not input.empty()) // delimiter empty, so just return input, if
@@ -934,12 +931,8 @@ std::vector<std::string> StringUtils::SplitMulti(
 // returns the number of occurrences of strFind in strInput.
 int StringUtils::FindNumber(const std::string &strInput,
 		const std::string &strFind) {
-   //std::cout << "FindNumber in: " << strInput << " pattern: " << strFind
-		//	<< std::endl;
-
-	int numFound = Unicode::countOccurances(strInput, strFind, RegexpFlag::UREGEX_LITERAL);
-	//std::cout << "FindNumber in: " << strInput << " pattern: " << strFind
-	//		<< " found: " << numFound << std::endl;
+	int numFound = Unicode::countOccurances(strInput, strFind,
+	    to_underlying(RegexpFlag::UREGEX_LITERAL));
 	return numFound;
 }
 
@@ -1188,6 +1181,16 @@ bool StringUtils::InitializeCollator(bool normalize /* = false */)
 {
   return Unicode::InitializeCollator(Unicode::getDefaultICULocale(), normalize);
 }
+bool StringUtils::InitializeCollator(const std::locale &locale, bool normalize /* = false */)
+{
+  return Unicode::InitializeCollator(Unicode::getICULocale(locale), normalize);
+}
+
+bool StringUtils::InitializeCollator(const icu::Locale &icuLocale, bool normalize /* = false */)
+{
+  return Unicode::InitializeCollator(icuLocale, normalize);
+}
+
 
 int32_t StringUtils::Collate(const std::wstring &left, const std::wstring &right)
 {
@@ -1396,7 +1399,7 @@ static uint32_t UTF8ToUnicode(const unsigned char *z, int nKey,
  every pair comparison made. That approach was found to be 10 times slower than using this
  separate routine.
 
- TODO: length is in bytes. What happens when not on grapheme (character) boundary?
+ TODO: length is in bytes. What happens when not on character boundary?
        Is normalization necessary?
  */
 
@@ -1762,13 +1765,21 @@ std::string StringUtils::ToHexadecimal(const std::string& in)
   return ss.str();
 }
 
-size_t StringUtils::FindWords(const std::string& str, const std::string& wordLowerCase) {
-
-	if (containsNonAscii(wordLowerCase)) {
-	 	CLog::Log(LOGWARNING, "StringUtils::FindWords wordLowerCase is non-ASCII: {}\n", wordLowerCase);
-	}
-		return Unicode::FindWords(str, wordLowerCase);
-	}
+size_t StringUtils::FindWord(const std::string &str, const std::string &word)
+{
+  size_t index;
+  // Ensure searched for word begins on a "word" boundary.
+  // \b matches boundary between word and non-word character
+  // std::string pattern = "((\d+)|([a-z]+|.)\s*)(\\Q" + word + "\\E)";  // \\Q does not interpret as regex \\E
+#ifdef USE_FINDWORD_REGEX
+  std::string pattern = "((\\Q" + word + "\\E)|(((?:(?:\\d++(?=[^\\d]))|(?:[a-z]++(?=[^a-z]))|(?:[^\\d\\sa-z]))\\s*+(?=[^\\s]))(\\Q" + word + "\\E)))";
+  int flags = to_underlying(RegexpFlag::UREGEX_CASE_INSENSITIVE);
+  index = Unicode::regexFind(str, pattern, flags);
+#else
+  index = Unicode::FindWord(str, word);
+#endif
+	return index;
+}
 
 /*
  * Guaranteed to work ONLY with ASCII 'brackets'. String may be utf-8.
@@ -1872,7 +1883,7 @@ double StringUtils::CompareFuzzy(const std::string &left,
 	/*  TODO: Unicode. Examine if this works with Unicode. Does it need locale?
 	 *        Should strings be case folded and normalized first?
 	 *        Other packages exist (mostly python) that take locale
-	 *        most are vague about Unicode
+	 *        most are vague about Unicode.
 	 *        Google's BERT and TensorFlow are interesting (mostly python).
 	 */
 

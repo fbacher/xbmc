@@ -27,7 +27,33 @@
 // USE_ICU_COLLATOR chooses between ICU and legacy Kodi collation
 
 #define USE_ICU_COLLATOR 1
+
+/*
+ *
+ * USE_TO_TITLE_FOR_CAPITALIZE controls whether to use legacy Kodi ToCapitalize
+ * algorithm:
+ *   Upper case first letter of every "word"; Punctuation as well as spaces
+ *   separates words. "n.y-c you pig" results in "N.Y-C You Pig". No characters
+ *   lower cased. Only uppercases first codepoint of word, potentially producing
+ *   bad Unicode when multiple codepoints are used to represent a letter. Probably
+ *   not a severe error. May be difficult to correct with exposed APIs.
+ * New Algorithm is to use ICU toTitle. This is locale dependent.
+ *   Imperfect, but uses Locale rules to Title Case. Takes context into account.
+ *   Does NOT generally use a dictionary of words to NOT uppercases (i.e. to, the...)
+ *   Would titlecase "n.y.c you pig" as "N.y.c You Pig", but "n-y-c" becomes "N-Y-C"
+ *   (the same as Capitalize).
+ *
+ *   Properly handles any change of string lengths.
+ */
+#undef USE_TO_TITLE_FOR_CAPITALIZE
+
+/*
+ * TODO: Fix, or remove code for USE_FINDWORD_REGEX
+ */
+#undef USE_FINDWORD_REGEX
+
 #include <stdarg.h>   // others depend on this
+#include <climits>
 #include <string>
 #include <sstream>
 #include <iostream>
@@ -113,16 +139,16 @@ public:
 	 *  Character UTF-8, wchar_t, Size, Length, Grapheme, Codepoints:
 	 *
 	 *  * A Unicode codepoint is unsigned 32 bits. This is specified in the
-	 *    standard. What we think of as a character is a Grapheme.
+	 *    standard. Unicode frequently uses the term Grapheme to mean Character.
 	 *    A Grapheme can be composed of one or more codepoints. The first
 	 *    codepoint contains the basic character information, additional
 	 *    codepoints add accents, etc.
 	 *
-	 *    Frequently an accented Grapheme can be represented in multiple
+	 *    Frequently an accented character can be represented in multiple
 	 *    combinations of codepoints. One such case has five different
-	 *    representations of the came Grapheme varying in length from 1
+	 *    representations of the same character varying in length from 1
 	 *    to five codepoints. Normalization (which is locale specific)
-	 *    reorders and possibly combines a Grapheme's codepoints into
+	 *    reorders and possibly combines a character's codepoints into
 	 *    a canological order so that they can be compared with one another.
 	 *
 	 *  * UTF-8 is a compressed encoding of Unicode (32-bit).
@@ -140,8 +166,8 @@ public:
 	 *  * Two strings of different, non-zero lengths does not tell you if
 	 *    strings are not-equal! (Not without knowing that the strings are normalized
 	 *    for the same locale).
-	 *  * When iterating the graphemes of a string, you frequently have
-	 *    to know where the grapheme boundaries are.
+	 *  * When iterating the characters of a string, you frequently have
+	 *    to know where the character boundaries are.
 	 *  * You may have to copy or alter strings simply to compare them
 	 *
 	 *  Don't give up hope yet:
@@ -256,7 +282,6 @@ public:
    * \param str string to change case on
    * \param locale controls the conversion rules
    */
-
   static void ToUpper(std::wstring &str, const icu::Locale& locale);
 
   /*!
@@ -268,275 +293,340 @@ public:
    */
   static void ToUpper(std::wstring &str);
 
-
-  /*! \brief Converts a string to Lower case using locale.
-
-  Conversion rules determined by locale
-
-  \param str string to change case on
-  \param locale
-  */
+  /*!
+   * \brief Converts a string to Lower case according to locale.
+   *
+   * Note: The length of the string can change, depending upon the underlying
+   * icu::locale.
+   *
+   * \param str string to change case on
+   * \param locale the underlying icu::Locale is created using the language,
+   *        country, etc. from this locale
+   */
   static void ToLower(std::string &str, const std::locale& locale);
 
-
-  /*! \brief Converts a string to Lower case using locale.
-
-  Conversion rules determined by locale
-
-  \param str string to change case on
-  \param locale
-  */
+  /*!
+   * \brief Converts a string to Lower case according to locale.
+   *
+   * Note: the length of the string can change, depending upon locale.
+   *
+   * \param str string to change case on
+   * \param locale controls the conversion rules
+   */
   static void ToLower(std::string &str, const icu::Locale& locale);
 
-  /*! \brief Converts a wstring to Lower case using LangInfo::GetSystemLocale.
-
-  Conversion rules determined by system locale
-
-  \param str string to change case on
-  \param locale
-  */
+  /*!
+   * \brief Converts a string to Lower case using LangInfo::GetSystemLocale
+   *
+   * Note: the length of the string can change, depending upon locale.
+   *
+   * \param str string to change case on
+   */
   static void ToLower(std::string &str);
 
-  /*! \brief Converts a string to Lower case using locale.
-
-  Conversion rules determined by locale
-
-  \param str string to change case on
-  \param locale
-  */
+  /*!
+   * \brief Converts a wstring to Lower case according to locale.
+   *
+   * Note: The length of the string can change, depending upon the underlying
+   * icu::locale.
+   *
+   * \param str string to change case on
+   * \param locale the underlying icu::Locale is created using the language,
+   *        country, etc. from this locale
+   */
   static void ToLower(std::wstring &str, const std::locale& locale);
 
-  /*! \brief Converts a string to Lower case using locale.
-
-  Conversion rules determined by locale
-
-  \param str string to change case on
-  \param locale
-  */
-
+  /*!
+   * \brief Converts a wstring to Lower case according to locale.
+   *
+   * Note: the length of the string can change, depending upon locale.
+   *
+   * \param str string to change case on
+   * \param locale controls the conversion rules
+   */
   static void ToLower(std::wstring &str, const icu::Locale& locale);
 
-  /*! \brief Converts a wstring to Lower case using locale.
-
-  Conversion rules determined by locale
-
-  \param str string to change case on
-  \param locale
-  */
+  /*!
+   * \brief Converts a wstring to Lower case using LangInfo::GetSystemLocale
+   *
+   * Note: the length of the string can change, depending upon locale.
+   *
+   * \param str string to change case on
+   */
   static void ToLower(std::wstring &str);
 
-  /*! \brief Folds the case of a string.
-
-  Similar to ToLower except in addition, insignificant accents are stripped
-  and other transformations are made (such as German sharp-S is converted to ss).
-  The transformation is independent of locale.
-
-  \param str string to fold in place
-  \param opt StringOptions to fine-tune behavior. For most purposes, leave at
-             default value, FOLD_CASE_DEFAULT
-
-	Note: This function is mostly used here to 'normalize' strings before using
-	      them as keywords/map indexes, etc. A particular problem is the behavior
-	      of "The Turkic I". FOLD_CASE_DEFAULT is effective at
-	      eliminating this problem. Below are the four "I" characters in
-	      Turkic and the result of FoldCase for each:
-
-	   *  FOLD_CASE_DEFAULT
-     * I (\u0049) -> i (\u0069) // ASCII upper -> ASCII lower
-     * İ (\u0130) -> i̇ (\u0069 \u0307) // Dotted upper ->
-     * i (\u0069) -> i (\u0069) // ASCII lower -> ASCII lower
-     * ı (\u0131) -> ı (\u0131)
-		 *
-		 *
-		 * FOLD_CASE_EXCLUDE_SPECIAL_I
-		 * I (\u0049) -> ı (\u0131) // Dotless upper -> Dotless lower
-		 * i (\u0069) -> i (\u0069) // Dotted lower -> Dotted lower
-		 * İ (\u0130) -> i (\u0069) // Dotted upper -> Dotted lower
-		 * ı (\u0131) -> ı (\u0131) // Dotless lower -> Dotless lower
-
-  TODO: Modify to return str (see StartsWithNoCase)
-  */
+  /*!
+   *  \brief Folds the case of a string. Locale Independent.
+   *
+   * Similar to ToLower except in addition, insignificant accents are stripped
+   * and other transformations are made (such as German sharp-S is converted to ss).
+   * The transformation is independent of locale.
+   *
+   * In particular, when FOLD_CASE_DEFAULT is used, the Turkic Dotted I and Dotless
+   * i follow the "en" locale rules for ToLower.
+   *
+   * DEVELOPERS who use non-ASCII keywords that will use FoldCase
+   * should be aware that it may not always work as expected. Testing is important.
+   * Changes will have to be made to keywords that don't work as expected. One solution is
+   * to try to always use lower-case in the first place.
+   *
+   * \param str string to fold in place
+   * \param opt StringOptions to fine-tune behavior. For most purposes, leave at
+   *            default value, FOLD_CASE_DEFAULT
+   *
+	 * Note: This function serves a similar purpose that "ToLower/ToUpper" is
+	 *       frequently used for ASCII maps indexed by keyword. ToLower/ToUpper does
+	 *       NOT work to 'normalize' Unicode to a consistent value regardless of
+	 *       the case variations of the input string. A particular problem is the behavior
+	 *       of "The Turkic I". FOLD_CASE_DEFAULT is effective at
+	 *       eliminating this problem. Below are the four "I" characters in
+	 *       Turkic and the result of FoldCase for each:
+   *
+	 * Locale                    Unicode                                      Unicode
+   *                           codepoint                                    (hex 32-bit codepoint(s))
+   * en_US I (Dotless I)       \u0049 -> i (Dotted small I)                 \u0069
+   * tr_TR I (Dotless I)       \u0049 -> ı (Dotless small I)                \u0131
+   * FOLD1 I (Dotless I)       \u0049 -> i (Dotted small I)                 \u0069
+   * FOLD2 I (Dotless I)       \u0049 -> ı (Dotless small I)                \u0131
+   *
+   * en_US i (Dotted small I)  \u0069 -> i (Dotted small I)                 \u0069
+   * tr_TR i (Dotted small I)  \u0069 -> i (Dotted small I)                 \u0069
+   * FOLD1 i (Dotted small I)  \u0069 -> i (Dotted small I)                 \u0069
+   * FOLD2 i (Dotted small I)  \u0069 -> i (Dotted small I)                 \u0069
+   *
+   * en_US İ (Dotted I)        \u0130 -> i̇ (Dotted small I + Combining dot) \u0069 \u0307
+   * tr_TR İ (Dotted I)        \u0130 -> i (Dotted small I)                 \u0069
+   * FOLD1 İ (Dotted I)        \u0130 -> i̇ (Dotted small I + Combining dot) \u0069 \u0307
+   * FOLD2 İ (Dotted I)        \u0130 -> i (Dotted small I)                 \u0069
+   *
+   * en_US ı (Dotless small I) \u0131 -> ı (Dotless small I)                \u0131
+   * tr_TR ı (Dotless small I) \u0131 -> ı (Dotless small I)                \u0131
+   * FOLD1 ı (Dotless small I) \u0131 -> ı (Dotless small I)                \u0131
+   * FOLD2 ı (Dotless small I) \u0131 -> ı (Dotless small I)                \u0131
+   *
+   * FOLD_CASE_DEFAULT causes FoldCase to behave similar to ToLower for the "en" locale
+   * FOLD_CASE_SPECIAL_I causes FoldCase to behave similar to ToLower for the "tr_TR" locale.
+   *
+   * Case folding also ignores insignificant differences in strings (some accent marks,
+   * etc.).
+   *
+   * TODO: Modify to return str (see StartsWithNoCase)
+   */
   static void FoldCase(std::wstring &str, const StringOptions opt = StringOptions::FOLD_CASE_DEFAULT);
 
-  /*! \brief Folds the case of a string.
-
-  Similar to ToLower except in addition, insignificant accents are stripped
-  and other transformations are made (such as German sharp-S is converted to ss).
-  The transformation is independent of locale.
-
-  \param str string to fold
-  \param opt StringOptions to fine-tune behavior. For most purposes, leave at
-             default value, FOLD_CASE_DEFAULT
-
-	Note: This function is mostly used here to 'normalize' strings before using
-	      them as keywords/map indexes, etc. A particular problem is the behavior
-	      of "The Turkic I". FOLD_CASE_DEFAULT is effective at
-	      eliminating this problem. Below are the four "I" characters in
-	      Turkic and the result of FoldCase for each:
-
-	   *  FOLD_CASE_DEFAULT
-     * I (\u0049) -> i (\u0069) // ASCII upper -> ASCII lower
-     * İ (\u0130) -> i̇ (\u0069 \u0307) // Dotted upper ->
-     * i (\u0069) -> i (\u0069) // ASCII lower -> ASCII lower
-     * ı (\u0131) -> ı (\u0131)
-		 *
-		 *
-		 * FOLD_CASE_EXCLUDE_SPECIAL_I
-		 * I (\u0049) -> ı (\u0131) // Dotless upper -> Dotless lower
-		 * i (\u0069) -> i (\u0069) // Dotted lower -> Dotted lower
-		 * İ (\u0130) -> i (\u0069) // Dotted upper -> Dotted lower
-		 * ı (\u0131) -> ı (\u0131) // Dotless lower -> Dotless lower
-
-  TODO: Modify to return str (see StartsWithNoCase)
-  */
+  /*!
+   *  \brief Folds the case of a string.
+   *
+   * Similar to ToLower except in addition, insignificant accents are stripped
+   * and other transformations are made (such as German sharp-S is converted to ss).
+   * The transformation is independent of locale.
+   *
+   * \param str string to fold
+   * \param opt StringOptions to fine-tune behavior. For most purposes, leave at
+   *            default value, FOLD_CASE_DEFAULT
+   *
+	 * Note: For more details, see
+	 *       FoldCase(std::wstring &str, const StringOptions opt = StringOptions::FOLD_CASE_DEFAULT);
+	 *
+   *
+   * TODO: Modify to return str (see StartsWithNoCase)
+   */
   static void FoldCase(std::string &str, const StringOptions opt = StringOptions::FOLD_CASE_DEFAULT);
 
-  /*! \brief Capitalizes a wstring using locale.
-
-  Capitalizes using a simplistic approach familiar to English speakers.
-  See TitleCase for a more language friendly version.
-
-  \param str string to capitalize
-  \param locale
-  */
+  /*!
+   *  \brief Capitalizes a wstring using locale.
+   *
+   * If USE_TO_TITLE_FOR_CAPITALIZE is set, then uses ICU:toTitle to
+   * convert string to "Title Case" following Locale specific rules.
+   *
+   * Otherwise, uses a simplistic approach familiar to English speakers.
+   * See comments for USE_TO_TITLE_FOR_CAPITALIZE for more information.
+   *
+   * \param str string to capitalize in place
+   * \param locale Use capitalization rules of Locale (ignored when
+   *        USE_TO_TITLE_FOR_CAPITALIZE not set)
+   * \return str converted to "Title Case"
+   */
   static void ToCapitalize(std::wstring &str, const icu::Locale &locale);
 
-  /*! \brief Capitalizes a wstring using locale.
-
-  Capitalizes using a simplistic approach familiar to English speakers.
-  See TitleCase for a more language friendly version.
-
-  \param str string to capitalize
-  \param locale
-  */
+  /*!
+   *  \brief Capitalizes a wstring using locale.
+   *
+   * If USE_TO_TITLE_FOR_CAPITALIZE is set, then uses ICU:toTitle to
+   * convert string to "Title Case" following Locale specific rules.
+   *
+   * Otherwise, uses a simplistic approach familiar to English speakers.
+   * See comments for USE_TO_TITLE_FOR_CAPITALIZE for more information.
+   *
+   * \param str string to capitalize in place
+   * \param locale Use capitalization rules of Locale (ignored when
+   *        USE_TO_TITLE_FOR_CAPITALIZE not set)
+   * \return str converted to "Title Case"
+   */
   static void ToCapitalize(std::wstring &str, const std::locale &locale);
 
-  /*! \brief Capitalizes a wstring using locale.
-
-  Capitalizes using a simplistic approach familiar to English speakers.
-  See TitleCase for a more language friendly version.
-
-  \param str string to capitalize
-  \param locale
-  */
+  /*!
+   *  \brief Capitalizes a wstring using locale.
+   *
+   * If USE_TO_TITLE_FOR_CAPITALIZE is set, then uses ICU:toTitle to
+   * convert string to "Title Case" following Locale specific rules, using
+   * LangInfo::GetSystemLocale.
+   *
+   * Otherwise, uses a simplistic approach familiar to English speakers.
+   * See comments for USE_TO_TITLE_FOR_CAPITALIZE for more information.
+   *
+   * \param str string to capitalize in place
+   * \return str converted to "Title Case"
+   */
   static void ToCapitalize(std::wstring &str);
 
-  /*! \brief Capitalizes a string using using a locale.
-
-  Capitalizes using a simplistic approach familiar to English speakers.
-  See TitleCase for a more language friendly version.
-
-  \param str string to capitalize
-  \param locale
-  */
+  /*!
+   *  \brief Capitalizes a string using locale.
+   *
+   * If USE_TO_TITLE_FOR_CAPITALIZE is set, then uses ICU:toTitle to
+   * convert string to "Title Case" following Locale specific rules.
+   *
+   * Otherwise, uses a simplistic approach familiar to English speakers.
+   * See comments for USE_TO_TITLE_FOR_CAPITALIZE for more information.
+   *
+   * \param str string to capitalize in place
+   * \param locale Use capitalization rules of Locale (ignored when
+   *        USE_TO_TITLE_FOR_CAPITALIZE not set)
+   * \return str converted to "Title Case"
+   */
   static void ToCapitalize(std::string &str, const icu::Locale &locale);
 
-  /*! \brief Capitalizes a string using using a locale.
-
-  Capitalizes using a simplistic approach familiar to English speakers.
-  See TitleCase for a more language friendly version.
-
-  \param str string to capitalize
-  \param locale
-  */
+  /*!
+   *  \brief Capitalizes a string using locale.
+   *
+   * If USE_TO_TITLE_FOR_CAPITALIZE is set, then uses ICU:toTitle to
+   * convert string to "Title Case" following Locale specific rules.
+   *
+   * Otherwise, uses a simplistic approach familiar to English speakers.
+   * See comments for USE_TO_TITLE_FOR_CAPITALIZE for more information.
+   *
+   * \param str string to capitalize in place
+   * \param locale Use capitalization rules of Locale (ignored when
+   *        USE_TO_TITLE_FOR_CAPITALIZE not set)
+   * \return str converted to "Title Case"
+   */
   static void ToCapitalize(std::string &str, const std::locale &locale);
 
-  /*! \brief Capitalizes a string using using LangInfo::GetSystemLocale.
-
-  Capitalizes using a simplistic approach familiar to English speakers.
-  See TitleCase for a more language friendly version.
-
-  \param str string to capitalize
-  \param locale
-  */
+  /*!
+   *  \brief Capitalizes a string using LangInfo::GetSystemLocale.
+   *
+   * If USE_TO_TITLE_FOR_CAPITALIZE is set, then uses ICU:toTitle to
+   * convert string to "Title Case" following Locale specific rules.
+   *
+   *
+   * Otherwise, uses a simplistic approach familiar to English speakers.
+   * See comments for USE_TO_TITLE_FOR_CAPITALIZE for more information.
+   *
+   * \param str string to capitalize in place
+   * \return str converted to "Title Case"
+   */
   static void ToCapitalize(std::string &str);
 
-  /*! \brief TitleCase a wstring using locale.
-
-    TitleCases the given wstring according to the rules of the given locale.
-    Similar too, but more language friendly version of ToCapitalize. Uses ICU library.
-
-    Best results are when a complete sentence/paragraph is TitleCased rather than
-    individual words.
-
-    \param str string to TitleCase
-    \param locale
-    */
+  /*!
+   *  \brief TitleCase a wstring using locale.
+   *
+   *  TitleCases the given wstring according to the rules of the given locale.
+   *  Similar too, but more language friendly version of ToCapitalize. Uses ICU library.
+   *
+   *  Best results are when a complete sentence/paragraph is TitleCased rather than
+   *  individual words.
+   *
+   *  \param str string to TitleCase
+   *  \param locale
+   */
     static void TitleCase(std::wstring &str, const std::locale &locale);
 
-    /*! \brief TitleCase a string using locale.
-
-      TitleCases the given wstring according to the rules of the given locale.
-      Similar too, but more language friendly version of ToCapitalize. Uses ICU library.
-
-      Best results are when a complete sentence/paragraph is TitleCased rather than
-      individual words.
-
-      \param str string to TitleCase
-      \param locale
-      */
+    /*!
+     *  \brief TitleCase a string using LangInfo::GetSystemLocale.
+     *
+     *  TitleCases the given wstring according to the locale.
+     *  Similar too, but more language friendly version of ToCapitalize with
+     *  USE_TO_TITLE_FOR_CAPITALIZE not defined. Uses ICU library.
+     *
+     *  Best results are when a complete sentence/paragraph is TitleCased rather than
+     *  individual words.
+     *
+     *  \param str string to TitleCase
+     *  \param locale
+     */
     static void TitleCase(std::wstring &str);
 
-    /*! \brief TitleCase a wstring using locale.
-
-      TitleCases the given wstring according to the rules of the given locale.
-      Similar too, but more language friendly version of ToCapitalize. Uses ICU library.
-
-      Best results are when a complete sentence/paragraph is TitleCased rather than
-      individual words.
-
-      \param str string to TitleCase
-      \param locale
-      */
+    /*!
+     *  \brief TitleCase a wstring using locale.
+     *
+     *  TitleCases the given wstring according to the rules of the given locale.
+     *  Similar too, but more language friendly version of ToCapitalize when
+     *  USE_TO_TITLE_FOR_CAPITALIZE is not defined. Uses ICU library.
+     *
+     *  Best results are when a complete sentence/paragraph is TitleCased rather than
+     *  individual words.
+     *
+     *  \param str string to TitleCase
+     *  \param locale
+     */
     static void TitleCase(std::string &str, const std::locale &locale);
 
-    /*! \brief TitleCase a wstring using locale.
-
-      TitleCases the given wstring according to the rules of the given locale.
-      Similar too, but more language friendly version of ToCapitalize. Uses ICU library.
-
-      Best results are when a complete sentence/paragraph is TitleCased rather than
-      individual words.
-
-      \param str string to TitleCase
-      \param locale
-      */
+    /*!
+     *  \brief TitleCase a wstring using LangInfo::GetSystemLocale.
+     *
+     *  TitleCases the given wstring according to the rules of the locale.
+     *  Similar too, but more language friendly version of ToCapitalize when
+     *  USE_TO_TITLE_FOR_CAPITALIZE is not defined. Uses ICU library.
+     *
+     *  Best results are when a complete sentence/paragraph is TitleCased rather than
+     *  individual words.
+     *
+     *  \param str string to TitleCase
+     *  \param locale
+     */
     static void TitleCase(std::string &str);
 
-    /*! \brief Normalizes a wstring.
+    /*!
+     *  \brief Normalizes a wstring. Not expected to be used outside of StringUtils.
+     *
+     *  Made public to facilitate testing.
+     *
+     *  There are multiple Normalizations that can be performed on Unicode. Fortunately
+     *  normalization is not needed in many situations. An introduction can be found
+     *  at: https://unicode-org.github.io/icu/userguide/transforms/normalization/
+     *
+     *  \param str string to normalize.
+     *  \param options fine tunes behavior. See StringOptions. Frequently can leave
+     *         at default value.
+     *  \param normalizerType select the appropriate normalizer for the job
+     *  \return normalized string
+     */
 
-      There are multiple Normalizations that can be performed on Unicode. Fortunately
-      normalization is not needed in many situations. An introduction can be found
-      at: https://unicode-org.github.io/icu/userguide/transforms/normalization/
-
-      \param str string to normalize in-place
-      \param options fine tunes behavior. See StringOptions. Frequently can leave
-      at default value.
-      \param normalizerType select the appropriate normalizer for the job
-      \return src
-      */
-
-    static const std::wstring Normalize(std::wstring &src,
+    static const std::wstring Normalize(const std::wstring &src,
     		const StringOptions opt = StringOptions::FOLD_CASE_DEFAULT, const NormalizerType normalizerType = NormalizerType::NFKC);
 
-    /*! \brief Normalizes a string.
+    /*!
+     *  \brief Normalizes a string. Not expected to be used outside of StringUtils.
+     *
+     *  Made public to facilitate testing.
+     *
+     * There are multiple Normalizations that can be performed on Unicode. Fortunately
+     * normalization is not needed in many situations. An introduction can be found
+     * at: https://unicode-org.github.io/icu/userguide/transforms/normalization/
+     *
+     * \param str string to normalize.
+     * \param options fine tunes behavior. See StringOptions. Frequently can leave
+     *        at default value.
+     * \param normalizerType select the appropriate normalizer for the job
+     * \return normalized string
+     */
 
-    There are multiple Normalizations that can be performed on Unicode. Fortunately
-    normalization is not needed in many situations. An introduction can be found
-    at: https://unicode-org.github.io/icu/userguide/transforms/normalization/
-
-    \param str string to normalize in-place
-    \param options fine tunes behavior. See StringOptions. Frequently can leave
-    at default value.
-    \param normalizerType select the appropriate normalizer for the job
-    \return src
-    */
-
-    static const std::string Normalize(std::string &src, const StringOptions opt = StringOptions::FOLD_CASE_DEFAULT,
+    static const std::string Normalize(const std::string &src, const StringOptions opt = StringOptions::FOLD_CASE_DEFAULT,
     	 const NormalizerType normalizerType = NormalizerType::NFKC);
 
 
-    /*! \brief Determines if two strings are identical in content.
+    /*!
+     *  \brief Determines if two strings are identical in content.
      *
      * Performs a bitwise comparison of the two strings. Locale is
      * not considered.
@@ -544,20 +634,12 @@ public:
      * \param str1 one of the strings to compare
      * \param str2 the other string to compare
      * \return true if both strings are identical, otherwise false
-     *
-     * Using NormalizerType.NFCKCASEFOLD
-     * I (\u0049) -> i (\u0069)
-     * İ (\u0130) -> i̇ (\u0069 \u0307)
-     * i (\u0069) -> i (\u0069)
-     * ı (\u0131) -> ı (\u0131)
-     * İİ (\u0130 \u0130) -> i̇i̇ (\u0069 \u0307 \u0069 \u0307)
-     * ii (\u0069 \u0069) -> ii (\u0069 \u0069)
-     * ıı (\u0131 \u0131) -> ıı (\u0131 \u0131)
      */
 
   static bool Equals(const std::string& str1, const std::string& str2);
 
-  /*! \brief determines if two wstrings are identical in content.
+  /*!
+   * \brief determines if two wstrings are identical in content.
    *
    * Performs a bitwise comparison of the two strings. Locale is
    * not considered.
@@ -568,144 +650,312 @@ public:
    */
     static bool Equals(const std::wstring &str1, const std::wstring &str2);
 
-    /*! \brief Determines if two strings are the same, after case folding each.
+    // TODO: Add wstring version of EqualsNoCase
+
+    /*!
+     * \brief Determines if two strings are the same, after case folding each.
      *
      * Logically equivalent to Equals(FoldCase(str1, opt)), FoldCase(str2, opt))
+     * or, if normalize == true: Equals(NFD(FoldCase(NFD(str1))), NFD(FoldCase(NFD(str2))))
+     * (NFD is a type of normalization)
+     *
+     * Note: When normalization = true, the string comparison is done incrementally
+     * as the strings are normalized and folded. Otherwise, case folding is applied
+     * to the entire string first.
+     *
+     * Note In most cases normalization should not be required, using normalize
+     * should yield better results for those cases.
      *
      * \param str1 one of the strings to compare
      * \param str2 one of the strings to compare
-     * \param opt StringOptions to apply
+     * \param opt StringOptions to apply. Generally leave at default value.
+     * \param normalize Controls whether normalization is performed before and after
+     *        case folding
      * \return true if both strings compare after case folding, otherwise false
      */
   static bool EqualsNoCase(const std::string &str1, const std::string &str2,
   		const StringOptions opt = StringOptions::FOLD_CASE_DEFAULT, const bool normalize = false);
 
-  /*! \brief Determines if two strings are the same, after case folding each.
-   *
-   * Logically equivalent to Equals(FoldCase(str1, opt)), FoldCase(str2, opt))
-   *
-   * \param str1 one of the strings to compare
-   * \param s2 one of the (c-style) strings to compare
-   * \param opt StringOptions to apply
-   * \return true if both strings compare after case folding, otherwise false
-   */
-   static bool EqualsNoCase(const std::string &str1, const char *s2, const StringOptions opt = StringOptions::FOLD_CASE_DEFAULT,
-  		 const bool normalize = false);
-
-   /*! \brief Determines if two strings are the same, after case folding each.
+  /*!
+    * \brief Determines if two strings are the same, after case folding each.
     *
-    * Logically equivalent to Equals(FoldCase(str1, opt)), FoldCase(str2, opt))
+    * Logically equivalent to Equals(FoldCase(str1, opt)), FoldCase(s2, opt))
+    * or, if normalize == true: Equals(NFD(FoldCase(NFD(str1))), NFD(FoldCase(NFD(s2))))
+    * (NFD is a type of normalization)
+    *
+    * Note: When normalization = true, the string comparison is done incrementally
+    * as the strings are normalized and folded. Otherwise, case folding is applied
+    * to the entire string first.
+    *
+    * Note In most cases normalization should not be required, using normalize
+    * should yield better results for those cases.
     *
     * \param str1 one of the strings to compare
     * \param s2 one of the (c-style) strings to compare
-    * \param opt StringOptions to apply
+    * \param opt StringOptions to apply. Generally leave at default value.
+    * \param normalize Controls whether normalization is performed before and after
+    *        case folding
     * \return true if both strings compare after case folding, otherwise false
     */
+   static bool EqualsNoCase(const std::string &str1, const char *s2, const StringOptions opt = StringOptions::FOLD_CASE_DEFAULT,
+  		 const bool normalize = false);
+
+   /*!
+     * \brief Determines if two strings are the same, after case folding each.
+     *
+     * Logically equivalent to Equals(FoldCase(s1, opt)), FoldCase(s2, opt))
+     * or, if normalize == true: Equals(NFD(FoldCase(NFD(s1))), NFD(FoldCase(NFD(s2))))
+     * (NFD is a type of normalization)
+     *
+     * Note: When normalization = true, the string comparison is done incrementally
+     * as the strings are normalized and folded. Otherwise, case folding is applied
+     * to the entire string first.
+     *
+     * Note In most cases normalization should not be required, using normalize
+     * should yield better results for those cases.
+     *
+     * \param s1 one of the (c-style) strings to compare
+     * \param s2 one of the (c-style) strings to compare
+     * \param opt StringOptions to apply. Generally leave at default value.
+     * \param normalize Controls whether normalization is performed before and after
+     *        case folding
+     * \return true if both strings compare after case folding, otherwise false
+     */
    static bool EqualsNoCase(const char *s1, const char *s2, StringOptions opt = StringOptions::FOLD_CASE_DEFAULT,
   		 const bool normalize = false);
 
+   /*!
+    * \brief Compares two wstrings using codepoint order. Locale does not matter.
+    *
+    * \param str1 one of the strings to compare
+    * \param str2 one of the strings to compare
+    * \return <0 or 0 or >0 as usual for string comparisons
+    */
    static int Compare(const std::wstring &str1, const std::wstring &str2);
 
+   /*!
+    * \brief Compares two strings using codepoint order. Locale does not matter.
+    *
+    * \param str1 one of the strings to compare
+    * \param str2 one of the strings to compare
+    * \return <0 or 0 or >0 as usual for string comparisons
+    */
    static int Compare(const std::string &str1, const std::string &str2);
 
+   /*!
+    * \brief Initializes the Collator for this thread, such as before sorting a
+    * table.
+    *
+    * Assumes that all collation will occur in this thread.
+    *
+    * \param icuLocale Collation order will be based on the given locale.
+    * \param normalize Controls whether normalization is performed prior to collation.
+    *                  Frequently not required. Some free normalization always occurs.
+    * \return true of initialization was successful, otherwise false.
+    */
+   static bool InitializeCollator(const icu::Locale &icuLocale, bool normalize /* = false */);
+
+   /*!
+    * \brief Initializes the Collator for this thread, such as before sorting a
+    * table.
+    *
+    * Assumes that all collation will occur in this thread.
+    *
+    * \param locale Collation order will be based on the given locale.
+    * \param normalize Controls whether normalization is performed prior to collation.
+    *                  Frequently not required. Some free normalization always occurs.
+    * \return true of initialization was successful, otherwise false.
+    */
+   static bool InitializeCollator(const std::locale &locale, bool normalize /* = false */);
+
+   /*!
+    * \brief Initializes the Collator for this thread using LangInfo::GetSystemLocale,
+    * such as before sorting a table.
+    *
+    * Assumes that all collation will occur in this thread.
+    *
+    * \param normalize Controls whether normalization is performed prior to collation.
+    *                  Frequently not required. Some free normalization always occurs.
+    * \return true of initialization was successful, otherwise false.
+    */
    static bool InitializeCollator(bool normalize = false);
 
+   /*!
+    * \brief Performs locale sensitive string comparison.
+    *
+    * Must be run in the same thread that InitializeCollator that configured the Collator
+    * for this was run.
+    *
+    * \param left string to compare
+    * \param right string to compare
+    * \return  < 0 if left collates < right
+    *         == 0 if left collates the same as right
+    *          > 0 if left collates > right
+    */
    static int32_t Collate(const std::wstring &left, const std::wstring &right);
 
+   /*!
+    * \brief Performs locale sensitive wstring comparison.
+    *
+    * Must be run in the same thread that InitializeCollator that configured the Collator
+    * for this was run.
+    *
+    * \param left string to compare
+    * \param right string to compare
+    * \return  < 0 if left collates < right
+    *         == 0 if left collates the same as right
+    *          > 0 if left collates > right
+    */
    static int32_t Collate(const wchar_t *left, const wchar_t *right) {
      return StringUtils::Collate(std::wstring(left), std::wstring(right));
    }
 
-   static int CompareNoCase(const std::wstring &str1, const std::wstring &str2,
-   		StringOptions opt = StringOptions::FOLD_CASE_DEFAULT , const bool normalize = false);
 
-
-   /*! \brief Performs a bit-wise comparison of two strings, after case folding each.
+   /*!
+    * \brief Performs a bit-wise comparison of two wstrings, after case folding each.
     *
     * Logically equivalent to Compare(FoldCase(str1, opt)), FoldCase(str2, opt))
+    * or, if normalize == true: Compare(NFD(FoldCase(NFD(str1))), NFD(FoldCase(NFD(str2))))
+    * (NFD is a type of normalization)
     *
-    * \param str1 one of the strings to compare
-    * \param s2 one of the (c-style) strings to compare
-    * \param n limits how many bytes are compared. A value of zero compares the
-    * entire string.
-    * \param opt StringOptions to apply
+    * Note: When normalization = true, the string comparison is done incrementally
+    * as the strings are normalized and folded. Otherwise, case folding is applied
+    * to the entire string first.
+    *
+    * Note In most cases normalization should not be required, using normalize
+    * should yield better results for those cases.
+    *
+    * \param str1 one of the wstrings to compare
+    * \param str2 one of the wstrings to compare
+    * \param opt StringOptions to apply. Generally leave at the default value
+    * \param normalize Controls whether normalization is performed before and after
+    *        case folding
     * \return The result of bitwise character comparison:
     * < 0 if the characters str1 are bitwise less than the characters in str2,
     * = 0 if str1 contains the same characters as str2,
     * > 0 if the characters in str1 are bitwise greater than the characters in str2.
     */
-  static int CompareNoCase(const std::string& str1, const std::string& str2, size_t n = 0,
-  		StringOptions opt = StringOptions::FOLD_CASE_DEFAULT, const bool normalize = false);
+   static int CompareNoCase(const std::wstring &str1, const std::wstring &str2,
+   		StringOptions opt = StringOptions::FOLD_CASE_DEFAULT , const bool normalize = false);
 
-  /*! \brief Performs a bit-wise comparison of two substrings, after case folding each.
+   /*!
+    * \brief Performs a bit-wise comparison of two strings, after case folding each.
+    *
+    * Logically equivalent to Compare(FoldCase(str1, opt)), FoldCase(str2, opt))
+    * or, if normalize == true: Compare(NFD(FoldCase(NFD(str1))), NFD(FoldCase(NFD(str2))))
+    * (NFD is a type of normalization)
+    *
+    * Note: When normalization = true, the string comparison is done incrementally
+    * as the strings are normalized and folded. Otherwise, case folding is applied
+    * to the entire string first.
+    *
+    * Note In most cases normalization should not be required, using normalize
+    * should yield better results for those cases.
     *
     * \param str1 one of the strings to compare
-    * \param s2 one of the (c-style) strings to compare
+    * \param str2 one of the strings to compare
     * \param n maximum number of characters to compare
-    * \param opt StringOptions to apply
+    * \param opt StringOptions to apply. Generally leave at the default value
+    * \param normalize Controls whether normalization is performed before and after
+    *        case folding
     * \return The result of bitwise character comparison:
     * < 0 if the characters str1 are bitwise less than the characters in str2,
     * = 0 if str1 contains the same characters as str2,
     * > 0 if the characters in str1 are bitwise greater than the characters in str2.
+    */
+   static int CompareNoCase(const std::string& str1, const std::string& str2, size_t n = 0,
+  	 	StringOptions opt = StringOptions::FOLD_CASE_DEFAULT, const bool normalize = false);
+
+   // TODO: Review issues with truncating length of multi-byte strings.
+
+   /*!
+    * \brief Performs a bit-wise comparison of two strings, after case folding each.
+    *
+    * Logically equivalent to Compare(FoldCase(s1, opt)), FoldCase(s2, opt))
+    * or, if normalize == true: Compare(NFD(FoldCase(NFD(s1))), NFD(FoldCase(NFD(s2))))
+    * (NFD is a type of normalization)
+    *
+    * NOTE: Limiting the number of bytes to compare via the option n may produce
+    *       unexpected results for multi-byte characters.
+    *
+    * Note: When normalization = true, the string comparison is done incrementally
+    * as the strings are normalized and folded. Otherwise, case folding is applied
+    * to the entire string first.
+    *
+    * Note In most cases normalization should not be required, using normalize
+    * should yield better results for those cases.
+    *
+    * \param s1 one of the strings to compare
+    * \param s2 one of the strings to compare
+    * \param n maximum number of characters to compare
+    * \param opt StringOptions to apply. Generally leave at the default value
+    * \param normalize Controls whether normalization is performed before and after
+    *        case folding
+    * \return The result of bitwise character comparison:
+    * < 0 if the characters s1 are bitwise less than the characters in s2,
+    * = 0 if s1 contains the same characters as s2,
+    * > 0 if the characters in s1 are bitwise greater than the characters in s2.
     */
   static int CompareNoCase(const char* s1, const char* s2, size_t n = 0,
   		StringOptions opt = StringOptions::FOLD_CASE_DEFAULT, const bool normalize = false);
 
-  /*! \brief Extracts every digit from string and then returns it's int value
+  // TODO: consider renaming to ParseInt
+
+  /*!
+   * \brief Returns the int value of the first series of digits found in the string
    *
-   * This is poorly named and defined. It is highly specialized and probably needs to be fast.
-   *
-   * It builds a string from every digit in the given string. It then returns the int value
-   * of that string. The desired behavior is probably atoi(str.Trim()). Or perhaps it is
-   * to skip anything that is not a digit and then convert everything up to the next non-digit
-   * into an int.
+   *  Ignores any non-digits in string
    *
    * \param str to extract number from
-   * \return int value of all concatenated digit in str
+   * \return int value of found string
    */
   static int ReturnDigits(const std::string &str);
 
-  /*! \brief Get the leftmost side of a string, limited by count graphemes ('characters')
-   *
-   *  Graphemes (Unicode 'characters') are of variable byte length. This function's
-   *  parameters are based on graphemes and NOT bytes.
-   *
-   * \param str to get a substring of
-   * \param count maximum number of characters to get
-   * \return leftmost count characters of str, or str if length >= count.
-   *
-   * TODO: Unicode There are several users which want count to be #bytes (fixed amount of
-   * space to write to).
-   */
-  static std::string Left(const std::string &str, size_t count);
+  /*!
+     * \brief Get the leftmost side of a UTF-8 string, limited by character count
+     *
+     * Unicode characters are of variable byte length. This function's
+     * parameters are based on characters and NOT bytes.
+     *
+     * \param str to get a substring of
+     * \param charCount if > 0 maximum number of characters to keep from left end
+     *                  if < 0 number of characters to remove from right end
+     * \return leftmost characters of string, length determined by charCount
+     *
+     */
+    static std::string Left(const std::string &str, const int charCount);
 
-  /*! \brief Get a substring of a string
-   *
-   * Roughly equivalent to string.substr, but works with Unicode. Note that first and count
-   * are related to graphemes (Unicode 'characters') and NOT bytes.
-   *
-   * \param str to extract substring from
-   * \param first character of substring [0 based]
-   * \param count maximum number of characters in substring
-   * \return substring of str, beginning with grapheme first for min(#num chars in str, count)
-   *
-   * TODO: Unicode - No apparent users requiring count to be bytes
-   */
-  static std::string Mid(const std::string &str, size_t first, size_t count = std::string::npos);
+    static std::string Left(const std::string &str, const int charCount, const icu::Locale& icuLocale);
 
+    /*!
+     *  \brief Get a substring of a UTF-8 string
+     *
+     * Unicode characters are of variable byte length. This function's
+     * parameters are based on characters and NOT bytes.
+     *
+     * \param str string to extract substring from
+     * \param startCharIndex leftmost character of substring [0 based]
+     * \param charCount maximum number of characters to include in substring
+     * \return substring of str, beginning with character 'firstCharIndex',
+     *         length determined by charCount
+     */
+    static std::string Mid(const std::string &str, const int startCharIndex,
+        const int charCount = INT_MAX);
 
-  /*! \brief Get the rightmost count graphemes of a string
-   *
-   * Roughly equivalent to string.substr(string.lenth() - count, count) but works with Unicode. Note that count
-   * are related to graphemes (Unicode 'characters') and NOT bytes.
-   *
-   * \param str to extract substring from
-   * \param count maximum rightmost characters to return
-   * \return rightmost count characters of str, or str if count >= str.length
-   *
-   * TODO: Unicode - No apparent users requiring count to be bytes
-   */
-  static std::string Right(const std::string &str, size_t count);
+    /*!
+     *  \brief Get the rightmost count characters of a string
+     *
+     * Unicode characters are of variable byte length. This function's
+     * parameters are based on characters and NOT bytes.
+     *
+     * \param str to extract substring from
+     * \param charCount if > 0 maximum number of characters to keep from left end
+     *                  if < 0 number of characters to remove from right end
+     * \return rightmost count characters of str, length determined by charCount
+     *
+     * TODO: Unicode - No apparent users requiring count to be bytes
+     */
+    static std::string Right(const std::string &str, const int charCount);
 
   /*! \brief Remove all whitespace from beginning and end of str
    *
@@ -714,19 +964,19 @@ public:
    */
   static std::string& Trim(std::string &str);
 
-  /*! \brief Remove a set of graphemes (characters) from beginning and end of str
+  /*! \brief Remove a set of characters from beginning and end of str
    *
-   *  Remove any leading or trailing graphemes in chars from str.
+   *  Remove any leading or trailing characters from a set of chars from str.
    *
    *  Ex: Trim("abc1234bxa", "acb") ==> "1234bx"
    *
    * \param str to trim
-   * \param chars (graphemes) to remove from str
+   * \param chars (characters) to remove from str
    * \return trimmed string, same as str argument.
    *
    * Note: Prior algorithm which will only work if chars is ASCII is probably sufficient
    * for current needs.
-   * This implementation allows for chars to be any utf-8 graphemes. (Does NOT normalize).
+   * This implementation allows for chars to be any utf-8 characters. (Does NOT normalize).
    */
   static std::string& Trim(std::string &str, const char* const chars);
 
@@ -737,20 +987,20 @@ public:
    */
   static std::string& TrimLeft(std::string &str);
 
-  /*! \brief Remove a set of graphemes (characters) from beginning of str
+  /*! \brief Remove a set of characters from beginning of str
    *
-   *  Remove any leading graphemes in chars from str.
+   *  Remove any leading characters in chars from str.
    *
    *  Ex: TrimLeft("abc1234bxa", "acb") ==> "1234bxa"
    *
    * \param str to trim
-   * \param chars (graphemes) to remove from str
+   * \param chars (characters) to remove from str
    * \return trimmed string, same as str argument.
    *
    *
    * Note: Prior algorithm which will only work if chars is ASCII is probably sufficient
    * for current needs.
-   * This implementation allows for chars to be any utf-8 graphemes. (Does NOT normalize).
+   * This implementation allows for chars to be any utf-8 characters. (Does NOT normalize).
    */
   static std::string& TrimLeft(std::string &str, const char* const chars);
 
@@ -761,19 +1011,19 @@ public:
    */
   static std::string& TrimRight(std::string &str);
 
-  /*! \brief Remove a set of graphemes (characters) from end of str
+  /*! \brief Remove a set of characters from end of str
    *
-   *  Remove any trailing graphemes in chars from str.
+   *  Remove any trailing characters in chars from str.
    *
-   *  Ex: trim("abc1234bxa", "acb") ==> "abc1234bx"
+   *  Ex: TrimRight("abc1234bxa", "acb") ==> "abc1234bx"
    *
    * \param str to trim
-   * \param chars (graphemes) to remove from str
+   * \param chars (characters) to remove from str
    * \return trimmed string, same as str argument.
    *
    * Note: Prior algorithm which will only work if chars is ASCII is probably sufficient
    * for current needs.
-   * This implementation allows for chars to be any utf-8 graphemes. (Does NOT normalize).
+   * This implementation allows for chars to be any utf-8 character(s). (Does NOT normalize).
    */
   static std::string& TrimRight(std::string &str, const char* const chars);
 
@@ -858,7 +1108,7 @@ public:
    * \return result of regular expression
    */
   std::string RegexReplaceAll(std::string &str, const std::string pattern,
-  		const std::string newStr, RegexpFlag flags);
+  		const std::string newStr, const int flags);
 
   /*! \brief Determines if a string begins with another string
    *
@@ -1193,13 +1443,12 @@ public:
   static const std::string Empty;
 
   /**
-   * Scans the str for the occurrence of wordLowerCase. If found, the
-   * byte index of the beginning of the occurrence is returned.
+   * Scans the str for the occurrence of word.
    *
-   * A "word" is either all letters or all digits. Words must be
+   * Word is either all letters or all digits. Words must be
    * separated by spaces.
    */
-  static size_t FindWords(const std::string &str, const std::string &wordLowerCase);
+  static size_t FindWord(const std::string &str, const std::string &word);
 
   /*!
    * \brief Starting at a point after an opening bracket, scans a string for it's matching
@@ -1275,6 +1524,7 @@ public:
    */
   static std::string Paramify(const std::string &param);
 
+  // TODO: Could rewrite to use Unicode delimiters using icu::UnicodeSet::spanUTF8(), and friends
   /*!
    *  \brief Splits a string using one or more delimiting ASCII characters,
    *  ignoring empty tokens.
