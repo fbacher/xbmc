@@ -514,32 +514,56 @@ TEST(TestStringUtils, EqualsNoCase_Normalize)
 TEST(TestStringUtils, Left_Basic)
 {
   std::string refstr;
-  std::string varstr;
-  std::string origstr = "test";
+   std::string varstr;
+   std::string origstr = "Test";
 
-  // All ASCII, character count = byte count
+   // First, request n chars to copy from left end
 
-  refstr = "";
-  varstr = StringUtils::Left(origstr, 0);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+   refstr = "";
+   varstr = StringUtils::Left(origstr, 0);
+   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-  refstr = "te";
-  varstr = StringUtils::Left(origstr, 2);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+   refstr = "Te";
+   varstr = StringUtils::Left(origstr, 2);
+   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-  refstr = "test";
-  varstr = StringUtils::Left(origstr, 10);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+   refstr = "Test";
+   varstr = StringUtils::Left(origstr, 4);
+   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-  // Get leftmost substring removing n characters from end of string
+   refstr = "Test";
+   varstr = StringUtils::Left(origstr, 10);
+   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-  refstr = "te";
-  varstr = StringUtils::Left(origstr, -2);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+   refstr = "Test";
+   varstr = StringUtils::Left(origstr, std::string::npos);
+   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-  refstr = "";
-  varstr = StringUtils::Left(origstr, -10);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+   // # of characters to omit from right end
+
+   refstr = "Tes";
+   varstr = StringUtils::Left(origstr, 1, false);
+   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+
+   refstr = "Test";
+   varstr = StringUtils::Left(origstr, 0, false);
+   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+
+   refstr = "T";
+   varstr = StringUtils::Left(origstr, 3, false);
+   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+
+   refstr = "";
+   varstr = StringUtils::Left(origstr, 4, false);
+   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+
+   refstr = "";
+   varstr = StringUtils::Left(origstr, 5, false);
+   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+
+   refstr = "";
+   varstr = StringUtils::Left(origstr, std::string::npos, false);
+   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   // TODO: Add test to ensure count works properly for multi-codepoint characters
 }
@@ -554,7 +578,7 @@ TEST(TestStringUtils, Left_Advanced)
 
   origstr = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1); // 3 codepoints, 1 char
   refstr = "";
-  varstr = StringUtils::Left(origstr, 0, getUSEnglishLocale());
+  varstr = StringUtils::Left(origstr, 0, true, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   // Interesting case. All five VARIENTs can be normalized
@@ -562,19 +586,19 @@ TEST(TestStringUtils, Left_Advanced)
 
   origstr = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
   refstr = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5); // 2 codepoints, 1 char
-  varstr = StringUtils::Left(origstr, 2, getUSEnglishLocale());
+  varstr = StringUtils::Left(origstr, 2, true, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   origstr = std::string(UTF8_GERMAN_SAMPLE); // u"óóßChloë"
   refstr = "óó";
-  varstr = StringUtils::Left(origstr, 2, getUSEnglishLocale());
+  varstr = StringUtils::Left(origstr, 2, true, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   // Get leftmost substring removing n characters from end of string
 
   origstr = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
   refstr = std::string("");
-  varstr = StringUtils::Left(origstr, -1, getUSEnglishLocale());
+  varstr = StringUtils::Left(origstr, 1, false, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   // Interesting case. All five VARIENTs can be normalized
@@ -582,17 +606,17 @@ TEST(TestStringUtils, Left_Advanced)
 
   origstr = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
   refstr = std::string("");
-  varstr = StringUtils::Left(origstr, -2, getUSEnglishLocale());
+  varstr = StringUtils::Left(origstr, 2, false, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   origstr = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
   refstr = "";
-  varstr = StringUtils::Left(origstr, -5, getUSEnglishLocale());
+  varstr = StringUtils::Left(origstr, 5, false, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   origstr = std::string(UTF8_GERMAN_SAMPLE); // u"óóßChloë"
   refstr = "óóßChl";
-  varstr = StringUtils::Left(origstr, -2, getUSEnglishLocale());
+  varstr = StringUtils::Left(origstr, 2, false, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   // TODO: Add test to ensure count works properly for multi-codepoint characters
@@ -627,13 +651,31 @@ TEST(TestStringUtils, Mid)
   refstr = "es";
   varstr = StringUtils::Mid(origstr, 1, 2);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+
+  refstr = "est";
+  varstr = StringUtils::Mid(origstr, 1, std::string::npos);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+
+  refstr = "est";
+  varstr = StringUtils::Mid(origstr, 1, 4);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+
+  refstr = "";
+  varstr = StringUtils::Mid(origstr, 1, 0);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+
+  refstr = "";
+  varstr = StringUtils::Mid(origstr, 4, 1);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
 
 TEST(TestStringUtils, Right)
 {
   std::string refstr;
   std::string varstr;
-  std::string origstr = "test";
+  std::string origstr = "Test";
+
+  // First, request n chars to copy from right end
 
   refstr = "";
   varstr = StringUtils::Right(origstr, 0);
@@ -643,8 +685,42 @@ TEST(TestStringUtils, Right)
   varstr = StringUtils::Right(origstr, 2);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-  refstr = "test";
+  refstr = "Test";
+  varstr = StringUtils::Right(origstr, 4);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+
+  refstr = "Test";
   varstr = StringUtils::Right(origstr, 10);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+
+  refstr = "Test";
+  varstr = StringUtils::Right(origstr, std::string::npos);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+
+  // # of characters to omit from left end
+
+  refstr = "est";
+  varstr = StringUtils::Right(origstr, 1, false);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+
+  refstr = "Test";
+  varstr = StringUtils::Right(origstr, 0, false);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+
+  refstr = "t";
+  varstr = StringUtils::Right(origstr, 3, false);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+
+  refstr = "";
+  varstr = StringUtils::Right(origstr, 4, false);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+
+  refstr = "";
+  varstr = StringUtils::Right(origstr, 5, false);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+
+  refstr = "";
+  varstr = StringUtils::Right(origstr, std::string::npos, false);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
 

@@ -443,13 +443,13 @@ int StringUtils::Compare(const std::string &str1, const std::string &str2) {
 }
 
 int StringUtils::CompareNoCase(const std::wstring &str1, const std::wstring &str2,
-		StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */ , const bool normalize /* = false */) {
+		StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */, const bool normalize /* = false */) {
 
 	int rc = Unicode::w_strcasecmp(str1, str2, opt, normalize);
 	return rc;
 }
 int StringUtils::CompareNoCase(const std::string &str1, const std::string &str2,
-    StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */ , const bool normalize /* = false */) {
+    StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */, const bool normalize /* = false */) {
   int rc = Unicode::utf8_strcasecmp(str1, str2, opt, normalize);
   return rc;
 }
@@ -496,28 +496,36 @@ int StringUtils::CompareNoCase(const char *s1, const char *s2,
 	return StringUtils::CompareNoCase(str1, str2, n, opt, normalize);
 }
 
-std::string StringUtils::Left(const std::string &str, const int charCount) {
-	std::string result = Unicode::Left(str, charCount, Unicode::getDefaultICULocale());
+std::string StringUtils::Left(const std::string &str, const size_t charCount, const bool leftReference)
+{
+	std::string result = Unicode::Left(str, charCount, leftReference, Unicode::getDefaultICULocale());
 
 	return result;
 }
 
-std::string StringUtils::Left(const std::string &str, const int charCount, const icu::Locale& icuLocale) {
-  std::string result = Unicode::Left(str, charCount, icuLocale);
+std::string StringUtils::Left(const std::string &str, const size_t charCount, const bool leftReference, const icu::Locale& icuLocale) {
+  std::string result = Unicode::Left(str, charCount, leftReference, icuLocale);
 
   return result;
 }
 
-std::string StringUtils::Mid(const std::string &str, const int firstCharIndex,
-		const int charCount /* = INT_MAX */) {
+std::string StringUtils::Mid(const std::string &str, const size_t firstCharIndex,
+		const size_t charCount /* = std::string::npos */) {
 	std::string result = Unicode::Mid(str, firstCharIndex, charCount);
 	return result;
 }
 
-
-std::string StringUtils::Right(const std::string &str, const int charCount) {
-	std::string result = Unicode::Right(str, charCount);
+std::string StringUtils::Right(const std::string &str, const size_t charCount, bool rightReference /* = true */)
+{
+	std::string result = Unicode::Right(str, charCount, rightReference, Unicode::getDefaultICULocale());
 	return result;
+}
+
+std::string StringUtils::Right(const std::string &str, const size_t charCount, bool rightReference,
+    const icu::Locale &icuLocale)
+{
+  std::string result = Unicode::Right(str, charCount, rightReference, icuLocale);
+  return result;
 }
 
 std::string& StringUtils::Trim(std::string &str) {
@@ -568,6 +576,10 @@ int StringUtils::ReturnDigits(const std::string &str)
 {
   std::stringstream ss;
   bool digitFound = false;
+
+  //TODO: DELETE ME
+  CLog::Log(LOGINFO, "StringUtils::ReturnDigits str: {}\n", str);
+
   for (const auto& character : str)
   {
     if (isdigit(character))

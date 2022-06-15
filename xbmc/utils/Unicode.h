@@ -489,13 +489,15 @@ public:
    * parameters are based on characters and NOT bytes.
    *
    * \param str to get a substring of
-   * \param charCount if > 0 maximum number of characters to keep from left end
-   *                  if < 0 number of characters to remove from right end
+   * \param charCount if leftReference: charCount is number of characters to
+   *                  copy from left end (limited by str length)
+   *                  if ! leftReference: number of characters to omit from right end
+   * \param leftReference controls how charCount is interpreted
    * \return leftmost characters of string, length determined by charCount
    *
    */
-
-  static std::string Left(const std::string &str, const int charCount, const icu::Locale icuLocale);
+  static std::string Left(const std::string &str, const size_t charCount, const bool leftReference,
+      const icu::Locale icuLocale);
 
   /*!
    *  \brief Get a substring of a UTF-8 string
@@ -509,22 +511,32 @@ public:
    * \return substring of str, beginning with character 'firstCharIndex',
    *         length determined by charCount
    */
-  static std::string Mid(const std::string &str, const int startCharIndex, const int charCount = INT_MAX);
+  static std::string Mid(const std::string &str, const size_t startCharIndex,
+      const size_t charCount = std::string::npos);
 
   /*!
-   *  \brief Get the rightmost count characters of a string
+   * \brief Get the rightmost side of a UTF-8 string, using character boundary
+   * rules defined by the given locale.
    *
-   * Unicode characters are of variable byte length. This function's
-   * parameters are based on characters and NOT bytes.
+   * Unicode characters may consist of multiple codepoints. This function's
+   * parameters are based on characters and NOT bytes. Due to normalization,
+   * the byte-length of the strings may change, although the character counts
+   * will not.
    *
-   * \param str to extract substring from
-   * \param charCount if > 0 maximum number of characters to keep from left end
-   *                  if < 0 number of characters to remove from right end
-   * \return rightmost count characters of str, length determined by charCount
+   * \param str to get a substring of
+   * \param charCount if rightReference: charCount is number of characters to
+   *                  copy from right end (limited by str length)
+   *                  if ! rightReference: number of characters to omit from left end
+   * \param rightReference controls how charCount is interpreted
+   * \param icuLocale determines how character breaks are made
+   * \return rightmost characters of string, length determined by charCount
    *
-   * TODO: Unicode - No apparent users requiring count to be bytes
+   * Ex: Copy all but the leftmost two characters from str:
+   *
+   * std::string x = Right(str, 2, false, Unicode::getDefaultICULocale());
    */
-  static std::string Right(const std::string &str, const int charCount);
+  static std::string Right(const std::string &str, const size_t charCount, bool rightReference,
+      const icu::Locale &icuLocale);
 
   static size_t getCodeUnitIndex(const std::string &str, size_t startOffset, size_t charCount,
       const bool forward, const bool left, icu::Locale icuLocale = nullptr);
@@ -539,9 +551,9 @@ public:
    *                  if < 0 number of characters to remove from right end
    * \return substring of str, beginning with character 'first', length determined by charCount
    * /
-  static const std::string substr(const std::string &str, int32_t startCharIndex,
-      int32_t numChars);
-  */
+   static const std::string substr(const std::string &str, int32_t startCharIndex,
+   int32_t numChars);
+   */
   static std::string Trim(const std::string &str);
   static std::string TrimLeft(const std::string &str);
   static std::string TrimLeft(const std::string &str, const std::string deleteChars);

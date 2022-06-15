@@ -34,6 +34,9 @@
 #include "log.h"
 #include "Locale.h"
 
+
+#undef DISABLE_OPTIMIZATION  // Used for testing. Code should behave the same way
+
 // convert UTF-8 string to wstring
 std::wstring Unicode::utf8_to_wstring(const std::string &str)
 {
@@ -1389,26 +1392,17 @@ bool Unicode::EndsWithNoCase(const std::string &s1, const std::string &s2,
  * \return leftmost characters of string, length determined by charCount
  *
  */
-std::string Unicode::Left(const std::string &str, const int charCount, const icu::Locale icuLocale)
+std::string Unicode::Left(const std::string &str, const size_t charCount, const bool leftReference, const icu::Locale icuLocale)
 {
   size_t utf8Index;
-  size_t charIndex;
   std::string result;
   result = Unicode::normalize(str, StringOptions::FOLD_CASE_DEFAULT,
       NormalizerType::NFC);
   if (result.compare(str) != 0)
     CLog::Log(LOGINFO, "Unicode::getCodeUnitIndex Normalized string different from original");
 
-  if (charCount < 0)
-  {
-    charIndex = -charCount;
-    utf8Index = Unicode::getCodeUnitIndex(result, 0, charIndex, false, true, icuLocale);
-  }
-  else
-  {
-    charIndex = charCount;
-    utf8Index = Unicode::getCodeUnitIndex(result, 0, charIndex, true, true, icuLocale);
-  }
+  utf8Index = Unicode::getCodeUnitIndex(result, 0, charCount, leftReference, true, icuLocale);
+
   return result.substr(0, utf8Index);
 }
 
@@ -1424,8 +1418,8 @@ std::string Unicode::Left(const std::string &str, const int charCount, const icu
  * \return substring of str, beginning with character 'firstCharIndex',
  *         length determined by charCount
  */
-std::string Unicode::Mid(const std::string &str, const int startCharIndex,
-    const int charCount /* = INT_MAX */)
+std::string Unicode::Mid(const std::string &str, const size_t startCharIndex,
+    const size_t charCount /* = std::string::npos */)
 {
   size_t startUTF8Index;
   size_t endUTF8Index;
@@ -1437,44 +1431,31 @@ std::string Unicode::Mid(const std::string &str, const int startCharIndex,
 
   startUTF8Index = Unicode::getCodeUnitIndex(result, 0, startCharIndex, true, true,
       Unicode::getDefaultICULocale());
+  if (startUTF8Index == std::string::npos)
+  {
+    result = std::string();
+    return result;
+  }
   endUTF8Index = Unicode::getCodeUnitIndex(result, startUTF8Index, charCount, true, true,
       Unicode::getDefaultICULocale());
   return result.substr(startUTF8Index, (endUTF8Index - startUTF8Index));
 }
 
-/*!
- *  \brief Get the rightmost count characters of a string
- *
- * Unicode characters are of variable byte length. This function's
- * parameters are based on characters and NOT bytes.
- *
- * \param str to extract substring from
- * \param charCount if > 0 number of characters to keep from right end
- *                  if < 0 number of characters to remove from left end
- * \return rightmost count characters of str, length determined by charCount
- *
- * TODO: Unicode - No apparent users requiring count to be bytes
- */
-std::string Unicode::Right(const std::string &str, const int charCount)
+std::string Unicode::Right(const std::string &str, const size_t charCount, bool rightReference,
+    const icu::Locale &icuLocale)
 {
   size_t utf8Index;
-  size_t charIndex;
   std::string result;
   result = Unicode::normalize(str, StringOptions::FOLD_CASE_DEFAULT,
       NormalizerType::NFC);
   if (result.compare(str) != 0)
     CLog::Log(LOGINFO, "Unicode::getCodeUnitIndex Normalized string different from original");
 
-  if (charCount < 0)
-  {
-    charIndex = -charCount;
-    utf8Index = Unicode::getCodeUnitIndex(result, 0, charIndex, false, false, Unicode::getDefaultICULocale());
-  }
-  else
-  {
-    charIndex = charCount;
-    utf8Index = Unicode::getCodeUnitIndex(result, 0, charIndex, true, false, Unicode::getDefaultICULocale());
-  }
+  utf8Index = Unicode::getCodeUnitIndex(result, 0, charCount, ! rightReference, false, icuLocale);
+
+  if (utf8Index == std::string::npos)
+    utf8Index = result.length();
+
   return result.substr(utf8Index, std::string::npos);
 }
 
@@ -1494,32 +1475,50 @@ thread_local icu::BreakIterator* m_cbi = nullptr;
 size_t Unicode::getCodeUnitIndex(const std::string &str, size_t startOffset, size_t charCount,
     const bool forward, const bool left, icu::Locale icuLocale)
 {
+#ifndef DISABLE_OPTIMIZATION
+  // Disable when we want to confirm that code behaves the same without
+  // this shortcut.
+  //
+  // If Requested # characters is 0 or > available code units (here bytes)
+  // then quick calculation can give result. Humans wouldn't use this
+  // codepath, but a loop or some such might.
 
-  if (charCount > str.length()) // Accurate for single-byte chars
+  size_t effectiveStrLength = str.length() - startOffset;
+  if (charCount == 0)
   {
-    if (left)
-    {
-    if (forward)
-      return std::string::npos;
-    else
-      return 0;
-    }
-    else // right
+    if (left) // Return n code-units to copy starting from left end
     {
       if (forward)
-        return 0;
+        return startOffset;
       else
+        return str.length(); // Omit charCount chars from right end
+    }
+    else // right- Return starting code-unit to begin copying
+    {
+      if (forward) // User wants to omit charCount (0) chars from left end
+        return startOffset;
+      else // User wants charCount (0) chars from right end
         return str.length();
     }
   }
-  if (charCount == 0 && forward)
+  if (charCount > effectiveStrLength) // Entire string, don't need to calculate char boundaries
   {
-    // Must check 'reverse' case later
-    if (left)
-      return 0;
-    else
-      return str.length();
+    if (left) // Return n code-units to copy starting from left end
+    {
+      if (forward)
+        return str.length();
+      else
+        return startOffset; // Omit charCount chars from right end
+    }
+    else // right- Return starting code-unit to begin copying
+    {
+      if (forward) // User wants to omit charCount (0) chars from left end
+        return str.length();
+      else // User wants charCount (0) chars from right end
+        return startOffset;
+    }
   }
+#endif
 
   UErrorCode status = U_ZERO_ERROR;
   if (m_cbi != nullptr)
@@ -1539,7 +1538,7 @@ size_t Unicode::getCodeUnitIndex(const std::string &str, size_t startOffset, siz
      {
        CLog::Log(LOGERROR, "Error in Unicode::getCodeUnitIndex: {}", status);
        m_cbi = nullptr;
-       return 0;
+       return startOffset;
      }
    }
 
