@@ -20,6 +20,7 @@
 #include "ServiceBroker.h"
 #include "StringUtils.h"
 #include "utils/log.h"
+#include "utils/UnicodeUtils.h"
 
 #if defined(TARGET_WINDOWS)
 #include "platform/win32/CharsetConverter.h"
@@ -145,7 +146,7 @@ void URIUtils::RemoveExtension(std::string& strFileName)
     if (StringUtils::containsNonAscii(strExtension)) {
       CLog::Log(LOGWARNING, "URIUtils::RemoveExtension strExtension contains non-ASCII: {}", strExtension);
     }
-    StringUtils::ToLower(strExtension, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
+    strExtension = UnicodeUtils::ToLower(strExtension, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
     strExtension += "|";
 
     std::string strFileMask;

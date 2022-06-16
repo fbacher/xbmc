@@ -8,6 +8,7 @@
 
 #include <locale>
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 
 #include <algorithm>
 
@@ -113,117 +114,76 @@ static icu::Locale getUkranianLocale()
   return ukranian_locale;
 }
 
-TEST(TestStringUtils, Format)
-{
-  std::string refstr = "test 25 2.7 ff FF";
-
-  std::string varstr = StringUtils::Format("{} {} {:.1f} {:x} {:02X}", "test", 25, 2.743f, 0x00ff,
-      0x00ff);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
-
-  varstr = StringUtils::Format("", "test", 25, 2.743f, 0x00ff, 0x00ff);
-  EXPECT_STREQ("", varstr.c_str());
-}
-
-TEST(TestStringUtils, FormatEnum)
-{
-  const char* zero = "0";
-  const char* one = "1";
-
-  std::string varstr = StringUtils::Format("{}", ECG::A);
-  EXPECT_STREQ(zero, varstr.c_str());
-
-  varstr = StringUtils::Format("{}", EG::C);
-  EXPECT_STREQ(zero, varstr.c_str());
-
-  varstr = StringUtils::Format("{}", test_enum::ECN::A);
-  EXPECT_STREQ(one, varstr.c_str());
-
-  varstr = StringUtils::Format("{}", test_enum::EN::C);
-  EXPECT_STREQ(one, varstr.c_str());
-}
-
-TEST(TestStringUtils, FormatEnumWidth)
-{
-  const char* one = "01";
-
-  std::string varstr = StringUtils::Format("{:02d}", ECG::B);
-  EXPECT_STREQ(one, varstr.c_str());
-
-  varstr = StringUtils::Format("{:02}", EG::D);
-  EXPECT_STREQ(one, varstr.c_str());
-}
-
-TEST(TestStringUtils, ToUpper)
+TEST(TestUnicodeUtils, ToUpper)
 {
 
   std::string refstr = "TEST";
 
   std::string varstr = "TeSt";
-  StringUtils::ToUpper(varstr);
+  varstr = UnicodeUtils::ToUpper(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = UTF8_GERMAN_UPPER; // ÓÓSSCHLOË
   varstr = UTF8_GERMAN_SAMPLE; // óóßChloë
-  StringUtils::ToUpper(varstr);
+  varstr = UnicodeUtils::ToUpper(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
   // Lower: óósschloë
 }
 
-TEST(TestStringUtils, ToUpper_w)
+TEST(TestUnicodeUtils, ToUpper_w)
 {
   std::wstring refstr = L"TEST";
   std::wstring varstr = L"TeSt";
-  StringUtils::ToUpper(varstr);
+  varstr = UnicodeUtils::ToUpper(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = Unicode::utf8_to_wstring(std::string(UTF8_GERMAN_UPPER)); // ÓÓSSCHLOË
   varstr = Unicode::utf8_to_wstring(std::string(UTF8_GERMAN_SAMPLE)); // óóßChloë
-  StringUtils::ToUpper(varstr);
-  int32_t result = StringUtils::Compare(refstr, varstr);
+  varstr = UnicodeUtils::ToUpper(varstr);
+  int32_t result = UnicodeUtils::Compare(refstr, varstr);
   EXPECT_EQ(result, 0);
 }
 
-TEST(TestStringUtils, ToUpper_Locale)
+TEST(TestUnicodeUtils, ToUpper_Locale)
 {
   std::string refstr = "TWITCH";
   std::string varstr = "Twitch";
-  StringUtils::ToUpper(varstr, getCLocale());
+  varstr = UnicodeUtils::ToUpper(varstr, getCLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "ABCÇDEFGĞH IİI JKLMNOÖPRSŞTUÜVYZ";
   varstr = "abcçdefgğh ıİi jklmnoöprsştuüvyz";
-  StringUtils::ToUpper(varstr, getUSEnglishLocale());
+  varstr = UnicodeUtils::ToUpper(varstr, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "ABCÇDEFGĞH IİI JKLMNOÖPRSŞTUÜVYZ";
   varstr = "abcçdefgğh ıİi jklmnoöprsştuüvyz";
-  StringUtils::ToUpper(varstr, getTurkicLocale());
+  varstr = UnicodeUtils::ToUpper(varstr, getTurkicLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "ABCÇDEFGĞH IİI JKLMNOÖPRSŞTUÜVYZ";
   varstr = "abcçdefgğh ıİi jklmnoöprsştuüvyz";
-  StringUtils::ToUpper(varstr, getUkranianLocale());
+  varstr = UnicodeUtils::ToUpper(varstr, getUkranianLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = UTF8_GERMAN_UPPER; // ÓÓSSCHLOË
   varstr = UTF8_GERMAN_SAMPLE; // óóßChloë
-  StringUtils::ToUpper(varstr, getCLocale());
+  varstr = UnicodeUtils::ToUpper(varstr, getCLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
   // Lower: óósschloë
 }
 
-TEST(TestStringUtils, ToLower)
+TEST(TestUnicodeUtils, ToLower)
 {
   std::string refstr = "test";
 
   std::string varstr = "TeSt";
-  StringUtils::ToLower(varstr);
+  varstr = UnicodeUtils::ToLower(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   varstr = UTF8_GERMAN_UPPER; // ÓÓSSCHLOË
   refstr = UTF8_GERMAN_LOWER_SS; // óósschloë // Does not convert SS to ß
-  StringUtils::ToLower(varstr);
+  varstr = UnicodeUtils::ToLower(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
   // Lower: óósschloë
 
@@ -231,24 +191,24 @@ TEST(TestStringUtils, ToLower)
 
   varstr = UTF8_GERMAN_SAMPLE; // óóßChloë
   refstr = UTF8_GERMAN_LOWER; // óóßChloë
-  StringUtils::ToLower(varstr);
-  int32_t result = StringUtils::Compare(refstr, varstr);
+  varstr = UnicodeUtils::ToLower(varstr);
+  int32_t result = UnicodeUtils::Compare(refstr, varstr);
   EXPECT_EQ(result, 0);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
 
-TEST(TestStringUtils, ToLower_w)
+TEST(TestUnicodeUtils, ToLower_w)
 {
   std::wstring refstr = L"test";
 
   std::wstring varstr = L"TeSt";
-  StringUtils::ToLower(varstr);
+  varstr = UnicodeUtils::ToLower(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str()); // Binary compare should work
 
   varstr = Unicode::utf8_to_wstring(std::string(UTF8_GERMAN_UPPER)); // ÓÓSSCHLOË
   refstr = Unicode::utf8_to_wstring(std::string(UTF8_GERMAN_LOWER_SS)); // óóßChloë
-  StringUtils::ToLower(varstr);
-  int32_t result = StringUtils::Compare(refstr, varstr);
+  varstr = UnicodeUtils::ToLower(varstr);
+  int32_t result = UnicodeUtils::Compare(refstr, varstr);
   EXPECT_EQ(result, 0);
 
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
@@ -258,14 +218,14 @@ TEST(TestStringUtils, ToLower_w)
 
   varstr = Unicode::utf8_to_wstring(std::string(UTF8_GERMAN_SAMPLE)); // óóßChloë
   refstr = Unicode::utf8_to_wstring(std::string(UTF8_GERMAN_LOWER)); // óóßchloë
-  StringUtils::ToLower(varstr);
-  result = StringUtils::Compare(refstr, varstr);
+  varstr = UnicodeUtils::ToLower(varstr);
+  result = UnicodeUtils::Compare(refstr, varstr);
   EXPECT_EQ(result, 0);
 
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
 
-TEST(TestStringUtils, Turkic_I)
+TEST(TestUnicodeUtils, Turkic_I)
 {
 
   // Specifically test behavior of Turkic I
@@ -288,7 +248,7 @@ TEST(TestStringUtils, Turkic_I)
   // Convert to native Unicode, UChar32
   std::string orig = std::string(varstr);
   std::wstring w_varstr_in = Unicode::utf8_to_wstring(varstr);
-  StringUtils::ToLower(varstr, getUSEnglishLocale());
+  varstr = UnicodeUtils::ToLower(varstr, getUSEnglishLocale());
   std::wstring w_varstr_out = Unicode::utf8_to_wstring(varstr);
   std::stringstream ss;
   std::string prefix = "\\u";
@@ -326,7 +286,7 @@ TEST(TestStringUtils, Turkic_I)
   refstr = "IIİI";
   orig = std::string(varstr);
   w_varstr_in = Unicode::utf8_to_wstring(varstr);
-  StringUtils::ToUpper(varstr, getUSEnglishLocale());
+  varstr = UnicodeUtils::ToUpper(varstr, getUSEnglishLocale());
   w_varstr_out = Unicode::utf8_to_wstring(varstr);
   ss.clear();
   ss.str(std::string());
@@ -366,7 +326,7 @@ TEST(TestStringUtils, Turkic_I)
   // Convert to native Unicode, UChar32
   orig = std::string(varstr);
   w_varstr_in = Unicode::utf8_to_wstring(varstr);
-  StringUtils::ToLower(varstr, getTurkicLocale());
+  varstr = UnicodeUtils::ToLower(varstr, getTurkicLocale());
   w_varstr_out = Unicode::utf8_to_wstring(varstr);
   ss.clear();
   ss.str(std::string());
@@ -428,90 +388,90 @@ TEST(TestStringUtils, Turkic_I)
       << hexInput << " output hex: " << hexOutput << std::endl;
 }
 
-TEST(TestStringUtils, ToCapitalize)
+TEST(TestUnicodeUtils, ToCapitalize)
 {
   std::string refstr = "Test";
   std::string varstr = "test";
-  StringUtils::ToCapitalize(varstr);
+  UnicodeUtils::ToCapitalize(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "Just A Test";
   varstr = "just a test";
-  StringUtils::ToCapitalize(varstr);
+  UnicodeUtils::ToCapitalize(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "Test -1;2:3, String For Case";
   varstr = "test -1;2:3, string for Case";
-  StringUtils::ToCapitalize(varstr);
+  UnicodeUtils::ToCapitalize(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "  JuST Another\t\tTEst:\nWoRKs ";
   varstr = "  juST another\t\ttEst:\nwoRKs ";
-  StringUtils::ToCapitalize(varstr);
+  UnicodeUtils::ToCapitalize(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "N.Y.P.D";
   varstr = "n.y.p.d";
-  StringUtils::ToCapitalize(varstr);
+  UnicodeUtils::ToCapitalize(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "N-Y-P-D";
   varstr = "n-y-p-d";
-  StringUtils::ToCapitalize(varstr);
+  UnicodeUtils::ToCapitalize(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
 
-TEST(TestStringUtils, TitleCase)
+TEST(TestUnicodeUtils, TitleCase)
 {
   // Different from ToCapitalize (single word not title cased)
 
   std::string refstr = "Test";
   std::string varstr = "test";
-  StringUtils::TitleCase(varstr);
+  UnicodeUtils::TitleCase(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "Just A Test";
   varstr = "just a test";
-  StringUtils::TitleCase(varstr);
+  UnicodeUtils::TitleCase(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "Test -1;2:3, String For Case";
   varstr = "test -1;2:3, string for Case";
-  StringUtils::TitleCase(varstr);
+  UnicodeUtils::TitleCase(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "  Just Another\t\tTest:\nWorks ";
   varstr = "  juST another\t\ttEst:\nwoRKs ";
-  StringUtils::TitleCase(varstr);
+  UnicodeUtils::TitleCase(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "N.y.p.d";
   varstr = "n.y.p.d";
-  StringUtils::TitleCase(varstr);
+  UnicodeUtils::TitleCase(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "N-Y-P-D";
   varstr = "n-y-p-d";
-  StringUtils::TitleCase(varstr);
+  UnicodeUtils::TitleCase(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
 
-TEST(TestStringUtils, EqualsNoCase)
+TEST(TestUnicodeUtils, EqualsNoCase)
 {
   std::string refstr = "TeSt";
 
-  EXPECT_TRUE(StringUtils::EqualsNoCase(refstr, "TeSt"));
-  EXPECT_TRUE(StringUtils::EqualsNoCase(refstr, "tEsT"));
+  EXPECT_TRUE(UnicodeUtils::EqualsNoCase(refstr, "TeSt"));
+  EXPECT_TRUE(UnicodeUtils::EqualsNoCase(refstr, "tEsT"));
 }
 
-TEST(TestStringUtils, EqualsNoCase_Normalize)
+TEST(TestUnicodeUtils, EqualsNoCase_Normalize)
 {
   const std::string refstr = UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5;
   const std::string varstr = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
-  EXPECT_FALSE(StringUtils::EqualsNoCase(refstr, varstr));
-  EXPECT_TRUE(StringUtils::EqualsNoCase(refstr, varstr, StringOptions::FOLD_CASE_DEFAULT, true));
+  EXPECT_FALSE(UnicodeUtils::EqualsNoCase(refstr, varstr));
+  EXPECT_TRUE(UnicodeUtils::EqualsNoCase(refstr, varstr, StringOptions::FOLD_CASE_DEFAULT, true));
 }
-TEST(TestStringUtils, Left_Basic)
+TEST(TestUnicodeUtils, Left_Basic)
 {
   std::string refstr;
    std::string varstr;
@@ -520,55 +480,55 @@ TEST(TestStringUtils, Left_Basic)
    // First, request n chars to copy from left end
 
    refstr = "";
-   varstr = StringUtils::Left(origstr, 0);
+   varstr = UnicodeUtils::Left(origstr, 0);
    EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
    refstr = "Te";
-   varstr = StringUtils::Left(origstr, 2);
+   varstr = UnicodeUtils::Left(origstr, 2);
    EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
    refstr = "Test";
-   varstr = StringUtils::Left(origstr, 4);
+   varstr = UnicodeUtils::Left(origstr, 4);
    EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
    refstr = "Test";
-   varstr = StringUtils::Left(origstr, 10);
+   varstr = UnicodeUtils::Left(origstr, 10);
    EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
    refstr = "Test";
-   varstr = StringUtils::Left(origstr, std::string::npos);
+   varstr = UnicodeUtils::Left(origstr, std::string::npos);
    EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
    // # of characters to omit from right end
 
    refstr = "Tes";
-   varstr = StringUtils::Left(origstr, 1, false);
+   varstr = UnicodeUtils::Left(origstr, 1, false);
    EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
    refstr = "Test";
-   varstr = StringUtils::Left(origstr, 0, false);
+   varstr = UnicodeUtils::Left(origstr, 0, false);
    EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
    refstr = "T";
-   varstr = StringUtils::Left(origstr, 3, false);
+   varstr = UnicodeUtils::Left(origstr, 3, false);
    EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
    refstr = "";
-   varstr = StringUtils::Left(origstr, 4, false);
+   varstr = UnicodeUtils::Left(origstr, 4, false);
    EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
    refstr = "";
-   varstr = StringUtils::Left(origstr, 5, false);
+   varstr = UnicodeUtils::Left(origstr, 5, false);
    EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
    refstr = "";
-   varstr = StringUtils::Left(origstr, std::string::npos, false);
+   varstr = UnicodeUtils::Left(origstr, std::string::npos, false);
    EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   // TODO: Add test to ensure count works properly for multi-codepoint characters
 }
 
-TEST(TestStringUtils, Left_Advanced)
+TEST(TestUnicodeUtils, Left_Advanced)
 {
   std::string origstr;
   std::string refstr;
@@ -578,7 +538,7 @@ TEST(TestStringUtils, Left_Advanced)
 
   origstr = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1); // 3 codepoints, 1 char
   refstr = "";
-  varstr = StringUtils::Left(origstr, 0, true, getUSEnglishLocale());
+  varstr = UnicodeUtils::Left(origstr, 0, true, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   // Interesting case. All five VARIENTs can be normalized
@@ -586,19 +546,19 @@ TEST(TestStringUtils, Left_Advanced)
 
   origstr = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
   refstr = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5); // 2 codepoints, 1 char
-  varstr = StringUtils::Left(origstr, 2, true, getUSEnglishLocale());
+  varstr = UnicodeUtils::Left(origstr, 2, true, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   origstr = std::string(UTF8_GERMAN_SAMPLE); // u"óóßChloë"
   refstr = "óó";
-  varstr = StringUtils::Left(origstr, 2, true, getUSEnglishLocale());
+  varstr = UnicodeUtils::Left(origstr, 2, true, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   // Get leftmost substring removing n characters from end of string
 
   origstr = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
   refstr = std::string("");
-  varstr = StringUtils::Left(origstr, 1, false, getUSEnglishLocale());
+  varstr = UnicodeUtils::Left(origstr, 1, false, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   // Interesting case. All five VARIENTs can be normalized
@@ -606,70 +566,70 @@ TEST(TestStringUtils, Left_Advanced)
 
   origstr = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
   refstr = std::string("");
-  varstr = StringUtils::Left(origstr, 2, false, getUSEnglishLocale());
+  varstr = UnicodeUtils::Left(origstr, 2, false, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   origstr = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
   refstr = "";
-  varstr = StringUtils::Left(origstr, 5, false, getUSEnglishLocale());
+  varstr = UnicodeUtils::Left(origstr, 5, false, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   origstr = std::string(UTF8_GERMAN_SAMPLE); // u"óóßChloë"
   refstr = "óóßChl";
-  varstr = StringUtils::Left(origstr, 2, false, getUSEnglishLocale());
+  varstr = UnicodeUtils::Left(origstr, 2, false, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   // TODO: Add test to ensure count works properly for multi-codepoint characters
 }
 
-TEST(TestStringUtils, Mid)
+TEST(TestUnicodeUtils, Mid)
 {
   std::string refstr;
   std::string varstr;
   std::string origstr = "test";
 
   refstr = "";
-  varstr = StringUtils::Mid(origstr, 0, 0);
+  varstr = UnicodeUtils::Mid(origstr, 0, 0);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "te";
-  varstr = StringUtils::Mid(origstr, 0, 2);
+  varstr = UnicodeUtils::Mid(origstr, 0, 2);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "test";
-  varstr = StringUtils::Mid(origstr, 0, 10);
+  varstr = UnicodeUtils::Mid(origstr, 0, 10);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "st";
-  varstr = StringUtils::Mid(origstr, 2);
+  varstr = UnicodeUtils::Mid(origstr, 2);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "st";
-  varstr = StringUtils::Mid(origstr, 2, 2);
+  varstr = UnicodeUtils::Mid(origstr, 2, 2);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "es";
-  varstr = StringUtils::Mid(origstr, 1, 2);
+  varstr = UnicodeUtils::Mid(origstr, 1, 2);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "est";
-  varstr = StringUtils::Mid(origstr, 1, std::string::npos);
+  varstr = UnicodeUtils::Mid(origstr, 1, std::string::npos);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "est";
-  varstr = StringUtils::Mid(origstr, 1, 4);
+  varstr = UnicodeUtils::Mid(origstr, 1, 4);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "";
-  varstr = StringUtils::Mid(origstr, 1, 0);
+  varstr = UnicodeUtils::Mid(origstr, 1, 0);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "";
-  varstr = StringUtils::Mid(origstr, 4, 1);
+  varstr = UnicodeUtils::Mid(origstr, 4, 1);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
 
-TEST(TestStringUtils, Right)
+TEST(TestUnicodeUtils, Right)
 {
   std::string refstr;
   std::string varstr;
@@ -678,162 +638,162 @@ TEST(TestStringUtils, Right)
   // First, request n chars to copy from right end
 
   refstr = "";
-  varstr = StringUtils::Right(origstr, 0);
+  varstr = UnicodeUtils::Right(origstr, 0);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "st";
-  varstr = StringUtils::Right(origstr, 2);
+  varstr = UnicodeUtils::Right(origstr, 2);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "Test";
-  varstr = StringUtils::Right(origstr, 4);
+  varstr = UnicodeUtils::Right(origstr, 4);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "Test";
-  varstr = StringUtils::Right(origstr, 10);
+  varstr = UnicodeUtils::Right(origstr, 10);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "Test";
-  varstr = StringUtils::Right(origstr, std::string::npos);
+  varstr = UnicodeUtils::Right(origstr, std::string::npos);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   // # of characters to omit from left end
 
   refstr = "est";
-  varstr = StringUtils::Right(origstr, 1, false);
+  varstr = UnicodeUtils::Right(origstr, 1, false);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "Test";
-  varstr = StringUtils::Right(origstr, 0, false);
+  varstr = UnicodeUtils::Right(origstr, 0, false);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "t";
-  varstr = StringUtils::Right(origstr, 3, false);
+  varstr = UnicodeUtils::Right(origstr, 3, false);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "";
-  varstr = StringUtils::Right(origstr, 4, false);
+  varstr = UnicodeUtils::Right(origstr, 4, false);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "";
-  varstr = StringUtils::Right(origstr, 5, false);
+  varstr = UnicodeUtils::Right(origstr, 5, false);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "";
-  varstr = StringUtils::Right(origstr, std::string::npos, false);
+  varstr = UnicodeUtils::Right(origstr, std::string::npos, false);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
 
-TEST(TestStringUtils, Trim)
+TEST(TestUnicodeUtils, Trim)
 {
   std::string refstr = "test test";
 
   std::string varstr = " test test   ";
-  StringUtils::Trim(varstr);
+  UnicodeUtils::Trim(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "";
   varstr = " \n\r\t   ";
-  StringUtils::Trim(varstr);
+  UnicodeUtils::Trim(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "\nx\r\t   x";
   varstr = "$ \nx\r\t   x?\t";
-  StringUtils::Trim(varstr, "$? \t");
+  UnicodeUtils::Trim(varstr, "$? \t");
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
 
-TEST(TestStringUtils, TrimLeft)
+TEST(TestUnicodeUtils, TrimLeft)
 {
   std::string refstr = "test test   ";
 
   std::string varstr = " test test   ";
-  StringUtils::TrimLeft(varstr);
+  UnicodeUtils::TrimLeft(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "";
   varstr = " \n\r\t   ";
-  StringUtils::TrimLeft(varstr);
+  UnicodeUtils::TrimLeft(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "\nx\r\t   x?\t";
   varstr = "$ \nx\r\t   x?\t";
-  StringUtils::TrimLeft(varstr, "$? \t");
+  UnicodeUtils::TrimLeft(varstr, "$? \t");
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
 
-TEST(TestStringUtils, TrimRight)
+TEST(TestUnicodeUtils, TrimRight)
 {
   std::string refstr = " test test";
 
   std::string varstr = " test test   ";
-  StringUtils::TrimRight(varstr);
+  UnicodeUtils::TrimRight(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "";
   varstr = " \n\r\t   ";
-  StringUtils::TrimRight(varstr);
+  UnicodeUtils::TrimRight(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   refstr = "$ \nx\r\t   x";
   varstr = "$ \nx\r\t   x?\t";
-  StringUtils::TrimRight(varstr, "$? \t");
+  UnicodeUtils::TrimRight(varstr, "$? \t");
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
 
-TEST(TestStringUtils, Replace)
+TEST(TestUnicodeUtils, Replace)
 {
   std::string refstr = "text text";
 
   std::string varstr = "test test";
-  EXPECT_EQ(StringUtils::Replace(varstr, 's', 'x'), 2);
+  EXPECT_EQ(UnicodeUtils::Replace(varstr, 's', 'x'), 2);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-  EXPECT_EQ(StringUtils::Replace(varstr, 's', 'x'), 0);
+  EXPECT_EQ(UnicodeUtils::Replace(varstr, 's', 'x'), 0);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   varstr = "test test";
-  EXPECT_EQ(StringUtils::Replace(varstr, "s", "x"), 2);
+  EXPECT_EQ(UnicodeUtils::Replace(varstr, "s", "x"), 2);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-  EXPECT_EQ(StringUtils::Replace(varstr, "s", "x"), 0);
+  EXPECT_EQ(UnicodeUtils::Replace(varstr, "s", "x"), 0);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
 
-TEST(TestStringUtils, StartsWith)
+TEST(TestUnicodeUtils, StartsWith)
 {
   std::string refstr = "test";
 
   // TODO: Test with FoldCase option
-  EXPECT_FALSE(StringUtils::StartsWithNoCase(refstr, "x"));
+  EXPECT_FALSE(UnicodeUtils::StartsWithNoCase(refstr, "x"));
 
-  EXPECT_TRUE(StringUtils::StartsWith(refstr, "te"));
-  EXPECT_TRUE(StringUtils::StartsWith(refstr, "test"));
-  EXPECT_FALSE(StringUtils::StartsWith(refstr, "Te"));
+  EXPECT_TRUE(UnicodeUtils::StartsWith(refstr, "te"));
+  EXPECT_TRUE(UnicodeUtils::StartsWith(refstr, "test"));
+  EXPECT_FALSE(UnicodeUtils::StartsWith(refstr, "Te"));
 
-  EXPECT_TRUE(StringUtils::StartsWithNoCase(refstr, "Te"));
-  EXPECT_TRUE(StringUtils::StartsWithNoCase(refstr, "TesT"));
+  EXPECT_TRUE(UnicodeUtils::StartsWithNoCase(refstr, "Te"));
+  EXPECT_TRUE(UnicodeUtils::StartsWithNoCase(refstr, "TesT"));
 }
 
-TEST(TestStringUtils, EndsWith)
+TEST(TestUnicodeUtils, EndsWith)
 {
   std::string refstr = "test";
-  EXPECT_TRUE(StringUtils::EndsWith(refstr, "st"));
-  EXPECT_TRUE(StringUtils::EndsWith(refstr, "test"));
-  EXPECT_FALSE(StringUtils::EndsWith(refstr, "sT"));
+  EXPECT_TRUE(UnicodeUtils::EndsWith(refstr, "st"));
+  EXPECT_TRUE(UnicodeUtils::EndsWith(refstr, "test"));
+  EXPECT_FALSE(UnicodeUtils::EndsWith(refstr, "sT"));
 }
 
-TEST(TestStringUtils, EndsWithNoCase)
+TEST(TestUnicodeUtils, EndsWithNoCase)
 {
   // TODO: Test with FoldCase option
 
   std::string refstr = "test";
-  EXPECT_FALSE(StringUtils::EndsWithNoCase(refstr, "x"));
-  EXPECT_TRUE(StringUtils::EndsWithNoCase(refstr, "sT"));
-  EXPECT_TRUE(StringUtils::EndsWithNoCase(refstr, "TesT"));
+  EXPECT_FALSE(UnicodeUtils::EndsWithNoCase(refstr, "x"));
+  EXPECT_TRUE(UnicodeUtils::EndsWithNoCase(refstr, "sT"));
+  EXPECT_TRUE(UnicodeUtils::EndsWithNoCase(refstr, "TesT"));
 }
 
-TEST(TestStringUtils, FoldCase)
+TEST(TestUnicodeUtils, FoldCase)
 {
   /*
    *  FOLD_CASE_DEFAULT
@@ -850,28 +810,28 @@ TEST(TestStringUtils, FoldCase)
    */
   std::string s1 = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5);
   std::string s2 = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
-  StringUtils::FoldCase(s1);
-  StringUtils::FoldCase(s2);
-  int32_t result = StringUtils::Compare(s1, s2);
+  UnicodeUtils::FoldCase(s1);
+  UnicodeUtils::FoldCase(s2);
+  int32_t result = UnicodeUtils::Compare(s1, s2);
   EXPECT_NE(result, 0);
 
   s1 = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5);
   s2 = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
-  StringUtils::FoldCase(s1, StringOptions::FOLD_CASE_DEFAULT);
-  StringUtils::FoldCase(s2, StringOptions::FOLD_CASE_DEFAULT);
+  UnicodeUtils::FoldCase(s1, StringOptions::FOLD_CASE_DEFAULT);
+  UnicodeUtils::FoldCase(s2, StringOptions::FOLD_CASE_DEFAULT);
   // td::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = StringUtils::Compare(s1, s2);
+  result = UnicodeUtils::Compare(s1, s2);
   EXPECT_NE(result, 0);
 
   s1 = "I İ İ i ı";
   s2 = "i i̇ i̇ i ı";
 
-  StringUtils::FoldCase(s1, StringOptions::FOLD_CASE_DEFAULT);
-  StringUtils::FoldCase(s2, StringOptions::FOLD_CASE_DEFAULT);
+  UnicodeUtils::FoldCase(s1, StringOptions::FOLD_CASE_DEFAULT);
+  UnicodeUtils::FoldCase(s2, StringOptions::FOLD_CASE_DEFAULT);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = StringUtils::Compare(s1, s2);
+  result = UnicodeUtils::Compare(s1, s2);
   EXPECT_EQ(result, 0);
 
   std::string I = "I";
@@ -886,11 +846,11 @@ TEST(TestStringUtils, FoldCase)
   s1 = I + I_DOT + i + i_DOTLESS + i_COMBINING_DOUBLE_DOT;
   s2 = i + i_COMBINING_DOUBLE_DOT + i + i_DOTLESS + i_COMBINING_DOUBLE_DOT;
 
-  StringUtils::FoldCase(s1, StringOptions::FOLD_CASE_DEFAULT);
-  StringUtils::FoldCase(s2, StringOptions::FOLD_CASE_DEFAULT);
+  UnicodeUtils::FoldCase(s1, StringOptions::FOLD_CASE_DEFAULT);
+  UnicodeUtils::FoldCase(s2, StringOptions::FOLD_CASE_DEFAULT);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = StringUtils::Compare(s1, s2);
+  result = UnicodeUtils::Compare(s1, s2);
   EXPECT_EQ(result, 0);
   /*
    FOLD_CASE_EXCLUDE_SPECIAL_I
@@ -903,11 +863,11 @@ TEST(TestStringUtils, FoldCase)
   s1 = I + I_DOT + i + i_DOTLESS;
   s2 = i_DOTLESS + i + i + i_DOTLESS;
 
-  StringUtils::FoldCase(s1, StringOptions::FOLD_CASE_EXCLUDE_SPECIAL_I);
-  StringUtils::FoldCase(s2, StringOptions::FOLD_CASE_EXCLUDE_SPECIAL_I);
+  UnicodeUtils::FoldCase(s1, StringOptions::FOLD_CASE_EXCLUDE_SPECIAL_I);
+  UnicodeUtils::FoldCase(s2, StringOptions::FOLD_CASE_EXCLUDE_SPECIAL_I);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = StringUtils::Compare(s1, s2);
+  result = UnicodeUtils::Compare(s1, s2);
   EXPECT_EQ(result, 0);
 
   /*
@@ -923,43 +883,43 @@ TEST(TestStringUtils, FoldCase)
   // std::cout << "Turkic orig s1: " << s1 << std::endl;
   // std::cout << "Turkic orig s2: " << s2 << std::endl;
 
-  StringUtils::FoldCase(s1, StringOptions::FOLD_CASE_DEFAULT);
-  StringUtils::FoldCase(s2, StringOptions::FOLD_CASE_DEFAULT);
+  UnicodeUtils::FoldCase(s1, StringOptions::FOLD_CASE_DEFAULT);
+  UnicodeUtils::FoldCase(s2, StringOptions::FOLD_CASE_DEFAULT);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
 
-  result = StringUtils::Compare(s1, s2);
+  result = UnicodeUtils::Compare(s1, s2);
   EXPECT_EQ(result, 0);
 
 }
 
-TEST(TestStringUtils, FoldCase_W)
+TEST(TestUnicodeUtils, FoldCase_W)
 {
   std::wstring w_s1 = Unicode::utf8_to_wstring(std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5));
   std::wstring w_s2 = Unicode::utf8_to_wstring(std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1));
-  StringUtils::FoldCase(w_s1);
-  StringUtils::FoldCase(w_s2);
-  int32_t result = StringUtils::Compare(w_s1, w_s2);
+  UnicodeUtils::FoldCase(w_s1);
+  UnicodeUtils::FoldCase(w_s2);
+  int32_t result = UnicodeUtils::Compare(w_s1, w_s2);
   EXPECT_NE(result, 0);
 
   w_s1 = Unicode::utf8_to_wstring(std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5));
   w_s2 = Unicode::utf8_to_wstring(std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1));
-  StringUtils::FoldCase(w_s1, StringOptions::FOLD_CASE_DEFAULT);
-  StringUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_DEFAULT);
+  UnicodeUtils::FoldCase(w_s1, StringOptions::FOLD_CASE_DEFAULT);
+  UnicodeUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_DEFAULT);
   // td::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = StringUtils::Compare(w_s1, w_s2);
+  result = UnicodeUtils::Compare(w_s1, w_s2);
   EXPECT_NE(result, 0);
 
   std::string s1 = "I İ İ i ı";
   std::string s2 = "i i̇ i̇ i ı";
   w_s1 = Unicode::utf8_to_wstring(s1);
   w_s2 = Unicode::utf8_to_wstring(s2);
-  StringUtils::FoldCase(w_s1, StringOptions::FOLD_CASE_DEFAULT);
-  StringUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_DEFAULT);
+  UnicodeUtils::FoldCase(w_s1, StringOptions::FOLD_CASE_DEFAULT);
+  UnicodeUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_DEFAULT);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = StringUtils::Compare(w_s1, w_s2);
+  result = UnicodeUtils::Compare(w_s1, w_s2);
   EXPECT_EQ(result, 0);
 
   std::string I = "I";
@@ -976,11 +936,11 @@ TEST(TestStringUtils, FoldCase_W)
 
   w_s1 = Unicode::utf8_to_wstring(s1);
   w_s2 = Unicode::utf8_to_wstring(s2);
-  StringUtils::FoldCase(w_s1, StringOptions::FOLD_CASE_DEFAULT);
-  StringUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_DEFAULT);
+  UnicodeUtils::FoldCase(w_s1, StringOptions::FOLD_CASE_DEFAULT);
+  UnicodeUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_DEFAULT);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = StringUtils::Compare(w_s1, w_s2);
+  result = UnicodeUtils::Compare(w_s1, w_s2);
 
   EXPECT_EQ(result, 0);
   /*
@@ -996,11 +956,11 @@ TEST(TestStringUtils, FoldCase_W)
 
   w_s1 = Unicode::utf8_to_wstring(s1);
   w_s2 = Unicode::utf8_to_wstring(s2);
-  StringUtils::FoldCase(w_s1, StringOptions::FOLD_CASE_EXCLUDE_SPECIAL_I);
-  StringUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_EXCLUDE_SPECIAL_I);
+  UnicodeUtils::FoldCase(w_s1, StringOptions::FOLD_CASE_EXCLUDE_SPECIAL_I);
+  UnicodeUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_EXCLUDE_SPECIAL_I);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = StringUtils::Compare(w_s1, w_s2);
+  result = UnicodeUtils::Compare(w_s1, w_s2);
   EXPECT_EQ(result, 0);
 
   /*
@@ -1018,15 +978,15 @@ TEST(TestStringUtils, FoldCase_W)
 
   w_s1 = Unicode::utf8_to_wstring(s1);
   w_s2 = Unicode::utf8_to_wstring(s2);
-  StringUtils::FoldCase(w_s1, StringOptions::FOLD_CASE_DEFAULT);
-  StringUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_DEFAULT);
+  UnicodeUtils::FoldCase(w_s1, StringOptions::FOLD_CASE_DEFAULT);
+  UnicodeUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_DEFAULT);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = StringUtils::Compare(w_s1, w_s2);
+  result = UnicodeUtils::Compare(w_s1, w_s2);
   EXPECT_EQ(result, 0);
 }
 
-TEST(TestStringUtils, Join)
+TEST(TestUnicodeUtils, Join)
 {
   std::string refstr;
   std::string varstr;
@@ -1040,48 +1000,48 @@ TEST(TestStringUtils, Join)
   strarray.emplace_back("fg");
   strarray.emplace_back(",");
   refstr = "a,b,c,de,,,fg,,";
-  varstr = StringUtils::Join(strarray, ",");
+  varstr = UnicodeUtils::Join(strarray, ",");
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
 
-TEST(TestStringUtils, Normalize)
+TEST(TestUnicodeUtils, Normalize)
 {
   // TODO: These tests are all on essentially the same caseless string.
   // The FOLD_CASE_DEFAULT option (which only impacts NFKD and maybe NFKC)
   // is not being tested, neither are the other alternatives to it.
 
   std::string s1 = UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
-  std::string result = StringUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFD);
-  int cmp = StringUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_2);
+  std::string result = UnicodeUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFD);
+  int cmp = UnicodeUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_2);
   EXPECT_EQ(cmp, 0);
 
   s1 = UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
-  result = StringUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFC);
-  cmp = StringUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5);
+  result = UnicodeUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFC);
+  cmp = UnicodeUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5);
   EXPECT_EQ(cmp, 0);
 
   s1 = UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
-  result = StringUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFKC);
-  cmp = StringUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5);
+  result = UnicodeUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFKC);
+  cmp = UnicodeUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5);
   EXPECT_EQ(cmp, 0);
 
   s1 = UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
-  result = StringUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFD);
-  cmp = StringUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_2);
+  result = UnicodeUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFD);
+  cmp = UnicodeUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_2);
   EXPECT_EQ(cmp, 0);
 
   s1 = UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
-  result = StringUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFKD);
-  cmp = StringUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_2);
+  result = UnicodeUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFKD);
+  cmp = UnicodeUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_2);
   EXPECT_EQ(cmp, 0);
 }
 
-TEST(TestStringUtils, Split)
+TEST(TestUnicodeUtils, Split)
 {
   std::vector<std::string> varresults;
 
   // test overload with string as delimiter
-  varresults = StringUtils::Split("g,h,ij,k,lm,,n", ",");
+  varresults = UnicodeUtils::Split("g,h,ij,k,lm,,n", ",");
   EXPECT_STREQ("g", varresults.at(0).c_str());
   EXPECT_STREQ("h", varresults.at(1).c_str());
   EXPECT_STREQ("ij", varresults.at(2).c_str());
@@ -1090,50 +1050,50 @@ TEST(TestStringUtils, Split)
   EXPECT_STREQ("", varresults.at(5).c_str());
   EXPECT_STREQ("n", varresults.at(6).c_str());
 
-  EXPECT_TRUE(StringUtils::Split("", "|").empty());
+  EXPECT_TRUE(UnicodeUtils::Split("", "|").empty());
 
-  EXPECT_EQ(4U, StringUtils::Split("a bc  d ef ghi ", " ", 4).size());
-  EXPECT_STREQ("d ef ghi ", StringUtils::Split("a bc  d ef ghi ", " ", 4).at(3).c_str())
+  EXPECT_EQ(4U, UnicodeUtils::Split("a bc  d ef ghi ", " ", 4).size());
+  EXPECT_STREQ("d ef ghi ", UnicodeUtils::Split("a bc  d ef ghi ", " ", 4).at(3).c_str())
       << "Last part must include rest of the input string";
-  EXPECT_EQ(7U, StringUtils::Split("a bc  d ef ghi ", " ").size())
+  EXPECT_EQ(7U, UnicodeUtils::Split("a bc  d ef ghi ", " ").size())
       << "Result must be 7 strings including two empty strings";
-  EXPECT_STREQ("bc", StringUtils::Split("a bc  d ef ghi ", " ").at(1).c_str());
-  EXPECT_STREQ("", StringUtils::Split("a bc  d ef ghi ", " ").at(2).c_str());
-  EXPECT_STREQ("", StringUtils::Split("a bc  d ef ghi ", " ").at(6).c_str());
+  EXPECT_STREQ("bc", UnicodeUtils::Split("a bc  d ef ghi ", " ").at(1).c_str());
+  EXPECT_STREQ("", UnicodeUtils::Split("a bc  d ef ghi ", " ").at(2).c_str());
+  EXPECT_STREQ("", UnicodeUtils::Split("a bc  d ef ghi ", " ").at(6).c_str());
 
-  EXPECT_EQ(2U, StringUtils::Split("a bc  d ef ghi ", "  ").size());
-  EXPECT_EQ(2U, StringUtils::Split("a bc  d ef ghi ", "  ", 10).size());
-  EXPECT_STREQ("a bc", StringUtils::Split("a bc  d ef ghi ", "  ", 10).at(0).c_str());
+  EXPECT_EQ(2U, UnicodeUtils::Split("a bc  d ef ghi ", "  ").size());
+  EXPECT_EQ(2U, UnicodeUtils::Split("a bc  d ef ghi ", "  ", 10).size());
+  EXPECT_STREQ("a bc", UnicodeUtils::Split("a bc  d ef ghi ", "  ", 10).at(0).c_str());
 
-  EXPECT_EQ(1U, StringUtils::Split("a bc  d ef ghi ", " z").size());
-  EXPECT_STREQ("a bc  d ef ghi ", StringUtils::Split("a bc  d ef ghi ", " z").at(0).c_str());
+  EXPECT_EQ(1U, UnicodeUtils::Split("a bc  d ef ghi ", " z").size());
+  EXPECT_STREQ("a bc  d ef ghi ", UnicodeUtils::Split("a bc  d ef ghi ", " z").at(0).c_str());
 
-  EXPECT_EQ(1U, StringUtils::Split("a bc  d ef ghi ", "").size());
-  EXPECT_STREQ("a bc  d ef ghi ", StringUtils::Split("a bc  d ef ghi ", "").at(0).c_str());
+  EXPECT_EQ(1U, UnicodeUtils::Split("a bc  d ef ghi ", "").size());
+  EXPECT_STREQ("a bc  d ef ghi ", UnicodeUtils::Split("a bc  d ef ghi ", "").at(0).c_str());
 
   // test overload with char as delimiter
-  EXPECT_EQ(4U, StringUtils::Split("a bc  d ef ghi ", ' ', 4).size());
-  EXPECT_STREQ("d ef ghi ", StringUtils::Split("a bc  d ef ghi ", ' ', 4).at(3).c_str());
-  EXPECT_EQ(7U, StringUtils::Split("a bc  d ef ghi ", ' ').size())
+  EXPECT_EQ(4U, UnicodeUtils::Split("a bc  d ef ghi ", ' ', 4).size());
+  EXPECT_STREQ("d ef ghi ", UnicodeUtils::Split("a bc  d ef ghi ", ' ', 4).at(3).c_str());
+  EXPECT_EQ(7U, UnicodeUtils::Split("a bc  d ef ghi ", ' ').size())
       << "Result must be 7 strings including two empty strings";
-  EXPECT_STREQ("bc", StringUtils::Split("a bc  d ef ghi ", ' ').at(1).c_str());
-  EXPECT_STREQ("", StringUtils::Split("a bc  d ef ghi ", ' ').at(2).c_str());
-  EXPECT_STREQ("", StringUtils::Split("a bc  d ef ghi ", ' ').at(6).c_str());
+  EXPECT_STREQ("bc", UnicodeUtils::Split("a bc  d ef ghi ", ' ').at(1).c_str());
+  EXPECT_STREQ("", UnicodeUtils::Split("a bc  d ef ghi ", ' ').at(2).c_str());
+  EXPECT_STREQ("", UnicodeUtils::Split("a bc  d ef ghi ", ' ').at(6).c_str());
 
-  EXPECT_EQ(1U, StringUtils::Split("a bc  d ef ghi ", 'z').size());
-  EXPECT_STREQ("a bc  d ef ghi ", StringUtils::Split("a bc  d ef ghi ", 'z').at(0).c_str());
+  EXPECT_EQ(1U, UnicodeUtils::Split("a bc  d ef ghi ", 'z').size());
+  EXPECT_STREQ("a bc  d ef ghi ", UnicodeUtils::Split("a bc  d ef ghi ", 'z').at(0).c_str());
 
-  EXPECT_EQ(1U, StringUtils::Split("a bc  d ef ghi ", "").size());
-  EXPECT_STREQ("a bc  d ef ghi ", StringUtils::Split("a bc  d ef ghi ", 'z').at(0).c_str());
+  EXPECT_EQ(1U, UnicodeUtils::Split("a bc  d ef ghi ", "").size());
+  EXPECT_STREQ("a bc  d ef ghi ", UnicodeUtils::Split("a bc  d ef ghi ", 'z').at(0).c_str());
 }
 
-TEST(TestStringUtils, FindNumber)
+TEST(TestUnicodeUtils, FindNumber)
 {
-  EXPECT_EQ(3, StringUtils::FindNumber("aabcaadeaa", "aa"));
-  EXPECT_EQ(1, StringUtils::FindNumber("aabcaadeaa", "b"));
+  EXPECT_EQ(3, UnicodeUtils::FindNumber("aabcaadeaa", "aa"));
+  EXPECT_EQ(1, UnicodeUtils::FindNumber("aabcaadeaa", "b"));
 }
 
-TEST(TestStringUtils, Collate)
+TEST(TestUnicodeUtils, Collate)
 {
   int32_t ref = 0;
   int32_t var;
@@ -1141,7 +1101,7 @@ TEST(TestStringUtils, Collate)
 
   const std::wstring s1 = std::wstring(L"The Farmer's Daughter");
   const std::wstring s2 = std::wstring(L"Ate Pie");
-  var = StringUtils::Collate(s1, s2);
+  var = UnicodeUtils::Collate(s1, s2);
   EXPECT_GT(var, ref);
 
   EXPECT_TRUE(Unicode::InitializeCollator(getTurkicLocale(), true));
@@ -1149,220 +1109,220 @@ TEST(TestStringUtils, Collate)
       Unicode::utf8_to_wstring(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5));
   const std::wstring s4 = std::wstring(
       Unicode::utf8_to_wstring(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1));
-  var = StringUtils::Collate(s3, s4);
+  var = UnicodeUtils::Collate(s3, s4);
   EXPECT_EQ(var, 0);
 
   EXPECT_TRUE(Unicode::InitializeCollator(getTurkicLocale(), false));
-  var = StringUtils::Collate(s3, s4); // No (extra) Normalization
+  var = UnicodeUtils::Collate(s3, s4); // No (extra) Normalization
   EXPECT_NE(var, 0);
 }
-TEST(TestStringUtils, AlphaNumericCompare)
+TEST(TestUnicodeUtils, AlphaNumericCompare)
 {
   int64_t ref;
   int64_t var;
 
   ref = 0;
-  var = StringUtils::AlphaNumericCompare(L"123abc", L"abc123");
+  var = UnicodeUtils::AlphaNumericCompare(L"123abc", L"abc123");
   EXPECT_LT(var, ref);
 }
 
-TEST(TestStringUtils, TimeStringToSeconds)
+TEST(TestUnicodeUtils, TimeStringToSeconds)
 {
-  EXPECT_EQ(77455, StringUtils::TimeStringToSeconds("21:30:55"));
-  EXPECT_EQ(7 * 60, StringUtils::TimeStringToSeconds("7 min"));
-  EXPECT_EQ(7 * 60, StringUtils::TimeStringToSeconds("7 min\t"));
-  EXPECT_EQ(154 * 60, StringUtils::TimeStringToSeconds("   154 min"));
-  EXPECT_EQ(1 * 60 + 1, StringUtils::TimeStringToSeconds("1:01"));
-  EXPECT_EQ(4 * 60 + 3, StringUtils::TimeStringToSeconds("4:03"));
-  EXPECT_EQ(2 * 3600 + 4 * 60 + 3, StringUtils::TimeStringToSeconds("2:04:03"));
-  EXPECT_EQ(2 * 3600 + 4 * 60 + 3, StringUtils::TimeStringToSeconds("   2:4:3"));
-  EXPECT_EQ(2 * 3600 + 4 * 60 + 3, StringUtils::TimeStringToSeconds("  \t\t 02:04:03 \n "));
-  EXPECT_EQ(1 * 3600 + 5 * 60 + 2, StringUtils::TimeStringToSeconds("01:05:02:04:03 \n "));
-  EXPECT_EQ(0, StringUtils::TimeStringToSeconds("blah"));
-  EXPECT_EQ(0, StringUtils::TimeStringToSeconds("ля-ля"));
+  EXPECT_EQ(77455, UnicodeUtils::TimeStringToSeconds("21:30:55"));
+  EXPECT_EQ(7 * 60, UnicodeUtils::TimeStringToSeconds("7 min"));
+  EXPECT_EQ(7 * 60, UnicodeUtils::TimeStringToSeconds("7 min\t"));
+  EXPECT_EQ(154 * 60, UnicodeUtils::TimeStringToSeconds("   154 min"));
+  EXPECT_EQ(1 * 60 + 1, UnicodeUtils::TimeStringToSeconds("1:01"));
+  EXPECT_EQ(4 * 60 + 3, UnicodeUtils::TimeStringToSeconds("4:03"));
+  EXPECT_EQ(2 * 3600 + 4 * 60 + 3, UnicodeUtils::TimeStringToSeconds("2:04:03"));
+  EXPECT_EQ(2 * 3600 + 4 * 60 + 3, UnicodeUtils::TimeStringToSeconds("   2:4:3"));
+  EXPECT_EQ(2 * 3600 + 4 * 60 + 3, UnicodeUtils::TimeStringToSeconds("  \t\t 02:04:03 \n "));
+  EXPECT_EQ(1 * 3600 + 5 * 60 + 2, UnicodeUtils::TimeStringToSeconds("01:05:02:04:03 \n "));
+  EXPECT_EQ(0, UnicodeUtils::TimeStringToSeconds("blah"));
+  EXPECT_EQ(0, UnicodeUtils::TimeStringToSeconds("ля-ля"));
 }
 
-TEST(TestStringUtils, RemoveCRLF)
+TEST(TestUnicodeUtils, RemoveCRLF)
 {
   std::string refstr;
   std::string varstr;
 
   refstr = "test\r\nstring\nblah blah";
   varstr = "test\r\nstring\nblah blah\n";
-  StringUtils::RemoveCRLF(varstr);
+  UnicodeUtils::RemoveCRLF(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
 
-TEST(TestStringUtils, utf8_strlen)
+TEST(TestUnicodeUtils, utf8_strlen)
 {
   size_t ref;
   size_t var;
 
   ref = 9;
-  var = StringUtils::utf8_strlen("ｔｅｓｔ＿ＵＴＦ８");
+  var = UnicodeUtils::utf8_strlen("ｔｅｓｔ＿ＵＴＦ８");
   EXPECT_EQ(ref, var);
 }
 
-TEST(TestStringUtils, SecondsToTimeString)
+TEST(TestUnicodeUtils, SecondsToTimeString)
 {
   std::string refstr;
   std::string varstr;
 
   refstr = "21:30:55";
-  varstr = StringUtils::SecondsToTimeString(77455);
+  varstr = UnicodeUtils::SecondsToTimeString(77455);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
 
-TEST(TestStringUtils, IsNaturalNumber)
+TEST(TestUnicodeUtils, IsNaturalNumber)
 {
-  EXPECT_TRUE(StringUtils::IsNaturalNumber("10"));
-  EXPECT_TRUE(StringUtils::IsNaturalNumber(" 10"));
-  EXPECT_TRUE(StringUtils::IsNaturalNumber("0"));
-  EXPECT_FALSE(StringUtils::IsNaturalNumber(" 1 0"));
-  EXPECT_FALSE(StringUtils::IsNaturalNumber("1.0"));
-  EXPECT_FALSE(StringUtils::IsNaturalNumber("1.1"));
-  EXPECT_FALSE(StringUtils::IsNaturalNumber("0x1"));
-  EXPECT_FALSE(StringUtils::IsNaturalNumber("blah"));
-  EXPECT_FALSE(StringUtils::IsNaturalNumber("120 h"));
-  EXPECT_FALSE(StringUtils::IsNaturalNumber(" "));
-  EXPECT_FALSE(StringUtils::IsNaturalNumber(""));
+  EXPECT_TRUE(UnicodeUtils::IsNaturalNumber("10"));
+  EXPECT_TRUE(UnicodeUtils::IsNaturalNumber(" 10"));
+  EXPECT_TRUE(UnicodeUtils::IsNaturalNumber("0"));
+  EXPECT_FALSE(UnicodeUtils::IsNaturalNumber(" 1 0"));
+  EXPECT_FALSE(UnicodeUtils::IsNaturalNumber("1.0"));
+  EXPECT_FALSE(UnicodeUtils::IsNaturalNumber("1.1"));
+  EXPECT_FALSE(UnicodeUtils::IsNaturalNumber("0x1"));
+  EXPECT_FALSE(UnicodeUtils::IsNaturalNumber("blah"));
+  EXPECT_FALSE(UnicodeUtils::IsNaturalNumber("120 h"));
+  EXPECT_FALSE(UnicodeUtils::IsNaturalNumber(" "));
+  EXPECT_FALSE(UnicodeUtils::IsNaturalNumber(""));
 }
 
-TEST(TestStringUtils, IsInteger)
+TEST(TestUnicodeUtils, IsInteger)
 {
-  EXPECT_TRUE(StringUtils::IsInteger("10"));
-  EXPECT_TRUE(StringUtils::IsInteger(" -10"));
-  EXPECT_TRUE(StringUtils::IsInteger("0"));
-  EXPECT_FALSE(StringUtils::IsInteger(" 1 0"));
-  EXPECT_FALSE(StringUtils::IsInteger("1.0"));
-  EXPECT_FALSE(StringUtils::IsInteger("1.1"));
-  EXPECT_FALSE(StringUtils::IsInteger("0x1"));
-  EXPECT_FALSE(StringUtils::IsInteger("blah"));
-  EXPECT_FALSE(StringUtils::IsInteger("120 h"));
-  EXPECT_FALSE(StringUtils::IsInteger(" "));
-  EXPECT_FALSE(StringUtils::IsInteger(""));
+  EXPECT_TRUE(UnicodeUtils::IsInteger("10"));
+  EXPECT_TRUE(UnicodeUtils::IsInteger(" -10"));
+  EXPECT_TRUE(UnicodeUtils::IsInteger("0"));
+  EXPECT_FALSE(UnicodeUtils::IsInteger(" 1 0"));
+  EXPECT_FALSE(UnicodeUtils::IsInteger("1.0"));
+  EXPECT_FALSE(UnicodeUtils::IsInteger("1.1"));
+  EXPECT_FALSE(UnicodeUtils::IsInteger("0x1"));
+  EXPECT_FALSE(UnicodeUtils::IsInteger("blah"));
+  EXPECT_FALSE(UnicodeUtils::IsInteger("120 h"));
+  EXPECT_FALSE(UnicodeUtils::IsInteger(" "));
+  EXPECT_FALSE(UnicodeUtils::IsInteger(""));
 }
 
-TEST(TestStringUtils, SizeToString)
+TEST(TestUnicodeUtils, SizeToString)
 {
   std::string ref;
   std::string var;
 
   ref = "2.00 GB";
-  var = StringUtils::SizeToString(2147483647);
+  var = UnicodeUtils::SizeToString(2147483647);
   EXPECT_STREQ(ref.c_str(), var.c_str());
 
   ref = "0.00 B";
-  var = StringUtils::SizeToString(0);
+  var = UnicodeUtils::SizeToString(0);
   EXPECT_STREQ(ref.c_str(), var.c_str());
 }
 
-TEST(TestStringUtils, EmptyString)
+TEST(TestUnicodeUtils, EmptyString)
 {
-  EXPECT_STREQ("", StringUtils::Empty.c_str());
+  EXPECT_STREQ("", UnicodeUtils::Empty.c_str());
 }
 
-TEST(TestStringUtils, FindWord)
+TEST(TestUnicodeUtils, FindWord)
 {
   size_t ref;
   size_t var;
 
   ref = 5;
-  var = StringUtils::FindWord("test string", "string");
+  var = UnicodeUtils::FindWord("test string", "string");
   EXPECT_EQ(ref, var);
-  var = StringUtils::FindWord("12345string", "string");
+  var = UnicodeUtils::FindWord("12345string", "string");
   EXPECT_EQ(ref, var);
-  var = StringUtils::FindWord("apple2012", "2012");
+  var = UnicodeUtils::FindWord("apple2012", "2012");
   EXPECT_EQ(ref, var);
 
   ref = std::string::npos;
-  var = StringUtils::FindWord("12345string", "ring");
+  var = UnicodeUtils::FindWord("12345string", "ring");
   EXPECT_EQ(ref, var);
-  var = StringUtils::FindWord("12345string", "345");
+  var = UnicodeUtils::FindWord("12345string", "345");
   EXPECT_EQ(ref, var);
-  var = StringUtils::FindWord("apple2012", "e2012");
+  var = UnicodeUtils::FindWord("apple2012", "e2012");
   EXPECT_EQ(ref, var);
-  var = StringUtils::FindWord("apple2012", "12");
+  var = UnicodeUtils::FindWord("apple2012", "12");
   EXPECT_EQ(ref, var);
-  var = StringUtils::FindWord("anyt]h(z_iILi234#!? 1a34#56bbc7 ", "1a34#56bbc7");
+  var = UnicodeUtils::FindWord("anyt]h(z_iILi234#!? 1a34#56bbc7 ", "1a34#56bbc7");
   ref = 20;
   EXPECT_EQ(ref, var);
 }
 
-TEST(TestStringUtils, FindWord_NonAscii)
+TEST(TestUnicodeUtils, FindWord_NonAscii)
 {
   size_t ref;
   size_t var;
 
   ref = 2;
-  var = StringUtils::FindWord("我的视频", "视频");
+  var = UnicodeUtils::FindWord("我的视频", "视频");
   EXPECT_EQ(ref, var);
-  var = StringUtils::FindWord("我的视频", "视");
-  EXPECT_EQ(ref, var);
-  ref = 6;
-  var = StringUtils::FindWord("Apple ple", "ple");
+  var = UnicodeUtils::FindWord("我的视频", "视");
   EXPECT_EQ(ref, var);
   ref = 6;
-  var = StringUtils::FindWord("Äpfel.pfel", "pfel");
+  var = UnicodeUtils::FindWord("Apple ple", "ple");
+  EXPECT_EQ(ref, var);
+  ref = 6;
+  var = UnicodeUtils::FindWord("Äpfel.pfel", "pfel");
   EXPECT_EQ(ref, var);
 
   // Yea old Turkic I problem....
   ref = 11;
-  var = StringUtils::FindWord("abcçdefgğh ıİi jklmnoöprsştuüvyz", "ıiİ jklmnoöprsştuüvyz");
+  var = UnicodeUtils::FindWord("abcçdefgğh ıİi jklmnoöprsştuüvyz", "ıiİ jklmnoöprsştuüvyz");
 }
 
-TEST(TestStringUtils, FindEndBracket)
+TEST(TestUnicodeUtils, FindEndBracket)
 {
   int ref;
   int var;
 
   ref = 11;
-  var = StringUtils::FindEndBracket("atest testbb test", 'a', 'b');
+  var = UnicodeUtils::FindEndBracket("atest testbb test", 'a', 'b');
   EXPECT_EQ(ref, var);
 }
 
-TEST(TestStringUtils, DateStringToYYYYMMDD)
+TEST(TestUnicodeUtils, DateStringToYYYYMMDD)
 {
   int ref;
   int var;
 
   ref = 20120706;
-  var = StringUtils::DateStringToYYYYMMDD("2012-07-06");
+  var = UnicodeUtils::DateStringToYYYYMMDD("2012-07-06");
   EXPECT_EQ(ref, var);
 }
 
-TEST(TestStringUtils, WordToDigits)
+TEST(TestUnicodeUtils, WordToDigits)
 {
   std::string ref;
   std::string var;
 
   ref = "8378 787464";
   var = "test string";
-  StringUtils::WordToDigits(var);
+  UnicodeUtils::WordToDigits(var);
   EXPECT_STREQ(ref.c_str(), var.c_str());
 }
 
-TEST(TestStringUtils, CreateUUID)
+TEST(TestUnicodeUtils, CreateUUID)
 {
-  std::cout << "CreateUUID(): " << StringUtils::CreateUUID() << std::endl;
+  std::cout << "CreateUUID(): " << UnicodeUtils::CreateUUID() << std::endl;
 }
 
-TEST(TestStringUtils, ValidateUUID)
+TEST(TestUnicodeUtils, ValidateUUID)
 {
-  EXPECT_TRUE(StringUtils::ValidateUUID(StringUtils::CreateUUID()));
+  EXPECT_TRUE(UnicodeUtils::ValidateUUID(UnicodeUtils::CreateUUID()));
 }
 
-TEST(TestStringUtils, CompareFuzzy)
+TEST(TestUnicodeUtils, CompareFuzzy)
 {
   double ref;
   double var;
 
   ref = 6.25;
-  var = StringUtils::CompareFuzzy("test string", "string test");
+  var = UnicodeUtils::CompareFuzzy("test string", "string test");
   EXPECT_EQ(ref, var);
 }
 
-TEST(TestStringUtils, FindBestMatch)
+TEST(TestUnicodeUtils, FindBestMatch)
 {
   double refdouble;
   double vardouble;
@@ -1377,20 +1337,20 @@ TEST(TestStringUtils, FindBestMatch)
   strarray.emplace_back("e");
   strarray.emplace_back("es");
   strarray.emplace_back("t");
-  varint = StringUtils::FindBestMatch("test", strarray, vardouble);
+  varint = UnicodeUtils::FindBestMatch("test", strarray, vardouble);
   EXPECT_EQ(refint, varint);
   EXPECT_EQ(refdouble, vardouble);
 }
 
-TEST(TestStringUtils, Paramify)
+TEST(TestUnicodeUtils, Paramify)
 {
   const char* input = "some, very \\ odd \"string\"";
   const char* ref = "\"some, very \\\\ odd \\\"string\\\"\"";
 
-  std::string result = StringUtils::Paramify(input);
+  std::string result = UnicodeUtils::Paramify(input);
   EXPECT_STREQ(ref, result.c_str());
 }
-TEST(TestStringUtils, Tokenize)
+TEST(TestUnicodeUtils, Tokenize)
 {
   // \brief Split a string by the specified delimiters.
 
@@ -1404,12 +1364,12 @@ TEST(TestStringUtils, Tokenize)
 
   std::string input = "All good men:should not die!";
   std::string delimiters = "";
-  result = StringUtils::Tokenize(input, delimiters);
+  result = UnicodeUtils::Tokenize(input, delimiters);
   EXPECT_EQ(1, result.size());
   EXPECT_STREQ("All good men:should not die!", result[0].c_str());
 
   delimiters = " :!";
-  result = StringUtils::Tokenize(input, delimiters);
+  result = UnicodeUtils::Tokenize(input, delimiters);
   EXPECT_EQ(result.size(), 6);
 
   EXPECT_STREQ("All", result[0].c_str());
@@ -1420,7 +1380,7 @@ TEST(TestStringUtils, Tokenize)
   EXPECT_STREQ("die", result[5].data());
 
   input = ":! All good men:should not die! :";
-  result = StringUtils::Tokenize(input, delimiters);
+  result = UnicodeUtils::Tokenize(input, delimiters);
   EXPECT_EQ(result.size(), 6);
 
   EXPECT_STREQ("All", result[0].c_str());
@@ -1431,7 +1391,7 @@ TEST(TestStringUtils, Tokenize)
   EXPECT_STREQ("die", result[5].data());
 }
 
-TEST(TestStringUtils, sortstringbyname)
+TEST(TestUnicodeUtils, sortstringbyname)
 {
   std::vector<std::string> strarray;
   strarray.emplace_back("B");
@@ -1444,40 +1404,17 @@ TEST(TestStringUtils, sortstringbyname)
   EXPECT_STREQ("c", strarray[2].c_str());
 }
 
-TEST(TestStringUtils, FileSizeFormat)
+TEST(TestUnicodeUtils, ToHexadecimal)
 {
-  EXPECT_STREQ("0B", StringUtils::FormatFileSize(0).c_str());
-
-  EXPECT_STREQ("999B", StringUtils::FormatFileSize(999).c_str());
-  EXPECT_STREQ("0.98kB", StringUtils::FormatFileSize(1000).c_str());
-
-  EXPECT_STREQ("1.00kB", StringUtils::FormatFileSize(1024).c_str());
-  EXPECT_STREQ("9.99kB", StringUtils::FormatFileSize(10229).c_str());
-
-  EXPECT_STREQ("10.1kB", StringUtils::FormatFileSize(10387).c_str());
-  EXPECT_STREQ("99.9kB", StringUtils::FormatFileSize(102297).c_str());
-
-  EXPECT_STREQ("100kB", StringUtils::FormatFileSize(102400).c_str());
-  EXPECT_STREQ("999kB", StringUtils::FormatFileSize(1023431).c_str());
-
-  EXPECT_STREQ("0.98MB", StringUtils::FormatFileSize(1023897).c_str());
-  EXPECT_STREQ("0.98MB", StringUtils::FormatFileSize(1024000).c_str());
-
-  //Last unit should overflow the 3 digit limit
-  EXPECT_STREQ("5432PB", StringUtils::FormatFileSize(6115888293969133568).c_str());
-}
-
-TEST(TestStringUtils, ToHexadecimal)
-{
-  EXPECT_STREQ("", StringUtils::ToHexadecimal("").c_str());
-  EXPECT_STREQ("616263", StringUtils::ToHexadecimal("abc").c_str());
+  EXPECT_STREQ("", UnicodeUtils::ToHexadecimal("").c_str());
+  EXPECT_STREQ("616263", UnicodeUtils::ToHexadecimal("abc").c_str());
   std::string a
   { "a\0b\n", 4 };
-  EXPECT_STREQ("6100620a", StringUtils::ToHexadecimal(a).c_str());
+  EXPECT_STREQ("6100620a", UnicodeUtils::ToHexadecimal(a).c_str());
   std::string nul
   { "\0", 1 };
-  EXPECT_STREQ("00", StringUtils::ToHexadecimal(nul).c_str());
+  EXPECT_STREQ("00", UnicodeUtils::ToHexadecimal(nul).c_str());
   std::string ff
   { "\xFF", 1 };
-  EXPECT_STREQ("ff", StringUtils::ToHexadecimal(ff).c_str());
+  EXPECT_STREQ("ff", UnicodeUtils::ToHexadecimal(ff).c_str());
 }

@@ -47,6 +47,7 @@
 #include "utils/Digest.h"
 #include "utils/FileExtensionProvider.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
@@ -740,7 +741,8 @@ void CMusicInfoScanner::FileItemsToAlbums(CFileItemList& items, VECALBUMS& album
         !songsByAlbumName.first.empty() && (isCompilation || !tracksOverlap); // 1+2b+2a
     if (artists.size() == 1)
     {
-      std::string artist = artists.begin()->first; StringUtils::ToLower(artist);
+      std::string artist = artists.begin()->first;
+      artist = UnicodeUtils::ToLower(artist);
       if (!StringUtils::EqualsNoCase(artist, "various") &&
         !StringUtils::EqualsNoCase(artist, "various artists") &&
         !StringUtils::EqualsNoCase(artist, various)) // 3a

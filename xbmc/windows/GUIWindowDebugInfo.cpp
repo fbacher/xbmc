@@ -25,6 +25,7 @@
 #include "utils/CPUInfo.h"
 #include "utils/MemUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
 
@@ -116,7 +117,7 @@ void CGUIWindowDebugInfo::Process(unsigned int currentTime, CDirtyRegionList &di
 #else
     double dCPU = m_resourceCounter.GetCPUUsage();
     std::string ucAppName = lcAppName;
-    StringUtils::ToUpper(ucAppName);
+    ucAppName = UnicodeUtils::ToUpper(ucAppName);
     info = StringUtils::Format("LOG: {}{}.log\n"
                                "MEM: {}/{} KB - FPS: {:2.1f} fps\n"
                                "CPU: {} (CPU-{} {:4.2f}%{})",

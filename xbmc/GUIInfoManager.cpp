@@ -25,6 +25,7 @@
 #include "settings/SkinSettings.h"
 #include "utils/CharsetConverter.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
@@ -11213,7 +11214,7 @@ std::string CGUIInfoManager::GetMultiInfoItemLabel(const CFileItem *item, int co
         //       "foreign" movie to the user (what would someone speaking English expect to
         //       type? Perhaps a "T" for Tau makes sense. How is this accomplished?
 
-        StringUtils::ToUpper(label);
+        label = UnicodeUtils::ToUpper(label);
 
         // FOLD_CASE_DEFAULT only impacts case-folding normalizer. Here a no-op
 

@@ -54,6 +54,7 @@
 #include "utils/Random.h"
 #include "utils/RegExp.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
@@ -3254,7 +3255,7 @@ std::string CFileItem::GetUserMusicThumb(bool alwaysCheckRemote /* = false */, b
         if (StringUtils::containsNonAscii(ext)) {
           CLog::Log(LOGWARNING, "CFileItem::GetUserMusicThumb ext contains non-ASCII: {}", ext);
         }
-        StringUtils::ToUpper(ext, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
+        ext = UnicodeUtils::ToUpper(ext, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
         StringUtils::Replace(folderThumb1, strFileName, name + ext);
         if (CFile::Exists(folderThumb1)) // folder.JPG
           return folderThumb1;
@@ -3267,7 +3268,7 @@ std::string CFileItem::GetUserMusicThumb(bool alwaysCheckRemote /* = false */, b
         if (StringUtils::containsNonAscii(firstletter)) {
           CLog::Log(LOGWARNING, "CFileItem::GetUserMusicThumb firstletter contains non-ASCII: {}", firstletter);
         }
-        StringUtils::ToUpper(firstletter, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
+        firstletter = UnicodeUtils::ToUpper(firstletter, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
         name.replace(0, 1, firstletter);
         StringUtils::Replace(folderThumb1, strFileName, name + ext);
         if (CFile::Exists(folderThumb1)) // Folder.JPG

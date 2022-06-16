@@ -518,7 +518,7 @@ const std::string Unicode::toUpper(const std::string &src, const icu::Locale &lo
   {
     CLog::Log(LOGERROR, "Error in Unicode::toUpper: {}", status);
 
-    return std::string();
+    return std::string(src);
   }
 
   size_t utf8_buffer_size = Unicode::getUTF8BufferSize(toupper_length, 2);

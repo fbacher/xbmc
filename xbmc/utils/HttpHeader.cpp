@@ -10,6 +10,7 @@
 #include "unicode/locid.h"
 #include "utils/log.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 
 // header white space characters according to RFC 2616
 const char* const CHttpHeader::m_whitespaceChars = " \t";
@@ -190,7 +191,7 @@ std::string CHttpHeader::GetCharset(void) const
   if (StringUtils::containsNonAscii(strValue)) {
     CLog::Log(LOGWARNING, "CHttpHeader::GetCharset strValue contains non-ASCII: {}", strValue);
   }
-  StringUtils::ToUpper(strValue, icu::Locale::getEnglish());
+  strValue = UnicodeUtils::ToUpper(strValue, icu::Locale::getEnglish());
   const size_t len = strValue.length();
 
   // extract charset value from 'contenttype/contentsubtype;pram1=param1Val ; charset=XXXX\t;param2=param2Val'

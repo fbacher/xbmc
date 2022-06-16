@@ -10,6 +10,7 @@
 
 #include "utils/log.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 
 const CLocale CLocale::Empty;
 
@@ -103,7 +104,7 @@ std::string CLocale::ToStringLC() const
   if (StringUtils::containsNonAscii(locale)) {
        CLog::Log(LOGWARNING, "CLocale::ToStringLC locale contains non-ASCII: {}", locale);
      }
-  StringUtils::ToLower(locale, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
+  locale = UnicodeUtils::ToLower(locale, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
 
   return locale;
 }
@@ -127,7 +128,7 @@ std::string CLocale::ToShortStringLC() const
     return "";
 
   std::string locale = ToShortString();
-  StringUtils::ToLower(locale);
+  locale = UnicodeUtils::ToLower(locale);
 
   return locale;
 }
@@ -253,7 +254,7 @@ bool CLocale::ParseLocale(const std::string &locale, std::string &language, std:
     if (StringUtils::containsNonAscii(territory)) {
       CLog::Log(LOGWARNING, "CLocale::ParseLocale territory contains non-ASCII: {}", territory);
     }
-    StringUtils::ToUpper(territory, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
+    territory = UnicodeUtils::ToUpper(territory, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
     tmp = tmp.substr(0, pos);
   }
 
@@ -265,7 +266,7 @@ bool CLocale::ParseLocale(const std::string &locale, std::string &language, std:
   if (StringUtils::containsNonAscii(language)) {
        CLog::Log(LOGWARNING, "CLocale::ParseLocale language contains non-ASCII: {}", language);
      }
-  StringUtils::ToLower(language, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
+  language = UnicodeUtils::ToLower(language, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
 
   return CheckValidity(language, territory, codeset, modifier);
 }
@@ -284,8 +285,10 @@ void CLocale::Initialize()
     if (StringUtils::containsNonAscii(m_territory)) {
       CLog::Log(LOGWARNING, " CLocale::Initialize m_territory contains non-ASCII: {}", m_territory);
     }
-    StringUtils::ToLower(m_language, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
-    StringUtils::ToUpper(m_territory, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
+    std::string lang = UnicodeUtils::ToLower(m_language, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
+    m_language.swap(lang);
+    std::string territory = UnicodeUtils::ToUpper(m_territory, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
+    m_territory.swap(territory);
   }
 }
 

@@ -17,6 +17,7 @@
 #include "profiles/ProfileManager.h"
 #include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/XMLUtils.h"
@@ -267,7 +268,7 @@ bool CMediaSourceSettings::AddShare(const std::string &type, const CMediaSource 
   if (StringUtils::containsNonAscii(strPath1)) {
     CLog::Log(LOGWARNING, "CMediaSourceSettings::AddShare strPath1 contains non-ASCII: {}", strPath1);
   }
-  StringUtils::ToUpper(strPath1, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
+  strPath1 = UnicodeUtils::ToUpper(strPath1, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
 
   CMediaSource shareToAdd = share;
   if (strPath1.at(0) == '$')

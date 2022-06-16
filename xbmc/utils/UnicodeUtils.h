@@ -1,5 +1,5 @@
 /*
- *  Copyright (C) 2005-2018 Team Kodi
+ *  Copyright (C) 2005-2022+ Team Kodi
  *  This file is part of Kodi - https://kodi.tv
  *
  *  SPDX-License-Identifier: GPL-2.0-or-later
@@ -10,9 +10,11 @@
 
 //-----------------------------------------------------------------------
 //
-//  File:      StringUtils.h
+//  File:      UnicodeUtils.h
 //
-//  Purpose:   ATL split string utility
+//  Purpose:   Provides Unicode-Safe string functions for Kodi
+//  Author:    Frank Feuerbacher
+//  Original 
 //  Author:    Paul J. Weiss
 //
 //  Major modifications by Frank Feuerbacher to utilize icu4c Unicode library
@@ -27,7 +29,6 @@
 // USE_ICU_COLLATOR chooses between ICU and legacy Kodi collation
 
 #define USE_ICU_COLLATOR 1
-#define STRINGUTILS_STRING_DISABLE 1
 
 /*
  *
@@ -89,9 +90,11 @@
  *
  */
 
+#undef UNICODE_STRING_DISABLE
 #define DEF_TO_STR_NAME(x) #x
 #define DEF_TO_STR_VALUE(x) DEF_TO_STR_NAME(x)
 
+#ifdef UNICODE_STRING_DISABLE
 template<typename T, std::enable_if_t<!std::is_enum<T>::value, int> = 0>
 constexpr auto&& EnumToInt(T&& arg) noexcept
 {
@@ -102,8 +105,9 @@ constexpr auto EnumToInt(T&& arg) noexcept
 {
   return static_cast<int>(arg);
 }
+#endif
 
-class StringUtils
+class UnicodeUtils
 {
 public:
 
@@ -191,7 +195,7 @@ public:
 	 *  flavor for the state of things.)
    */
 
-
+#ifdef UNICODE_STRING_DISABLE
   /*!
    * \brief Get a formatted string similar to sprintf
    *
@@ -231,19 +235,20 @@ public:
 
   static std::string FormatV(PRINTF_FORMAT_STRING const char *fmt, va_list args);
   static std::wstring FormatV(PRINTF_FORMAT_STRING const wchar_t *fmt, va_list args);
+#endif
 
-#if defined(UNICODE_STRING_DISABLE)
   /*!
    * \brief Converts a string to Upper case according to locale.
    *
    * Note: The length of the string can change, depending upon the underlying
-   * icu::locale.
+   * icu::locale
    *
    * \param str string to change case on
    * \param locale the underlying icu::Locale is created using the language,
    *        country, etc. from this locale
+   * \return modified string
    */
-  static void ToUpper(std::string &str, const std::locale &locale);
+  static std::string ToUpper(const std::string &str, const std::locale &locale);
 
   /*!
    * \brief Converts a string to Upper case according to locale.
@@ -252,8 +257,9 @@ public:
    *
    * \param str string to change case on
    * \param locale controls the conversion rules
+   * \return modified string
    */
-  static void ToUpper(std::string &str, const icu::Locale &locale);
+  static std::string ToUpper(const std::string &str, const icu::Locale &locale);
 
   /*!
    * \brief Converts a string to Upper case using LangInfo::GetSystemLocale
@@ -261,8 +267,9 @@ public:
    * Note: the length of the string can change, depending upon locale.
    *
    * \param str string to change case on
+   * \return modified string
    */
-  static void ToUpper(std::string &str);
+  static std::string ToUpper(const std::string &str);
 
   /*!
    * \brief Converts a wstring to Upper case according to locale.
@@ -273,8 +280,9 @@ public:
    * \param str string to change case on
    * \param locale the underlying icu::Locale is created using the language,
    *        country, etc. from this locale
+   * \return modified string
    */
-  static void ToUpper(std::wstring &str, const std::locale &locale);
+  static std::wstring ToUpper(const std::wstring &str, const std::locale &locale);
 
   /*!
    * \brief Converts a wstring to Upper case according to locale.
@@ -283,8 +291,9 @@ public:
    *
    * \param str string to change case on
    * \param locale controls the conversion rules
+   * \return modified string
    */
-  static void ToUpper(std::wstring &str, const icu::Locale &locale);
+  static std::wstring ToUpper(const std::wstring &str, const icu::Locale &locale);
 
   /*!
    * \brief Converts a wstring to Upper case using LangInfo::GetSystemLocale
@@ -292,8 +301,9 @@ public:
    * Note: the length of the string can change, depending upon locale.
    *
    * \param str string to change case on
+   * \return modfied string
    */
-  static void ToUpper(std::wstring &str);
+  static std::wstring ToUpper(const std::wstring &str);
 
   /*!
    * \brief Converts a string to Lower case according to locale.
@@ -304,8 +314,9 @@ public:
    * \param str string to change case on
    * \param locale the underlying icu::Locale is created using the language,
    *        country, etc. from this locale
+   * \return modified string
    */
-  static void ToLower(std::string &str, const std::locale &locale);
+  static std::string ToLower(const std::string &str, const std::locale &locale);
 
   /*!
    * \brief Converts a string to Lower case according to locale.
@@ -314,8 +325,9 @@ public:
    *
    * \param str string to change case on
    * \param locale controls the conversion rules
+   * \return modified string
    */
-  static void ToLower(std::string &str, const icu::Locale &locale);
+  static std::string ToLower(const std::string &str, const icu::Locale &locale);
 
   /*!
    * \brief Converts a string to Lower case using LangInfo::GetSystemLocale
@@ -323,8 +335,9 @@ public:
    * Note: the length of the string can change, depending upon locale.
    *
    * \param str string to change case on
+   * \return modified string
    */
-  static void ToLower(std::string &str);
+  static std::string ToLower(const std::string &str);
 
   /*!
    * \brief Converts a wstring to Lower case according to locale.
@@ -335,8 +348,9 @@ public:
    * \param str string to change case on
    * \param locale the underlying icu::Locale is created using the language,
    *        country, etc. from this locale
+   * \param modified string
    */
-  static void ToLower(std::wstring &str, const std::locale &locale);
+  static std::wstring ToLower(const std::wstring &str, const std::locale &locale);
 
   /*!
    * \brief Converts a wstring to Lower case according to locale.
@@ -345,8 +359,9 @@ public:
    *
    * \param str string to change case on
    * \param locale controls the conversion rules
+   * \return modified string
    */
-  static void ToLower(std::wstring &str, const icu::Locale &locale);
+  static std::wstring ToLower(const std::wstring &str, const icu::Locale &locale);
 
   /*!
    * \brief Converts a wstring to Lower case using LangInfo::GetSystemLocale
@@ -354,11 +369,12 @@ public:
    * Note: the length of the string can change, depending upon locale.
    *
    * \param str string to change case on
+   * \return modified string
    */
-  static void ToLower(std::wstring &str);
-#endif
+  static std::wstring ToLower(const std::wstring &str);
+
   /*!
-   *  \brief Folds the case of a string. Locale Independent.
+   * \brief Folds the case of a string. Locale Independent.
    *
    * Similar to ToLower except in addition, insignificant accents are stripped
    * and other transformations are made (such as German sharp-S is converted to ss).
@@ -590,7 +606,7 @@ public:
   static void TitleCase(std::string &str);
 
   /*!
-   *  \brief Normalizes a wstring. Not expected to be used outside of StringUtils.
+   *  \brief Normalizes a wstring. Not expected to be used outside of UnicodeUtils.
    *
    *  Made public to facilitate testing.
    *
@@ -609,7 +625,7 @@ public:
       StringOptions::FOLD_CASE_DEFAULT, const NormalizerType normalizerType = NormalizerType::NFKC);
 
   /*!
-   *  \brief Normalizes a string. Not expected to be used outside of StringUtils.
+   *  \brief Normalizes a string. Not expected to be used outside of UnicodeUtils.
    *
    *  Made public to facilitate testing.
    *
@@ -810,7 +826,7 @@ public:
    */
   static int32_t Collate(const wchar_t *left, const wchar_t *right)
   {
-    return StringUtils::Collate(std::wstring(left), std::wstring(right));
+    return UnicodeUtils::Collate(std::wstring(left), std::wstring(right));
   }
 
   /*!
@@ -1091,7 +1107,7 @@ public:
    *  \brief Remove all whitespace from beginning and end of str
    *
    *  TODO:  Create TrimCopy versions which do not modify the original string.
-   *         If, in order to avoid complications with redefining StringUtils methods,
+   *         If, in order to avoid complications with redefining UnicodeUtils methods,
    *         a replacement class, UnicodeUtils or some such is created. Then more
    *         latitude will exist for naming, etc.
    *
@@ -1730,7 +1746,7 @@ public:
    * numbers will have more decimals than larger ones.
    *
    * For example: 1024 bytes will be formatted as "1.00kB", 10240 bytes as "10.0kB" and
-   * 102400 bytes as "100kB". See TestStringUtils for more examples.
+   * 102400 bytes as "100kB". See TestUnicodeUtils for more examples.
    */
   static std::string FormatFileSize(uint64_t bytes);
 
@@ -1747,10 +1763,13 @@ private:
 
 };
 
+#if defined(UNICODE_STRING_DISABLE)
+
 struct sortstringbyname
 {
   bool operator()(const std::string& strItem1, const std::string& strItem2) const
   {
-    return StringUtils::CompareNoCase(strItem1, strItem2) < 0;
+    return UnicodeUtils::CompareNoCase(strItem1, strItem2) < 0;
   }
 };
+#endif

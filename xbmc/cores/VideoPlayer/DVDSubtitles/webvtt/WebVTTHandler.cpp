@@ -18,6 +18,7 @@
 #include "utils/CharsetConverter.h"
 #include "utils/HTMLUtil.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 #include <algorithm>
@@ -902,7 +903,7 @@ void CWebVTTHandler::ConvertSubtitle(std::string& text)
     if (StringUtils::containsNonAscii(fullTag)) {
       CLog::Log(LOGWARNING, "CWebVTTHandler::ConvertSubtitle fullTag is non-ASCII: {}\n", fullTag);
     }
-    StringUtils::ToLower(fullTag, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues.
+    fullTag = UnicodeUtils::ToLower(fullTag, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues.
 
     // Get tag name only (e.g. full tag is "</c>", tagName will be "c")
     std::string tagName = m_tagsRegex.GetMatch(1);
