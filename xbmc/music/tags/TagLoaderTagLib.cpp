@@ -1137,7 +1137,7 @@ void CTagLoaderTagLib::AddArtistRole(CMusicInfoTag &tag, const std::vector<std::
     for (auto role : roles)
     {
       StringUtils::Trim(role);
-      StringUtils::ToCapitalize(role);
+      role = UnicodeUtils::ToCapitalize(role);
       tag.AddArtistRole(role, StringUtils::Split(values[i + 1], ","));
     }
   }
@@ -1177,7 +1177,7 @@ void CTagLoaderTagLib::AddArtistInstrument(CMusicInfoTag &tag, const std::vector
       for (auto role : roles)
       {
         StringUtils::Trim(role);
-        StringUtils::ToCapitalize(role);
+        role = UnicodeUtils::ToCapitalize(role);
         tag.AddArtistRole(role, strArtist);
       }
   }

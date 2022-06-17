@@ -484,7 +484,7 @@ icu::Locale Unicode::getICULocale(const char *language, const char *country, con
   return icu_locale;
 }
 
-const std::string Unicode::toUpper(const std::string &src, const icu::Locale &locale)
+const std::string Unicode::ToUpper(const std::string &src, const icu::Locale &locale)
 {
   // TODO: Change to icu::CaseMap::utf8ToUpper or ucasemap_utf8ToUpper
 
@@ -493,7 +493,7 @@ const std::string Unicode::toUpper(const std::string &src, const icu::Locale &lo
   {
     localeId = Unicode::getICULocaleId(locale);
   }
-  // CLog::Log(LOGINFO, "toUpper locale: %s", localeId);
+  // CLog::Log(LOGINFO, "ToUpper locale: %s", localeId);
 
   if (src.length() == 0)
     return std::string(src);
@@ -511,12 +511,12 @@ const std::string Unicode::toUpper(const std::string &src, const icu::Locale &lo
   UChar* p_u_toupper_buffer = u_toupper_buffer;
   int32_t toupper_length = 0;
 
-  Unicode::toUpper(p_u_src, u_src_actual_length, locale, p_u_toupper_buffer, u_toupper_size,
+  Unicode::ToUpper(p_u_src, u_src_actual_length, locale, p_u_toupper_buffer, u_toupper_size,
       toupper_length, status);
 
   if (U_FAILURE(status))
   {
-    CLog::Log(LOGERROR, "Error in Unicode::toUpper: {}", status);
+    CLog::Log(LOGERROR, "Error in Unicode::ToUpper: {}", status);
 
     return std::string(src);
   }
@@ -529,35 +529,7 @@ const std::string Unicode::toUpper(const std::string &src, const icu::Locale &lo
   return result;
 }
 
-/**
- * Uppercase the characters in a string.
- * Casing is locale-dependent and context-sensitive.
- * The result may be longer or shorter than the original.
- * The source string and the destination buffer are allowed to overlap.
- *
- * @param dest      A buffer for the result string. The result will be zero-terminated if
- *                  the buffer is large enough.
- * @param destCapacity The size of the buffer (number of UChars). If it is 0, then
- *                  dest may be NULL and the function will only return the length of the result
- *                  without writing any of the result string.
- * @param src       The original string
- * @param srcLength The length of the original string. If -1, then src must be zero-terminated.
- * @param locale    The locale to consider, or "" for the root locale or NULL for the default locale.
- * @param pErrorCode Must be a valid pointer to an error code value,
- *                  which must not indicate a failure before the function call.
- * @return The length of the result string. It may be greater than destCapacity. In that case,
- *         only some of the result was written to the destination buffer.
- * @stable ICU 2.0
- *
- U_CAPI int32_t U_EXPORT2
- u_strToUpper(UChar *dest, int32_t destCapacity,
- const UChar *src, int32_t srcLength,
- const char *locale,
- UErrorCode *pErrorCode) {
-
- } */
-
-void Unicode::toUpper(UChar *p_u_src_buffer, int32_t u_src_length, const icu::Locale locale,
+void Unicode::ToUpper(UChar *p_u_src_buffer, int32_t u_src_length, const icu::Locale locale,
     UChar *p_u_toupper_buffer, const int32_t u_toupper_buffer_size, int32_t &to_upper_length,
     UErrorCode &status)
 {
@@ -569,7 +541,7 @@ void Unicode::toUpper(UChar *p_u_src_buffer, int32_t u_src_length, const icu::Lo
 
   status = U_ZERO_ERROR;
   std::string localeId = Unicode::getICULocaleId(locale);
-  // CLog::Log(LOGINFO, "toUpper locale: %s", localeId);
+  // CLog::Log(LOGINFO, "ToUpper locale: %s", localeId);
   to_upper_length = u_strToUpper(p_u_toupper_buffer, u_toupper_buffer_size, p_u_src_buffer,
       u_src_length, localeId.data(), &status);
 
@@ -577,7 +549,7 @@ void Unicode::toUpper(UChar *p_u_src_buffer, int32_t u_src_length, const icu::Lo
   {
     // Caller supposed to examine status
 
-    CLog::Log(LOGERROR, "Error in Unicode::toUpper: {}", status);
+    CLog::Log(LOGERROR, "Error in Unicode::ToUpper: {}", status);
   }
 }
 
@@ -598,7 +570,7 @@ const std::string Unicode::toLower(const std::string &src, const icu::Locale &lo
   return result;
 }
 
-const std::wstring Unicode::toCapitalize(const std::wstring &src, const icu::Locale &locale)
+const std::wstring Unicode::ToCapitalize(const std::wstring &src, const icu::Locale &locale)
 {
   std::string localeId = "none";
   if (locale != nullptr)
@@ -642,7 +614,7 @@ const std::wstring Unicode::toCapitalize(const std::wstring &src, const icu::Loc
   return wresult;
 }
 
-const std::string Unicode::toCapitalize(const std::string &src, const icu::Locale &locale)
+const std::string Unicode::ToCapitalize(const std::string &src, const icu::Locale &locale)
 {
 
   std::string localeId = "none";
@@ -650,7 +622,7 @@ const std::string Unicode::toCapitalize(const std::string &src, const icu::Local
   {
     localeId = Unicode::getICULocaleId(locale);
   }
-  CLog::Log(LOGINFO, "toCapitalize locale: {}", localeId);
+  CLog::Log(LOGINFO, "ToCapitalize locale: {}", localeId);
   icu::UnicodeString uString = Unicode::toUnicodeString(src);
   icu::StringCharacterIterator iter = icu::StringCharacterIterator(uString);
 

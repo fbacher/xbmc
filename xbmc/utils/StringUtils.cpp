@@ -159,66 +159,6 @@ std::wstring StringUtils::FormatV(const wchar_t *fmt, va_list args) {
 	return L"";
 }
 
-void StringUtils::ToCapitalize(std::wstring &str, const icu::Locale &icuLocale) {
-#ifdef USE_TO_TITLE_FOR_CAPITALIZE
-  Unicode::toTitle(str, icuLocale);
-#else
-  std::wstring result = Unicode::toCapitalize(str, icuLocale);
-  // TODO: Eliminate swap
-  str.swap(result);
-#endif
-  return;
-}
-
-void StringUtils::ToCapitalize(std::wstring &str, const std::locale &locale) {
-	icu::Locale icuLocale = Unicode::getICULocale(locale);
-#ifdef USE_TO_TITLE_FOR_CAPITALIZE
-  Unicode::toTitle(str, icuLocale);
-#else
- return StringUtils::ToCapitalize(str, icuLocale);
-#endif
-}
-
-void StringUtils::ToCapitalize(std::string &str, const icu::Locale &locale) {
-#ifdef USE_TO_TITLE_FOR_CAPITALIZE
-  Unicode::toTitle(str, locale);
-#else
-  std::string result = Unicode::toCapitalize(str, locale);
-	str.swap(result);
-#endif
-		return;
-}
-
-void StringUtils::ToCapitalize(std::string &str, const std::locale &locale) {
-  icu::Locale icuLocale = Unicode::getICULocale(locale);
-#ifdef USE_TO_TITLE_FOR_CAPITALIZE
-  Unicode::toTitle(str, icuLocale);
-#else
-  StringUtils::ToCapitalize(str, icuLocale);
-#endif
-	return;
-}
-
-void StringUtils::ToCapitalize(std::wstring &str) {
-  icu::Locale icuLocale = Unicode::getDefaultICULocale();
-#ifdef USE_TO_TITLE_FOR_CAPITALIZE
-  Unicode::toTitle(str, icuLocale);
-#else
-	StringUtils::ToCapitalize(str, icuLocale);
-#endif
-	return;
-}
-
-void StringUtils::ToCapitalize(std::string &str) {
-  icu::Locale icuLocale = Unicode::getDefaultICULocale();
-#ifdef USE_TO_TITLE_FOR_CAPITALIZE
-  Unicode::toTitle(str, icuLocale);
-#else
-  StringUtils::ToCapitalize(str, icuLocale);
-#endif
-	return;
-}
-
 void StringUtils::TitleCase(std::wstring &str, const std::locale &locale)
 {
   icu::Locale icuLocale = Unicode::getICULocale(locale);

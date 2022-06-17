@@ -504,7 +504,7 @@ void CGUITextLayout::ParseText(const std::wstring& text,
       if (currentStyle & FONT_STYLE_LOWERCASE)
         subText = UnicodeUtils::ToLower(subText);
       if (currentStyle & FONT_STYLE_CAPITALIZE)
-        StringUtils::ToCapitalize(subText);
+        subText = UnicodeUtils::ToCapitalize(subText);
       AppendToUTF32(subText, ((currentStyle & FONT_STYLE_MASK) << 24) | (currentColor << 16), parsedText);
       if (newLine)
         parsedText.push_back(L'\n');
@@ -528,7 +528,7 @@ void CGUITextLayout::ParseText(const std::wstring& text,
   if (currentStyle & FONT_STYLE_LOWERCASE)
     subText = UnicodeUtils::ToLower(subText);
   if (currentStyle & FONT_STYLE_CAPITALIZE)
-    StringUtils::ToCapitalize(subText);
+    subText = UnicodeUtils::ToCapitalize(subText);
   AppendToUTF32(subText, ((currentStyle & FONT_STYLE_MASK) << 24) | (currentColor << 16), parsedText);
 }
 

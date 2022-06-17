@@ -432,10 +432,10 @@ public:
   static const std::string normalize(const std::string &src, const StringOptions options,
       const NormalizerType normalizerType = NormalizerType::NFKC);
 
-  static const std::string toUpper(const std::string &src, const icu::Locale &locale);
+  static const std::string ToUpper(const std::string &src, const icu::Locale &locale);
   static const std::string toLower(const std::string &src, const icu::Locale &locale);
-  static const std::string toCapitalize(const std::string &src, const icu::Locale &locale);
-  static const std::wstring toCapitalize(const std::wstring &src, const icu::Locale &locale);
+  static const std::string ToCapitalize(const std::string &src, const icu::Locale &locale);
+  static const std::wstring ToCapitalize(const std::wstring &src, const icu::Locale &locale);
   static const std::wstring toTitle(const std::wstring &src, const icu::Locale &locale);
   static const std::string toTitle(const std::string &src, const icu::Locale &locale);
 
@@ -883,7 +883,7 @@ private:
     return icu::UnicodeString::fromUTF8(src);
   }
 
-  static void toUpper(UChar *p_u_src_buffer, int32_t u_src_length, icu::Locale locale,
+  static void ToUpper(UChar *p_u_src_buffer, int32_t u_src_length, icu::Locale locale,
       UChar *p_u_toupper_buffer, const int32_t u_toupper_buffer_size, int32_t &to_upper_length,
       UErrorCode &status);
 

@@ -122,13 +122,14 @@ TEST(TestUnicodeUtils, ToUpper)
   std::string refstr = "TEST";
 
   std::string varstr = "TeSt";
-  varstr = UnicodeUtils::ToUpper(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  std::string result;
+  result = UnicodeUtils::ToUpper(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 
   refstr = TestUnicodeUtils::UTF8_GERMAN_UPPER; // ÓÓSSCHLOË
   varstr = TestUnicodeUtils::UTF8_GERMAN_SAMPLE; // óóßChloë
-  varstr = UnicodeUtils::ToUpper(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::ToUpper(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
   // Lower: óósschloë
 }
 
@@ -136,95 +137,100 @@ TEST(TestUnicodeUtils, ToUpper_w)
 {
   std::wstring refstr = L"TEST";
   std::wstring varstr = L"TeSt";
-  varstr = UnicodeUtils::ToUpper(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+
+  std::wstring result;
+  result = UnicodeUtils::ToUpper(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 
   refstr = Unicode::utf8_to_wstring(std::string(TestUnicodeUtils::UTF8_GERMAN_UPPER)); // ÓÓSSCHLOË
   varstr = Unicode::utf8_to_wstring(std::string(TestUnicodeUtils::UTF8_GERMAN_SAMPLE)); // óóßChloë
-  varstr = UnicodeUtils::ToUpper(varstr);
-  int32_t result = UnicodeUtils::Compare(refstr, varstr);
-  EXPECT_EQ(result, 0);
+  result = UnicodeUtils::ToUpper(varstr);
+  int32_t cmp = UnicodeUtils::Compare(refstr, result);
+  EXPECT_EQ(cmp, 0);
 }
 
 TEST(TestUnicodeUtils, ToUpper_Locale)
 {
   std::string refstr = "TWITCH";
   std::string varstr = "Twitch";
-  varstr = UnicodeUtils::ToUpper(varstr, getCLocale());
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  std::string result;
+  result = UnicodeUtils::ToUpper(varstr, getCLocale());
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 
   refstr = "ABCÇDEFGĞH IİI JKLMNOÖPRSŞTUÜVYZ";
   varstr = "abcçdefgğh ıİi jklmnoöprsştuüvyz";
-  varstr = UnicodeUtils::ToUpper(varstr, getUSEnglishLocale());
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::ToUpper(varstr, getUSEnglishLocale());
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 
   refstr = "ABCÇDEFGĞH IİI JKLMNOÖPRSŞTUÜVYZ";
   varstr = "abcçdefgğh ıİi jklmnoöprsştuüvyz";
-  varstr = UnicodeUtils::ToUpper(varstr, getTurkicLocale());
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::ToUpper(varstr, getTurkicLocale());
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 
   refstr = "ABCÇDEFGĞH IİI JKLMNOÖPRSŞTUÜVYZ";
   varstr = "abcçdefgğh ıİi jklmnoöprsştuüvyz";
-  varstr = UnicodeUtils::ToUpper(varstr, getUkranianLocale());
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::ToUpper(varstr, getUkranianLocale());
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 
   refstr = TestUnicodeUtils::UTF8_GERMAN_UPPER; // ÓÓSSCHLOË
   varstr = TestUnicodeUtils::UTF8_GERMAN_SAMPLE; // óóßChloë
-  varstr = UnicodeUtils::ToUpper(varstr, getCLocale());
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::ToUpper(varstr, getCLocale());
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
   // Lower: óósschloë
 }
 
 TEST(TestUnicodeUtils, ToLower)
 {
   std::string refstr = "test";
-
   std::string varstr = "TeSt";
-  varstr = UnicodeUtils::ToLower(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  std::string result;
+
+  result = UnicodeUtils::ToLower(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 
   varstr = TestUnicodeUtils::UTF8_GERMAN_UPPER; // ÓÓSSCHLOË
   refstr = TestUnicodeUtils::UTF8_GERMAN_LOWER_SS; // óósschloë // Does not convert SS to ß
-  varstr = UnicodeUtils::ToLower(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::ToLower(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
   // Lower: óósschloë
 
   // ToLower of string with (with sharp-s) should not change it.
 
   varstr = TestUnicodeUtils::UTF8_GERMAN_SAMPLE; // óóßChloë
   refstr = TestUnicodeUtils::UTF8_GERMAN_LOWER; // óóßChloë
-  varstr = UnicodeUtils::ToLower(varstr);
-  int32_t result = UnicodeUtils::Compare(refstr, varstr);
-  EXPECT_EQ(result, 0);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::ToLower(varstr);
+  int32_t cmp = UnicodeUtils::Compare(refstr, result);
+  EXPECT_EQ(cmp, 0);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 }
 
 TEST(TestUnicodeUtils, ToLower_w)
 {
   std::wstring refstr = L"test";
-
   std::wstring varstr = L"TeSt";
-  varstr = UnicodeUtils::ToLower(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str()); // Binary compare should work
+
+  std::wstring result;
+  result = UnicodeUtils::ToLower(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str()); // Binary compare should work
 
   varstr = Unicode::utf8_to_wstring(std::string(TestUnicodeUtils::UTF8_GERMAN_UPPER)); // ÓÓSSCHLOË
   refstr = Unicode::utf8_to_wstring(std::string(TestUnicodeUtils::UTF8_GERMAN_LOWER_SS)); // óóßChloë
-  varstr = UnicodeUtils::ToLower(varstr);
-  int32_t result = UnicodeUtils::Compare(refstr, varstr);
-  EXPECT_EQ(result, 0);
+  result = UnicodeUtils::ToLower(varstr);
+  int32_t cmp = UnicodeUtils::Compare(refstr, result);
+  EXPECT_EQ(cmp, 0);
 
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
   // Lower: óósschloë
 
   // ToLower of string with (with sharp-s) should not change it.
 
   varstr = Unicode::utf8_to_wstring(std::string(TestUnicodeUtils::UTF8_GERMAN_SAMPLE)); // óóßChloë
   refstr = Unicode::utf8_to_wstring(std::string(TestUnicodeUtils::UTF8_GERMAN_LOWER)); // óóßchloë
-  varstr = UnicodeUtils::ToLower(varstr);
-  result = UnicodeUtils::Compare(refstr, varstr);
-  EXPECT_EQ(result, 0);
+  result = UnicodeUtils::ToLower(varstr);
+  cmp = UnicodeUtils::Compare(refstr, result);
+  EXPECT_EQ(cmp, 0);
 
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 }
 
 TEST(TestUnicodeUtils, Turkic_I)
@@ -394,33 +400,70 @@ TEST(TestUnicodeUtils, ToCapitalize)
 {
   std::string refstr = "Test";
   std::string varstr = "test";
-  UnicodeUtils::ToCapitalize(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+
+  std::string result;
+  result = UnicodeUtils::ToCapitalize(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 
   refstr = "Just A Test";
   varstr = "just a test";
-  UnicodeUtils::ToCapitalize(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::ToCapitalize(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 
   refstr = "Test -1;2:3, String For Case";
   varstr = "test -1;2:3, string for Case";
-  UnicodeUtils::ToCapitalize(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::ToCapitalize(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 
   refstr = "  JuST Another\t\tTEst:\nWoRKs ";
   varstr = "  juST another\t\ttEst:\nwoRKs ";
-  UnicodeUtils::ToCapitalize(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::ToCapitalize(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 
   refstr = "N.Y.P.D";
   varstr = "n.y.p.d";
-  UnicodeUtils::ToCapitalize(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::ToCapitalize(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 
   refstr = "N-Y-P-D";
   varstr = "n-y-p-d";
-  UnicodeUtils::ToCapitalize(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::ToCapitalize(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
+}
+
+TEST(TestUnicodeUtils, ToCapitalize_w)
+{
+  std::wstring refstr = L"Test";
+  std::wstring varstr = L"test";
+
+  std::wstring result;
+  result = UnicodeUtils::ToCapitalize(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
+
+  refstr = L"Just A Test";
+  varstr = L"just a test";
+  result = UnicodeUtils::ToCapitalize(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
+
+  refstr = L"Test -1;2:3, String For Case";
+  varstr = L"test -1;2:3, string for Case";
+  result = UnicodeUtils::ToCapitalize(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
+
+  refstr = L"  JuST Another\t\tTEst:\nWoRKs ";
+  varstr = L"  juST another\t\ttEst:\nwoRKs ";
+  result = UnicodeUtils::ToCapitalize(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
+
+  refstr = L"N.Y.P.D";
+  varstr = L"n.y.p.d";
+  result = UnicodeUtils::ToCapitalize(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
+
+  refstr = L"N-Y-P-D";
+  varstr = L"n-y-p-d";
+  result = UnicodeUtils::ToCapitalize(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 }
 
 TEST(TestUnicodeUtils, TitleCase)

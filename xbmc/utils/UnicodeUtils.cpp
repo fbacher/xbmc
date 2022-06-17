@@ -168,7 +168,7 @@ std::string UnicodeUtils::ToUpper(const std::string &str, const icu::Locale &loc
 		return upper;
 	}
 
-	upper = Unicode::toUpper(str, locale);
+	upper = Unicode::ToUpper(str, locale);
 	return upper;
 }
 
@@ -190,20 +190,23 @@ std::wstring UnicodeUtils::ToUpper(const std::wstring &str, const std::locale &l
 std::wstring UnicodeUtils::ToUpper(const std::wstring &str, const icu::Locale &locale) {
   std::wstring wUpper;
 	if (str.length() == 0)
+	{
 	  wUpper = std::wstring();
 		return wUpper;
-
+	}
 	std::string str_utf8 = Unicode::wstring_to_utf8(str);
-	const std::string upper = Unicode::toUpper(str_utf8, locale);
+	const std::string upper = Unicode::ToUpper(str_utf8, locale);
 	wUpper = Unicode::utf8_to_wstring(upper);
+	return wUpper;
 }
 
 std::wstring UnicodeUtils::ToUpper(const std::wstring &str) {
   std::wstring wUpper;
   if (str.length() == 0)
+  {
     wUpper = std::wstring();
     return wUpper;
-
+  }
   icu::Locale icuLocale = Unicode::getDefaultICULocale();
 	return UnicodeUtils::ToUpper(str, icuLocale);
 }
@@ -216,8 +219,10 @@ std::string UnicodeUtils::ToLower(const std::string &str, const std::locale &loc
 std::string UnicodeUtils::ToLower(const std::string &str, const icu::Locale &locale) {
   std::string lower;
 	if (str.length() == 0)
+	{
 	  lower = std::string();
 		return lower;
+	}
 
 	lower = Unicode::toLower(str, locale);
   return lower;
@@ -231,9 +236,10 @@ std::wstring UnicodeUtils::ToLower(const std::wstring &str, const std::locale &l
 std::wstring UnicodeUtils::ToLower(const std::wstring &str, const icu::Locale &locale) {
   std::wstring wLower;
 	if (str.length() == 0)
+	{
 	  wLower = std::wstring();
 		return wLower;
-
+	}
 	std::string str_utf8 = Unicode::wstring_to_utf8(str);
 	const std::string lower_utf8 = Unicode::toLower(str_utf8, locale);
 	wLower = Unicode::utf8_to_wstring(lower_utf8);
@@ -272,64 +278,68 @@ std::wstring UnicodeUtils::FoldCase(const std::wstring str, const StringOptions 
 	return result;
 }
 
-void UnicodeUtils::ToCapitalize(std::wstring &str, const icu::Locale &icuLocale) {
+std::wstring UnicodeUtils::ToCapitalize(const std::wstring &str, const icu::Locale &icuLocale) {
+  std::wstring result;
 #ifdef USE_TO_TITLE_FOR_CAPITALIZE
-  Unicode::toTitle(str, icuLocale);
+  result = Unicode::toTitle(str, icuLocale);
 #else
-  std::wstring result = Unicode::toCapitalize(str, icuLocale);
-  // TODO: Eliminate swap
-  str.swap(result);
+  result = Unicode::ToCapitalize(str, icuLocale);
 #endif
-  return;
+  return result;
 }
 
-void UnicodeUtils::ToCapitalize(std::wstring &str, const std::locale &locale) {
+std::wstring UnicodeUtils::ToCapitalize(const std::wstring &str, const std::locale &locale) {
 	icu::Locale icuLocale = Unicode::getICULocale(locale);
+	std::wstring result;
 #ifdef USE_TO_TITLE_FOR_CAPITALIZE
-  Unicode::toTitle(str, icuLocale);
+  result = Unicode::toTitle(str, icuLocale);
 #else
- return UnicodeUtils::ToCapitalize(str, icuLocale);
+ result = UnicodeUtils::ToCapitalize(str, icuLocale);
 #endif
+ return result;
 }
 
-void UnicodeUtils::ToCapitalize(std::string &str, const icu::Locale &locale) {
+std::string UnicodeUtils::ToCapitalize(const std::string &str, const icu::Locale &locale) {
+  std::string result;
 #ifdef USE_TO_TITLE_FOR_CAPITALIZE
-  Unicode::toTitle(str, locale);
+  result = Unicode::toTitle(str, locale);
 #else
-  std::string result = Unicode::toCapitalize(str, locale);
-	str.swap(result);
+  result = Unicode::ToCapitalize(str, locale);
 #endif
-		return;
+  return result;
 }
 
-void UnicodeUtils::ToCapitalize(std::string &str, const std::locale &locale) {
+std::string UnicodeUtils::ToCapitalize(const std::string &str, const std::locale &locale) {
   icu::Locale icuLocale = Unicode::getICULocale(locale);
+  std::string result;
 #ifdef USE_TO_TITLE_FOR_CAPITALIZE
-  Unicode::toTitle(str, icuLocale);
+  result = Unicode::toTitle(str, icuLocale);
 #else
-  UnicodeUtils::ToCapitalize(str, icuLocale);
+  result = UnicodeUtils::ToCapitalize(str, icuLocale);
 #endif
-	return;
+	return result;
 }
 
-void UnicodeUtils::ToCapitalize(std::wstring &str) {
+std::wstring UnicodeUtils::ToCapitalize(const std::wstring &str) {
   icu::Locale icuLocale = Unicode::getDefaultICULocale();
+  std::wstring result;
 #ifdef USE_TO_TITLE_FOR_CAPITALIZE
-  Unicode::toTitle(str, icuLocale);
+  result = Unicode::toTitle(str, icuLocale);
 #else
-	UnicodeUtils::ToCapitalize(str, icuLocale);
+	result = UnicodeUtils::ToCapitalize(str, icuLocale);
 #endif
-	return;
+	return result;
 }
 
-void UnicodeUtils::ToCapitalize(std::string &str) {
+std::string UnicodeUtils::ToCapitalize(const std::string &str) {
   icu::Locale icuLocale = Unicode::getDefaultICULocale();
+  std::string result;
 #ifdef USE_TO_TITLE_FOR_CAPITALIZE
-  Unicode::toTitle(str, icuLocale);
+  result = Unicode::toTitle(str, icuLocale);
 #else
-  UnicodeUtils::ToCapitalize(str, icuLocale);
+  result = UnicodeUtils::ToCapitalize(str, icuLocale);
 #endif
-	return;
+	return result;
 }
 
 void UnicodeUtils::TitleCase(std::wstring &str, const std::locale &locale)
@@ -396,8 +406,6 @@ bool UnicodeUtils::EqualsNoCase(const std::string &str1, const std::string &str2
 	int8_t rc = Unicode::utf8_strcasecmp(str1, str2, opt, normalize);
 
 	rc = rc == 0;
-   //std::cout << "EqualsNoCase 1 str1: " << str1 << " str2: " << str2 << " rc: "
-	//		<< (int) rc << std::endl;
 	return rc;
 }
 
@@ -423,8 +431,6 @@ int UnicodeUtils::Compare(const std::wstring &str1, const std::wstring &str2) {
 	int32_t str2_start = 0;
 	int rc = Unicode::strcmp(str1, str1_start, str1_length,
 			                     str2, str2_start, str2_length);
-	// std::cout << "Compare 1 str1: " << str1 << " str2: " << str2 << " n: " << n
-	// 		<< " rc: " << (int) rc << std::endl;
 
 	return rc;
 }
@@ -437,8 +443,6 @@ int UnicodeUtils::Compare(const std::string &str1, const std::string &str2) {
 	int32_t str2_start = 0;
 	int rc = Unicode::strcmp(str1, str1_start, str1_length,
 			                     str2, str2_start, str2_length);
-	// std::cout << "Compare 1 str1: " << str1 << " str2: " << str2 << " n: " << n
-	// 		<< " rc: " << (int) rc << std::endl;
 
 	return rc;
 }
@@ -491,7 +495,6 @@ int UnicodeUtils::CompareNoCase(const std::string &str1, const std::string &str2
 int UnicodeUtils::CompareNoCase(const char *s1, const char *s2,
 		size_t n /* = 0 */, StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */, const bool normalize /* = false */) {
 
-
 	std::string str1 = std::string(s1);
 	std::string str2 = std::string(s2);
 	return UnicodeUtils::CompareNoCase(str1, str2, n, opt, normalize);
@@ -538,8 +541,7 @@ std::string& UnicodeUtils::Trim(std::string &str) {
 std::string& UnicodeUtils::Trim(std::string &str, const char *const chars) {
 	std::string delChars = std::string(chars);
 	std::string result = Unicode::Trim(str, delChars, true, true);
-	 //+CLog::Log(LOGINFO, "UnicodeUtils::Trim str: {} delChars: {} result: {}\n",
-	//+		 orig, delChars, str);
+
   str.swap(result);
 	return str;
 }
@@ -611,10 +613,7 @@ std::string& UnicodeUtils::FindAndReplace(std::string &str, const std::string ol
 		const std::string newText) {
 	std::string orig = str;
 	 Unicode::findAndReplace(str, oldText, newText);
-		//CLog::Log(LOGINFO, "UnicodeUtils::FindAndReplace\n");
 
-	 //+CLog::Log(LOGINFO, "UnicodeUtils::FindAndReplace str: {} newText: {} result: {}\n",
-	 //+		 orig, newText, str);
 	 return str;
 }
 
@@ -633,10 +632,7 @@ std::string& UnicodeUtils::FindAndReplace(std::string &str, const char * oldText
 std::string UnicodeUtils::RegexReplaceAll(std::string &str, const std::string pattern,
 		const std::string newStr, const int flags)  {
 	 std::string result = Unicode::RegexReplaceAll(str, pattern, newStr, flags);
-		//CLog::Log(LOGINFO, "UnicodeUtils::RegexReplaceAll\n");
 
-	 //+CLog::Log(LOGINFO, "UnicodeUtils::RegexReplaceAll str: {} pattern: {} newStr: {} result: {}\n",
-	 //+		 str, pattern, newStr, result);
 	 return result;
 }
 
@@ -716,18 +712,10 @@ int UnicodeUtils::Replace(std::wstring &str, const std::wstring &oldStr,
 	std::string str_utf8_save = std::string(str_utf8);
 	std::string oldStr_utf8 = Unicode::wstring_to_utf8(oldStr);
 	std::string newStr_utf8 = Unicode::wstring_to_utf8(newStr);
-   //std::cout << "Replace (wide) str: " << str_utf8_save << "oldStr: "
-		//	<< oldStr_utf8 << " newStr: " << newStr_utf8 << std::endl;
 
 	int changes = UnicodeUtils::Replace(str_utf8, oldStr_utf8, newStr_utf8);
 
 	std::wstring result_w = Unicode::utf8_to_wstring(str_utf8);
-
-	//CLog::Log(LOGINFO, "UnicodeUtils::Replace_w\n");
-
-	//+ CLog::Log(LOGINFO, "UnicodeUtils::Replace_w input: {} #changes: %d oldStr: {} newStr: {}\n", str_utf8_save, changes, oldStr_utf8, newStr_utf8);
-	//+ CLog::Log(LOGINFO, "UnicodeUtils::Replace str: {}\n", str_utf8);
-
 
 	str.swap(result_w);
 	return changes;
@@ -802,12 +790,7 @@ std::vector<std::string> UnicodeUtils::Split(const std::string &input,
 		if (not input.empty()) // delimiter empty, so just return input, if
 			result.push_back(input);     // any. TODO: Verify that we return empty vector.
 	}
-//  CLog::Log(LOGINFO, "UnicodeUtils::Split\n");
 
-	 //+ CLog::Log(LOGINFO, "UnicodeUtils::Split input: {} delimiter: {} maxStrings: %d\n", orig, delimiter, iMaxStrings);
-  //+ for (int i = 0; i < result.size(); i++) {
-  //+	CLog::Log(LOGINFO, "UnicodeUtils::    result: {}\n", result[i]);
-  //+ }
 	return result;
 }
 
@@ -843,15 +826,6 @@ std::vector<std::string> UnicodeUtils::Split(const std::string &input,
 
 	std::string orig = input;
 	Unicode::SplitTo(std::back_inserter(result), input, delimiters);
-	/*+
-	 CLog::Log(LOGINFO, "UnicodeUtils::Split input: {}\n", orig);
-	 for (int i = 0; i < delimiters.size(); i++) {
-		 CLog::Log(LOGINFO, "UnicodeUtils::Split delimiter: {}\n", delimiters[i]);
-	 }
-	 for (int i = 0; i < result.size(); i++) {
-		 CLog::Log(LOGINFO, "UnicodeUtils::Split result: {}\n", result[i]);
-	 }
-	 +*/
 
 	return result;
 }
@@ -940,6 +914,8 @@ int UnicodeUtils::FindNumber(const std::string &strInput,
 	    to_underlying(RegexpFlag::UREGEX_LITERAL));
 	return numFound;
 }
+
+#ifdef UNICODE_STRING_DISABLE
 
 // Plane maps for MySQL utf8_general_ci (now known as utf8mb3_general_ci) collation
 // Derived from https://github.com/MariaDB/server/blob/10.5/strings/ctype-utf8.c
@@ -1181,6 +1157,7 @@ static const uint16_t* const planemap[256] = {
     NULL,    NULL,    planeFF
 };
 // clang-format on
+#endif
 
 bool UnicodeUtils::InitializeCollator(bool normalize /* = false */)
 {
@@ -1202,6 +1179,7 @@ int32_t UnicodeUtils::Collate(const std::wstring &left, const std::wstring &righ
 	return Unicode::Collate(left, right);
 }
 
+#ifdef UNICODE_STRING_DISABLE
 static wchar_t GetCollationWeight(const wchar_t &r) {
 	// Lookup the "weight" of a UTF8 char, equivalent lowercase ascii letter, in the plane map,
 	// the character comparison value used by using "accent folding" collation utf8_general_ci
@@ -1214,6 +1192,7 @@ static wchar_t GetCollationWeight(const wchar_t &r) {
 		return r;
 	return static_cast<wchar_t>(plane[r & 0xFF]);
 }
+#endif
 
 // Not sure what the real goal is here. I think it is just to see if the
 // strings are the same after case folding. (Normalizing might be a good
@@ -1235,6 +1214,8 @@ int64_t UnicodeUtils::AlphaNumericCompare(const wchar_t *left, const wchar_t *ri
 #endif
 	return result;
 }
+
+#ifdef UNICODE_STRING_DISABLE
 
 // Not sure what the real goal is here. I think it is just to see if the
 // strings are the same after case folding. (Normalizing might be a good
@@ -1354,6 +1335,8 @@ int64_t UnicodeUtils::AlphaNumericCompare_orig(const wchar_t *left,
 	}
 	return 0; // files are the same
 }
+#endif
+
 /*
  Convert the UTF8 character to which z points into a 31-bit Unicode point.
  Return how many bytes (0 to 3) of UTF8 data encode the character.
@@ -1392,6 +1375,8 @@ static uint32_t UTF8ToUnicode(const unsigned char *z, int nKey,
 	}
 	return c;
 }
+
+#ifdef UNICODE_STRING_DISABLE
 
 /*
  SQLite collating function, see sqlite3_create_collation
@@ -1524,6 +1509,7 @@ int UnicodeUtils::AlphaNumericCollation(int nKey1, const void* pKey1, int nKey2,
   // Compared characters of shortest are the same as longest, length determines order
   return (nKey1 - nKey2);
 }
+#endif
 
 int UnicodeUtils::DateStringToYYYYMMDD(const std::string &dateString) {
 	// TODO: I assume this is a fixed format for a database or something?

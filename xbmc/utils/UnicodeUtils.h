@@ -464,7 +464,7 @@ public:
    *        USE_TO_TITLE_FOR_CAPITALIZE not set)
    * \return str converted to "Title Case"
    */
-  static void ToCapitalize(std::wstring &str, const icu::Locale &locale);
+  static std::wstring ToCapitalize(const std::wstring &str, const icu::Locale &locale);
 
   /*!
    *  \brief Capitalizes a wstring using locale.
@@ -480,7 +480,7 @@ public:
    *        USE_TO_TITLE_FOR_CAPITALIZE not set)
    * \return str converted to "Title Case"
    */
-  static void ToCapitalize(std::wstring &str, const std::locale &locale);
+  static std::wstring ToCapitalize(const std::wstring &str, const std::locale &locale);
 
   /*!
    *  \brief Capitalizes a wstring using locale.
@@ -495,7 +495,7 @@ public:
    * \param str string to capitalize in place
    * \return str converted to "Title Case"
    */
-  static void ToCapitalize(std::wstring &str);
+  static std::wstring ToCapitalize(const std::wstring &str);
 
   /*!
    *  \brief Capitalizes a string using locale.
@@ -511,7 +511,7 @@ public:
    *        USE_TO_TITLE_FOR_CAPITALIZE not set)
    * \return str converted to "Title Case"
    */
-  static void ToCapitalize(std::string &str, const icu::Locale &locale);
+  static std::string ToCapitalize(const std::string &str, const icu::Locale &locale);
 
   /*!
    *  \brief Capitalizes a string using locale.
@@ -527,7 +527,7 @@ public:
    *        USE_TO_TITLE_FOR_CAPITALIZE not set)
    * \return str converted to "Title Case"
    */
-  static void ToCapitalize(std::string &str, const std::locale &locale);
+  static std::string ToCapitalize(const std::string &str, const std::locale &locale);
 
   /*!
    *  \brief Capitalizes a string using LangInfo::GetSystemLocale.
@@ -541,7 +541,7 @@ public:
    * \param str string to capitalize in place
    * \return str converted to "Title Case"
    */
-  static void ToCapitalize(std::string &str);
+  static std::string ToCapitalize(const std::string &str);
 
   /*!
    *  \brief TitleCase a wstring using locale.
