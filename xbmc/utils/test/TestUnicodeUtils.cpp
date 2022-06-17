@@ -35,6 +35,8 @@ enum EN
 };
 }
 
+namespace TestUnicodeUtils
+{
 // MULTICODEPOINT_CHARS
 
 // There are multiple ways to compose some graphemes. These are the same grapheme:
@@ -91,7 +93,7 @@ const char UTF8_GERMAN_LOWER[] =
 const char* UTF8_GERMAN_LOWER_SS =
 { "\xc3\xb3\xc3\xb3\x73\x73\x63\x68\x6c\x6f\xc3\xab" };
 // u"óósschloë";
-
+}
 static icu::Locale getCLocale()
 {
   icu::Locale c_locale = Unicode::getICULocale(std::locale::classic().name().c_str());
@@ -123,8 +125,8 @@ TEST(TestUnicodeUtils, ToUpper)
   varstr = UnicodeUtils::ToUpper(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-  refstr = UTF8_GERMAN_UPPER; // ÓÓSSCHLOË
-  varstr = UTF8_GERMAN_SAMPLE; // óóßChloë
+  refstr = TestUnicodeUtils::UTF8_GERMAN_UPPER; // ÓÓSSCHLOË
+  varstr = TestUnicodeUtils::UTF8_GERMAN_SAMPLE; // óóßChloë
   varstr = UnicodeUtils::ToUpper(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
   // Lower: óósschloë
@@ -137,8 +139,8 @@ TEST(TestUnicodeUtils, ToUpper_w)
   varstr = UnicodeUtils::ToUpper(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-  refstr = Unicode::utf8_to_wstring(std::string(UTF8_GERMAN_UPPER)); // ÓÓSSCHLOË
-  varstr = Unicode::utf8_to_wstring(std::string(UTF8_GERMAN_SAMPLE)); // óóßChloë
+  refstr = Unicode::utf8_to_wstring(std::string(TestUnicodeUtils::UTF8_GERMAN_UPPER)); // ÓÓSSCHLOË
+  varstr = Unicode::utf8_to_wstring(std::string(TestUnicodeUtils::UTF8_GERMAN_SAMPLE)); // óóßChloë
   varstr = UnicodeUtils::ToUpper(varstr);
   int32_t result = UnicodeUtils::Compare(refstr, varstr);
   EXPECT_EQ(result, 0);
@@ -166,8 +168,8 @@ TEST(TestUnicodeUtils, ToUpper_Locale)
   varstr = UnicodeUtils::ToUpper(varstr, getUkranianLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-  refstr = UTF8_GERMAN_UPPER; // ÓÓSSCHLOË
-  varstr = UTF8_GERMAN_SAMPLE; // óóßChloë
+  refstr = TestUnicodeUtils::UTF8_GERMAN_UPPER; // ÓÓSSCHLOË
+  varstr = TestUnicodeUtils::UTF8_GERMAN_SAMPLE; // óóßChloë
   varstr = UnicodeUtils::ToUpper(varstr, getCLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
   // Lower: óósschloë
@@ -181,16 +183,16 @@ TEST(TestUnicodeUtils, ToLower)
   varstr = UnicodeUtils::ToLower(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-  varstr = UTF8_GERMAN_UPPER; // ÓÓSSCHLOË
-  refstr = UTF8_GERMAN_LOWER_SS; // óósschloë // Does not convert SS to ß
+  varstr = TestUnicodeUtils::UTF8_GERMAN_UPPER; // ÓÓSSCHLOË
+  refstr = TestUnicodeUtils::UTF8_GERMAN_LOWER_SS; // óósschloë // Does not convert SS to ß
   varstr = UnicodeUtils::ToLower(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
   // Lower: óósschloë
 
   // ToLower of string with (with sharp-s) should not change it.
 
-  varstr = UTF8_GERMAN_SAMPLE; // óóßChloë
-  refstr = UTF8_GERMAN_LOWER; // óóßChloë
+  varstr = TestUnicodeUtils::UTF8_GERMAN_SAMPLE; // óóßChloë
+  refstr = TestUnicodeUtils::UTF8_GERMAN_LOWER; // óóßChloë
   varstr = UnicodeUtils::ToLower(varstr);
   int32_t result = UnicodeUtils::Compare(refstr, varstr);
   EXPECT_EQ(result, 0);
@@ -205,8 +207,8 @@ TEST(TestUnicodeUtils, ToLower_w)
   varstr = UnicodeUtils::ToLower(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str()); // Binary compare should work
 
-  varstr = Unicode::utf8_to_wstring(std::string(UTF8_GERMAN_UPPER)); // ÓÓSSCHLOË
-  refstr = Unicode::utf8_to_wstring(std::string(UTF8_GERMAN_LOWER_SS)); // óóßChloë
+  varstr = Unicode::utf8_to_wstring(std::string(TestUnicodeUtils::UTF8_GERMAN_UPPER)); // ÓÓSSCHLOË
+  refstr = Unicode::utf8_to_wstring(std::string(TestUnicodeUtils::UTF8_GERMAN_LOWER_SS)); // óóßChloë
   varstr = UnicodeUtils::ToLower(varstr);
   int32_t result = UnicodeUtils::Compare(refstr, varstr);
   EXPECT_EQ(result, 0);
@@ -216,8 +218,8 @@ TEST(TestUnicodeUtils, ToLower_w)
 
   // ToLower of string with (with sharp-s) should not change it.
 
-  varstr = Unicode::utf8_to_wstring(std::string(UTF8_GERMAN_SAMPLE)); // óóßChloë
-  refstr = Unicode::utf8_to_wstring(std::string(UTF8_GERMAN_LOWER)); // óóßchloë
+  varstr = Unicode::utf8_to_wstring(std::string(TestUnicodeUtils::UTF8_GERMAN_SAMPLE)); // óóßChloë
+  refstr = Unicode::utf8_to_wstring(std::string(TestUnicodeUtils::UTF8_GERMAN_LOWER)); // óóßchloë
   varstr = UnicodeUtils::ToLower(varstr);
   result = UnicodeUtils::Compare(refstr, varstr);
   EXPECT_EQ(result, 0);
@@ -466,8 +468,8 @@ TEST(TestUnicodeUtils, EqualsNoCase)
 
 TEST(TestUnicodeUtils, EqualsNoCase_Normalize)
 {
-  const std::string refstr = UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5;
-  const std::string varstr = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
+  const std::string refstr = TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5;
+  const std::string varstr = std::string(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
   EXPECT_FALSE(UnicodeUtils::EqualsNoCase(refstr, varstr));
   EXPECT_TRUE(UnicodeUtils::EqualsNoCase(refstr, varstr, StringOptions::FOLD_CASE_DEFAULT, true));
 }
@@ -536,7 +538,7 @@ TEST(TestUnicodeUtils, Left_Advanced)
 
   // Multi-byte characters character count != byte count
 
-  origstr = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1); // 3 codepoints, 1 char
+  origstr = std::string(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1); // 3 codepoints, 1 char
   refstr = "";
   varstr = UnicodeUtils::Left(origstr, 0, true, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
@@ -544,19 +546,19 @@ TEST(TestUnicodeUtils, Left_Advanced)
   // Interesting case. All five VARIENTs can be normalized
   // to a single codepoint. We are NOT normalizing here.
 
-  origstr = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
-  refstr = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5); // 2 codepoints, 1 char
+  origstr = std::string(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
+  refstr = std::string(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5); // 2 codepoints, 1 char
   varstr = UnicodeUtils::Left(origstr, 2, true, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-  origstr = std::string(UTF8_GERMAN_SAMPLE); // u"óóßChloë"
+  origstr = std::string(TestUnicodeUtils::UTF8_GERMAN_SAMPLE); // u"óóßChloë"
   refstr = "óó";
   varstr = UnicodeUtils::Left(origstr, 2, true, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   // Get leftmost substring removing n characters from end of string
 
-  origstr = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
+  origstr = std::string(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
   refstr = std::string("");
   varstr = UnicodeUtils::Left(origstr, 1, false, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
@@ -564,17 +566,17 @@ TEST(TestUnicodeUtils, Left_Advanced)
   // Interesting case. All five VARIENTs can be normalized
   // to a single codepoint. We are NOT normalizing here.
 
-  origstr = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
+  origstr = std::string(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
   refstr = std::string("");
   varstr = UnicodeUtils::Left(origstr, 2, false, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-  origstr = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
+  origstr = std::string(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
   refstr = "";
   varstr = UnicodeUtils::Left(origstr, 5, false, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-  origstr = std::string(UTF8_GERMAN_SAMPLE); // u"óóßChloë"
+  origstr = std::string(TestUnicodeUtils::UTF8_GERMAN_SAMPLE); // u"óóßChloë"
   refstr = "óóßChl";
   varstr = UnicodeUtils::Left(origstr, 2, false, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
@@ -808,30 +810,33 @@ TEST(TestUnicodeUtils, FoldCase)
    * i (Dotted small I)  \u0069 -> i (Dotted small I)  \u0069
    * ı (Dotless small I) \u0131 -> ı (Dotless small I) \u0131
    */
-  std::string s1 = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5);
-  std::string s2 = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
-  UnicodeUtils::FoldCase(s1);
-  UnicodeUtils::FoldCase(s2);
+  std::string s1 = std::string(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5);
+  std::string s2 = std::string(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
+  std::string r1;
+  std::string r2;
+
+  s1 = UnicodeUtils::FoldCase(s1);
+  s2 = UnicodeUtils::FoldCase(s2);
   int32_t result = UnicodeUtils::Compare(s1, s2);
   EXPECT_NE(result, 0);
 
-  s1 = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5);
-  s2 = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
-  UnicodeUtils::FoldCase(s1, StringOptions::FOLD_CASE_DEFAULT);
-  UnicodeUtils::FoldCase(s2, StringOptions::FOLD_CASE_DEFAULT);
+  s1 = std::string(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5);
+  s2 = std::string(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
+  r1 = UnicodeUtils::FoldCase(s1, StringOptions::FOLD_CASE_DEFAULT);
+  r2 = UnicodeUtils::FoldCase(s2, StringOptions::FOLD_CASE_DEFAULT);
   // td::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = UnicodeUtils::Compare(s1, s2);
+  result = UnicodeUtils::Compare(r1, r2);
   EXPECT_NE(result, 0);
 
   s1 = "I İ İ i ı";
   s2 = "i i̇ i̇ i ı";
 
-  UnicodeUtils::FoldCase(s1, StringOptions::FOLD_CASE_DEFAULT);
-  UnicodeUtils::FoldCase(s2, StringOptions::FOLD_CASE_DEFAULT);
+  r1 = UnicodeUtils::FoldCase(s1, StringOptions::FOLD_CASE_DEFAULT);
+  r2 = UnicodeUtils::FoldCase(s2, StringOptions::FOLD_CASE_DEFAULT);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = UnicodeUtils::Compare(s1, s2);
+  result = UnicodeUtils::Compare(r1, r2);
   EXPECT_EQ(result, 0);
 
   std::string I = "I";
@@ -846,11 +851,11 @@ TEST(TestUnicodeUtils, FoldCase)
   s1 = I + I_DOT + i + i_DOTLESS + i_COMBINING_DOUBLE_DOT;
   s2 = i + i_COMBINING_DOUBLE_DOT + i + i_DOTLESS + i_COMBINING_DOUBLE_DOT;
 
-  UnicodeUtils::FoldCase(s1, StringOptions::FOLD_CASE_DEFAULT);
-  UnicodeUtils::FoldCase(s2, StringOptions::FOLD_CASE_DEFAULT);
+  r1 = UnicodeUtils::FoldCase(s1, StringOptions::FOLD_CASE_DEFAULT);
+  r2 = UnicodeUtils::FoldCase(s2, StringOptions::FOLD_CASE_DEFAULT);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = UnicodeUtils::Compare(s1, s2);
+  result = UnicodeUtils::Compare(r1, r2);
   EXPECT_EQ(result, 0);
   /*
    FOLD_CASE_EXCLUDE_SPECIAL_I
@@ -863,11 +868,11 @@ TEST(TestUnicodeUtils, FoldCase)
   s1 = I + I_DOT + i + i_DOTLESS;
   s2 = i_DOTLESS + i + i + i_DOTLESS;
 
-  UnicodeUtils::FoldCase(s1, StringOptions::FOLD_CASE_EXCLUDE_SPECIAL_I);
-  UnicodeUtils::FoldCase(s2, StringOptions::FOLD_CASE_EXCLUDE_SPECIAL_I);
+  r1 = UnicodeUtils::FoldCase(s1, StringOptions::FOLD_CASE_EXCLUDE_SPECIAL_I);
+  r2 = UnicodeUtils::FoldCase(s2, StringOptions::FOLD_CASE_EXCLUDE_SPECIAL_I);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = UnicodeUtils::Compare(s1, s2);
+  result = UnicodeUtils::Compare(r1, r2);
   EXPECT_EQ(result, 0);
 
   /*
@@ -883,43 +888,47 @@ TEST(TestUnicodeUtils, FoldCase)
   // std::cout << "Turkic orig s1: " << s1 << std::endl;
   // std::cout << "Turkic orig s2: " << s2 << std::endl;
 
-  UnicodeUtils::FoldCase(s1, StringOptions::FOLD_CASE_DEFAULT);
-  UnicodeUtils::FoldCase(s2, StringOptions::FOLD_CASE_DEFAULT);
+  r1 = UnicodeUtils::FoldCase(s1, StringOptions::FOLD_CASE_DEFAULT);
+  r2 = UnicodeUtils::FoldCase(s2, StringOptions::FOLD_CASE_DEFAULT);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
 
-  result = UnicodeUtils::Compare(s1, s2);
+  result = UnicodeUtils::Compare(r1, r2);
   EXPECT_EQ(result, 0);
 
 }
 
 TEST(TestUnicodeUtils, FoldCase_W)
 {
-  std::wstring w_s1 = Unicode::utf8_to_wstring(std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5));
-  std::wstring w_s2 = Unicode::utf8_to_wstring(std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1));
-  UnicodeUtils::FoldCase(w_s1);
-  UnicodeUtils::FoldCase(w_s2);
-  int32_t result = UnicodeUtils::Compare(w_s1, w_s2);
+  std::wstring w_s1 = Unicode::utf8_to_wstring(std::string(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5));
+  std::wstring w_s2 = Unicode::utf8_to_wstring(std::string(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1));
+
+  std::wstring r1;
+  std::wstring r2;
+
+  r1 = UnicodeUtils::FoldCase(w_s1);
+  r2 = UnicodeUtils::FoldCase(w_s2);
+  int32_t result = UnicodeUtils::Compare(r1, r2);
   EXPECT_NE(result, 0);
 
-  w_s1 = Unicode::utf8_to_wstring(std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5));
-  w_s2 = Unicode::utf8_to_wstring(std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1));
-  UnicodeUtils::FoldCase(w_s1, StringOptions::FOLD_CASE_DEFAULT);
-  UnicodeUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_DEFAULT);
+  w_s1 = Unicode::utf8_to_wstring(std::string(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5));
+  w_s2 = Unicode::utf8_to_wstring(std::string(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1));
+  r1 = UnicodeUtils::FoldCase(w_s1, StringOptions::FOLD_CASE_DEFAULT);
+  r2 = UnicodeUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_DEFAULT);
   // td::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = UnicodeUtils::Compare(w_s1, w_s2);
+  result = UnicodeUtils::Compare(r1, r2);
   EXPECT_NE(result, 0);
 
   std::string s1 = "I İ İ i ı";
   std::string s2 = "i i̇ i̇ i ı";
   w_s1 = Unicode::utf8_to_wstring(s1);
   w_s2 = Unicode::utf8_to_wstring(s2);
-  UnicodeUtils::FoldCase(w_s1, StringOptions::FOLD_CASE_DEFAULT);
-  UnicodeUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_DEFAULT);
+  r1 = UnicodeUtils::FoldCase(w_s1, StringOptions::FOLD_CASE_DEFAULT);
+  r2 = UnicodeUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_DEFAULT);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = UnicodeUtils::Compare(w_s1, w_s2);
+  result = UnicodeUtils::Compare(r1, r2);
   EXPECT_EQ(result, 0);
 
   std::string I = "I";
@@ -936,11 +945,11 @@ TEST(TestUnicodeUtils, FoldCase_W)
 
   w_s1 = Unicode::utf8_to_wstring(s1);
   w_s2 = Unicode::utf8_to_wstring(s2);
-  UnicodeUtils::FoldCase(w_s1, StringOptions::FOLD_CASE_DEFAULT);
-  UnicodeUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_DEFAULT);
+  r1 = UnicodeUtils::FoldCase(w_s1, StringOptions::FOLD_CASE_DEFAULT);
+  r2 = UnicodeUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_DEFAULT);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = UnicodeUtils::Compare(w_s1, w_s2);
+  result = UnicodeUtils::Compare(r1, r2);
 
   EXPECT_EQ(result, 0);
   /*
@@ -956,11 +965,11 @@ TEST(TestUnicodeUtils, FoldCase_W)
 
   w_s1 = Unicode::utf8_to_wstring(s1);
   w_s2 = Unicode::utf8_to_wstring(s2);
-  UnicodeUtils::FoldCase(w_s1, StringOptions::FOLD_CASE_EXCLUDE_SPECIAL_I);
-  UnicodeUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_EXCLUDE_SPECIAL_I);
+  r1 = UnicodeUtils::FoldCase(w_s1, StringOptions::FOLD_CASE_EXCLUDE_SPECIAL_I);
+  r2 = UnicodeUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_EXCLUDE_SPECIAL_I);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = UnicodeUtils::Compare(w_s1, w_s2);
+  result = UnicodeUtils::Compare(r1, r2);
   EXPECT_EQ(result, 0);
 
   /*
@@ -978,11 +987,11 @@ TEST(TestUnicodeUtils, FoldCase_W)
 
   w_s1 = Unicode::utf8_to_wstring(s1);
   w_s2 = Unicode::utf8_to_wstring(s2);
-  UnicodeUtils::FoldCase(w_s1, StringOptions::FOLD_CASE_DEFAULT);
-  UnicodeUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_DEFAULT);
+  r1 = UnicodeUtils::FoldCase(w_s1, StringOptions::FOLD_CASE_DEFAULT);
+  r2 = UnicodeUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_DEFAULT);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = UnicodeUtils::Compare(w_s1, w_s2);
+  result = UnicodeUtils::Compare(r1, r2);
   EXPECT_EQ(result, 0);
 }
 
@@ -1010,29 +1019,29 @@ TEST(TestUnicodeUtils, Normalize)
   // The FOLD_CASE_DEFAULT option (which only impacts NFKD and maybe NFKC)
   // is not being tested, neither are the other alternatives to it.
 
-  std::string s1 = UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
+  std::string s1 = TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
   std::string result = UnicodeUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFD);
-  int cmp = UnicodeUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_2);
+  int cmp = UnicodeUtils::Compare(result, TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_2);
   EXPECT_EQ(cmp, 0);
 
-  s1 = UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
+  s1 = TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
   result = UnicodeUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFC);
-  cmp = UnicodeUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5);
+  cmp = UnicodeUtils::Compare(result, TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5);
   EXPECT_EQ(cmp, 0);
 
-  s1 = UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
+  s1 = TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
   result = UnicodeUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFKC);
-  cmp = UnicodeUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5);
+  cmp = UnicodeUtils::Compare(result, TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5);
   EXPECT_EQ(cmp, 0);
 
-  s1 = UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
+  s1 = TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
   result = UnicodeUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFD);
-  cmp = UnicodeUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_2);
+  cmp = UnicodeUtils::Compare(result, TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_2);
   EXPECT_EQ(cmp, 0);
 
-  s1 = UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
+  s1 = TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
   result = UnicodeUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFKD);
-  cmp = UnicodeUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_2);
+  cmp = UnicodeUtils::Compare(result, TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_2);
   EXPECT_EQ(cmp, 0);
 }
 
@@ -1106,9 +1115,9 @@ TEST(TestUnicodeUtils, Collate)
 
   EXPECT_TRUE(Unicode::InitializeCollator(getTurkicLocale(), true));
   const std::wstring s3 = std::wstring(
-      Unicode::utf8_to_wstring(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5));
+      Unicode::utf8_to_wstring(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5));
   const std::wstring s4 = std::wstring(
-      Unicode::utf8_to_wstring(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1));
+      Unicode::utf8_to_wstring(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1));
   var = UnicodeUtils::Collate(s3, s4);
   EXPECT_EQ(var, 0);
 
@@ -1163,6 +1172,7 @@ TEST(TestUnicodeUtils, utf8_strlen)
   EXPECT_EQ(ref, var);
 }
 
+#ifdef UNICODE_STRING_DISABLE
 TEST(TestUnicodeUtils, SecondsToTimeString)
 {
   std::string refstr;
@@ -1172,6 +1182,7 @@ TEST(TestUnicodeUtils, SecondsToTimeString)
   varstr = UnicodeUtils::SecondsToTimeString(77455);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
+#endif
 
 TEST(TestUnicodeUtils, IsNaturalNumber)
 {
@@ -1203,6 +1214,7 @@ TEST(TestUnicodeUtils, IsInteger)
   EXPECT_FALSE(UnicodeUtils::IsInteger(""));
 }
 
+#ifdef UNICODE_STRING_DISABLE
 TEST(TestUnicodeUtils, SizeToString)
 {
   std::string ref;
@@ -1216,11 +1228,14 @@ TEST(TestUnicodeUtils, SizeToString)
   var = UnicodeUtils::SizeToString(0);
   EXPECT_STREQ(ref.c_str(), var.c_str());
 }
+#endif
 
+#ifdef UNICODE_STRING_DISABLE
 TEST(TestUnicodeUtils, EmptyString)
 {
   EXPECT_STREQ("", UnicodeUtils::Empty.c_str());
 }
+#endif
 
 TEST(TestUnicodeUtils, FindWord)
 {

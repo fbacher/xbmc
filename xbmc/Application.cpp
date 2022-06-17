@@ -92,6 +92,7 @@
 #include "utils/FileExtensionProvider.h"
 #include "utils/SystemInfo.h"
 #include "utils/TimeUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/XTimeUtils.h"
 #include "utils/log.h"
 #include "windowing/WinSystem.h"
@@ -3486,8 +3487,7 @@ void CApplication::PrintStartupLog()
   std::string hostname("[unknown]");
   m_ServiceManager->GetNetwork().GetHostName(hostname);
   CLog::Log(LOGINFO, "Local hostname: {}", hostname);
-  std::string lowerAppName = CCompileInfo::GetAppName();
-  StringUtils::FoldCase(lowerAppName);
+  std::string lowerAppName = UnicodeUtils::FoldCase(CCompileInfo::GetAppName());
   CLog::Log(LOGINFO, "Log File is located: {}.log",
             CSpecialProtocol::TranslatePath("special://logpath/" + lowerAppName));
   CRegExp::LogCheckUtf8Support();

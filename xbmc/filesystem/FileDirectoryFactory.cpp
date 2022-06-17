@@ -35,6 +35,7 @@
 #include "playlists/PlayListFactory.h"
 #include "playlists/SmartPlayList.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 using namespace ADDON;
@@ -64,7 +65,7 @@ IFileDirectory* CFileDirectoryFactory::Create(const CURL& url, CFileItem* pItem,
 
   // Get file extensions to find addon related to it.
   std::string strExtension = URIUtils::GetExtension(url);
-  StringUtils::FoldCase(strExtension);
+  strExtension = UnicodeUtils::FoldCase(strExtension);
 
   if (!strExtension.empty() && CServiceBroker::IsBinaryAddonCacheUp())
   {

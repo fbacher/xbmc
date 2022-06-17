@@ -24,6 +24,7 @@
 #include "utils/CharsetConverter.h"
 #include "utils/LangCodeExpander.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/XMLUtils.h"
@@ -142,8 +143,7 @@ static std::string ToSettingTimeFormat(const CDateTime& time, const std::string&
 
 static CTemperature::Unit StringToTemperatureUnit(const std::string& temperatureUnit)
 {
-  std::string unit(temperatureUnit);
-  StringUtils::FoldCase(unit);
+  std::string unit = UnicodeUtils::FoldCase(temperatureUnit);
 
   for (const TemperatureInfo& info : temperatureInfo)
   {
@@ -156,8 +156,7 @@ static CTemperature::Unit StringToTemperatureUnit(const std::string& temperature
 
 static CSpeed::Unit StringToSpeedUnit(const std::string& speedUnit)
 {
-  std::string unit(speedUnit);
-  StringUtils::FoldCase(unit);
+  std::string unit = UnicodeUtils::FoldCase(speedUnit);
 
   for (const SpeedInfo& info : speedInfo)
   {

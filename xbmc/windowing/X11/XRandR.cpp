@@ -11,6 +11,7 @@
 #include "CompileInfo.h"
 #include "threads/SystemClock.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/XTimeUtils.h"
 #include "utils/log.h"
@@ -62,8 +63,7 @@ bool CXRandR::Query(bool force, bool ignoreoff)
 bool CXRandR::Query(bool force, int screennum, bool ignoreoff)
 {
   std::string cmd;
-  std::string appname = CCompileInfo::GetAppName();
-  StringUtils::FoldCase(appname);
+  std::string appname = UnicodeUtils::FoldCase(CCompileInfo::GetAppName());
   if (getenv("KODI_BIN_HOME"))
   {
     cmd  = getenv("KODI_BIN_HOME");
@@ -152,8 +152,7 @@ bool CXRandR::TurnOffOutput(const std::string& name)
     return false;
 
   std::string cmd;
-  std::string appname = CCompileInfo::GetAppName();
-  StringUtils::FoldCase(appname);
+  std::string appname = UnicodeUtils::FoldCase(CCompileInfo::GetAppName());
 
   if (getenv("KODI_BIN_HOME"))
   {
@@ -326,8 +325,7 @@ bool CXRandR::SetMode(const XOutput& output, const XMode& mode)
 
   m_currentOutput = outputFound.name;
   m_currentMode = modeFound.id;
-  std::string appname = CCompileInfo::GetAppName();
-  StringUtils::FoldCase(appname);
+  std::string appname = UnicodeUtils::FoldCase(CCompileInfo::GetAppName());
   char cmd[255];
 
   if (getenv("KODI_BIN_HOME"))
@@ -420,8 +418,7 @@ void CXRandR::LoadCustomModeLinesToAllOutputs(void)
     StringUtils::Trim(name);
     strModeLine = modeline->FirstChild()->Value();
     StringUtils::Trim(strModeLine);
-    std::string appname = CCompileInfo::GetAppName();
-    StringUtils::FoldCase(appname);
+    std::string appname = UnicodeUtils::FoldCase(CCompileInfo::GetAppName());
 
     if (getenv("KODI_BIN_HOME"))
     {

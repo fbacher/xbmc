@@ -396,7 +396,7 @@ public:
     * See StringOptions for the more details.
     */
 
-  static const std::wstring toFold(std::wstring &src, const StringOptions options);
+  static const std::wstring toFold(const std::wstring &src, const StringOptions options);
 
   /*!
    *  \brief Folds the case of a wstring, independent of Locale.
@@ -424,7 +424,7 @@ public:
    * See StringOptions for the more details.
    */
 
-  static const std::string toFold(std::string &src, const StringOptions options);
+  static const std::string toFold(const std::string &src, const StringOptions options);
 
   static const std::wstring normalize(const std::wstring &src, const StringOptions option,
       const NormalizerType normalizerType = NormalizerType::NFKC);

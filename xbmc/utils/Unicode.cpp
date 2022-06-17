@@ -741,12 +741,16 @@ const std::string Unicode::toTitle(const std::string &src, const icu::Locale &lo
   return utf8Result;
 }
 
-const std::wstring Unicode::toFold(std::wstring &src, const StringOptions options)
+const std::wstring Unicode::toFold(const std::wstring &src, const StringOptions options)
 {
   // ICU wchar_t support is spotty. Convert to native UChars (UTF-16).
 
+  std::wstring result;
   if (src.length() == 0)
-    return src;
+  {
+    result = std::wstring(src);
+    return result;
+  }
 
   size_t u_src_size = Unicode::getUCharBufferSize(src.length(), 2);
   UChar u_src[u_src_size];
@@ -768,9 +772,9 @@ const std::wstring Unicode::toFold(std::wstring &src, const StringOptions option
   int wchar_buffer_size = Unicode::getWCharBufferSize(folded_length, 2);
   wchar_t wchar_buffer[wchar_buffer_size];
   UChar_to_wchar(u_dest, wchar_buffer, wchar_buffer_size, destLength, folded_length);
-  src.assign(wchar_buffer, destLength);
+  result.assign(wchar_buffer, destLength);
 
-  return src;
+  return result;
 
 }
 
@@ -789,8 +793,12 @@ const std::string Unicode::utf8Fold(const std::string &src, const int32_t option
 {
   // Note: very similar to using ucasemap_utf8FoldCase
 
+  std::string result;
   if (src.length() == 0)
-    return src;
+  {
+    result = std::string(src);
+    return result;
+  }
 
   UErrorCode status = U_ZERO_ERROR;
   // Create buffer on stack
@@ -799,7 +807,6 @@ const std::string Unicode::utf8Fold(const std::string &src, const int32_t option
   icu::CheckedArrayByteSink sink = icu::CheckedArrayByteSink(buffer, bufferSize);
 
   Unicode::toFold(icu::StringPiece(src), sink, status, options);
-  std::string result;
 
   if (U_FAILURE(status))
   {
@@ -808,18 +815,19 @@ const std::string Unicode::utf8Fold(const std::string &src, const int32_t option
     {
       CLog::Log(LOGERROR, "Error in Unicode::utf8Fold: buffer not large enough need: {}",
           sink.NumberOfBytesAppended());
-      return src;
+      result = std::string(src);
+      return result;
     }
     else
     {
       CLog::Log(LOGERROR, "Error in Unicode::utf8Fold: {}", status);
     }
-    result = src;
+    result = std::string(src);
   }
   else
   {
     size_t size = sink.NumberOfBytesWritten();
-    result = std::string(buffer, size);
+    result.assign(buffer, size);
   }
   return result;
 }
@@ -835,12 +843,14 @@ const std::string Unicode::utf8Fold(const std::string &src, const int32_t option
  \return folded string
  */
 
-const std::string Unicode::toFold(std::string &src, const StringOptions options)
+const std::string Unicode::toFold(const std::string &src, const StringOptions options)
 {
-
+  std::string result;
   if (src.length() == 0)
-    return src;
-
+  {
+    result = std::string(src);
+    return result;
+  }
   UErrorCode status = U_ZERO_ERROR;
   // Create buffer on stack
   int32_t bufferSize = Unicode::getBasicUTF8BufferSize(src.length(), 1.5);
@@ -856,20 +866,22 @@ const std::string Unicode::toFold(std::string &src, const StringOptions options)
     {
       CLog::Log(LOGERROR, "Error in Unicode::toFold: buffer not large enough need: {}",
           sink.NumberOfBytesAppended());
-      return src;
+      result = std::string(src);
+      return result;
     }
     else
     {
       CLog::Log(LOGERROR, "Error in Unicode::toFold: {}", status);
-      return src;
+      result = std::string(src);
+      return result;
     }
   }
   else
   {
     size_t size = sink.NumberOfBytesWritten();
-    src.assign(buffer, size);
+    result.assign(buffer, size);
   }
-  return src;
+  return result;
 }
 
 /*! \brief PRIVATE Folds the case of a string.

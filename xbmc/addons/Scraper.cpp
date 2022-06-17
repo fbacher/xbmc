@@ -31,6 +31,7 @@
 #include "utils/ScraperParser.h"
 #include "utils/ScraperUrl.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/XMLUtils.h"
 #include "utils/log.h"
@@ -970,9 +971,9 @@ std::vector<CScraperUrl> CScraper::FindMovie(XFILE::CCurlFile &fcurl,
 
         // calculate the relevance of this hit
         std::string sCompareTitle = scurlMovie.GetTitle();
-        StringUtils::FoldCase(sCompareTitle);
+        sCompareTitle = UnicodeUtils::FoldCase(sCompareTitle);
         std::string sMatchTitle = sTitle;
-        StringUtils::FoldCase(sMatchTitle);
+        sMatchTitle = UnicodeUtils::FoldCase(sMatchTitle);
 
         /*
          * TODO: Need Unicode fuzzy compare

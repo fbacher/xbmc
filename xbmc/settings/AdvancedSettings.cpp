@@ -24,6 +24,7 @@
 #include "utils/LangCodeExpander.h"
 #include "utils/StringUtils.h"
 #include "utils/SystemInfo.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/XMLUtils.h"
@@ -1500,7 +1501,7 @@ void CAdvancedSettings::MigrateOldArtSettings()
       std::vector<std::string> thumbs2;
       for (auto& it : thumbs1)
       {
-        StringUtils::FoldCase(it);
+        it.assign(UnicodeUtils::FoldCase(it));
         if (std::find(thumbs2.begin(), thumbs2.end(), it) == thumbs2.end())
           thumbs2.emplace_back(it);
       }

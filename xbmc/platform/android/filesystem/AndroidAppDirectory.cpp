@@ -13,6 +13,7 @@
 #include "URL.h"
 #include "filesystem/File.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
@@ -27,8 +28,7 @@ bool CAndroidAppDirectory::GetDirectory(const CURL& url, CFileItemList &items)
   std::string dirname = url.GetFileName();
   URIUtils::RemoveSlashAtEnd(dirname);
   CLog::Log(LOGDEBUG, "CAndroidAppDirectory::GetDirectory: {}", dirname);
-  std::string appName = CCompileInfo::GetAppName();
-  StringUtils::FoldCase(appName);
+  std::string appName = UnicodeUtils::FoldCase(CCompileInfo::GetAppName());
   std::string className = CCompileInfo::GetPackage();
 
   if (dirname == "apps")

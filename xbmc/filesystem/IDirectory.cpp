@@ -13,6 +13,7 @@
 #include "guilib/GUIKeyboardFactory.h"
 #include "messaging/helpers/DialogOKHelper.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 
 using namespace KODI::MESSAGING;
@@ -102,7 +103,7 @@ void IDirectory::SetMask(const std::string& strMask)
 {
   m_strFileMask = strMask;
   // ensure it's completed with a | so that filtering is easy.
-  StringUtils::FoldCase(m_strFileMask);
+  m_strFileMask = UnicodeUtils::FoldCase(m_strFileMask);
   if (m_strFileMask.size() && m_strFileMask[m_strFileMask.size() - 1] != '|')
     m_strFileMask += '|';
 }

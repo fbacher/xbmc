@@ -13,6 +13,7 @@
 #include "addons/binary-addons/AddonDll.h"
 #include "addons/kodi-dev-kit/include/kodi/gui/ListItem.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
 
@@ -330,9 +331,7 @@ void Interface_GUIListItem::set_property(KODI_HANDLE kodiBase,
     return;
   }
 
-  std::string lowerKey = key;
-  StringUtils::FoldCase(lowerKey);
-
+  std::string lowerKey = UnicodeUtils::FoldCase(key);
   Interface_GUIGeneral::lock();
   item->get()->SetProperty(lowerKey, CVariant(value));
   Interface_GUIGeneral::unlock();
@@ -361,8 +360,7 @@ char* Interface_GUIListItem::get_property(KODI_HANDLE kodiBase,
     return nullptr;
   }
 
-  std::string lowerKey = key;
-  StringUtils::FoldCase(lowerKey);
+  std::string lowerKey = UnicodeUtils::FoldCase(key);
 
   Interface_GUIGeneral::lock();
   char* ret = strdup(item->get()->GetProperty(lowerKey).asString().c_str());

@@ -9,6 +9,7 @@
 #include "TextSearch.h"
 
 #include "StringUtils.h"
+#include "utils/UnicodeUtils.h"
 
 CTextSearch::CTextSearch(const std::string &strSearchTerms, bool bCaseSensitive /* = false */, TextSearchDefault defaultSearchMode /* = SEARCH_DEFAULT_OR */)
 {
@@ -36,7 +37,7 @@ bool CTextSearch::Search(const std::string &strHaystack) const
   // comes to mind).
   
   if (!m_bCaseSensitive)
-    StringUtils::FoldCase(strSearch); // TODO: fpf Verify
+    strSearch = UnicodeUtils::FoldCase(strSearch); // TODO: Unicode fpf Verify
 
   /* check whether any of the NOT terms matches and return false if there's a match */
   for (unsigned int iNotPtr = 0; iNotPtr < m_NOT.size(); iNotPtr++)
@@ -98,7 +99,7 @@ void CTextSearch::ExtractSearchTerms(const std::string &strSearchTerm, TextSearc
   StringUtils::Trim(strParsedSearchTerm);
 
   if (!m_bCaseSensitive)
-    StringUtils::FoldCase(strParsedSearchTerm);
+    strParsedSearchTerm = UnicodeUtils::FoldCase(strParsedSearchTerm);
 
   bool bNextAND(defaultSearchMode == SEARCH_DEFAULT_AND);
   bool bNextOR(defaultSearchMode == SEARCH_DEFAULT_OR);

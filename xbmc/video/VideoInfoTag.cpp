@@ -15,6 +15,7 @@
 #include "settings/SettingsComponent.h"
 #include "utils/Archive.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Variant.h"
 #include "utils/XMLUtils.h"
 #include "utils/log.h"
@@ -1300,8 +1301,8 @@ void CVideoInfoTag::ParseNative(const TiXmlElement* movie, bool prioritise)
           p->m_strLanguage = StringUtils::Trim(value);
 
         XMLUtils::GetInt(nodeDetail, "channels", p->m_iChannels);
-        StringUtils::FoldCase(p->m_strCodec);
-        StringUtils::FoldCase(p->m_strLanguage);
+        p->m_strCodec = UnicodeUtils::FoldCase(p->m_strCodec);
+        p->m_strLanguage = UnicodeUtils::FoldCase(p->m_strLanguage);
         m_streamDetails.AddStream(p);
       }
       nodeDetail = NULL;
@@ -1322,10 +1323,10 @@ void CVideoInfoTag::ParseNative(const TiXmlElement* movie, bool prioritise)
         if (XMLUtils::GetString(nodeDetail, "hdrtype", value))
           p->m_strHdrType = StringUtils::Trim(value);
 
-        StringUtils::FoldCase(p->m_strCodec);
-        StringUtils::FoldCase(p->m_strStereoMode);
-        StringUtils::FoldCase(p->m_strLanguage);
-        StringUtils::FoldCase(p->m_strHdrType);
+        p->m_strCodec = UnicodeUtils::FoldCase(p->m_strCodec);
+        p->m_strStereoMode = UnicodeUtils::FoldCase(p->m_strStereoMode);
+        p->m_strLanguage = UnicodeUtils::FoldCase(p->m_strLanguage);
+        p->m_strHdrType = UnicodeUtils::FoldCase(p->m_strHdrType);
         m_streamDetails.AddStream(p);
       }
       nodeDetail = NULL;
@@ -1334,7 +1335,7 @@ void CVideoInfoTag::ParseNative(const TiXmlElement* movie, bool prioritise)
         CStreamDetailSubtitle *p = new CStreamDetailSubtitle();
         if (XMLUtils::GetString(nodeDetail, "language", value))
           p->m_strLanguage = StringUtils::Trim(value);
-        StringUtils::FoldCase(p->m_strLanguage);
+        p->m_strLanguage = UnicodeUtils::FoldCase(p->m_strLanguage);
         m_streamDetails.AddStream(p);
       }
     }

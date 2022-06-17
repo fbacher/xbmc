@@ -20,6 +20,7 @@
 #include "utils/FileUtils.h"
 #include "utils/Mime.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
@@ -813,7 +814,7 @@ MHD_RESULT CWebServer::CreateFileDownloadResponse(
   if (mimeType.empty())
   {
     std::string ext = URIUtils::GetExtension(filePath);
-    StringUtils::FoldCase(ext);
+    ext = UnicodeUtils::FoldCase(ext);
     mimeType = CreateMimeTypeFromExtension(ext.c_str());
   }
 

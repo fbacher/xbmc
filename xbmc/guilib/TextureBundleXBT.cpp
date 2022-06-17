@@ -19,6 +19,7 @@
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 #include "windowing/GraphicContext.h"
@@ -257,7 +258,7 @@ void CTextureBundleXBT::SetThemeBundle(bool themeBundle)
 std::string CTextureBundleXBT::Normalize(std::string name)
 {
   StringUtils::Trim(name);
-  StringUtils::FoldCase(name);
+  name = UnicodeUtils::FoldCase(name);
   StringUtils::Replace(name, '\\', '/');
 
   return name;

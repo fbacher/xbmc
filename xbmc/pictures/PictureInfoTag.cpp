@@ -16,6 +16,7 @@
 #include "utils/CharsetConverter.h"
 #include "utils/log.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 
@@ -138,7 +139,7 @@ bool CPictureInfoTag::Load(const std::string &path)
   if (StringUtils::containsNonAscii(strExtension)) {
        CLog::Log(LOGWARNING, "CPictureInfoTag::Load strExtension contains non-ASCII: {}", strExtension);
      }
-  StringUtils::ToLower(strExtension, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
+  strExtension = UnicodeUtils::ToLower(strExtension, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
   if (!strExtension.empty() && CServiceBroker::IsBinaryAddonCacheUp())
   {
     // Load via available image decoder addons

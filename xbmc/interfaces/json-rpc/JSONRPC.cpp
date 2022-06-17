@@ -21,6 +21,7 @@
 #include "settings/AdvancedSettings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
 
@@ -287,7 +288,7 @@ bool CJSONRPC::HandleMethodCall(const CVariant& request, CVariant& response, ITr
     isNotification = !request.isMember("id");
 
     std::string methodName = request["method"].asString();
-    StringUtils::FoldCase(methodName);
+    methodName = UnicodeUtils::FoldCase(methodName);
 
     JSONRPC::MethodCall method;
     CVariant params;

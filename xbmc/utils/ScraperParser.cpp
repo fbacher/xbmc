@@ -15,6 +15,7 @@
 #include "addons/Scraper.h"
 #include "URL.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "log.h"
 #include "CharsetConverter.h"
 #ifdef HAVE_LIBXSLT
@@ -248,7 +249,7 @@ void CScraperParser::ParseExpression(const std::string& input, std::string& dest
     int iCompare = -1;
     pExpression->QueryIntAttribute("compare",&iCompare);
     if (iCompare > -1)
-      StringUtils::FoldCase(m_param[iCompare-1]);
+      m_param[iCompare-1] = UnicodeUtils::FoldCase(m_param[iCompare-1]);
     std::string curInput = input;
     for (int iBuf=0;iBuf<MAX_SCRAPER_BUFFERS;++iBuf)
     {
@@ -308,8 +309,7 @@ void CScraperParser::ParseExpression(const std::string& input, std::string& dest
         ReplaceBuffers(strResult);
         if (iCompare > -1)
         {
-          std::string strResultNoCase = strResult;
-          StringUtils::FoldCase(strResultNoCase);
+          std::string strResultNoCase = UnicodeUtils::FoldCase(strResult);
           if (strResultNoCase.find(m_param[iCompare-1]) != std::string::npos)
             dest += strResult;
         }

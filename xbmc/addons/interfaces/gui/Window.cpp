@@ -25,6 +25,7 @@
 #include "input/Key.h"
 #include "messaging/ApplicationMessenger.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
@@ -504,9 +505,7 @@ void Interface_GUIWindow::set_property(KODI_HANDLE kodiBase,
     return;
   }
 
-  std::string lowerKey = key;
-  StringUtils::FoldCase(lowerKey);
-
+  std::string lowerKey = UnicodeUtils::FoldCase(key);
   Interface_GUIGeneral::lock();
   pAddonWindow->SetProperty(lowerKey, value);
   Interface_GUIGeneral::unlock();
@@ -529,8 +528,7 @@ void Interface_GUIWindow::set_property_int(KODI_HANDLE kodiBase,
     return;
   }
 
-  std::string lowerKey = key;
-  StringUtils::FoldCase(lowerKey);
+  std::string lowerKey = UnicodeUtils::FoldCase(key);
 
   Interface_GUIGeneral::lock();
   pAddonWindow->SetProperty(lowerKey, value);
@@ -554,8 +552,7 @@ void Interface_GUIWindow::set_property_bool(KODI_HANDLE kodiBase,
     return;
   }
 
-  std::string lowerKey = key;
-  StringUtils::FoldCase(lowerKey);
+  std::string lowerKey = UnicodeUtils::FoldCase(key);
 
   Interface_GUIGeneral::lock();
   pAddonWindow->SetProperty(lowerKey, value);
@@ -579,8 +576,7 @@ void Interface_GUIWindow::set_property_double(KODI_HANDLE kodiBase,
     return;
   }
 
-  std::string lowerKey = key;
-  StringUtils::FoldCase(lowerKey);
+  std::string lowerKey = UnicodeUtils::FoldCase(key);
 
   Interface_GUIGeneral::lock();
   pAddonWindow->SetProperty(lowerKey, value);
@@ -603,8 +599,7 @@ char* Interface_GUIWindow::get_property(KODI_HANDLE kodiBase,
     return nullptr;
   }
 
-  std::string lowerKey = key;
-  StringUtils::FoldCase(lowerKey);
+  std::string lowerKey = UnicodeUtils::FoldCase(key);
 
   Interface_GUIGeneral::lock();
   std::string value = pAddonWindow->GetProperty(lowerKey).asString();
@@ -629,8 +624,7 @@ int Interface_GUIWindow::get_property_int(KODI_HANDLE kodiBase,
     return -1;
   }
 
-  std::string lowerKey = key;
-  StringUtils::FoldCase(lowerKey);
+  std::string lowerKey = UnicodeUtils::FoldCase(key);
 
   Interface_GUIGeneral::lock();
   int value = static_cast<int>(pAddonWindow->GetProperty(lowerKey).asInteger());
@@ -655,8 +649,7 @@ bool Interface_GUIWindow::get_property_bool(KODI_HANDLE kodiBase,
     return false;
   }
 
-  std::string lowerKey = key;
-  StringUtils::FoldCase(lowerKey);
+  std::string lowerKey = UnicodeUtils::FoldCase(key);
 
   Interface_GUIGeneral::lock();
   bool value = pAddonWindow->GetProperty(lowerKey).asBoolean();
@@ -681,8 +674,7 @@ double Interface_GUIWindow::get_property_double(KODI_HANDLE kodiBase,
     return 0.0;
   }
 
-  std::string lowerKey = key;
-  StringUtils::FoldCase(lowerKey);
+  std::string lowerKey = UnicodeUtils::FoldCase(key);
 
   Interface_GUIGeneral::lock();
   double value = pAddonWindow->GetProperty(lowerKey).asDouble();
@@ -725,8 +717,7 @@ void Interface_GUIWindow::clear_property(KODI_HANDLE kodiBase,
     return;
   }
 
-  std::string lowerKey = key;
-  StringUtils::FoldCase(lowerKey);
+  std::string lowerKey = UnicodeUtils::FoldCase(key);
 
   Interface_GUIGeneral::lock();
   pAddonWindow->SetProperty(lowerKey, "");

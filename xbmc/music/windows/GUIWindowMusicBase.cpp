@@ -55,6 +55,7 @@
 #include "settings/SettingsComponent.h"
 #include "storage/MediaManager.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/XTimeUtils.h"
@@ -1142,7 +1143,7 @@ void CGUIWindowMusicBase::OnInitWindow()
 
 std::string CGUIWindowMusicBase::GetStartFolder(const std::string &dir)
 {
-  std::string lower(dir); StringUtils::FoldCase(lower);
+  std::string lower = UnicodeUtils::FoldCase(dir);
   if (lower == "plugins" || lower == "addons")
     return "addons://sources/audio/";
   else if (lower == "$playlists" || lower == "playlists")

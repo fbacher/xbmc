@@ -16,6 +16,7 @@
 #include "PlayListXML.h"
 #include "PlayListXSPF.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 
 using namespace PLAYLIST;
@@ -34,8 +35,7 @@ CPlayList* CPlayListFactory::Create(const CFileItem& item)
     if (item.GetMimeType().empty())
       const_cast<CFileItem&>(item).FillInMimeType();
 
-    std::string strMimeType = item.GetMimeType();
-    StringUtils::FoldCase(strMimeType);
+    std::string strMimeType = UnicodeUtils::FoldCase(item.GetMimeType());
 
     if (strMimeType == "video/x-ms-asf"
     || strMimeType == "video/x-ms-asx"
@@ -67,8 +67,7 @@ CPlayList* CPlayListFactory::Create(const CFileItem& item)
 
   std::string path = item.GetDynPath();
 
-  std::string extension = URIUtils::GetExtension(path);
-  StringUtils::FoldCase(extension);
+  std::string extension = UnicodeUtils::FoldCase(URIUtils::GetExtension(path));
 
   if (extension == ".m3u" || extension == ".strm")
     return new CPlayListM3U();
@@ -103,8 +102,7 @@ CPlayList* CPlayListFactory::Create(const CFileItem& item)
 
 bool CPlayListFactory::IsPlaylist(const CFileItem& item)
 {
-  std::string strMimeType = item.GetMimeType();
-  StringUtils::FoldCase(strMimeType);
+  std::string strMimeType =  UnicodeUtils::FoldCase(item.GetMimeType());
 
 /* These are a bit uncertain
   if(strMimeType == "video/x-ms-asf"

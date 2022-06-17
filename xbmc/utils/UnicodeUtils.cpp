@@ -249,19 +249,27 @@ std::wstring UnicodeUtils::ToLower(const std::wstring &str) {
   icu::Locale icuLocale = Unicode::getDefaultICULocale();
   return UnicodeUtils::ToLower(str, icuLocale);}
 
-void UnicodeUtils::FoldCase(std::string &str, const StringOptions opt /*  = StringOptions::FOLD_CASE_DEFAULT */) {
+std::string UnicodeUtils::FoldCase(const std::string str, const StringOptions opt /*  = StringOptions::FOLD_CASE_DEFAULT */) {
+  std::string result;
 	if (str.length() == 0)
-		return;
-
-	std::string result = Unicode::toFold(str, opt);
+	{
+		result = std::string(str);
+    return result;
+	}
+	result = Unicode::toFold(str, opt);
+	return result;
 }
 
-void UnicodeUtils::FoldCase(std::wstring &str, const StringOptions opt /*  = StringOptions::FOLD_CASE_DEFAULT */) {
+std::wstring UnicodeUtils::FoldCase(const std::wstring str, const StringOptions opt /*  = StringOptions::FOLD_CASE_DEFAULT */) {
+  std::wstring result;
 	if (str.length() == 0)
-		return;
+	{
+	  result = std::wstring();
+		return result;
+	}
 
-	Unicode::toFold(str, opt);
-	return;
+	result = Unicode::toFold(str, opt);
+	return result;
 }
 
 void UnicodeUtils::ToCapitalize(std::wstring &str, const icu::Locale &icuLocale) {

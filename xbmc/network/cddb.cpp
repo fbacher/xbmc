@@ -17,6 +17,7 @@
 #include "utils/CharsetConverter.h"
 #include "utils/StringUtils.h"
 #include "utils/SystemInfo.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
@@ -868,7 +869,7 @@ bool Xcddb::queryCDinfo(CCdInfo* pInfo)
   // Send the Hello message
   std::string version = CSysInfo::GetVersion();
   std::string lcAppName = CCompileInfo::GetAppName();
-  StringUtils::FoldCase(lcAppName);
+  lcAppName = UnicodeUtils::FoldCase(lcAppName);
   if (version.find(' ') != std::string::npos)
     version = version.substr(0, version.find(' '));
   std::string strGreeting = "cddb hello " + lcAppName + " kodi.tv " + CCompileInfo::GetAppName() + " " + version;

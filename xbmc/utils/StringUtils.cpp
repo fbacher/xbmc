@@ -51,6 +51,7 @@
 
 #include <unicode/utf8.h>
 #include "utils/log.h"
+#include "utils/UnicodeUtils.h"
 
 // don't move or std functions end up in PCRE namespace
 // clang-format off
@@ -156,122 +157,6 @@ std::wstring StringUtils::FormatV(const wchar_t *fmt, va_list args) {
 	}
 
 	return L"";
-}
-
-#if defined(UNICODE_STRING_DISABLE)
-void StringUtils::ToUpper(std::string &str, const icu::Locale &locale) {
-	// std::cout << "ToUpper in: " << str << std::endl;
-
-	if (str.length() == 0)
-		return;
-
-	std::string upper = Unicode::toUpper(str, locale);
-   //std::cout << "ToUpper in: " << str << " out: " << upper << std::endl;
-	str.swap(upper);
-}
-
-void StringUtils::ToUpper(std::string &str, const std::locale &locale) {
-  icu::Locale icuLocale = Unicode::getICULocale(locale);
-  return StringUtils::ToUpper(str, icuLocale);
-}
-
-void StringUtils::ToUpper(std::string &str) {
-	if (str.length() == 0)
-		return;
-
-	icu::Locale icuLocale = Unicode::getDefaultICULocale();
-  StringUtils::ToUpper(str, icuLocale);
-}
-
-void StringUtils::ToUpper(std::wstring &str, const std::locale &locale) {
-	if (str.length() == 0)
-		return;
-
-  icu::Locale icuLocale = Unicode::getICULocale(locale);
-  StringUtils::ToUpper(str, icuLocale);
-}
-
-
-void StringUtils::ToUpper(std::wstring &str, const icu::Locale &locale) {
-	if (str.length() == 0)
-		return;
-
-	std::string str_utf8 = Unicode::wstring_to_utf8(str);
-	const std::string upper = Unicode::toUpper(str_utf8, locale);
-   //std::cout << "ToUpper 1 (wide) in: " << str_utf8 << " out: " << upper << std::endl;
-	std::wstring wUpper = Unicode::utf8_to_wstring(upper);
-	str.swap(wUpper);
-}
-void StringUtils::ToUpper(std::wstring &str) {
-	if (str.length() == 0)
-		return;
-
-  icu::Locale icuLocale = Unicode::getDefaultICULocale();
-	StringUtils::ToUpper(str, icuLocale);
-}
-
-/**
- * Only these two methods with locale arg are true to-lower.
- * TODO: fix this
- */
-void StringUtils::ToLower(std::string &str, const std::locale &locale) {
-  icu::Locale icuLocale = Unicode::getICULocale(locale);
-	return StringUtils::ToLower(str, icuLocale);
-}
-
-/**
- * Only these two methods with locale arg are true to-lower.
- * TODO: fix this
- */
-void StringUtils::ToLower(std::string &str, const icu::Locale &locale) {
-	if (str.length() == 0)
-		return;
-
-	std::string lower = Unicode::toLower(str, locale);
-   //std::cout << "ToLower 1 in: " << str << " out: " << lower << std::endl;
-	str.swap(lower);
-}
-
-void StringUtils::ToLower(std::wstring &str, const std::locale &locale) {
-  icu::Locale icuLocale = Unicode::getICULocale(locale);
-  return StringUtils::ToLower(str, icuLocale);
-}
-
-void StringUtils::ToLower(std::wstring &str, const icu::Locale &locale) {
-	if (str.length() == 0)
-		return;
-
-	std::string str_utf8 = Unicode::wstring_to_utf8(str);
-	const std::string lower_utf8 = Unicode::toLower(str_utf8, locale);
-   //std::cout << "ToLower 1 (wide) in: " << str_utf8 << " out: " << lower_utf8 << std::endl;
-	std::wstring wLower = Unicode::utf8_to_wstring(lower_utf8);
-	str.swap(wLower);
-}
-
-void StringUtils::ToLower(std::string &str) {
-  icu::Locale icuLocale = Unicode::getDefaultICULocale();
-	return StringUtils::ToLower(str, icuLocale);
-}
-
-void StringUtils::ToLower(std::wstring &str) {
-  icu::Locale icuLocale = Unicode::getDefaultICULocale();
-  return StringUtils::ToLower(str, icuLocale);}
-
-#endif
-
-void StringUtils::FoldCase(std::string &str, const StringOptions opt /*  = StringOptions::FOLD_CASE_DEFAULT */) {
-	if (str.length() == 0)
-		return;
-
-	std::string result = Unicode::toFold(str, opt);
-}
-
-void StringUtils::FoldCase(std::wstring &str, const StringOptions opt /*  = StringOptions::FOLD_CASE_DEFAULT */) {
-	if (str.length() == 0)
-		return;
-
-	Unicode::toFold(str, opt);
-	return;
 }
 
 void StringUtils::ToCapitalize(std::wstring &str, const icu::Locale &icuLocale) {

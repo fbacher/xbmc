@@ -10,6 +10,7 @@
 
 #include "peripherals/Peripherals.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 #include "platform/win32/CharsetConverter.h"
@@ -130,9 +131,7 @@ bool CPeripheralBusUSB::PerformDeviceScan(const GUID *guid, const PeripheralType
 
       if (bDetailResult)
       {
-        std::string strTmp(deviceProperty);
-
-        StringUtils::FoldCase(strTmp);
+        std::string strTmp(UnicodeUtils::FoldCase(deviceProperty));
         size_t posVid, posPid;
         if (((posVid=strTmp.find("\\vid_")) != std::string::npos || (posVid=strTmp.find("&vid_")) != std::string::npos) &&
               ((posPid=strTmp.find("\\pid_")) != std::string::npos || (posPid=strTmp.find("&pid_")) != std::string::npos))

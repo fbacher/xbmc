@@ -12,6 +12,7 @@
 #include "guilib/LocalizeStrings.h"
 #include "utils/CharsetConverter.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/log.h"
 
@@ -69,8 +70,7 @@ bool CKeyboardLayout::Load(const TiXmlElement* element)
     const char* strModifiers = keyboard->Attribute("modifiers");
     if (strModifiers != NULL)
     {
-      std::string modifiers = strModifiers;
-      StringUtils::FoldCase(modifiers);
+      std::string modifiers = UnicodeUtils::FoldCase(strModifiers);
 
       std::vector<std::string> variants = StringUtils::Split(modifiers, ",");
       for (const auto& itv : variants)

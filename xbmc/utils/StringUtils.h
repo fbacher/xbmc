@@ -356,7 +356,7 @@ public:
    * \param str string to change case on
    */
   static void ToLower(std::wstring &str);
-#endif
+
   /*!
    *  \brief Folds the case of a string. Locale Independent.
    *
@@ -436,6 +436,7 @@ public:
    */
   static void FoldCase(std::string &str,
       const StringOptions opt = StringOptions::FOLD_CASE_DEFAULT);
+#endif
 
   /*!
    *  \brief Capitalizes a wstring using locale.

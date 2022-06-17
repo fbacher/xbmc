@@ -23,6 +23,7 @@
 #include "settings/SettingsComponent.h"
 #include "settings/lib/SettingsManager.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/XMLUtils.h"
 
 #include <mutex>
@@ -372,7 +373,7 @@ bool CPlayerCoreFactory::LoadConfiguration(const std::string &file, bool clear)
       std::string name = XMLUtils::GetAttribute(pPlayer, "name");
       std::string type = XMLUtils::GetAttribute(pPlayer, "type");
       if (type.empty()) type = name;
-      StringUtils::FoldCase(type);
+      type = UnicodeUtils::FoldCase(type);
 
       std::string internaltype;
       if (type == "videoplayer")

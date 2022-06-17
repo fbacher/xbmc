@@ -24,6 +24,7 @@
 #include "games/tags/GameInfoTag.h"
 #include "messaging/helpers/DialogOKHelper.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
@@ -148,8 +149,8 @@ void CGameUtils::GetGameClients(const CFileItem& file,
 
     // TODO: Unicode- A Case insensitive sort may be more appropriate.
 
-    StringUtils::FoldCase(lhsName);
-    StringUtils::FoldCase(rhsName);
+    lhsName = UnicodeUtils::FoldCase(lhsName);
+    rhsName = UnicodeUtils::FoldCase(rhsName);
 
     return lhsName < rhsName;
   };
@@ -205,7 +206,7 @@ bool CGameUtils::HasGameExtension(const std::string& path)
   if (extension.empty())
     return false;
 
-  StringUtils::FoldCase(extension);
+  extension = UnicodeUtils::FoldCase(extension);
 
   // Look for a game client that supports this extension
   VECADDONS gameClients;

@@ -12,6 +12,7 @@
 #include "input/actions/ActionIDs.h"
 #include "input/actions/ActionTranslator.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/log.h"
 
@@ -148,8 +149,7 @@ unsigned int CTouchTranslator::TranslateTouchCommand(const TiXmlElement* pButton
   if (szAction == nullptr)
     return ACTION_NONE;
 
-  std::string strTouchCommand = szButton;
-  StringUtils::FoldCase(strTouchCommand);
+  std::string strTouchCommand = UnicodeUtils::FoldCase(szButton);
 
   // Handle direction
   const char* attrVal = pButton->Attribute("direction");

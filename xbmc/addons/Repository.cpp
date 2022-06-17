@@ -24,6 +24,7 @@
 #include "utils/Digest.h"
 #include "utils/Mime.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/log.h"
@@ -304,7 +305,7 @@ CRepository::DirInfo CRepository::ParseDirConfiguration(const CAddonExtensions& 
   }
 
   std::string hashStr = configuration.GetValue("hashes").asString();
-  StringUtils::FoldCase(hashStr);
+  hashStr = UnicodeUtils::FoldCase(hashStr);
   if (hashStr == "true")
   {
     // Deprecated alias

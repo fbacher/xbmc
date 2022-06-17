@@ -33,6 +33,7 @@
 #include "messaging/ApplicationMessenger.h"
 #include "messaging/helpers/DialogOKHelper.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
@@ -66,7 +67,7 @@ std::string NormalizeExtension(const std::string& strExtension)
 
   if (!ext.empty() && ext != EXTENSION_WILDCARD)
   {
-    StringUtils::FoldCase(ext);
+    ext = UnicodeUtils::FoldCase(ext);
 
     if (ext[0] != '.')
       ext.insert(0, ".");

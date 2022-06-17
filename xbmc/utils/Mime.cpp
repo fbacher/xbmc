@@ -14,6 +14,7 @@
 #include "filesystem/CurlFile.h"
 #include "music/tags/MusicInfoTag.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "video/VideoInfoTag.h"
 
 #include <algorithm>
@@ -522,8 +523,7 @@ std::string CMime::GetMimeType(const std::string &extension)
   std::string ext = extension;
   size_t posNotPoint = ext.find_first_not_of('.');
   if (posNotPoint != std::string::npos && posNotPoint > 0)
-    ext = extension.substr(posNotPoint);
-  StringUtils::FoldCase(ext);
+    ext = UnicodeUtils::FoldCase(extension.substr(posNotPoint));
 
   std::map<std::string, std::string>::const_iterator it = m_mimetypes.find(ext);
   if (it != m_mimetypes.end())
@@ -693,8 +693,8 @@ bool CMime::parseMimeType(const std::string& mimeType, std::string& type, std::s
     return false;
   }
 
-  StringUtils::FoldCase(type);
-  StringUtils::FoldCase(subtype);
+  type = UnicodeUtils::FoldCase(type);
+  subtype = UnicodeUtils::FoldCase(subtype);
 
   return true;
 }

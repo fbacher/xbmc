@@ -54,6 +54,7 @@
 #include "utils/CharsetConverter.h"
 #include "utils/RssManager.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/XMLUtils.h"
 
 using namespace KODI;
@@ -938,7 +939,7 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
 
   if (XMLUtils::GetString(pControlNode, "subtype", strSubType))
   {
-    StringUtils::FoldCase(strSubType);
+    strSubType = UnicodeUtils::FoldCase(strSubType);
 
     if ( strSubType == "int")
       iType = SPIN_CONTROL_TYPE_INT;
@@ -982,7 +983,7 @@ CGUIControl* CGUIControlFactory::Create(int parentID, const CRect &rect, TiXmlEl
 
   if ( XMLUtils::GetString(pControlNode, "orientation", strTmp) )
   {
-    StringUtils::FoldCase(strTmp);
+    strTmp = UnicodeUtils::FoldCase(strTmp);
     if (strTmp == "horizontal")
       orientation = HORIZONTAL;
   }

@@ -2193,7 +2193,7 @@ bool CMusicInfoScanner::AddLocalArtwork(std::map<std::string, std::string>& art,
     // Strip media name
     if (!mediaName.empty() && StringUtils::StartsWith(strCandidate, mediaName))
       strCandidate.erase(0, mediaName.length());
-    StringUtils::FoldCase(strCandidate);
+    strCandidate = UnicodeUtils::FoldCase(strCandidate);
     // Skip files already used as "thumb"
     // Typically folder.jpg but can be from multiple confgurable file names
 	

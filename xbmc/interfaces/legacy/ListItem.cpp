@@ -18,6 +18,7 @@
 #include "settings/AdvancedSettings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
 #include "video/VideoInfoTag.h"
@@ -222,8 +223,7 @@ namespace XBMCAddon
     void ListItem::setProperty(const char * key, const String& value)
     {
       XBMCAddonUtils::GuiLock lock(languageHook, m_offscreen);
-      String lowerKey = key;
-      StringUtils::FoldCase(lowerKey);
+      String lowerKey = UnicodeUtils::FoldCase(key);
       if (lowerKey == "startoffset")
       { // special case for start offset - don't actually store in a property
         setStartOffsetRaw(strtod(value.c_str(), nullptr));
@@ -269,8 +269,7 @@ namespace XBMCAddon
     String ListItem::getProperty(const char* key)
     {
       XBMCAddonUtils::GuiLock lock(languageHook, m_offscreen);
-      String lowerKey = key;
-      StringUtils::FoldCase(lowerKey);
+      String lowerKey = UnicodeUtils::FoldCase(key);
       std::string value;
       if (lowerKey == "startoffset")
       { // special case for start offset - don't actually store in a property,
@@ -381,8 +380,7 @@ namespace XBMCAddon
         auto videotag = GetVideoInfoTag();
         for (const auto& it : infoLabels)
         {
-          String key = it.first;
-          StringUtils::FoldCase(key);
+          String key = UnicodeUtils::FoldCase(it.first);
           const InfoLabelValue& alt = it.second;
           const String value(alt.which() == first ? alt.former() : emptyString);
 
@@ -553,8 +551,7 @@ namespace XBMCAddon
         auto musictag = GetMusicInfoTag();
         for (const auto& it : infoLabels)
         {
-          String key = it.first;
-          StringUtils::FoldCase(key);
+          String key = UnicodeUtils::FoldCase(it.first);
           const auto& alt = it.second;
           const String value(alt.which() == first ? alt.former() : emptyString);
 
@@ -567,7 +564,7 @@ namespace XBMCAddon
             setDateTimeRaw(value);
           else
           {
-          StringUtils::FoldCase(key);
+          key = UnicodeUtils::FoldCase(key);
             hasDeprecatedInfoLabel = true;
 
             if (key == "dbid")
@@ -639,8 +636,7 @@ namespace XBMCAddon
       {
         for (const auto& it : infoLabels)
         {
-          String key = it.first;
-          StringUtils::FoldCase(key);
+          String key = UnicodeUtils::FoldCase(it.first);
           const auto& alt = it.second;
           const String value(alt.which() == first ? alt.former() : emptyString);
 
@@ -687,8 +683,7 @@ namespace XBMCAddon
         auto gametag = item->GetGameInfoTag();
         for (const auto& it : infoLabels)
         {
-          String key = it.first;
-          StringUtils::FoldCase(key);
+          String key = UnicodeUtils::FoldCase(it.first);
           const auto& alt = it.second;
           const String value(alt.which() == first ? alt.former() : emptyString);
 
@@ -1030,7 +1025,7 @@ namespace XBMCAddon
 
     void ListItem::setSpecialSortRaw(std::string specialSort)
     {
-      StringUtils::FoldCase(specialSort);
+      specialSort = UnicodeUtils::FoldCase(specialSort);
 
       if (specialSort == "bottom")
         item->SetSpecialSort(SortSpecialOnBottom);
@@ -1045,13 +1040,13 @@ namespace XBMCAddon
 
     void ListItem::addArtRaw(std::string type, const std::string& url)
     {
-      StringUtils::FoldCase(type);
+      type = UnicodeUtils::FoldCase(type);
       item->SetArt(type, url);
     }
 
     void ListItem::addPropertyRaw(std::string type, const CVariant& value)
     {
-      StringUtils::FoldCase(type);
+      type = UnicodeUtils::FoldCase(type);
       item->SetProperty(type, value);
     }
 

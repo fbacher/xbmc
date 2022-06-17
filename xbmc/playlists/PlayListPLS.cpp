@@ -14,6 +14,7 @@
 #include "music/tags/MusicInfoTag.h"
 #include "utils/CharsetConverter.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/XMLUtils.h"
@@ -112,7 +113,7 @@ bool CPlayListPLS::Load(const std::string &strFile)
       std::string strLeft = strLine.substr(0, iPosEqual);
       iPosEqual++;
       std::string strValue = strLine.substr(iPosEqual);
-      StringUtils::FoldCase(strLeft);
+      strLeft = UnicodeUtils::FoldCase(strLeft);
       StringUtils::TrimLeft(strLeft);
 
       if (strLeft == "numberofentries")
@@ -308,8 +309,7 @@ bool CPlayListASX::LoadData(std::istream& stream)
     TiXmlNode *pNode = pRootElement;
     TiXmlNode *pChild = NULL;
     std::string value;
-    value = pNode->Value();
-    StringUtils::FoldCase(value);
+    value = UnicodeUtils::FoldCase(pNode->Value());
     pNode->SetValue(value);
     while(pNode)
     {
@@ -318,15 +318,13 @@ bool CPlayListASX::LoadData(std::istream& stream)
       {
         if (pChild->Type() == TiXmlNode::TINYXML_ELEMENT)
         {
-          value = pChild->Value();
-          StringUtils::FoldCase(value);
+          value = UnicodeUtils::FoldCase(pChild->Value());
           pChild->SetValue(value);
 
           TiXmlAttribute* pAttr = pChild->ToElement()->FirstAttribute();
           while(pAttr)
           {
-            value = pAttr->Name();
-            StringUtils::FoldCase(value);
+            value = UnicodeUtils::FoldCase(pAttr->Name());
             pAttr->SetName(value);
             pAttr = pAttr->Next();
           }

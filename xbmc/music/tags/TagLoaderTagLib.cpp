@@ -55,6 +55,7 @@
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "ServiceBroker.h"
 #include "settings/AdvancedSettings.h"
 #include "settings/SettingsComponent.h"
@@ -1021,7 +1022,7 @@ std::vector<std::string> CTagLoaderTagLib::SplitMBID(const std::vector<std::stri
   // MBIDs to make sure we hit them all...
   std::vector<std::string> ret;
   std::string value = values[0];
-  StringUtils::FoldCase(value);
+  value = UnicodeUtils::FoldCase(value);
   CRegExp reg;
   if (reg.RegComp("([[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12})"))
   {
@@ -1194,7 +1195,7 @@ bool CTagLoaderTagLib::Load(const std::string& strFileName, CMusicInfoTag& tag, 
       return false;
   }
 
-  StringUtils::FoldCase(strExtension);
+  strExtension = UnicodeUtils::FoldCase(strExtension);
   TagLibVFSStream*           stream = new TagLibVFSStream(strFileName, true);
   if (!stream)
   {

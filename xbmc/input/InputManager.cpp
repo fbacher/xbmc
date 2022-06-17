@@ -39,6 +39,7 @@
 #include "settings/lib/Setting.h"
 #include "utils/Geometry.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 #include <algorithm>
@@ -676,7 +677,7 @@ bool CInputManager::AlwaysProcess(const CAction& action)
     std::string builtInFunction;
     std::vector<std::string> params;
     CUtil::SplitExecFunction(action.GetName(), builtInFunction, params);
-    StringUtils::FoldCase(builtInFunction);
+    builtInFunction = UnicodeUtils::FoldCase(builtInFunction);
 
     // should this button be handled normally or just cancel the screensaver?
     if (builtInFunction == "powerdown" || builtInFunction == "reboot" ||

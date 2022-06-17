@@ -25,6 +25,7 @@
 #include "settings/SettingsComponent.h"
 #include "utils/SortUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 
@@ -714,7 +715,7 @@ JSONRPC_STATUS CAudioLibrary::GetAvailableArt(const std::string& method, ITransp
     return InternalError;
 
   std::string artType = parameterObject["arttype"].asString();
-  StringUtils::FoldCase(artType);
+  artType = UnicodeUtils::FoldCase(artType);
 
   CMusicDatabase musicdatabase;
   if (!musicdatabase.Open())

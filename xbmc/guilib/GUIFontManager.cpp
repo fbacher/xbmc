@@ -32,6 +32,7 @@
 #include "settings/lib/SettingDefinitions.h"
 #include "utils/FontUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/XMLUtils.h"
 #include "utils/log.h"
@@ -487,7 +488,7 @@ void GUIFontManager::LoadFonts(const TiXmlNode* fontNode)
     	// TODO: Verify. Probably to 1) handle OS's with case insensitive file system
     	// 2) Consistency (avoids problems with sloppy case in filenaming).
       std::string strFontFileName = fileName;
-      StringUtils::FoldCase(strFontFileName);
+      strFontFileName = UnicodeUtils::FoldCase(strFontFileName);
       LoadTTF(fontName, strFontFileName, textColor, shadowColor, iSize, iStyle, false, lineSpacing,
               aspect);
     }

@@ -388,9 +388,10 @@ public:
    * Changes will have to be made to keywords that don't work as expected. One solution is
    * to try to always use lower-case in the first place.
    *
-   * \param str string to fold in place
+   * \param str string to fold
    * \param opt StringOptions to fine-tune behavior. For most purposes, leave at
    *            default value, FOLD_CASE_DEFAULT
+   * \return folded string
    *
    * Note: This function serves a similar purpose that "ToLower/ToUpper" is
    *       frequently used for ASCII maps indexed by keyword. ToLower/ToUpper does
@@ -427,10 +428,8 @@ public:
    *
    * Case folding also ignores insignificant differences in strings (some accent marks,
    * etc.).
-   *
-   * TODO: Modify to return str (see StartsWithNoCase)
    */
-  static void FoldCase(std::wstring &str,
+  static std::wstring FoldCase(const std::wstring str,
       const StringOptions opt = StringOptions::FOLD_CASE_DEFAULT);
 
   /*!
@@ -443,14 +442,12 @@ public:
    * \param str string to fold
    * \param opt StringOptions to fine-tune behavior. For most purposes, leave at
    *            default value, FOLD_CASE_DEFAULT
+   * \return folded string
    *
    * Note: For more details, see
    *       FoldCase(std::wstring &str, const StringOptions opt = StringOptions::FOLD_CASE_DEFAULT);
-   *
-   *
-   * TODO: Modify to return str (see StartsWithNoCase)
    */
-  static void FoldCase(std::string &str,
+  static std::string FoldCase(const std::string str,
       const StringOptions opt = StringOptions::FOLD_CASE_DEFAULT);
 
   /*!

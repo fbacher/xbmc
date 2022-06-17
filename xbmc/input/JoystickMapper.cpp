@@ -14,6 +14,7 @@
 #include "input/joysticks/JoystickTranslator.h"
 #include "input/joysticks/JoystickUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/XBMCTinyXML.h"
 
 #include <algorithm>
@@ -117,8 +118,7 @@ bool CJoystickMapper::DeserializeButton(const TiXmlElement* pButton,
 
     if (szAction != nullptr)
     {
-      feature = szButton;
-      StringUtils::FoldCase(feature);
+      feature = UnicodeUtils::FoldCase(szButton);
       actionStr = szAction;
     }
   }

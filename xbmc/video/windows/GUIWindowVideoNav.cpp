@@ -36,6 +36,7 @@
 #include "settings/SettingsComponent.h"
 #include "utils/FileUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
@@ -1169,7 +1170,7 @@ bool CGUIWindowVideoNav::OnClick(int iItem, const std::string &player)
 
 std::string CGUIWindowVideoNav::GetStartFolder(const std::string &dir)
 {
-  std::string lower(dir); StringUtils::FoldCase(lower);
+  std::string lower = UnicodeUtils::FoldCase(dir);
   if (lower == "moviegenres")
     return "videodb://movies/genres/";
   else if (lower == "movietitles")

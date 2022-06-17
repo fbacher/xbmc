@@ -16,6 +16,7 @@
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Variant.h"
 
 using namespace KODI::MESSAGING;
@@ -124,8 +125,7 @@ std::string CLanguageResource::GetAddonId(const std::string& locale)
   if (!StringUtils::StartsWith(addonId, LANGUAGE_ADDON_PREFIX))
     addonId = LANGUAGE_ADDON_PREFIX + locale;
 
-  StringUtils::FoldCase(addonId);
-  return addonId;
+  return UnicodeUtils::FoldCase(addonId);
 }
 
 bool CLanguageResource::FindLegacyLanguage(const std::string &locale, std::string &legacyLanguage)

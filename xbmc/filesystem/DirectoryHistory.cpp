@@ -9,6 +9,7 @@
 #include "DirectoryHistory.h"
 
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
@@ -153,7 +154,7 @@ std::string CDirectoryHistory::preparePath(const std::string &strDirectory, bool
   
   std::string strDir = strDirectory;
   if (foldCase)
-    StringUtils::FoldCase(strDir);
+    strDir = UnicodeUtils::FoldCase(strDir);
 
   URIUtils::RemoveSlashAtEnd(strDir);
 

@@ -56,6 +56,7 @@
 #include "utils/MathUtils.h"
 #include "utils/Random.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/XMLUtils.h"
 #include "utils/log.h"
@@ -1390,8 +1391,7 @@ int CMusicDatabase::AddAlbum(const std::string& strAlbum,
                           "AND strMusicBrainzAlbumID IS NULL",
                           strArtist.c_str(), strAlbum.c_str());
     m_pDS->query(strSQL);
-    std::string strCheckFlag = strType;
-    StringUtils::FoldCase(strCheckFlag);
+    std::string strCheckFlag = UnicodeUtils::FoldCase(strType);
     if (strCheckFlag.find("boxset") != std::string::npos) //boxset flagged in album type
       bBoxedSet = true;
     if (m_pDS->num_rows() == 0)

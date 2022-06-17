@@ -13,6 +13,7 @@
 #include "utils/HTMLUtil.h"
 #include "utils/RegExp.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 
 CDVDSubtitleTagSami::~CDVDSubtitleTagSami()
 {
@@ -45,7 +46,7 @@ void CDVDSubtitleTagSami::ConvertLine(std::string& strUTF8, const char* langClas
   {
     // Parser for SubRip/SAMI Tags
     std::string fullTag = m_tags->GetMatch(0);
-    StringUtils::FoldCase(fullTag);
+    fullTag = UnicodeUtils::FoldCase(fullTag);
     strUTF8.erase(pos, fullTag.length());
     if (fullTag == "<b>")
     {
@@ -151,7 +152,7 @@ void CDVDSubtitleTagSami::ConvertLine(std::string& strUTF8, const char* langClas
       {
         std::string tagOptionName = m_tagOptions->GetMatch(1);
         std::string tagOptionValue = m_tagOptions->GetMatch(2);
-        StringUtils::FoldCase(tagOptionValue);
+        tagOptionValue = UnicodeUtils::FoldCase(tagOptionValue);
 
         pos2 += static_cast<int>(tagOptionName.length() + tagOptionValue.length());
         if (tagOptionName == "class")

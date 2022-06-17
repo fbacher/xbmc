@@ -16,6 +16,7 @@
 #include "MediaCodecDecoderFilterManager.h"
 
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 #include <androidjni/MediaCodecList.h>
@@ -54,8 +55,7 @@ CMediaCodecDecoderFilterManager::CMediaCodecDecoderFilterManager()
       if (StringUtils::StartsWithNoCase(codecname, *ptr))
         flags = 0;
     }
-    std::string tmp(codecname);
-    StringUtils::FoldCase(tmp);
+    std::string tmp = UnicodeUtils::FoldCase(codecname);
     int minheight = 0;
     if (tmp.find("mpeg4") != std::string::npos)
       minheight = 720;

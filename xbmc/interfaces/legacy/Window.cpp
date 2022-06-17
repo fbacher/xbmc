@@ -18,6 +18,7 @@
 #include "guilib/GUIRadioButtonControl.h"
 #include "guilib/GUIWindowManager.h"
 #include "messaging/ApplicationMessenger.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Variant.h"
 
 #define ACTIVE_WINDOW CServiceBroker::GetGUI()->GetWindowManager().GetActiveWindow()
@@ -599,8 +600,7 @@ namespace XBMCAddon
     {
       XBMC_TRACE;
       SingleLockWithDelayGuard gslock(CServiceBroker::GetWinSystem()->GetGfxContext(),languageHook);
-      std::string lowerKey = key;
-      StringUtils::FoldCase(lowerKey);
+      std::string lowerKey = UnicodeUtils::FoldCase(key);
 
       ref(window)->SetProperty(lowerKey, value);
     }
@@ -609,8 +609,7 @@ namespace XBMCAddon
     {
       XBMC_TRACE;
       SingleLockWithDelayGuard gslock(CServiceBroker::GetWinSystem()->GetGfxContext(),languageHook);
-      std::string lowerKey = key;
-      StringUtils::FoldCase(lowerKey);
+      std::string lowerKey = UnicodeUtils::FoldCase(key);
       std::string value = ref(window)->GetProperty(lowerKey).asString();
       return value;
     }
@@ -621,8 +620,7 @@ namespace XBMCAddon
       if (!key) return;
       SingleLockWithDelayGuard gslock(CServiceBroker::GetWinSystem()->GetGfxContext(),languageHook);
 
-      std::string lowerKey = key;
-      StringUtils::FoldCase(lowerKey);
+      std::string lowerKey = UnicodeUtils::FoldCase(key);
       ref(window)->SetProperty(lowerKey, "");
     }
 

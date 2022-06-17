@@ -41,6 +41,7 @@
 #include "utils/FileExtensionProvider.h"
 #include "utils/RegExp.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
@@ -1542,7 +1543,7 @@ namespace VIDEO
       if (matchesFilename)
         candidate.erase(0, baseFilename.length());
       URIUtils::RemoveExtension(candidate);
-      StringUtils::FoldCase(candidate);
+      candidate = UnicodeUtils::FoldCase(candidate);
 
       // move 'folder' to thumb / poster / banner based on aspect ratio
       // if such artwork doesn't already exist
@@ -1878,14 +1879,13 @@ namespace VIDEO
             {
               title = guide->strTitle;
             }
-            StringUtils::FoldCase(title);
+            title = UnicodeUtils::FoldCase(title);
             guide->cScraperUrl.SetTitle(title);
             titles.push_back(title);
           }
 
           double matchscore;
-          std::string loweredTitle(file->strTitle);
-          StringUtils::FoldCase(loweredTitle);
+          std::string loweredTitle(UnicodeUtils::FoldCase(file->strTitle));
           int index = StringUtils::FindBestMatch(loweredTitle, titles, matchscore);
           if (index >= 0 && matchscore >= minscore)
           {

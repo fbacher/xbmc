@@ -28,6 +28,7 @@
 #include "storage/MediaManager.h"
 #include "utils/FileExtensionProvider.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 #include "video/PlayerController.h"
@@ -60,8 +61,7 @@ static int PlayOffset(const std::vector<std::string>& params)
   // playlist.playoffset(offset)
   // playlist.playoffset(music|video,offset)
   std::string strPos = params[0];
-  std::string paramlow(params[0]);
-  StringUtils::FoldCase(paramlow);
+  std::string paramlow = UnicodeUtils::FoldCase(params[0]);
   if (params.size() > 1)
   {
     // ignore any other parameters if present
@@ -111,8 +111,8 @@ static int PlayerControl(const std::vector<std::string>& params)
   g_application.ResetScreenSaver();
   g_application.WakeUpScreenSaverAndDPMS();
 
-  std::string paramlow(params[0]);
-  StringUtils::FoldCase(paramlow);
+  std::string paramlow = UnicodeUtils::FoldCase(params[0]);
+
 
   if (paramlow ==  "play")
   { // play/pause
@@ -316,8 +316,7 @@ static int PlayerControl(const std::vector<std::string>& params)
     int iPlaylist = CServiceBroker::GetPlaylistPlayer().GetCurrentPlaylist();
     PLAYLIST::REPEAT_STATE previous_state = CServiceBroker::GetPlaylistPlayer().GetRepeat(iPlaylist);
 
-    std::string paramlow(params[0]);
-    StringUtils::FoldCase(paramlow);
+  std::string paramlow = UnicodeUtils::FoldCase(params[0]);
 
     PLAYLIST::REPEAT_STATE state;
     if (paramlow == "repeatall")

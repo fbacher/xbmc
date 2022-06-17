@@ -760,8 +760,7 @@ bool URIUtils::IsHD(const std::string& strFileName)
 
 bool URIUtils::IsDVD(const std::string& strFile)
 {
-  std::string strFileLow = strFile;
-  StringUtils::FoldCase(strFileLow);
+  std::string strFileLow = UnicodeUtils::FoldCase(strFile);
   if (strFileLow.find("video_ts.ifo") != std::string::npos && IsOnDVD(strFile))
     return true;
 

@@ -13,6 +13,7 @@
 #include "SettingDefinitions.h"
 #include "SettingSection.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/log.h"
 
@@ -552,7 +553,7 @@ SettingSectionPtr CSettingsManager::GetSection(std::string section) const
   if (section.empty())
     return nullptr;
 
-  StringUtils::FoldCase(section);
+  section = UnicodeUtils::FoldCase(section);
 
   auto sectionIt = m_sections.find(section);
   if (sectionIt != m_sections.end())
@@ -1407,18 +1408,16 @@ void CSettingsManager::ResolveSettingDependencies(const Setting& setting)
 
 CSettingsManager::SettingMap::const_iterator CSettingsManager::FindSetting(std::string settingId) const
 {
-  StringUtils::FoldCase(settingId);
-  return m_settings.find(settingId);
+  return m_settings.find(UnicodeUtils::FoldCase(settingId));
 }
 
 CSettingsManager::SettingMap::iterator CSettingsManager::FindSetting(std::string settingId)
 {
-  StringUtils::FoldCase(settingId);
-  return m_settings.find(settingId);
+  return m_settings.find(UnicodeUtils::FoldCase(settingId));
 }
 
 std::pair<CSettingsManager::SettingMap::iterator, bool> CSettingsManager::InsertSetting(std::string settingId, const Setting& setting)
 {
-  StringUtils::FoldCase(settingId);
+  settingId = UnicodeUtils::FoldCase(settingId);
   return m_settings.insert(std::make_pair(settingId, setting));
 }

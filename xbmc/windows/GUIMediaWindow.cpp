@@ -55,6 +55,7 @@
 #include "utils/log.h"
 #include "utils/SortUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "view/GUIViewState.h"
@@ -1394,7 +1395,7 @@ void CGUIMediaWindow::GetDirectoryHistoryString(const CFileItem* pItem, std::str
     strHistoryString = RemoveParameterFromPath(strHistoryString, "filter");
 
   URIUtils::RemoveSlashAtEnd(strHistoryString);
-  StringUtils::FoldCase(strHistoryString);
+  strHistoryString = UnicodeUtils::FoldCase(strHistoryString);
 }
 
 /*!
@@ -2079,7 +2080,7 @@ bool CGUIMediaWindow::GetAdvanceFilteredItems(CFileItemList &items)
   for (int j = 0; j < resultItems.Size(); j++)
   {
     std::string itemPath = CURL(resultItems[j]->GetPath()).GetWithoutOptions();
-    StringUtils::FoldCase(itemPath);
+    itemPath = UnicodeUtils::FoldCase(itemPath);
 
     lookup[itemPath] = resultItems[j];
   }
@@ -2099,8 +2100,7 @@ bool CGUIMediaWindow::GetAdvanceFilteredItems(CFileItemList &items)
     // check if the item is part of the resultItems list
     // by comparing their paths (but ignoring any special
     // options because they differ from filter to filter)
-    std::string path = CURL(item->GetPath()).GetWithoutOptions();
-    StringUtils::FoldCase(path);
+    std::string path = UnicodeUtils::FoldCase(CURL(item->GetPath()).GetWithoutOptions());
 
     std::map<std::string, CFileItemPtr>::iterator itItem = lookup.find(path);
     if (itItem != lookup.end())

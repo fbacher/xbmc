@@ -18,6 +18,7 @@
 #include "PlatformDefs.h"
 #endif
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 
 class CSetting;
 
@@ -145,8 +146,7 @@ public:
 
   static PeripheralType GetTypeFromString(const std::string& strType)
   {
-    std::string strTypeLowerCase(strType);
-    StringUtils::FoldCase(strTypeLowerCase);
+    std::string strTypeLowerCase = UnicodeUtils::FoldCase(strType);
 
     if (strTypeLowerCase == "bluetooth")
       return PERIPHERAL_BLUETOOTH;
@@ -203,8 +203,7 @@ public:
 
   static PeripheralBusType GetBusTypeFromString(const std::string& strType)
   {
-    std::string strTypeLowerCase(strType);
-    StringUtils::FoldCase(strTypeLowerCase);
+    std::string strTypeLowerCase = UnicodeUtils::FoldCase(strType);
 
     if (strTypeLowerCase == "usb")
       return PERIPHERAL_BUS_USB;
@@ -266,8 +265,7 @@ public:
 
   static PeripheralFeature GetFeatureTypeFromString(const std::string& strType)
   {
-    std::string strTypeLowerCase(strType);
-    StringUtils::FoldCase(strTypeLowerCase);
+    std::string strTypeLowerCase = UnicodeUtils::FoldCase(strType);
 
     if (strTypeLowerCase == "hid")
       return FEATURE_HID;

@@ -25,6 +25,7 @@
 #include "threads/SingleLock.h"
 #include "utils/ColorUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/TimeUtils.h"
 #include "utils/Variant.h"
 #include "utils/XMLUtils.h"
@@ -98,8 +99,7 @@ bool CGUIWindow::Load(const std::string& strFileName, bool bContainsPath)
   else
   {
     // FIXME: strLowerPath needs to eventually go since resToUse can get incorrectly overridden
-    std::string strFileNameLower = strFileName;
-    StringUtils::FoldCase(strFileNameLower);  // FYI, fold case avoids strange side-effects of FoldCase for some locales.
+    std::string strFileNameLower = UnicodeUtils::FoldCase(strFileName);
     strLowerPath =  g_SkinInfo->GetSkinPath(strFileNameLower, &m_coordsRes);
     strPath = g_SkinInfo->GetSkinPath(strFileName, &m_coordsRes);
   }
@@ -126,8 +126,7 @@ bool CGUIWindow::LoadXML(const std::string &strPath, const std::string &strLower
   if (!m_windowXMLRootElement)
   {
     CXBMCTinyXML xmlDoc;
-    std::string strPathLower = strPath;
-    StringUtils::FoldCase(strPathLower);
+    std::string strPathLower = UnicodeUtils::FoldCase(strPath);
     if (!xmlDoc.LoadFile(strPath) && !xmlDoc.LoadFile(strPathLower) && !xmlDoc.LoadFile(strLowerPath))
     {
       CLog::Log(LOGERROR, "Unable to load window XML: {}. Line {}\n{}", strPath, xmlDoc.ErrorRow(),

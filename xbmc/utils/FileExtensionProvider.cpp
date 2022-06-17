@@ -15,6 +15,7 @@
 #include "addons/ImageDecoder.h"
 #include "settings/AdvancedSettings.h"
 #include "settings/SettingsComponent.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 
 #include <string>
@@ -104,8 +105,7 @@ bool CFileExtensionProvider::CanOperateExtension(const std::string& path) const
    */
 
   // Get file extensions to find addon related to it.
-  std::string strExtension = URIUtils::GetExtension(path);
-  StringUtils::FoldCase(strExtension);
+  std::string strExtension = UnicodeUtils::FoldCase(URIUtils::GetExtension(path));
   if (!strExtension.empty() && CServiceBroker::IsBinaryAddonCacheUp())
   {
     std::vector<std::unique_ptr<KODI::ADDONS::IAddonSupportCheck>> supportList;

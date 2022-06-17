@@ -27,6 +27,7 @@
 #include "settings/lib/SettingDefinitions.h"
 #include "threads/Timer.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/XMLUtils.h"
@@ -346,7 +347,8 @@ void CSkinInfo::GetSkinPaths(std::vector<std::string> &paths) const
 
 bool CSkinInfo::TranslateResolution(const std::string &name, RESOLUTION_INFO &res)
 {
-  std::string lower(name); StringUtils::FoldCase(lower);
+  std::string lower(name);
+  lower = UnicodeUtils::FoldCase(lower);
   if (lower == "pal")
     res = RESOLUTION_INFO(720, 576, 4.0f/3, "pal");
   else if (lower == "pal16x9")

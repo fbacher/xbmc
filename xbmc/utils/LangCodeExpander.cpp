@@ -9,6 +9,7 @@
 #include "LangCodeExpander.h"
 
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/XBMCTinyXML.h"
 
 #include <algorithm>
@@ -71,7 +72,7 @@ void CLangCodeExpander::LoadUserCodes(const TiXmlElement* pRootElement)
       {
         sShort = pShort->FirstChild()->Value();
         sLong = pLong->FirstChild()->Value();
-        StringUtils::FoldCase(sShort);
+        sShort = UnicodeUtils::FoldCase(sShort);
 
         m_mapUser[sShort] = sLong;
       }
@@ -141,11 +142,7 @@ bool CLangCodeExpander::ConvertISO6391ToISO6392B(const std::string& strISO6391,
   if (strISO6391.length() != 2)
     return false;
 
-  std::string strISO6391Lower(strISO6391);
-  
-  // FoldCase used to avoid issues like "The Turkic 'I' Problem
-  
-  StringUtils::FoldCase(strISO6391Lower);
+  std::string strISO6391Lower(UnicodeUtils::FoldCase(strISO6391));
   StringUtils::Trim(strISO6391Lower);
 
   for (const auto& codes : LanguageCodes)
@@ -180,8 +177,7 @@ bool CLangCodeExpander::ConvertToISO6392B(const std::string& strCharCode,
 
   if (strCharCode.size() == 3)
   {
-    std::string charCode(strCharCode);
-    StringUtils::FoldCase(charCode);
+    std::string charCode(UnicodeUtils::FoldCase(strCharCode));
     for (const auto& codes : LanguageCodes)
     {
       if (charCode == codes.iso639_2b ||
@@ -256,8 +252,7 @@ bool CLangCodeExpander::ConvertISO31661Alpha2ToISO31661Alpha3(const std::string&
   if (strISO31661Alpha2.length() != 2)
     return false;
 
-  std::string strLower(strISO31661Alpha2);
-  StringUtils::FoldCase(strLower);
+  std::string strLower(UnicodeUtils::FoldCase(strISO31661Alpha2));
   StringUtils::Trim(strLower);
   for (const auto& codes : RegionCodes)
   {
@@ -277,8 +272,7 @@ bool CLangCodeExpander::ConvertWindowsLanguageCodeToISO6392B(
   if (strWindowsLanguageCode.length() != 3)
     return false;
 
-  std::string strLower(strWindowsLanguageCode);
-  StringUtils::FoldCase(strLower);
+  std::string strLower(UnicodeUtils::FoldCase(strWindowsLanguageCode));
   for (const auto& codes : LanguageCodes)
   {
     if ((codes.win_id && strLower == codes.win_id) || strLower == codes.iso639_2b)
@@ -312,8 +306,7 @@ bool CLangCodeExpander::ConvertToISO6391(const std::string& lang, std::string& c
   }
   else if (lang.length() == 3)
   {
-    std::string lower(lang);
-    StringUtils::FoldCase(lower);
+    std::string lower(UnicodeUtils::FoldCase(lang));
     for (const auto& codes : LanguageCodes)
     {
       if (lower == codes.iso639_2b || (codes.win_id && lower == codes.win_id))
@@ -399,8 +392,7 @@ bool CLangCodeExpander::LookupInUserMap(const std::string& code, std::string& de
     return false;
 
   // make sure we convert to lowercase before trying to find it
-  std::string sCode(code);
-  StringUtils::FoldCase(sCode);
+  std::string sCode(UnicodeUtils::FoldCase(code));
   StringUtils::Trim(sCode);
 
   STRINGLOOKUPTABLE::iterator it = m_mapUser.find(sCode);
@@ -419,8 +411,7 @@ bool CLangCodeExpander::LookupInISO639Tables(const std::string& code, std::strin
     return false;
 
   long longcode;
-  std::string sCode(code);
-  StringUtils::FoldCase(sCode);
+  std::string sCode(UnicodeUtils::FoldCase(code));
   StringUtils::Trim(sCode);
 
   if (sCode.length() == 2)

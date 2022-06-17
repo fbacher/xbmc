@@ -18,6 +18,7 @@
 #include "pvr/guilib/PVRGUIActions.h"
 #include "pvr/windows/GUIWindowPVRGuide.h"
 #include "utils/log.h"
+#include "utils/UnicodeUtils.h"
 
 #include <algorithm>
 #include <cstdlib>
@@ -112,8 +113,7 @@ int EpgGridControl(const std::vector<std::string>& params)
     return 0;
   }
 
-  std::string param(params[0]);
-  StringUtils::FoldCase(param);
+  std::string param = UnicodeUtils::FoldCase((params[0]));
 
   if (param == "firstprogramme")
   {

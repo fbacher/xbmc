@@ -14,6 +14,7 @@
 #include "profiles/ProfileManager.h"
 #include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/log.h"
@@ -53,7 +54,7 @@ bool CIRTranslator::LoadIRMap(const std::string& irMapPath)
   size_t lastindex = remoteMapTag.find_last_of('.');
   if (lastindex != std::string::npos)
     remoteMapTag = remoteMapTag.substr(0, lastindex);
-  StringUtils::FoldCase(remoteMapTag);
+  remoteMapTag = UnicodeUtils::FoldCase(remoteMapTag);
 
   // Load our xml file, and fill up our mapping tables
   CXBMCTinyXML xmlDoc;
@@ -158,7 +159,7 @@ uint32_t CIRTranslator::TranslateString(std::string strButton)
 
   uint32_t buttonCode = 0;
 
-  StringUtils::FoldCase(strButton);
+  strButton = UnicodeUtils::FoldCase(strButton);
 
   if (strButton == "left")
     buttonCode = XINPUT_IR_REMOTE_LEFT;

@@ -14,6 +14,7 @@
 #include "pvr/PVRManager.h"
 #include "pvr/guilib/PVRGUIActions.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 #include <algorithm>
@@ -211,7 +212,7 @@ int CWindowTranslator::TranslateWindow(const std::string& window)
   if (strWindow.empty())
     return WINDOW_INVALID;
 
-  StringUtils::FoldCase(strWindow);
+  strWindow = UnicodeUtils::FoldCase(strWindow);
 
   // Eliminate .xml
   if (StringUtils::EndsWith(strWindow, ".xml"))

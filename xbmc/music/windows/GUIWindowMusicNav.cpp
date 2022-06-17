@@ -41,6 +41,7 @@
 #include "utils/FileUtils.h"
 #include "utils/LegacyPathTranslation.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
@@ -911,7 +912,7 @@ void CGUIWindowMusicNav::AddSearchFolder()
 
 std::string CGUIWindowMusicNav::GetStartFolder(const std::string &dir)
 {
-  std::string lower(dir); StringUtils::FoldCase(lower);
+  std::string lower = UnicodeUtils::FoldCase(dir);
   if (lower == "genres")
     return "musicdb://genres/";
   else if (lower == "artists")

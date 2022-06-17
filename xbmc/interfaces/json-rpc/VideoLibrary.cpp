@@ -15,6 +15,7 @@
 #include "messaging/ApplicationMessenger.h"
 #include "utils/SortUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "video/VideoDatabase.h"
@@ -431,7 +432,7 @@ JSONRPC_STATUS CVideoLibrary::GetInProgressTVShows(const std::string &method, IT
 JSONRPC_STATUS CVideoLibrary::GetGenres(const std::string &method, ITransportLayer *transport, IClient *client, const CVariant &parameterObject, CVariant &result)
 {
   std::string media = parameterObject["type"].asString();
-  StringUtils::FoldCase(media);
+  media = UnicodeUtils::FoldCase(media);
   int idContent = -1;
 
   std::string strPath = "videodb://";
@@ -472,7 +473,7 @@ JSONRPC_STATUS CVideoLibrary::GetGenres(const std::string &method, ITransportLay
 JSONRPC_STATUS CVideoLibrary::GetTags(const std::string &method, ITransportLayer *transport, IClient *client, const CVariant &parameterObject, CVariant &result)
 {
   std::string media = parameterObject["type"].asString();
-  StringUtils::FoldCase(media);
+  media = UnicodeUtils::FoldCase(media);
   int idContent = -1;
 
   std::string strPath = "videodb://";
@@ -568,7 +569,7 @@ JSONRPC_STATUS CVideoLibrary::GetAvailableArt(const std::string& method, ITransp
     return InternalError;
 
   std::string artType = parameterObject["arttype"].asString();
-  StringUtils::FoldCase(artType);
+  artType = UnicodeUtils::FoldCase(artType);
 
   CVideoDatabase videodatabase;
   if (!videodatabase.Open())

@@ -11,6 +11,7 @@
 #include "Key.h"
 #include "XBMC_keytable.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/log.h"
 
@@ -49,7 +50,7 @@ uint32_t CKeyboardTranslator::TranslateButton(const TiXmlElement* pButton)
   std::string strMod;
   if (pButton->QueryValueAttribute("mod", &strMod) == TIXML_SUCCESS)
   {
-    StringUtils::FoldCase(strMod);
+    strMod = UnicodeUtils::FoldCase(strMod);
 
     std::vector<std::string> modArray = StringUtils::Split(strMod, ",");
     for (auto substr : modArray)

@@ -10,6 +10,7 @@
 #include "utils/log.h"
 #include "utils/URIUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "Util.h"
 #include "filesystem/File.h"
 #include "FileItem.h"
@@ -138,8 +139,7 @@ void CURL::Parse(const std::string& strURL1)
 
   if (IsProtocol("udf") || IsProtocol("iso9660"))
   {
-    std::string lower(strURL);
-    StringUtils::FoldCase(lower);
+    std::string lower = UnicodeUtils::FoldCase(strURL);
     size_t isoPos = lower.find(".iso\\", iPos);
     if (isoPos == std::string::npos)
       isoPos = lower.find(".udf\\", iPos);
@@ -330,13 +330,12 @@ void CURL::SetFileName(const std::string& strFileName)
     m_strShareName = m_strFileName.substr(0, slash);
 
   StringUtils::Trim(m_strFileType);
-  StringUtils::FoldCase(m_strFileType);
+  m_strFileType = UnicodeUtils::FoldCase(m_strFileType);
 }
 
 void CURL::SetProtocol(const std::string& strProtocol)
 {
-  m_strProtocol = strProtocol;
-  StringUtils::FoldCase(m_strProtocol);
+  m_strProtocol = UnicodeUtils::FoldCase(strProtocol);
 }
 
 void CURL::SetOptions(const std::string& strOptions)

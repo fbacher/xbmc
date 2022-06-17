@@ -10,6 +10,7 @@
 
 #include "settings/lib/SettingDefinitions.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/XMLUtils.h"
 #include "utils/log.h"
@@ -98,9 +99,7 @@ bool CSettingControlSpinner::SetFormat(const std::string &format)
       !StringUtils::EqualsNoCase(format, "number"))
     return false;
 
-  m_format = format;
-  StringUtils::FoldCase(m_format);
-
+  m_format = UnicodeUtils::FoldCase(format);
   return true;
 }
 
@@ -126,8 +125,7 @@ bool CSettingControlEdit::SetFormat(const std::string &format)
       !StringUtils::EqualsNoCase(format, "urlencoded"))
     return false;
 
-  m_format = format;
-  StringUtils::FoldCase(m_format);
+  m_format = UnicodeUtils::FoldCase(format);
 
   return true;
 }
@@ -223,8 +221,7 @@ bool CSettingControlButton::SetFormat(const std::string &format)
       !StringUtils::EqualsNoCase(format, "time"))
     return false;
 
-  m_format = format;
-  StringUtils::FoldCase(m_format);
+  m_format = UnicodeUtils::FoldCase(format);
 
   return true;
 }
@@ -248,8 +245,7 @@ bool CSettingControlList::SetFormat(const std::string &format)
       !StringUtils::EqualsNoCase(format, "integer"))
     return false;
 
-  m_format = format;
-  StringUtils::FoldCase(m_format);
+  m_format = UnicodeUtils::FoldCase(format);
 
   return true;
 }
@@ -280,8 +276,7 @@ bool CSettingControlSlider::SetFormat(const std::string &format)
       !StringUtils::EqualsNoCase(format, "number"))
     return false;
 
-  m_format = format;
-  StringUtils::FoldCase(m_format);
+  m_format = UnicodeUtils::FoldCase(format);
   m_formatString = GetDefaultFormatString();
 
   return true;
@@ -342,8 +337,7 @@ bool CSettingControlRange::SetFormat(const std::string &format)
   else
     return false;
 
-  m_format = format;
-  StringUtils::FoldCase(m_format);
+  m_format = UnicodeUtils::FoldCase(format);
 
   return true;
 }
