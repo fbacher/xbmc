@@ -1092,7 +1092,7 @@ bool CXBMCApp::GetStorageUsage(const std::string &path, std::string &usage)
 
   fmt.width(PATH_MAXLEN);
   fmt << std::left
-      << (path.size() < PATH_MAXLEN - 1 ? path : StringUtils::Left(path, PATH_MAXLEN - 4) + "...");
+      << (path.size() < PATH_MAXLEN - 1 ? path : UnicodeUtils::Left(path, PATH_MAXLEN - 4) + "...");
 
   fmt.width(11);
   fmt << std::right << totalSize << "G";

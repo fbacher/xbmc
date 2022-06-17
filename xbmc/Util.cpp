@@ -1531,7 +1531,7 @@ void CUtil::GetSkinThemes(std::vector<std::string>& vecTheme)
       if ((strExtension == ".xbt" && !StringUtils::EqualsNoCase(strLabel, TexturesXbt)))
         // TODO: Unicode BROKEN Left operates on character counts, not bytes
         // Only works if strExtension is single-byte chars
-        vecTheme.push_back(StringUtils::Left(strLabel, strExtension.size(), false));
+        vecTheme.push_back(UnicodeUtils::Left(strLabel, strExtension.size(), false));
     }
     else
     {
@@ -1544,7 +1544,7 @@ void CUtil::GetSkinThemes(std::vector<std::string>& vecTheme)
       if (!StringUtils::EqualsNoCase(strLabel, TexturesXbt))
         // TODO: Unicode BROKEN Left operates on character counts, not bytes
         // Only works if strExtension is single-byte chars
-        vecTheme.push_back(StringUtils::Left(strLabel, URIUtils::GetExtension(strLabel).size(), false));
+        vecTheme.push_back(UnicodeUtils::Left(strLabel, URIUtils::GetExtension(strLabel).size(), false));
     }
   }
   std::sort(vecTheme.begin(), vecTheme.end(), sortstringbyname());

@@ -295,38 +295,6 @@ int StringUtils::CompareNoCase(const char *s1, const char *s2,
 	return StringUtils::CompareNoCase(str1, str2, n, opt, normalize);
 }
 
-std::string StringUtils::Left(const std::string &str, const size_t charCount, const bool leftReference)
-{
-	std::string result = Unicode::Left(str, charCount, leftReference, Unicode::getDefaultICULocale());
-
-	return result;
-}
-
-std::string StringUtils::Left(const std::string &str, const size_t charCount, const bool leftReference, const icu::Locale& icuLocale) {
-  std::string result = Unicode::Left(str, charCount, leftReference, icuLocale);
-
-  return result;
-}
-
-std::string StringUtils::Mid(const std::string &str, const size_t firstCharIndex,
-		const size_t charCount /* = std::string::npos */) {
-	std::string result = Unicode::Mid(str, firstCharIndex, charCount);
-	return result;
-}
-
-std::string StringUtils::Right(const std::string &str, const size_t charCount, bool rightReference /* = true */)
-{
-	std::string result = Unicode::Right(str, charCount, rightReference, Unicode::getDefaultICULocale());
-	return result;
-}
-
-std::string StringUtils::Right(const std::string &str, const size_t charCount, bool rightReference,
-    const icu::Locale &icuLocale)
-{
-  std::string result = Unicode::Right(str, charCount, rightReference, icuLocale);
-  return result;
-}
-
 std::string& StringUtils::Trim(std::string &str) {
 	std::string result = Unicode::Trim(str);
 	str.swap(result);

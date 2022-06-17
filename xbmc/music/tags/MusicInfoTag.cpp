@@ -117,7 +117,7 @@ const std::string& CMusicInfoTag::GetOriginalDate() const
 
 const std::string MUSIC_INFO::CMusicInfoTag::GetOriginalYear() const
 {
-  return StringUtils::Left(m_strOriginalDate, 4);
+  return UnicodeUtils::Left(m_strOriginalDate, 4);
 }
 
 int CMusicInfoTag::GetAlbumId() const
@@ -303,7 +303,7 @@ const std::string& CMusicInfoTag::GetReleaseDate() const
 
 const std::string MUSIC_INFO::CMusicInfoTag::GetReleaseYear() const
 {
-  return StringUtils::Left(m_strReleaseDate, 4);
+  return UnicodeUtils::Left(m_strReleaseDate, 4);
 }
 
 // This is the Musicbrainz release status tag. See https://musicbrainz.org/doc/Release#Status
@@ -495,7 +495,7 @@ void CMusicInfoTag::AddReleaseDate(const std::string& strDateYear, bool isMonth 
     std::string strYYYY = GetReleaseYear();
     if (strYYYY.empty())
       strYYYY = "0000"; // Fake year when TYER not read yet
-    m_strReleaseDate = StringUtils::Format("{}-{}-{}", strYYYY, StringUtils::Left(strDateYear, 2),
+    m_strReleaseDate = StringUtils::Format("{}-{}-{}", strYYYY, UnicodeUtils::Left(strDateYear, 2),
                                            StringUtils::Right(strDateYear, 2));
   }
   // Given YYYY only (from YEAR tag) and already have YYYY-MM or YYYY-MM-DD (from DATE tag)
