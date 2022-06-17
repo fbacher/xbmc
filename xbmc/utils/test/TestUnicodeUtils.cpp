@@ -472,33 +472,72 @@ TEST(TestUnicodeUtils, TitleCase)
 
   std::string refstr = "Test";
   std::string varstr = "test";
-  UnicodeUtils::TitleCase(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  std::string result;
+
+  result = UnicodeUtils::TitleCase(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 
   refstr = "Just A Test";
   varstr = "just a test";
-  UnicodeUtils::TitleCase(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::TitleCase(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 
   refstr = "Test -1;2:3, String For Case";
   varstr = "test -1;2:3, string for Case";
-  UnicodeUtils::TitleCase(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::TitleCase(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 
   refstr = "  Just Another\t\tTest:\nWorks ";
   varstr = "  juST another\t\ttEst:\nwoRKs ";
-  UnicodeUtils::TitleCase(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::TitleCase(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 
   refstr = "N.y.p.d";
   varstr = "n.y.p.d";
-  UnicodeUtils::TitleCase(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::TitleCase(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 
   refstr = "N-Y-P-D";
   varstr = "n-y-p-d";
-  UnicodeUtils::TitleCase(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::TitleCase(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
+}
+
+TEST(TestUnicodeUtils, TitleCase_w)
+{
+  // Different from ToCapitalize (single word not title cased)
+
+  std::wstring refstr = L"Test";
+  std::wstring varstr = L"test";
+  std::wstring result;
+
+  result = UnicodeUtils::TitleCase(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
+
+  refstr = L"Just A Test";
+  varstr = L"just a test";
+  result = UnicodeUtils::TitleCase(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
+
+  refstr = L"Test -1;2:3, String For Case";
+  varstr = L"test -1;2:3, string for Case";
+  result = UnicodeUtils::TitleCase(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
+
+  refstr = L"  Just Another\t\tTest:\nWorks ";
+  varstr = L"  juST another\t\ttEst:\nwoRKs ";
+  result = UnicodeUtils::TitleCase(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
+
+  refstr = L"N.y.p.d";
+  varstr = L"n.y.p.d";
+  result = UnicodeUtils::TitleCase(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
+
+  refstr = L"N-Y-P-D";
+  varstr = L"n-y-p-d";
+  result = UnicodeUtils::TitleCase(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 }
 
 TEST(TestUnicodeUtils, EqualsNoCase)

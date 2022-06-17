@@ -555,7 +555,7 @@ public:
    *  \param str string to TitleCase
    *  \param locale
    */
-  static void TitleCase(std::wstring &str, const std::locale &locale);
+  static std::wstring TitleCase(const std::wstring &str, const std::locale &locale);
 
   /*!
    *  \brief TitleCase a string using LangInfo::GetSystemLocale.
@@ -570,7 +570,7 @@ public:
    *  \param str string to TitleCase
    *  \param locale
    */
-  static void TitleCase(std::wstring &str);
+  static std::wstring TitleCase(const std::wstring &str);
 
   /*!
    *  \brief TitleCase a wstring using locale.
@@ -585,7 +585,7 @@ public:
    *  \param str string to TitleCase
    *  \param locale
    */
-  static void TitleCase(std::string &str, const std::locale &locale);
+  static std::string TitleCase(const std::string &str, const std::locale &locale);
 
   /*!
    *  \brief TitleCase a wstring using LangInfo::GetSystemLocale.
@@ -600,7 +600,7 @@ public:
    *  \param str string to TitleCase
    *  \param locale
    */
-  static void TitleCase(std::string &str);
+  static std::string TitleCase(const std::string &str);
 
   /*!
    *  \brief Normalizes a wstring. Not expected to be used outside of UnicodeUtils.

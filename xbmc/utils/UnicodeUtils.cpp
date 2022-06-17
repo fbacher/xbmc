@@ -342,33 +342,29 @@ std::string UnicodeUtils::ToCapitalize(const std::string &str) {
 	return result;
 }
 
-void UnicodeUtils::TitleCase(std::wstring &str, const std::locale &locale)
+std::wstring UnicodeUtils::TitleCase(const std::wstring &str, const std::locale &locale)
 {
   icu::Locale icuLocale = Unicode::getICULocale(locale);
   std::wstring result = Unicode::toTitle(str, icuLocale);
-  str.swap(result);
-  return;
+  return result;
 }
 
-void UnicodeUtils::TitleCase(std::wstring &str) {
+std::wstring UnicodeUtils::TitleCase(const std::wstring &str) {
   icu::Locale icuLocale = Unicode::getDefaultICULocale();
   std::wstring result = Unicode::toTitle(str, icuLocale);
-  str.swap(result);
-  return;
+  return result;
 }
 
-void UnicodeUtils::TitleCase(std::string &str, const std::locale &locale) {
+std::string UnicodeUtils::TitleCase(const std::string &str, const std::locale &locale) {
   icu::Locale icuLocale = Unicode::getICULocale(locale);
   std::string result = Unicode::toTitle(str, icuLocale);
-  str.swap(result);
-  return;
+  return result;
 }
 
-void UnicodeUtils::TitleCase(std::string &str) {
+std::string UnicodeUtils::TitleCase(const std::string &str) {
   icu::Locale icuLocale = Unicode::getDefaultICULocale();
   std::string result = Unicode::toTitle(str, icuLocale);
-  str.swap(result);
-  return;
+  return result;
 }
 
 const std::wstring UnicodeUtils::Normalize(const std::wstring &src,

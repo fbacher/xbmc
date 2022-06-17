@@ -157,41 +157,6 @@ TEST(TestStringUtils, FormatEnumWidth)
   EXPECT_STREQ(one, varstr.c_str());
 }
 
-TEST(TestStringUtils, TitleCase)
-{
-  // Different from ToCapitalize (single word not title cased)
-
-  std::string refstr = "Test";
-  std::string varstr = "test";
-  StringUtils::TitleCase(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
-
-  refstr = "Just A Test";
-  varstr = "just a test";
-  StringUtils::TitleCase(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
-
-  refstr = "Test -1;2:3, String For Case";
-  varstr = "test -1;2:3, string for Case";
-  StringUtils::TitleCase(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
-
-  refstr = "  Just Another\t\tTest:\nWorks ";
-  varstr = "  juST another\t\ttEst:\nwoRKs ";
-  StringUtils::TitleCase(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
-
-  refstr = "N.y.p.d";
-  varstr = "n.y.p.d";
-  StringUtils::TitleCase(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
-
-  refstr = "N-Y-P-D";
-  varstr = "n-y-p-d";
-  StringUtils::TitleCase(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
-}
-
 TEST(TestStringUtils, EqualsNoCase)
 {
   std::string refstr = "TeSt";

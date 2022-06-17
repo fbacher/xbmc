@@ -159,35 +159,6 @@ std::wstring StringUtils::FormatV(const wchar_t *fmt, va_list args) {
 	return L"";
 }
 
-void StringUtils::TitleCase(std::wstring &str, const std::locale &locale)
-{
-  icu::Locale icuLocale = Unicode::getICULocale(locale);
-  std::wstring result = Unicode::toTitle(str, icuLocale);
-  str.swap(result);
-  return;
-}
-
-void StringUtils::TitleCase(std::wstring &str) {
-  icu::Locale icuLocale = Unicode::getDefaultICULocale();
-  std::wstring result = Unicode::toTitle(str, icuLocale);
-  str.swap(result);
-  return;
-}
-
-void StringUtils::TitleCase(std::string &str, const std::locale &locale) {
-  icu::Locale icuLocale = Unicode::getICULocale(locale);
-  std::string result = Unicode::toTitle(str, icuLocale);
-  str.swap(result);
-  return;
-}
-
-void StringUtils::TitleCase(std::string &str) {
-  icu::Locale icuLocale = Unicode::getDefaultICULocale();
-  std::string result = Unicode::toTitle(str, icuLocale);
-  str.swap(result);
-  return;
-}
-
 const std::wstring StringUtils::Normalize(const std::wstring &src,
 		const StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */,
 		const NormalizerType normalizerType) {
