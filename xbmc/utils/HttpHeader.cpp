@@ -77,10 +77,10 @@ bool CHttpHeader::ParseLine(const std::string& headerLine)
     std::string strParam(headerLine, 0, valueStart);
     std::string strValue(headerLine, valueStart + 1);
 
-    StringUtils::Trim(strParam, m_whitespaceChars);
+    strParam = UnicodeUtils::Trim(strParam, m_whitespaceChars);
     strParam = UnicodeUtils::FoldCase(strParam);
 
-    StringUtils::Trim(strValue, m_whitespaceChars);
+    strValue = UnicodeUtils::Trim(strValue, m_whitespaceChars);
 
     if (!strParam.empty() && !strValue.empty())
       m_params.push_back(HeaderParams::value_type(strParam, strValue));
@@ -96,7 +96,7 @@ bool CHttpHeader::ParseLine(const std::string& headerLine)
 void CHttpHeader::AddParam(const std::string& param, const std::string& value, const bool overwrite /*= false*/)
 {
   std::string paramLower(UnicodeUtils::FoldCase(param));
-  StringUtils::Trim(paramLower, m_whitespaceChars);
+  paramLower = UnicodeUtils::Trim(paramLower, m_whitespaceChars);
   if (paramLower.empty())
     return;
 
@@ -113,8 +113,7 @@ void CHttpHeader::AddParam(const std::string& param, const std::string& value, c
     }
   }
 
-  std::string valueTrim(value);
-  StringUtils::Trim(valueTrim, m_whitespaceChars);
+  std::string valueTrim(UnicodeUtils::Trim(value, m_whitespaceChars));
   if (valueTrim.empty())
     return;
 
@@ -173,7 +172,7 @@ std::string CHttpHeader::GetMimeType(void) const
   std::string strValue(GetValueRaw("content-type"));
 
   std::string mimeType(strValue, 0, strValue.find(';'));
-  StringUtils::TrimRight(mimeType, m_whitespaceChars);
+  mimeType = UnicodeUtils::TrimRight(mimeType, m_whitespaceChars);
 
   return mimeType;
 }
@@ -212,7 +211,7 @@ std::string CHttpHeader::GetCharset(void) const
           len -= pos;
         std::string charset(strValue, pos, len);  // intentionally ignoring possible ';' inside quoted string
                                                   // as we don't support any charset with ';' in name
-        StringUtils::Trim(charset, m_whitespaceChars);
+        charset = UnicodeUtils::Trim(charset, m_whitespaceChars);
         if (!charset.empty())
         {
           if (charset[0] != '"')

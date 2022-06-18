@@ -257,8 +257,7 @@ void CTextureBundleXBT::SetThemeBundle(bool themeBundle)
 // lower case + using forward slash rather than back slash
 std::string CTextureBundleXBT::Normalize(std::string name)
 {
-  StringUtils::Trim(name);
-  name = UnicodeUtils::FoldCase(name);
+  name = UnicodeUtils::FoldCase(UnicodeUtils::Trim(name));
   StringUtils::Replace(name, '\\', '/');
 
   return name;

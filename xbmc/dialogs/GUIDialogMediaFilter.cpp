@@ -25,6 +25,7 @@
 #include "settings/windows/GUIControlSettings.h"
 #include "utils/SortUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
 #include "video/VideoDatabase.h"
@@ -448,7 +449,7 @@ void CGUIDialogMediaFilter::InitializeSettings()
       std::vector<std::string> values;
       if (filter.rule != NULL && !filter.rule->m_parameter.empty())
       {
-        values = StringUtils::Split(filter.rule->GetParameter(), DATABASEQUERY_RULE_VALUE_SEPARATOR);
+        values = UnicodeUtils::Split(filter.rule->GetParameter(), DATABASEQUERY_RULE_VALUE_SEPARATOR);
         if (values.size() == 1 && values.at(0).empty())
           values.erase(values.begin());
       }

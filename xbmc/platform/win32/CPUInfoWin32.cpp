@@ -12,6 +12,7 @@
 #include "settings/AdvancedSettings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Temperature.h"
 
 #include "platform/win32/CharsetConverter.h"
@@ -73,7 +74,7 @@ CCPUInfoWin32::CCPUInfoWin32()
           m_cpuModel =
               m_cpuModel.substr(0, m_cpuModel.find(char(0))); // remove extra null terminations
           StringUtils::RemoveDuplicatedSpacesAndTabs(m_cpuModel);
-          StringUtils::Trim(m_cpuModel);
+          m_cpuModel = UnicodeUtils::Trim(m_cpuModel);
           modelfound = true;
         }
         bufSize = sizeof(buf);

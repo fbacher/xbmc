@@ -12,6 +12,7 @@
 #include "filesystem/File.h"
 #include "guilib/LocalizeStrings.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 #include <mutex>
@@ -276,8 +277,7 @@ void CDetectDVDMedia::DetectMediaType()
   }
   else
   {
-    strLabel = m_pCdInfo->GetDiscLabel();
-    StringUtils::TrimRight(strLabel);
+    strLabel = UnicodeUtils::TrimRight(m_pCdInfo->GetDiscLabel());
   }
 
   SetNewDVDShareUrl( strNewUrl , bCDDA, strLabel);

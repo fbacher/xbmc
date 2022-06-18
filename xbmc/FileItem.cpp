@@ -1595,7 +1595,7 @@ void CFileItem::FillInMimeType(bool lookup /*= true*/)
       size_t i = m_mimetype.find(';');
       if(i != std::string::npos)
         m_mimetype.erase(i, m_mimetype.length() - i);
-      StringUtils::Trim(m_mimetype);
+      m_mimetype = UnicodeUtils::Trim(m_mimetype);
     }
     else
       m_mimetype = CMime::GetMimeType(*this);
@@ -2729,7 +2729,7 @@ void CFileItemList::FilterCueItems()
                 }
                 else
                 { // try replacing the extension with one of our allowed ones.
-                  std::vector<std::string> extensions = StringUtils::Split(CServiceBroker::GetFileExtensionProvider().GetMusicExtensions(), "|");
+                  std::vector<std::string> extensions = UnicodeUtils::Split(CServiceBroker::GetFileExtensionProvider().GetMusicExtensions(), "|");
                   for (std::vector<std::string>::const_iterator i = extensions.begin(); i != extensions.end(); ++i)
                   {
                     strMediaFile = URIUtils::ReplaceExtension(pItem->GetPath(), *i);

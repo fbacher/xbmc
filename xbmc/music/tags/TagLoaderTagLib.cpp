@@ -1008,7 +1008,7 @@ void CTagLoaderTagLib::SetArtistSort(CMusicInfoTag &tag, const std::vector<std::
 void CTagLoaderTagLib::SetArtistHints(CMusicInfoTag &tag, const std::vector<std::string> &values)
 {
   if (values.size() == 1)
-    tag.SetMusicBrainzArtistHints(StringUtils::Split(values[0], CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_musicItemSeparator));
+    tag.SetMusicBrainzArtistHints(UnicodeUtils::Split(values[0], CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_musicItemSeparator));
   else
     tag.SetMusicBrainzArtistHints(values);
 }
@@ -1055,7 +1055,7 @@ void CTagLoaderTagLib::SetAlbumArtistSort(CMusicInfoTag &tag, const std::vector<
 void CTagLoaderTagLib::SetAlbumArtistHints(CMusicInfoTag &tag, const std::vector<std::string> &values)
 {
   if (values.size() == 1)
-    tag.SetMusicBrainzAlbumArtistHints(StringUtils::Split(values[0], CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_musicItemSeparator));
+    tag.SetMusicBrainzAlbumArtistHints(UnicodeUtils::Split(values[0], CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_musicItemSeparator));
   else
     tag.SetMusicBrainzAlbumArtistHints(values);
 }
@@ -1133,12 +1133,12 @@ void CTagLoaderTagLib::AddArtistRole(CMusicInfoTag &tag, const std::vector<std::
   {
     std::vector<std::string> roles;
     //Split into individual roles
-    roles = StringUtils::Split(values[i], separators);
+    roles = UnicodeUtils::Split(values[i], separators);
     for (auto role : roles)
     {
-      StringUtils::Trim(role);
+      role = UnicodeUtils::Trim(role);
       role = UnicodeUtils::ToCapitalize(role);
-      tag.AddArtistRole(role, StringUtils::Split(values[i + 1], ","));
+      tag.AddArtistRole(role, UnicodeUtils::Split(values[i + 1], ","));
     }
   }
 }
@@ -1168,15 +1168,15 @@ void CTagLoaderTagLib::AddArtistInstrument(CMusicInfoTag &tag, const std::vector
       strArtist.erase(firstLim, lastLim - firstLim + 1);
       std::string strRole = values[i].substr(firstLim + 1, lastLim - firstLim - 1);
       //Split into individual roles
-      roles = StringUtils::Split(strRole, separators);
+      roles = UnicodeUtils::Split(strRole, separators);
     }
-    StringUtils::Trim(strArtist);
+    strArtist = UnicodeUtils::Trim(strArtist);
     if (roles.empty())
       tag.AddArtistRole("Performer", strArtist);
     else
       for (auto role : roles)
       {
-        StringUtils::Trim(role);
+        role = UnicodeUtils::Trim(role);
         role = UnicodeUtils::ToCapitalize(role);
         tag.AddArtistRole(role, strArtist);
       }
@@ -1186,7 +1186,7 @@ void CTagLoaderTagLib::AddArtistInstrument(CMusicInfoTag &tag, const std::vector
 bool CTagLoaderTagLib::Load(const std::string& strFileName, CMusicInfoTag& tag, const std::string& fallbackFileExtension, EmbeddedArt *art /* = NULL */)
 {
   std::string strExtension = URIUtils::GetExtension(strFileName);
-  StringUtils::TrimLeft(strExtension, ".");
+  strExtension = UnicodeUtils::TrimLeft(strExtension, ".");
 
   if (strExtension.empty())
   {

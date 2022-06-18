@@ -16,6 +16,7 @@
 #include "settings/AdvancedSettings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/log.h"
@@ -155,7 +156,7 @@ bool CEdl::ReadEdl(const std::string& strMovie, const float fFramesPerSecond)
     {
       if (strFields[i].find(':') != std::string::npos) // HH:MM:SS.sss format
       {
-        std::vector<std::string> fieldParts = StringUtils::Split(strFields[i], '.');
+        std::vector<std::string> fieldParts = UnicodeUtils::Split(strFields[i], '.');
         if (fieldParts.size() == 1) // No ms
         {
           editStartEnd[i] = StringUtils::TimeStringToSeconds(fieldParts[0]) *

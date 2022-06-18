@@ -15,6 +15,7 @@
 #include "filesystem/File.h"
 #include "filesystem/StackDirectory.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "video/VideoInfoTag.h"
 
 using namespace XFILE;
@@ -188,7 +189,7 @@ CInfoScanner::INFO_TYPE CVideoTagLoaderFFmpeg::LoadMKV(CVideoInfoTag& tag,
       tag.SetTitle(avtag->value);
     else if (StringUtils::CompareNoCase(avtag->key, "director") == 0)
     {
-      std::vector<std::string> dirs = StringUtils::Split(avtag->value, " / ");
+      std::vector<std::string> dirs = UnicodeUtils::Split(avtag->value, " / ");
       tag.SetDirector(dirs);
     }
     else if (StringUtils::CompareNoCase(avtag->key, "date_released") == 0)
@@ -211,9 +212,9 @@ CInfoScanner::INFO_TYPE CVideoTagLoaderFFmpeg::LoadMP4(CVideoInfoTag& tag,
     if (strcmp(avtag->key, "title") == 0)
       tag.SetTitle(avtag->value);
     else if (strcmp(avtag->key, "composer") == 0)
-      tag.SetWritingCredits(StringUtils::Split(avtag->value, " / "));
+      tag.SetWritingCredits(UnicodeUtils::Split(avtag->value, " / "));
     else if (strcmp(avtag->key, "genre") == 0)
-      tag.SetGenre(StringUtils::Split(avtag->value, " / "));
+      tag.SetGenre(UnicodeUtils::Split(avtag->value, " / "));
     else if (strcmp(avtag->key,"date") == 0)
       tag.SetYear(atoi(avtag->value));
     else if (strcmp(avtag->key, "description") == 0)
@@ -231,7 +232,7 @@ CInfoScanner::INFO_TYPE CVideoTagLoaderFFmpeg::LoadMP4(CVideoInfoTag& tag,
     else if (strcmp(avtag->key, "album") == 0)
       tag.SetAlbum(avtag->value);
     else if (strcmp(avtag->key, "artist") == 0)
-      tag.SetArtist(StringUtils::Split(avtag->value, " / "));
+      tag.SetArtist(UnicodeUtils::Split(avtag->value, " / "));
   }
 
   for (size_t i = 0; i < m_fctx->nb_streams; ++i)

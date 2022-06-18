@@ -295,50 +295,6 @@ int StringUtils::CompareNoCase(const char *s1, const char *s2,
 	return StringUtils::CompareNoCase(str1, str2, n, opt, normalize);
 }
 
-std::string& StringUtils::Trim(std::string &str) {
-	std::string result = Unicode::Trim(str);
-	str.swap(result);
-	return str;
-}
-
-std::string& StringUtils::Trim(std::string &str, const char *const chars) {
-	std::string delChars = std::string(chars);
-	std::string result = Unicode::Trim(str, delChars, true, true);
-	 //+CLog::Log(LOGINFO, "StringUtils::Trim str: {} delChars: {} result: {}\n",
-	//+		 orig, delChars, str);
-  str.swap(result);
-	return str;
-}
-
-std::string& StringUtils::TrimLeft(std::string &str) {
-	std::string orig = std::string(str);
-	std::string result = Unicode::TrimLeft(str);
-	 //+ CLog::Log(LOGINFO, "StringUtils::TrimLeft str: {} result: {}\n", orig, str);
-
-	str.swap(result);
-	 return str;
-}
-
-std::string& StringUtils::TrimLeft(std::string &str, const char *const chars) {
-	std::string delChars = std::string(chars);
-	std::string result = Unicode::Trim(str, delChars, true, false);
-	str.swap(result);
-	return str;
-}
-
-std::string& StringUtils::TrimRight(std::string &str) {
-	std::string result = Unicode::TrimRight(str);
-  str.swap(result);
-	return str;
-}
-
-std::string& StringUtils::TrimRight(std::string &str, const char *const chars) {
-	std::string delChars = std::string(chars);
-	std::string result = Unicode::Trim(str, delChars, false, true);
-  str.swap(result);
-	return str;
-}
-
 int StringUtils::ReturnDigits(const std::string &str)
 {
   std::stringstream ss;
@@ -551,152 +507,6 @@ bool StringUtils::EndsWithNoCase(const std::string &str1, const std::string &str
 bool StringUtils::EndsWithNoCase(const std::string &str1, const char *s2, StringOptions opt) {
 	std::string str2 = std::string(s2);
 	return EndsWithNoCase(str1, str2, opt);
-}
-
-std::vector<std::string> StringUtils::Split(const std::string &input,
-		const std::string &delimiter, const unsigned int iMaxStrings) {
-	if (containsNonAscii(delimiter)) {
-		CLog::Log(LOGWARNING, "StringUtils::Split delimiter contains non-ASCII: {}", delimiter);
-	}
-	std::string orig = input;
-	std::vector < std::string > result = std::vector<std::string>();
-	if (not (input.empty() or delimiter.empty())) {
-		Unicode::SplitTo(std::back_inserter(result), input, delimiter, iMaxStrings,
-		    to_underlying(RegexpFlag::UREGEX_LITERAL));
-	}
-	else {
-		if (not input.empty()) // delimiter empty, so just return input, if
-			result.push_back(input);     // any. TODO: Verify that we return empty vector.
-	}
-//  CLog::Log(LOGINFO, "StringUtils::Split\n");
-
-	 //+ CLog::Log(LOGINFO, "StringUtils::Split input: {} delimiter: {} maxStrings: %d\n", orig, delimiter, iMaxStrings);
-  //+ for (int i = 0; i < result.size(); i++) {
-  //+	CLog::Log(LOGINFO, "StringUtils::    result: {}\n", result[i]);
-  //+ }
-	return result;
-}
-
-std::vector<std::string> StringUtils::Split(const std::string &input,
-		const char delimiter, size_t iMaxStrings) {
-	if (not isascii(delimiter)) {
-		CLog::Log(LOGWARNING, "StringUtils::Split delimiter contains non-ASCII: {}\n", delimiter);
-	}
-	std::vector < std::string > result;
-	std::string sDelimiter = std::string(1, delimiter);
-	result = StringUtils::Split(input, sDelimiter, iMaxStrings);
-
-	return result;
-}
-
-std::vector<std::string> StringUtils::Split(const std::string &input,
-		const std::vector<std::string> &delimiters) {
-	for (size_t i = 0; i < delimiters.size(); i++) {
-		if (containsNonAscii(delimiters[i])) {
-			CLog::Log(LOGWARNING, "StringUtils::Split delimiter contains non-ASCII: {}\n",
-					delimiters[i]);
-		}
-	}
-	std::vector < std::string > result = std::vector<std::string>();
-
-	if (input.length() == 0)
-		return result;
-
-	if (delimiters.size() == 0) {
-		result.push_back(std::string(input)); // Send back a copy
-	  return result;
-}
-
-	std::string orig = input;
-	Unicode::SplitTo(std::back_inserter(result), input, delimiters);
-	/*+
-	 CLog::Log(LOGINFO, "StringUtils::Split input: {}\n", orig);
-	 for (int i = 0; i < delimiters.size(); i++) {
-		 CLog::Log(LOGINFO, "StringUtils::Split delimiter: {}\n", delimiters[i]);
-	 }
-	 for (int i = 0; i < result.size(); i++) {
-		 CLog::Log(LOGINFO, "StringUtils::Split result: {}\n", result[i]);
-	 }
-	 +*/
-
-	return result;
-}
-
-// TODO: Need test for this
-std::vector<std::string> StringUtils::SplitMulti(
-		const std::vector<std::string> &input,
-		const std::vector<std::string> &delimiters, size_t iMaxStrings /* = 0 */) {
-	for (size_t i = 0; i < delimiters.size(); i++) {
-		if (containsNonAscii(delimiters[i])) {
-			CLog::Log(LOGWARNING, "StringUtils::SplitMulti delimiter contains non-ASCII: {}\n",
-					delimiters[i]);
-		}
-	}
-	return Unicode::SplitMulti(input, delimiters, iMaxStrings);
-
-	/**
-	 std::cout << "SplitMulti: #inputs: " << input.size() << " #delims: " << delimiters.size()
-	 << " maxStrings: " << iMaxStrings << std::endl;
-	 if (input.empty())
-	 return std::vector<std::string>();
-
-	 std::vector<std::string> results(input);
-
-	 if (delimiters.empty() || (iMaxStrings > 0 && iMaxStrings <= input.size()))
-	 return results;
-
-	 std::vector<std::string> strings1;
-	 if (iMaxStrings == 0)
-	 {
-	 for (size_t di = 0; di < delimiters.size(); di++)
-	 {
-	 // For each delimiter given us, split(remaining delimiter)
-
-	 for (size_t i = 0; i < results.size(); i++)
-	 {
-	 // for each input string, split(<input_string>, current_delimiter)
-	 //
-	 std::vector<std::string> substrings = StringUtils::Split(results[i], delimiters[di]);
-	 for (size_t j = 0; j < substrings.size(); j++)
-	 // Copy every substring (found by above split) to a new vector.
-	 strings1.push_back(substrings[j]);
-	 }
-	 // Move all of the substrings (produced by the split) is copied to the vector of all
-	 // of the substrings found so far. This means results has:
-	 // original input strings + substrings from first delimiter ... + substrings from last delimiter
-	 //
-
-	 results = strings1;
-	 strings1.clear();
-	 }
-	 return results;
-	 }
-
-	 // Control the number of strings input is split into, keeping the original strings.
-	 // Note iMaxStrings > input.size()
-	 int64_t iNew = iMaxStrings - results.size();
-	 for (size_t di = 0; di < delimiters.size(); di++)
-	 {
-	 for (size_t i = 0; i < results.size(); i++)
-	 {
-	 if (iNew > 0)
-	 {
-	 std::vector<std::string> substrings = StringUtils::Split(results[i], delimiters[di], iNew + 1);
-	 iNew = iNew - substrings.size() + 1;
-	 for (size_t j = 0; j < substrings.size(); j++)
-	 strings1.push_back(substrings[j]);
-	 }
-	 else
-	 strings1.push_back(results[i]);
-	 }
-	 results = strings1;
-	 iNew = iMaxStrings - results.size();
-	 strings1.clear();
-	 if ((iNew <= 0))
-	 break;  //Stop trying any more delimiters
-	 }
-	 return results;
-	 */
 }
 
 // returns the number of occurrences of strFind in strInput.
@@ -1293,7 +1103,7 @@ int StringUtils::AlphaNumericCollation(int nKey1, const void* pKey1, int nKey2, 
 
 int StringUtils::DateStringToYYYYMMDD(const std::string &dateString) {
 	// TODO: I assume this is a fixed format for a database or something?
-	std::vector < std::string > days = StringUtils::Split(dateString, '-');
+	std::vector < std::string > days = UnicodeUtils::Split(dateString, '-');
 	if (days.size() == 1)
 		return atoi(days[0].c_str());
 	else if (days.size() == 2)
@@ -1339,12 +1149,12 @@ std::string StringUtils::ISODateToLocalizedDate(const std::string &strIsoDate) {
 
 long StringUtils::TimeStringToSeconds(const std::string &timeString) {
 	std::string strCopy(timeString);
-	StringUtils::Trim(strCopy);
+	strCopy = UnicodeUtils::Trim(strCopy);
 	if (StringUtils::EndsWithNoCase(strCopy, " min")) {
 		// this is imdb format of "XXX min"
 		return 60 * atoi(strCopy.c_str());
 	} else {
-		std::vector < std::string > secs = StringUtils::Split(strCopy, ':');
+		std::vector < std::string > secs = UnicodeUtils::Split(strCopy, ':');
 		int timeInSecs = 0;
 
 		// TODO: This looks odd. Verify
@@ -1471,7 +1281,7 @@ int StringUtils::asciixdigitvalue(char chr) {
 }
 
 void StringUtils::RemoveCRLF(std::string &strLine) {
-	StringUtils::TrimRight(strLine, "\n\r");
+	strLine = UnicodeUtils::TrimRight(strLine, "\n\r");
 }
 
 std::string StringUtils::SizeToString(int64_t size)
@@ -1599,7 +1409,6 @@ size_t StringUtils::FindEndBracket(const std::string &str, char opener,
 }
 */
 
-#include "utils/UnicodeUtils.h"
 void StringUtils::WordToDigits(std::string &word)
 {
 

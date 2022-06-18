@@ -10,6 +10,7 @@
 
 #include "playlists/PlayListM3U.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 
 
 using namespace XFILE;
@@ -116,7 +117,7 @@ std::string CDVDInputStreamFFmpeg::GetFileName()
       url.IsProtocol("rtmpe") || url.IsProtocol("rtmpte") ||
       url.IsProtocol("rtmps"))
   {
-    std::vector<std::string> opts = StringUtils::Split(url.Get(), " ");
+    std::vector<std::string> opts = UnicodeUtils::Split(url.Get(), " ");
     if (opts.size() > 0)
     {
       return opts.front();

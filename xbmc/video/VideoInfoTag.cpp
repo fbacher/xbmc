@@ -964,7 +964,7 @@ const std::string CVideoInfoTag::GetCast(bool bIncludeRole /*= false*/) const
           StringUtils::Format("{} {} {}\n", it->strName, g_localizeStrings.Get(20347), it->strRole);
     strLabel += character;
   }
-  return StringUtils::TrimRight(strLabel, "\n");
+  return UnicodeUtils::TrimRight(strLabel, "\n");
 }
 
 void CVideoInfoTag::ParseNative(const TiXmlElement* movie, bool prioritise)
@@ -1067,8 +1067,10 @@ void CVideoInfoTag::ParseNative(const TiXmlElement* movie, bool prioritise)
 
 
   if (XMLUtils::GetString(movie, "runtime", value) && !value.empty())
-    m_duration = GetDurationFromMinuteString(StringUtils::Trim(value));
-
+  {
+    value = UnicodeUtils::Trim(value);
+    m_duration = GetDurationFromMinuteString(value);
+  }
   if (XMLUtils::GetString(movie, "mpaa", value))
     SetMPAARating(value);
 
@@ -1215,8 +1217,10 @@ void CVideoInfoTag::ParseNative(const TiXmlElement* movie, bool prioritise)
       info.strName = actor->FirstChild()->Value();
 
       if (XMLUtils::GetString(node, "role", value))
-        info.strRole = StringUtils::Trim(value);
-
+      {
+        value = UnicodeUtils::Trim(value);
+        info.strRole = value;
+      }
       XMLUtils::GetInt(node, "order", info.order);
       const TiXmlElement* thumb = node->FirstChildElement("thumb");
       while (thumb)
@@ -1276,7 +1280,7 @@ void CVideoInfoTag::ParseNative(const TiXmlElement* movie, bool prioritise)
       const char* clear=node->Attribute("clear");
       if (clear && StringUtils::CompareNoCase(clear, "true") == 0)
         artist.clear();
-      std::vector<std::string> newArtists = StringUtils::Split(pValue, itemSeparator);
+      std::vector<std::string> newArtists = UnicodeUtils::Split(pValue, itemSeparator);
       artist.insert(artist.end(), newArtists.begin(), newArtists.end());
     }
     node = node->NextSiblingElement("artist");
@@ -1295,10 +1299,10 @@ void CVideoInfoTag::ParseNative(const TiXmlElement* movie, bool prioritise)
       {
         CStreamDetailAudio *p = new CStreamDetailAudio();
         if (XMLUtils::GetString(nodeDetail, "codec", value))
-          p->m_strCodec = StringUtils::Trim(value);
+          p->m_strCodec = UnicodeUtils::Trim(value);
 
         if (XMLUtils::GetString(nodeDetail, "language", value))
-          p->m_strLanguage = StringUtils::Trim(value);
+          p->m_strLanguage = UnicodeUtils::Trim(value);
 
         XMLUtils::GetInt(nodeDetail, "channels", p->m_iChannels);
         p->m_strCodec = UnicodeUtils::FoldCase(p->m_strCodec);
@@ -1310,18 +1314,18 @@ void CVideoInfoTag::ParseNative(const TiXmlElement* movie, bool prioritise)
       {
         CStreamDetailVideo *p = new CStreamDetailVideo();
         if (XMLUtils::GetString(nodeDetail, "codec", value))
-          p->m_strCodec = StringUtils::Trim(value);
+          p->m_strCodec = UnicodeUtils::Trim(value);
 
         XMLUtils::GetFloat(nodeDetail, "aspect", p->m_fAspect);
         XMLUtils::GetInt(nodeDetail, "width", p->m_iWidth);
         XMLUtils::GetInt(nodeDetail, "height", p->m_iHeight);
         XMLUtils::GetInt(nodeDetail, "durationinseconds", p->m_iDuration);
         if (XMLUtils::GetString(nodeDetail, "stereomode", value))
-          p->m_strStereoMode = StringUtils::Trim(value);
+          p->m_strStereoMode = UnicodeUtils::Trim(value);
         if (XMLUtils::GetString(nodeDetail, "language", value))
-          p->m_strLanguage = StringUtils::Trim(value);
+          p->m_strLanguage = UnicodeUtils::Trim(value);
         if (XMLUtils::GetString(nodeDetail, "hdrtype", value))
-          p->m_strHdrType = StringUtils::Trim(value);
+          p->m_strHdrType = UnicodeUtils::Trim(value);
 
         p->m_strCodec = UnicodeUtils::FoldCase(p->m_strCodec);
         p->m_strStereoMode = UnicodeUtils::FoldCase(p->m_strStereoMode);
@@ -1334,7 +1338,7 @@ void CVideoInfoTag::ParseNative(const TiXmlElement* movie, bool prioritise)
       {
         CStreamDetailSubtitle *p = new CStreamDetailSubtitle();
         if (XMLUtils::GetString(nodeDetail, "language", value))
-          p->m_strLanguage = StringUtils::Trim(value);
+          p->m_strLanguage = UnicodeUtils::Trim(value);
         p->m_strLanguage = UnicodeUtils::FoldCase(p->m_strLanguage);
         m_streamDetails.AddStream(p);
       }
@@ -1727,13 +1731,13 @@ void CVideoInfoTag::SetUserrating(int userrating)
 
 std::string CVideoInfoTag::Trim(std::string &&value)
 {
-  return StringUtils::Trim(value);
+  return UnicodeUtils::Trim(value);
 }
 
 std::vector<std::string> CVideoInfoTag::Trim(std::vector<std::string>&& items)
 {
   std::for_each(items.begin(), items.end(), [](std::string &str){
-    str = StringUtils::Trim(str);
+    str = UnicodeUtils::Trim(str);
   });
   return std::move(items);
 }

@@ -28,6 +28,7 @@
 #include "utils/JSONVariantParser.h"
 #include "utils/RegExp.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/UrlOptions.h"
 
 #include <climits>
@@ -272,7 +273,7 @@ bool CShoutcastFile::ExtractTagInfo(const char* buf)
       if (artistInfo.empty() || title.empty())
       {
         // Most stations supply StreamTitle in format "artist - songtitle"
-        const std::vector<std::string> tokens = StringUtils::Split(newtitle, " - ");
+        const std::vector<std::string> tokens = UnicodeUtils::Split(newtitle, " - ");
         if (tokens.size() == 2)
         {
           if (artistInfo.empty())

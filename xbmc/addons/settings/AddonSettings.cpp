@@ -30,6 +30,7 @@
 #include "settings/lib/SettingsManager.h"
 #include "utils/FileExtensionProvider.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/XMLUtils.h"
@@ -479,7 +480,7 @@ std::shared_ptr<CSettingGroup> CAddonSettings::ParseOldSettingElement(
       const auto settingId = XMLUtils::GetAttribute(settingElement, "id");
       const auto defaultValue = XMLUtils::GetAttribute(settingElement, "default");
       const auto settingValues = XMLUtils::GetAttribute(settingElement, "values");
-      const auto settingLValues = StringUtils::Split(XMLUtils::GetAttribute(settingElement, "lvalues"), OldSettingValuesSeparator);
+      const auto settingLValues = UnicodeUtils::Split(XMLUtils::GetAttribute(settingElement, "lvalues"), OldSettingValuesSeparator);
       int settingLabel = -1;
       bool settingLabelParsed = ParseOldLabel(settingElement, settingId, settingLabel);
 
@@ -911,7 +912,7 @@ SettingPtr CAddonSettings::InitializeFromOldSettingPath(const std::string& setti
     control->SetFormat("file");
 
     // parse the options
-    const auto options = StringUtils::Split(option, OldSettingValuesSeparator);
+    const auto options = UnicodeUtils::Split(option, OldSettingValuesSeparator);
     control->SetUseImageThumbs(std::find(options.cbegin(), options.cend(), "usethumbs") != options.cend());
     control->SetUseFileDirectories(std::find(options.cbegin(), options.cend(), "treatasfolder") != options.cend());
   }
@@ -956,7 +957,7 @@ SettingPtr CAddonSettings::InitializeFromOldSettingSelect(const std::string& set
   if (!settingLValues.empty())
     values = settingLValues;
   else
-    values = StringUtils::Split(settingValues, OldSettingValuesSeparator);
+    values = UnicodeUtils::Split(settingValues, OldSettingValuesSeparator);
 
   SettingPtr setting = nullptr;
   if (!values.empty())
@@ -1014,11 +1015,11 @@ SettingPtr CAddonSettings::InitializeFromOldSettingAddon(const std::string& sett
 {
   // get addon types
   std::string addonTypeStr = XMLUtils::GetAttribute(settingElement, "addontype");
-  const auto addonTypesStr = StringUtils::Split(addonTypeStr, ",");
+  const auto addonTypesStr = UnicodeUtils::Split(addonTypeStr, ",");
   std::set<ADDON::TYPE> addonTypes;
   for (auto addonType : addonTypesStr)
   {
-    auto type = ADDON::CAddonInfo::TranslateType(StringUtils::Trim(addonType));
+    auto type = ADDON::CAddonInfo::TranslateType(UnicodeUtils::Trim(addonType));
     if (type != ADDON::ADDON_UNKNOWN)
       addonTypes.insert(type);
   }
@@ -1037,7 +1038,7 @@ SettingPtr CAddonSettings::InitializeFromOldSettingAddon(const std::string& sett
   }
 
   // parse addon ids
-  auto addonIds = StringUtils::Split(defaultValue, ",");
+  auto addonIds = UnicodeUtils::Split(defaultValue, ",");
 
   // parse multiselect option
   bool multiselect = false;
@@ -1086,10 +1087,10 @@ SettingPtr CAddonSettings::InitializeFromOldSettingEnums(const std::string& sett
       values.push_back(CDateTime(2000, 1, 1, hour, 0, 0).GetAsLocalizedTime(g_langInfo.GetTimeFormat(), false));
   }
   else
-    values = StringUtils::Split(settingValues, OldSettingValuesSeparator);
+    values = UnicodeUtils::Split(settingValues, OldSettingValuesSeparator);
 
   // process entries
-  const auto settingEntries = StringUtils::Split(XMLUtils::GetAttribute(settingElement, "entries"), OldSettingValuesSeparator);
+  const auto settingEntries = UnicodeUtils::Split(XMLUtils::GetAttribute(settingElement, "entries"), OldSettingValuesSeparator);
 
   // process sort
   bool sortAscending = false;
@@ -1238,7 +1239,7 @@ SettingPtr CAddonSettings::InitializeFromOldSettingSlider(const std::string& set
 {
   // parse range
   double min = 0.0, max = 100.0, step = 1.0;
-  const auto range = StringUtils::Split(XMLUtils::GetAttribute(settingElement, "range"), ',');
+  const auto range = UnicodeUtils::Split(XMLUtils::GetAttribute(settingElement, "range"), ',');
 
   if (range.size() > 1)
   {
@@ -1496,7 +1497,7 @@ bool CAddonSettings::ParseOldCondition(const std::shared_ptr<const CSetting>& se
 
 bool CAddonSettings::ParseOldConditionExpression(std::string str, ConditionExpression& expression)
 {
-  StringUtils::Trim(str);
+  str = UnicodeUtils::Trim(str);
 
   size_t posOpen = str.find('(');
   size_t posSep = str.find(',', posOpen);

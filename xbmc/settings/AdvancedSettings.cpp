@@ -1253,7 +1253,7 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
   if (!seekSteps.empty())
   {
     m_seekSteps.clear();
-    std::vector<std::string> steps = StringUtils::Split(seekSteps, ',');
+    std::vector<std::string> steps = UnicodeUtils::Split(seekSteps, ',');
     for(std::vector<std::string>::iterator it = steps.begin(); it != steps.end(); ++it)
       m_seekSteps.push_back(atoi((*it).c_str()));
   }
@@ -1400,7 +1400,7 @@ void CAdvancedSettings::GetCustomExtensions(TiXmlElement *pRootElement, std::str
     extensions += "|" + extraExtensions;
   if (XMLUtils::GetString(pRootElement, "remove", extraExtensions) && !extraExtensions.empty())
   {
-    std::vector<std::string> exts = StringUtils::Split(extraExtensions, '|');
+    std::vector<std::string> exts = UnicodeUtils::Split(extraExtensions, '|');
     for (std::vector<std::string>::const_iterator i = exts.begin(); i != exts.end(); ++i)
     {
       size_t iPos = extensions.find(*i);
@@ -1497,7 +1497,7 @@ void CAdvancedSettings::MigrateOldArtSettings()
     // e.g. {"folder.jpg", "cover.jpg", "cover.jpeg", "thumb.jpg"}
     if (!m_musicThumbs.empty())
     {
-      std::vector<std::string> thumbs1 = StringUtils::Split(m_musicThumbs, "|");
+      std::vector<std::string> thumbs1 = UnicodeUtils::Split(m_musicThumbs, "|");
       std::vector<std::string> thumbs2;
       for (auto& it : thumbs1)
       {

@@ -1344,13 +1344,13 @@ void CVideoLibrary::UpdateVideoTag(const CVariant &parameterObject, CVideoInfoTa
   if (ParameterNotNull(parameterObject, "thumbnail"))
   {
     std::string value = parameterObject["thumbnail"].asString();
-    artwork["thumb"] = StringUtils::Trim(value);
+    artwork["thumb"] = UnicodeUtils::Trim(value);
     updatedDetails.insert("art.altered");
   }
   if (ParameterNotNull(parameterObject, "fanart"))
   {
     std::string value = parameterObject["fanart"].asString();
-    artwork["fanart"] = StringUtils::Trim(value);
+    artwork["fanart"] = UnicodeUtils::Trim(value);
     updatedDetails.insert("art.altered");
   }
 

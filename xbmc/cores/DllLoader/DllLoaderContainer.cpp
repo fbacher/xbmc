@@ -18,6 +18,7 @@
 #include "filesystem/File.h"
 #include "utils/URIUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 #include "URL.h"
 
@@ -161,11 +162,11 @@ LibraryLoader* DllLoaderContainer::FindModule(const char* sName, const char* sCu
 
 #if defined(TARGET_ANDROID)
   std::string systemLibs = getenv("KODI_ANDROID_SYSTEM_LIBS");
-  vecEnv = StringUtils::Split(systemLibs, ':');
+  vecEnv = UnicodeUtils::Split(systemLibs, ':');
   std::string localLibs = getenv("KODI_ANDROID_LIBS");
   vecEnv.insert(vecEnv.begin(),localLibs);
 #else
-  vecEnv = StringUtils::Split(ENV_PATH, ';');
+  vecEnv = UnicodeUtils::Split(ENV_PATH, ';');
 #endif
   LibraryLoader* pDll = NULL;
 

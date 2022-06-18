@@ -393,7 +393,7 @@ void Xcddb::addTitle(const char *buffer)
   value[sizeof(value) - 1] = '\0';
 
   // track artist" / "track title
-  std::vector<std::string> values = StringUtils::Split(value, " / ");
+  std::vector<std::string> values = UnicodeUtils::Split(value, " / ");
   if (values.size() > 1)
   {
     g_charsetConverter.unknownToUTF8(values[0]);
@@ -493,7 +493,7 @@ void Xcddb::parseData(const char *buffer)
       if (s != NULL)
       {
         std::string strKeyword(line, s - line);
-        StringUtils::TrimRight(strKeyword);
+        strKeyword = UnicodeUtils::TrimRight(strKeyword);
 
         std::string strValue(s+1);
         StringUtils::Replace(strValue, "\\n", "\n");
@@ -563,7 +563,7 @@ void Xcddb::parseData(const char *buffer)
         if (iPos != std::string::npos)
         {
           std::string strGenre = strExtd.substr(iPos + 5, 4);
-          StringUtils::TrimLeft(strGenre);
+          strGenre = UnicodeUtils::TrimLeft(strGenre);
           if (StringUtils::IsNaturalNumber(strGenre))
           {
             int iGenre = strtol(strGenre.c_str(), NULL, 10);
@@ -1077,7 +1077,7 @@ std::string Xcddb::GetCacheFile(uint32_t disc_id) const
 std::string Xcddb::TrimToUTF8(const std::string &untrimmedText)
 {
   std::string text(untrimmedText);
-  StringUtils::Trim(text);
+  text = UnicodeUtils::Trim(text);
   // You never know if you really get UTF-8 strings from cddb
   g_charsetConverter.unknownToUTF8(text);
   return text;

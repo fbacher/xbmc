@@ -17,6 +17,7 @@
 #include "ServiceBroker.h"
 #include "Util.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "XBDateTime.h"
 #include "settings/lib/Setting.h"
 #include "settings/lib/SettingDefinitions.h"
@@ -45,7 +46,7 @@ CPosixTimezone::CPosixTimezone()
       {
          tokens.clear();
          s = line;
-         StringUtils::Trim(s);
+         s = UnicodeUtils::Trim(s);
 
          if (s.length() == 0)
             continue;
@@ -99,7 +100,7 @@ CPosixTimezone::CPosixTimezone()
       while (getdelim(&line, &linelen, '\n', fp) > 0)
       {
          s = line;
-         StringUtils::Trim(s);
+         s = UnicodeUtils::Trim(s);
 
         //! @todo STRING_CLEANUP
          if (s.length() == 0)

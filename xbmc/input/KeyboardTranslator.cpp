@@ -52,10 +52,10 @@ uint32_t CKeyboardTranslator::TranslateButton(const TiXmlElement* pButton)
   {
     strMod = UnicodeUtils::FoldCase(strMod);
 
-    std::vector<std::string> modArray = StringUtils::Split(strMod, ",");
+    std::vector<std::string> modArray = UnicodeUtils::Split(strMod, ",");
     for (auto substr : modArray)
     {
-      StringUtils::Trim(substr);
+      substr = UnicodeUtils::Trim(substr);
 
       if (substr == "ctrl" || substr == "control")
         button_id |= CKey::MODIFIER_CTRL;

@@ -773,18 +773,20 @@ TEST(TestUnicodeUtils, Trim)
   std::string refstr = "test test";
 
   std::string varstr = " test test   ";
-  UnicodeUtils::Trim(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  std::string result;
+
+  result = UnicodeUtils::Trim(varstr);
+  EXPECT_STREQ(result.c_str(), refstr.c_str());
 
   refstr = "";
   varstr = " \n\r\t   ";
-  UnicodeUtils::Trim(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::Trim(varstr);
+  EXPECT_STREQ(result.c_str(), refstr.c_str());
 
   refstr = "\nx\r\t   x";
   varstr = "$ \nx\r\t   x?\t";
-  UnicodeUtils::Trim(varstr, "$? \t");
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::Trim(varstr, "$? \t");
+  EXPECT_STREQ(result.c_str(), refstr.c_str());
 }
 
 TEST(TestUnicodeUtils, TrimLeft)
@@ -792,18 +794,20 @@ TEST(TestUnicodeUtils, TrimLeft)
   std::string refstr = "test test   ";
 
   std::string varstr = " test test   ";
-  UnicodeUtils::TrimLeft(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  std::string result;
+
+  result = UnicodeUtils::TrimLeft(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 
   refstr = "";
   varstr = " \n\r\t   ";
-  UnicodeUtils::TrimLeft(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::TrimLeft(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 
   refstr = "\nx\r\t   x?\t";
   varstr = "$ \nx\r\t   x?\t";
-  UnicodeUtils::TrimLeft(varstr, "$? \t");
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::TrimLeft(varstr, "$? \t");
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 }
 
 TEST(TestUnicodeUtils, TrimRight)
@@ -811,18 +815,20 @@ TEST(TestUnicodeUtils, TrimRight)
   std::string refstr = " test test";
 
   std::string varstr = " test test   ";
-  UnicodeUtils::TrimRight(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  std::string result;
+
+  result = UnicodeUtils::TrimRight(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 
   refstr = "";
   varstr = " \n\r\t   ";
-  UnicodeUtils::TrimRight(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::TrimRight(varstr);
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 
   refstr = "$ \nx\r\t   x";
   varstr = "$ \nx\r\t   x?\t";
-  UnicodeUtils::TrimRight(varstr, "$? \t");
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  result = UnicodeUtils::TrimRight(varstr, "$? \t");
+  EXPECT_STREQ(refstr.c_str(), result.c_str());
 }
 
 TEST(TestUnicodeUtils, Replace)
@@ -1216,7 +1222,7 @@ TEST(TestUnicodeUtils, AlphaNumericCompare)
   var = UnicodeUtils::AlphaNumericCompare(L"123abc", L"abc123");
   EXPECT_LT(var, ref);
 }
-
+#ifdef UNICODE_STRING_DISABLE
 TEST(TestUnicodeUtils, TimeStringToSeconds)
 {
   EXPECT_EQ(77455, UnicodeUtils::TimeStringToSeconds("21:30:55"));
@@ -1243,6 +1249,7 @@ TEST(TestUnicodeUtils, RemoveCRLF)
   UnicodeUtils::RemoveCRLF(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
+#endif
 
 TEST(TestUnicodeUtils, utf8_strlen)
 {

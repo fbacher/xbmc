@@ -19,6 +19,7 @@
 #include "storage/cdioSupport.h"
 #include "utils/CharsetConverter.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/SystemInfo.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
@@ -210,7 +211,7 @@ bool CWIN32Util::XBMCShellExecute(const std::string &strPath, bool bWaitForScrip
   std::string strParams;
   std::string strWorkingDir;
 
-  StringUtils::Trim(strCommand);
+  strCommand = UnicodeUtils::Trim(strCommand);
   if (strCommand.empty())
   {
     return false;

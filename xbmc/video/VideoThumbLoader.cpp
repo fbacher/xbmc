@@ -29,6 +29,7 @@
 #include "settings/SettingsComponent.h"
 #include "utils/EmbeddedArt.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 #include "video/VideoDatabase.h"
@@ -312,7 +313,7 @@ bool CVideoThumbLoader::IsArtTypeInWhitelist(const std::string& artType, const s
   // whitelist contains art "families", 'fanart' also matches 'fanart1', 'fanart2', and so on
   std::string compareArtType = artType;
   if (!exact)
-    StringUtils::TrimRight(compareArtType, "0123456789");
+    compareArtType = UnicodeUtils::TrimRight(compareArtType, "0123456789");
 
   return std::find(whitelist.begin(), whitelist.end(), compareArtType) != whitelist.end();
 }

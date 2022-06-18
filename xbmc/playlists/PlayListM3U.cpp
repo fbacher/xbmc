@@ -13,6 +13,7 @@
 #include "filesystem/File.h"
 #include "music/tags/MusicInfoTag.h"
 #include "utils/CharsetConverter.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 #include "video/VideoInfoTag.h"
@@ -83,7 +84,7 @@ bool CPlayListM3U::Load(const std::string& strFileName)
   while (file.ReadString(szLine, 4095))
   {
     strLine = szLine;
-    StringUtils::Trim(strLine);
+    strLine = UnicodeUtils::Trim(strLine);
 
     if (StringUtils::StartsWith(strLine, InfoMarker))
     {
@@ -129,8 +130,8 @@ bool CPlayListM3U::Load(const std::string& strFileName)
       {
         std::string strFirst, strSecond;
         properties.emplace_back(
-          StringUtils::Trim((strFirst = strLine.substr(iColon + 1, iEqualSign - iColon - 1))),
-          StringUtils::Trim((strSecond = strLine.substr(iEqualSign + 1))));
+            UnicodeUtils::Trim((strFirst = strLine.substr(iColon + 1, iEqualSign - iColon - 1))),
+            UnicodeUtils::Trim((strSecond = strLine.substr(iEqualSign + 1))));
       }
     }
     else if (strLine != StartMarker &&
@@ -257,18 +258,18 @@ std::map< std::string, std::string > CPlayListM3U::ParseStreamLine(const std::st
   std::string strParams(streamLine.substr(strlen(StreamMarker) + 1));
 
   // separate the parameters
-  std::vector<std::string> vecParams = StringUtils::Split(strParams, ",");
+  std::vector<std::string> vecParams = UnicodeUtils::Split(strParams, ",");
   for (std::vector<std::string>::iterator i = vecParams.begin(); i != vecParams.end(); ++i)
   {
     // split the param, ensure there was an =
-    StringUtils::Trim(*i);
-    std::vector<std::string> vecTuple = StringUtils::Split(*i, "=");
+    *i = UnicodeUtils::Trim(*i);
+    std::vector<std::string> vecTuple = UnicodeUtils::Split(*i, "=");
     if (vecTuple.size() < 2)
       continue;
 
     // remove white space from name and value and store it in the dictionary
-    StringUtils::Trim(vecTuple[0]);
-    StringUtils::Trim(vecTuple[1]);
+    vecTuple[0] = UnicodeUtils::Trim(vecTuple[0]);
+    vecTuple[1] = UnicodeUtils::Trim(vecTuple[1]);
     params[vecTuple[0]] = vecTuple[1];
   }
 

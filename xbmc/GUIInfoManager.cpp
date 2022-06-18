@@ -9875,8 +9875,7 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
    *  This is achieved by setting the bool pointed at by listItemDependent, either here or in a recursive call
    */
   // trim whitespaces
-  std::string strTest = strCondition;
-  StringUtils::Trim(strTest);
+  std::string strTest = UnicodeUtils::Trim(strCondition);
 
   std::vector< Property> info;
   SplitInfoString(strTest, info);
@@ -10669,8 +10668,7 @@ bool CGUIInfoManager::GetInt(int &value, int info, int contextWindow, const CGUI
 
 INFO::InfoPtr CGUIInfoManager::Register(const std::string &expression, int context)
 {
-  std::string condition(CGUIInfoLabel::ReplaceLocalize(expression));
-  StringUtils::Trim(condition);
+  std::string condition = UnicodeUtils::Trim(CGUIInfoLabel::ReplaceLocalize(expression));
 
   if (condition.empty())
     return INFO::InfoPtr();
@@ -11131,7 +11129,7 @@ std::string CGUIInfoManager::GetMultiInfoItemLabel(const CFileItem *item, int co
         if (info.m_info == LISTITEM_FILE_EXTENSION)
         {
           std::string strExtension = URIUtils::GetExtension(strFile);
-          return StringUtils::TrimLeft(strExtension, ".");
+          return UnicodeUtils::TrimLeft(strExtension, ".");
         }
         else if (info.m_info == LISTITEM_FILENAME_NO_EXTENSION)
         {

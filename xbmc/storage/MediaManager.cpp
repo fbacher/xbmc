@@ -42,6 +42,7 @@
 #include "settings/SettingsComponent.h"
 #include "utils/JobManager.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/XMLUtils.h"
 #include "utils/log.h"
@@ -495,7 +496,7 @@ std::string CMediaManager::GetDiskLabel(const std::string& devicePath)
   if(GetVolumeInformationW(strDeviceW.c_str(), cVolumenName, 127, NULL, NULL, NULL, cFSName, 127)==0)
     return "";
   g_charsetConverter.wToUTF8(cVolumenName, strDevice);
-  info.name = StringUtils::TrimRight(strDevice, " ");
+  info.name = UnicodeUtils::TrimRight(strDevice, " ");
   if (!info.name.empty())
     m_mapDiscInfo[mediaPath] = info;
 

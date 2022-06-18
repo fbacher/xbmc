@@ -122,17 +122,17 @@ JSONRPC_STATUS CApplicationOperations::GetPropertyValue(const std::string &prope
     if (StringUtils::StartsWithNoCase(tag, "alpha"))
     {
       result["tag"] = "alpha";
-      result["tagversion"] = StringUtils::Mid(tag, 5);
+      result["tagversion"] = UnicodeUtils::Mid(tag, 5);
     }
     else if (StringUtils::StartsWithNoCase(tag, "beta"))
     {
       result["tag"] = "beta";
-      result["tagversion"] = StringUtils::Mid(tag, 4);
+      result["tagversion"] = UnicodeUtils::Mid(tag, 4);
     }
     else if (StringUtils::StartsWithNoCase(tag, "rc"))
     {
       result["tag"] = "releasecandidate";
-      result["tagversion"] = StringUtils::Mid(tag, 2);
+      result["tagversion"] = UnicodeUtils::Mid(tag, 2);
     }
     else if (tag.empty())
       result["tag"] = "stable";

@@ -15,6 +15,7 @@
 #include "utils/HttpParser.h"
 #include "utils/HttpResponse.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 #include <sstream>
@@ -97,10 +98,10 @@ bool CWebSocketV8::Handshake(const char* data, size_t length, std::string &respo
   value = header.getValue(WS_HEADER_PROTOCOL_LC);
   if (value && strlen(value) > 0)
   {
-    std::vector<std::string> protocols = StringUtils::Split(value, ",");
+    std::vector<std::string> protocols = UnicodeUtils::Split(value, ",");
     for (auto& protocol : protocols)
     {
-      StringUtils::Trim(protocol);
+      protocol = UnicodeUtils::Trim(protocol);
       if (protocol == WS_PROTOCOL_JSONRPC)
       {
         websocketProtocol = WS_PROTOCOL_JSONRPC;

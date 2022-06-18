@@ -93,7 +93,7 @@ bool CPlayListPLS::Load(const std::string &strFile)
       return size() > 0;
     }
     strLine = szLine;
-    StringUtils::Trim(strLine);
+    strLine = UnicodeUtils::Trim(strLine);
     if(StringUtils::EqualsNoCase(strLine, START_PLAYLIST_MARKER))
       break;
 
@@ -114,7 +114,7 @@ bool CPlayListPLS::Load(const std::string &strFile)
       iPosEqual++;
       std::string strValue = strLine.substr(iPosEqual);
       strLeft = UnicodeUtils::FoldCase(strLeft);
-      StringUtils::TrimLeft(strLeft);
+      strLeft = UnicodeUtils::TrimLeft(strLeft);
 
       if (strLeft == "numberofentries")
       {

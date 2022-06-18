@@ -14,6 +14,7 @@
 #include "addons/Skin.h" // for the effect time adjustments
 #include "guilib/GUIComponent.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/XMLUtils.h"
 #include "utils/log.h"
@@ -176,7 +177,7 @@ CSlideEffect::CSlideEffect(const TiXmlElement *node) : CAnimEffect(node, EFFECT_
   const char *startPos = node->Attribute("start");
   if (startPos)
   {
-    std::vector<std::string> commaSeparated = StringUtils::Split(startPos, ",");
+    std::vector<std::string> commaSeparated = UnicodeUtils::Split(startPos, ",");
     if (commaSeparated.size() > 1)
       m_startY = (float)atof(commaSeparated[1].c_str());
     if (!commaSeparated.empty())
@@ -185,7 +186,7 @@ CSlideEffect::CSlideEffect(const TiXmlElement *node) : CAnimEffect(node, EFFECT_
   const char *endPos = node->Attribute("end");
   if (endPos)
   {
-    std::vector<std::string> commaSeparated = StringUtils::Split(endPos, ",");
+    std::vector<std::string> commaSeparated = UnicodeUtils::Split(endPos, ",");
     if (commaSeparated.size() > 1)
       m_endY = (float)atof(commaSeparated[1].c_str());
     if (!commaSeparated.empty())
@@ -216,7 +217,7 @@ CRotateEffect::CRotateEffect(const TiXmlElement *node, EFFECT_TYPE effect) : CAn
       m_autoCenter = true;
     else
     {
-      std::vector<std::string> commaSeparated = StringUtils::Split(centerPos, ",");
+      std::vector<std::string> commaSeparated = UnicodeUtils::Split(centerPos, ",");
       if (commaSeparated.size() > 1)
         m_center.y = (float)atof(commaSeparated[1].c_str());
       if (!commaSeparated.empty())
@@ -256,7 +257,7 @@ CZoomEffect::CZoomEffect(const TiXmlElement *node, const CRect &rect) : CAnimEff
   const char *start = node->Attribute("start");
   if (start)
   {
-    std::vector<std::string> params = StringUtils::Split(start, ",");
+    std::vector<std::string> params = UnicodeUtils::Split(start, ",");
     if (params.size() == 1)
     {
       m_startX = CGUIControlFactory::ParsePosition(params[0].c_str(), rect.Width());
@@ -281,7 +282,7 @@ CZoomEffect::CZoomEffect(const TiXmlElement *node, const CRect &rect) : CAnimEff
   const char *end = node->Attribute("end");
   if (end)
   {
-    std::vector<std::string> params = StringUtils::Split(end, ",");
+    std::vector<std::string> params = UnicodeUtils::Split(end, ",");
     if (params.size() == 1)
     {
       m_endX = CGUIControlFactory::ParsePosition(params[0].c_str(), rect.Width());
@@ -310,7 +311,7 @@ CZoomEffect::CZoomEffect(const TiXmlElement *node, const CRect &rect) : CAnimEff
       m_autoCenter = true;
     else
     {
-      std::vector<std::string> commaSeparated = StringUtils::Split(centerPos, ",");
+      std::vector<std::string> commaSeparated = UnicodeUtils::Split(centerPos, ",");
       if (commaSeparated.size() > 1)
         m_center.y = CGUIControlFactory::ParsePosition(commaSeparated[1].c_str(), rect.Height());
       if (!commaSeparated.empty())

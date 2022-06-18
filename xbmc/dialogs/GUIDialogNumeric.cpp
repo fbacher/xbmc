@@ -19,6 +19,7 @@
 #include "messaging/helpers/DialogOKHelper.h"
 #include "utils/Digest.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Variant.h"
 
 #include <cassert>
@@ -430,7 +431,7 @@ void CGUIDialogNumeric::SetMode(INPUT_MODE mode, const std::string &initial)
   else if (m_mode == INPUT_IP_ADDRESS)
   {
     m_lastblock = 3;
-    auto blocks = StringUtils::Split(initial, '.');
+    auto blocks = UnicodeUtils::Split(initial, '.');
     if (blocks.size() != 4)
       return;
 

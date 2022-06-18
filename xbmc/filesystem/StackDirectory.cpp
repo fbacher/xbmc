@@ -14,6 +14,7 @@
 #include "settings/AdvancedSettings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
@@ -171,7 +172,7 @@ namespace XFILE
     // remove stack:// from the beginning
     path = path.substr(8);
 
-    vecPaths = StringUtils::Split(path, " , ");
+    vecPaths = UnicodeUtils::Split(path, " , ");
     if (vecPaths.empty())
       return false;
 

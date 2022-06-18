@@ -22,6 +22,7 @@
 #include "utils/StreamDetails.h"
 #include "utils/StringUtils.h"
 #include "utils/StringValidation.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/XMLUtils.h"
@@ -257,7 +258,7 @@ bool CSmartPlaylistRule::Validate(const std::string &input, void *data)
     return true;
 
   // split the input into multiple values and validate every value separately
-  std::vector<std::string> values = StringUtils::Split(input, RULE_VALUE_SEPARATOR);
+  std::vector<std::string> values = UnicodeUtils::Split(input, RULE_VALUE_SEPARATOR);
   for (std::vector<std::string>::const_iterator it = values.begin(); it != values.end(); ++it)
   {
     if (!validator(*it, data))
@@ -271,7 +272,7 @@ bool CSmartPlaylistRule::ValidateRating(const std::string &input, void *data)
 {
   char *end = NULL;
   std::string strRating = input;
-  StringUtils::Trim(strRating);
+  strRating = UnicodeUtils::Trim(strRating);
 
   double rating = std::strtod(strRating.c_str(), &end);
   return (end == NULL || *end == '\0') &&
@@ -281,7 +282,7 @@ bool CSmartPlaylistRule::ValidateRating(const std::string &input, void *data)
 bool CSmartPlaylistRule::ValidateMyRating(const std::string &input, void *data)
 {
   std::string strRating = input;
-  StringUtils::Trim(strRating);
+  strRating = UnicodeUtils::Trim(strRating);
 
   int rating = atoi(strRating.c_str());
   return StringValidation::IsPositiveInteger(input, data) && rating <= 10;

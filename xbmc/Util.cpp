@@ -444,7 +444,7 @@ void CUtil::CleanString(const std::string& strFileName,
     }
   }
 
-  StringUtils::Trim(strTitleAndYear);
+  strTitleAndYear = UnicodeUtils::Trim(strTitleAndYear);
   strTitle = strTitleAndYear;
 
   // append year
@@ -918,7 +918,7 @@ std::string CUtil::MakeLegalFileName(const std::string &strFile, int LegalType)
     StringUtils::Replace(result, '<', '_');
     StringUtils::Replace(result, '>', '_');
     StringUtils::Replace(result, '|', '_');
-    StringUtils::TrimRight(result, ". ");
+    result = UnicodeUtils::TrimRight(result, ". ");
   }
   return result;
 }
@@ -1020,7 +1020,7 @@ void CUtil::SplitExecFunction(const std::string &execString, std::string &functi
     function = execString;
 
   // remove any whitespace, and the standard prefix (if it exists)
-  StringUtils::Trim(function);
+  function = UnicodeUtils::Trim(function);
 
   SplitParams(paramString, parameters);
 }
@@ -1492,7 +1492,7 @@ bool CUtil::SupportsWriteFileOperations(const std::string& strPath)
     for (const auto& addon : CServiceBroker::GetVFSAddonCache().GetAddonInstances())
     {
       const auto& info = addon->GetProtocolInfo();
-      auto prots = StringUtils::Split(info.type, "|");
+      auto prots = UnicodeUtils::Split(info.type, "|");
       if (info.supportWrite &&
           std::find(prots.begin(), prots.end(), url.GetProtocol()) != prots.end())
         return true;
@@ -1562,7 +1562,7 @@ void CUtil::InitRandomSeed()
 #if defined(TARGET_POSIX) && !defined(TARGET_DARWIN_TVOS)
 bool CUtil::RunCommandLine(const std::string& cmdLine, bool waitExit)
 {
-  std::vector<std::string> args = StringUtils::Split(cmdLine, ",");
+  std::vector<std::string> args = UnicodeUtils::Split(cmdLine, ",");
 
   // Strip quotes and whitespace around the arguments, or exec will fail.
   // This allows the python invocation to be written more naturally with any amount of whitespace around the args.
@@ -2019,7 +2019,7 @@ void CUtil::ScanForExternalSubtitles(const std::string& strMovie, std::vector<st
     items.Append(moreItems);
   }
 
-  std::vector<std::string> exts = StringUtils::Split(subtitleExtensions, '|');
+  std::vector<std::string> exts = UnicodeUtils::Split(subtitleExtensions, '|');
   exts.erase(std::remove(exts.begin(), exts.end(), ".zip"), exts.end());
   exts.erase(std::remove(exts.begin(), exts.end(), ".rar"), exts.end());
 
@@ -2126,8 +2126,7 @@ ExternalStreamInfo CUtil::GetExternalStreamDetailsFromFilename(const std::string
     }
   }
   name += " ";
-  name += g_localizeStrings.Get(21602); // External
-  StringUtils::Trim(name);
+  name += UnicodeUtils::Trim(g_localizeStrings.Get(21602)); // External
   info.name = StringUtils::RemoveDuplicatedSpacesAndTabs(name);
   if (info.flag == 0)
     info.flag = StreamFlags::FLAG_NONE;
@@ -2273,7 +2272,7 @@ void CUtil::ScanForExternalAudio(const std::string& videoPath, std::vector<std::
   const std::vector<std::string> common_sub_dirs = { "audio", "tracks"};
   GetItemsToScan(strBasePath, CServiceBroker::GetFileExtensionProvider().GetMusicExtensions(), common_sub_dirs, items);
 
-  std::vector<std::string> exts = StringUtils::Split(CServiceBroker::GetFileExtensionProvider().GetMusicExtensions(), "|");
+  std::vector<std::string> exts = UnicodeUtils::Split(CServiceBroker::GetFileExtensionProvider().GetMusicExtensions(), "|");
 
   CVideoDatabase database;
   database.Open();

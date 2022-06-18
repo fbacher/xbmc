@@ -98,8 +98,7 @@ bool CXRandR::Query(bool force, int screennum, bool ignoreoff)
   for (TiXmlElement* output = pRootElement->FirstChildElement("output"); output; output = output->NextSiblingElement("output"))
   {
     XOutput xoutput;
-    xoutput.name = output->Attribute("name");
-    StringUtils::Trim(xoutput.name);
+    xoutput.name = UnicodeUtils::Trim(output->Attribute("name"));
     xoutput.isConnected = (StringUtils::CompareNoCase(output->Attribute("connected"), "true") == 0);
     xoutput.screen = screennum;
     xoutput.w = (output->Attribute("w") != NULL ? atoi(output->Attribute("w")) : 0);
@@ -414,10 +413,8 @@ void CXRandR::LoadCustomModeLinesToAllOutputs(void)
 
   for (TiXmlElement* modeline = pRootElement->FirstChildElement("modeline"); modeline; modeline = modeline->NextSiblingElement("modeline"))
   {
-    name = modeline->Attribute("label");
-    StringUtils::Trim(name);
-    strModeLine = modeline->FirstChild()->Value();
-    StringUtils::Trim(strModeLine);
+    name = UnicodeUtils::Trim(modeline->Attribute("label"));
+    strModeLine = UnicodeUtils::Trim(modeline->FirstChild()->Value());
     std::string appname = UnicodeUtils::FoldCase(CCompileInfo::GetAppName());
 
     if (getenv("KODI_BIN_HOME"))

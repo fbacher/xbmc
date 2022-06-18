@@ -12,6 +12,7 @@
 #include "SettingDefinitions.h"
 #include "SettingsManager.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/XMLUtils.h"
 #include "utils/log.h"
@@ -617,7 +618,7 @@ void CSettingList::copy(const SettingList &srcValues, SettingList &dstValues)
 
 bool CSettingList::fromString(const std::string &strValue, SettingList &values) const
 {
-  return fromValues(StringUtils::Split(strValue, m_delimiter), values);
+  return fromValues(UnicodeUtils::Split(strValue, m_delimiter), values);
 }
 
 bool CSettingList::fromValues(const std::vector<std::string> &strValues, SettingList &values) const

@@ -12,6 +12,7 @@
 #include "utils/HttpParser.h"
 #include "utils/HttpResponse.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 #include <algorithm>
@@ -95,8 +96,8 @@ bool CWebSocketV13::Handshake(const char* data, size_t length, std::string &resp
   value = header.getValue(WS_HEADER_CONNECTION_LC);
   std::vector<std::string> elements;
   if (value != nullptr)
-    elements = StringUtils::Split(value, ",");
-  if (elements.empty() || !std::any_of(elements.begin(), elements.end(), [](std::string& elem) { return StringUtils::EqualsNoCase(StringUtils::Trim(elem), WS_HEADER_UPGRADE); }))
+    elements = UnicodeUtils::Split(value, ",");
+  if (elements.empty() || !std::any_of(elements.begin(), elements.end(), [](std::string& elem) { return StringUtils::EqualsNoCase(UnicodeUtils::Trim(elem), WS_HEADER_UPGRADE); }))
   {
     CLog::Log(LOGINFO, "WebSocket [RFC6455]: invalid \"{}\" received", WS_HEADER_CONNECTION_LC);
     return true;
@@ -114,10 +115,10 @@ bool CWebSocketV13::Handshake(const char* data, size_t length, std::string &resp
   value = header.getValue(WS_HEADER_PROTOCOL_LC);
   if (value && strlen(value) > 0)
   {
-    std::vector<std::string> protocols = StringUtils::Split(value, ",");
+    std::vector<std::string> protocols = UnicodeUtils::Split(value, ",");
     for (auto& protocol : protocols)
     {
-      StringUtils::Trim(protocol);
+      protocol = UnicodeUtils::Trim(protocol);
       if (protocol == WS_PROTOCOL_JSONRPC)
       {
         websocketProtocol = WS_PROTOCOL_JSONRPC;

@@ -197,7 +197,7 @@ bool XMLUtils::GetStringArray(const TiXmlNode* pRootNode, const char* strTag, st
         arrayValue.push_back(strTemp);
       else
       {
-        std::vector<std::string> tempArray = StringUtils::Split(strTemp, separator);
+        std::vector<std::string> tempArray = UnicodeUtils::Split(strTemp, separator);
         arrayValue.insert(arrayValue.end(), tempArray.begin(), tempArray.end());
       }
     }
@@ -262,7 +262,7 @@ std::string XMLUtils::GetAttribute(const TiXmlElement *element, const char *tag)
 
 void XMLUtils::SetAdditiveString(TiXmlNode* pRootNode, const char *strTag, const std::string& strSeparator, const std::string& strValue)
 {
-  std::vector<std::string> list = StringUtils::Split(strValue, strSeparator);
+  std::vector<std::string> list = UnicodeUtils::Split(strValue, strSeparator);
   for (std::vector<std::string>::const_iterator i = list.begin(); i != list.end(); ++i)
     SetString(pRootNode, strTag, *i);
 }

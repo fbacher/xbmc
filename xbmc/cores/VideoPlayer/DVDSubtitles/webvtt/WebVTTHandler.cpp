@@ -473,7 +473,7 @@ void CWebVTTHandler::DecodeLine(std::string line, std::vector<subtitleData>* sub
       std::string colorRGB = GetCueCssValue("colorRGB", line);
       if (!colorRGB.empty()) // From CSS Color numeric R,G,B values
       {
-        auto intValues = StringUtils::Split(colorRGB, ",");
+        auto intValues = UnicodeUtils::Split(colorRGB, ",");
         uint32_t color = UTILS::COLOR::ConvertIntToRGB(
             std::stoi(intValues[2]), std::stoi(intValues[1]), std::stoi(intValues[0]));
         m_feedCssStyle.color = StringUtils::Format("{:6x}", color);
@@ -564,7 +564,7 @@ void CWebVTTHandler::GetCueData(std::string& cueText)
         m_hlsTimestampMpegTsUs - m_hlsTimestampLocalUs;
     cueSettings =
         cueText.substr(m_cueTimeRegex.GetFindLen(), cueText.length() - m_cueTimeRegex.GetFindLen());
-    StringUtils::Trim(cueSettings);
+    cueSettings = UnicodeUtils::Trim(cueSettings);
   }
   else // This should never happen
   {

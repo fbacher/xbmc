@@ -38,7 +38,7 @@ bool CDVDSubtitleTagSami::Init()
 
 void CDVDSubtitleTagSami::ConvertLine(std::string& strUTF8, const char* langClassID)
 {
-  StringUtils::Trim(strUTF8);
+  strUTF8 = UnicodeUtils::Trim(strUTF8);
 
   int pos = 0;
   int del_start = 0;
@@ -253,7 +253,7 @@ void CDVDSubtitleTagSami::LoadHead(CDVDSubtitleStream* samiStream)
   std::string line;
   while (samiStream->ReadLine(line))
   {
-    StringUtils::Trim(line);
+    line = UnicodeUtils::Trim(line);
 
     if (StringUtils::EqualsNoCase(line, "<BODY>"))
       break;
@@ -267,12 +267,9 @@ void CDVDSubtitleTagSami::LoadHead(CDVDSubtitleStream* samiStream)
         {
           SLangclass lc;
           lc.ID = reg.GetMatch(1);
-          lc.Name = reg.GetMatch(2);
-          lc.Lang = reg.GetMatch(3);
-          lc.SAMIType = reg.GetMatch(4);
-          StringUtils::Trim(lc.Name);
-          StringUtils::Trim(lc.Lang);
-          StringUtils::Trim(lc.SAMIType);
+          lc.Name = UnicodeUtils::Trim(reg.GetMatch(2));
+          lc.Lang = UnicodeUtils::Trim(reg.GetMatch(3));
+          lc.SAMIType = UnicodeUtils::Trim(reg.GetMatch(4));
           m_Langclass.push_back(lc);
         }
       }

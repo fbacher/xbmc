@@ -17,6 +17,7 @@
 #include "Util.h"
 #include "storage/MediaManager.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 
 using namespace XFILE;
@@ -102,8 +103,7 @@ void CVirtualDirectory::CancelDirectory()
  */
 bool CVirtualDirectory::IsSource(const std::string& strPath, VECSOURCES *sources, std::string *name) const
 {
-  std::string strPathCpy = strPath;
-  StringUtils::TrimRight(strPathCpy, "/\\");
+  std::string strPathCpy = UnicodeUtils::TrimRight(strPath, "/\\");
 
   // just to make sure there's no mixed slashing in share/default defines
   // ie. f:/video and f:\video was not be recognised as the same directory,
@@ -119,8 +119,7 @@ bool CVirtualDirectory::IsSource(const std::string& strPath, VECSOURCES *sources
   for (int i = 0; i < (int)shares.size(); ++i)
   {
     const CMediaSource& share = shares.at(i);
-    std::string strShare = share.strPath;
-    StringUtils::TrimRight(strShare, "/\\");
+    std::string strShare = UnicodeUtils::TrimRight(share.strPath, "/\\");
     if(URIUtils::IsDOSPath(strShare))
       StringUtils::Replace(strShare, '/', '\\');
     if (strShare == strPathCpy)

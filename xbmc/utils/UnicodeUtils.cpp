@@ -503,16 +503,18 @@ std::string UnicodeUtils::Left(const std::string &str, const size_t charCount, c
 	return result;
 }
 
-std::string UnicodeUtils::Left(const std::string &str, const size_t charCount, const bool leftReference, const icu::Locale& icuLocale) {
+std::string UnicodeUtils::Left(const std::string &str, const size_t charCount,
+    const bool leftReference, const icu::Locale &icuLocale)
+{
   std::string result = Unicode::Left(str, charCount, leftReference, icuLocale);
-
   return result;
 }
 
 std::string UnicodeUtils::Mid(const std::string &str, const size_t firstCharIndex,
-		const size_t charCount /* = std::string::npos */) {
-	std::string result = Unicode::Mid(str, firstCharIndex, charCount);
-	return result;
+    const size_t charCount /* = std::string::npos */)
+{
+  std::string result = Unicode::Mid(str, firstCharIndex, charCount);
+  return result;
 }
 
 std::string UnicodeUtils::Right(const std::string &str, const size_t charCount, bool rightReference /* = true */)
@@ -528,47 +530,38 @@ std::string UnicodeUtils::Right(const std::string &str, const size_t charCount, 
   return result;
 }
 
-std::string& UnicodeUtils::Trim(std::string &str) {
+std::string UnicodeUtils::Trim(const std::string &str) {
 	std::string result = Unicode::Trim(str);
-	str.swap(result);
-	return str;
+	return result;
 }
 
-std::string& UnicodeUtils::Trim(std::string &str, const char *const chars) {
+std::string UnicodeUtils::Trim(const std::string &str, const char *const chars) {
 	std::string delChars = std::string(chars);
 	std::string result = Unicode::Trim(str, delChars, true, true);
-
-  str.swap(result);
-	return str;
+	return result;
 }
 
-std::string& UnicodeUtils::TrimLeft(std::string &str) {
+std::string UnicodeUtils::TrimLeft(const std::string &str) {
 	std::string orig = std::string(str);
 	std::string result = Unicode::TrimLeft(str);
-	 //+ CLog::Log(LOGINFO, "UnicodeUtils::TrimLeft str: {} result: {}\n", orig, str);
-
-	str.swap(result);
-	 return str;
+	 return result;
 }
 
-std::string& UnicodeUtils::TrimLeft(std::string &str, const char *const chars) {
+std::string UnicodeUtils::TrimLeft(const std::string &str, const char *const chars) {
 	std::string delChars = std::string(chars);
 	std::string result = Unicode::Trim(str, delChars, true, false);
-	str.swap(result);
-	return str;
+	return result;
 }
 
-std::string& UnicodeUtils::TrimRight(std::string &str) {
+std::string UnicodeUtils::TrimRight(const std::string &str) {
 	std::string result = Unicode::TrimRight(str);
-  str.swap(result);
-	return str;
+	return result;
 }
 
-std::string& UnicodeUtils::TrimRight(std::string &str, const char *const chars) {
+std::string UnicodeUtils::TrimRight(const std::string &str, const char *const chars) {
 	std::string delChars = std::string(chars);
 	std::string result = Unicode::Trim(str, delChars, false, true);
-  str.swap(result);
-	return str;
+	return result;
 }
 
 int UnicodeUtils::ReturnDigits(const std::string &str)

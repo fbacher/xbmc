@@ -55,6 +55,7 @@
 #include "settings/SettingsComponent.h"
 #include "settings/lib/Setting.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/XMLUtils.h"
 #include "utils/log.h"
@@ -528,10 +529,10 @@ bool CPeripherals::LoadMappings()
     {
       // The vendor_product attribute is a list of comma separated vendor:product pairs
       std::vector<std::string> vpArray =
-          StringUtils::Split(currentNode->Attribute("vendor_product"), ",");
+          UnicodeUtils::Split(currentNode->Attribute("vendor_product"), ",");
       for (const auto& i : vpArray)
       {
-        std::vector<std::string> idArray = StringUtils::Split(i, ":");
+        std::vector<std::string> idArray = UnicodeUtils::Split(i, ":");
         if (idArray.size() != 2)
         {
           CLog::Log(LOGERROR, "{} - ignoring node \"{}\" with invalid vendor_product attribute",

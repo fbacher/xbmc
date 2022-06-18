@@ -20,6 +20,7 @@
 #include "utils/StringUtils.h"
 #include "utils/URIUtils.h"
 #include "URL.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/XMLUtils.h"
 #include "utils/log.h"
 #include "utils/Variant.h"
@@ -157,7 +158,7 @@ void CExternalPlayer::Process()
   {
     for (unsigned int i = 0; i < m_filenameReplacers.size(); i++)
     {
-      std::vector<std::string> vecSplit = StringUtils::Split(m_filenameReplacers[i], " , ");
+      std::vector<std::string> vecSplit = UnicodeUtils::Split(m_filenameReplacers[i], " , ");
 
       // something is wrong, go to next substitution
       if (vecSplit.size() != 4)

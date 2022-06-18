@@ -140,7 +140,7 @@ static int PlayerControl(const std::vector<std::string>& params)
     else
 
     strFrames = params[0].substr(13);
-    StringUtils::TrimRight(strFrames, ")");
+    strFrames = UnicodeUtils::TrimRight(strFrames, ")");
     float frames = (float) atof(strFrames.c_str());
     g_application.GetAppPlayer().FrameAdvance(frames);
   }
@@ -196,7 +196,7 @@ static int PlayerControl(const std::vector<std::string>& params)
       if (player.SupportsTempo() && player.IsPlaying() && !player.IsPaused())
       {
         std::string strTempo = params[0].substr(6);
-        StringUtils::TrimRight(strTempo, ")");
+        strTempo = UnicodeUtils::TrimRight(strTempo, ")");
         float playTempo = strtof(strTempo.c_str(), nullptr);
 
         player.SetTempo(playTempo);
@@ -243,7 +243,7 @@ static int PlayerControl(const std::vector<std::string>& params)
     {
       // Don't bother checking the argument: an invalid arg will do seek(0)
       offset = params[0].substr(15);
-      StringUtils::TrimRight(offset, ")");
+      offset = UnicodeUtils::TrimRight(offset, ")");
       float offsetpercent = (float) atof(offset.c_str());
       if (offsetpercent < 0 || offsetpercent > 100)
         CLog::Log(LOGERROR, "PlayerControl(seekpercentage(n)) argument, {:f}, must be 0-100",
@@ -269,7 +269,7 @@ static int PlayerControl(const std::vector<std::string>& params)
       else if (params[0].size() != 16 || !StringUtils::EndsWithNoCase(params[0], "music)"))
       {
         strXspPath = params[0].substr(10);
-        StringUtils::TrimRight(strXspPath, ")");
+        strXspPath = UnicodeUtils::TrimRight(strXspPath, ")");
         context = PARTYMODECONTEXT_UNKNOWN;
       }
     }

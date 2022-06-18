@@ -16,6 +16,7 @@
 #include "pvr/epg/EpgSearchFilter.h"
 #include "settings/AdvancedSettings.h"
 #include "settings/SettingsComponent.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 #include <memory>
@@ -535,7 +536,7 @@ public:
         result += strFieldName;
     }
 
-    StringUtils::TrimRight(result);
+    result = UnicodeUtils::TrimRight(result);
     result += ")";
     return result;
   }
@@ -544,14 +545,14 @@ private:
   void Parse(const std::string& strSearchTerm)
   {
     std::string strParsedSearchTerm(strSearchTerm);
-    StringUtils::Trim(strParsedSearchTerm);
+    strParsedSearchTerm = UnicodeUtils::Trim(strParsedSearchTerm);
 
     std::string strFragment;
 
     bool bNextOR = false;
     while (!strParsedSearchTerm.empty())
     {
-      StringUtils::TrimLeft(strParsedSearchTerm);
+      strParsedSearchTerm = UnicodeUtils::TrimLeft(strParsedSearchTerm);
 
       if (StringUtils::StartsWith(strParsedSearchTerm, "!") ||
           StringUtils::StartsWithNoCase(strParsedSearchTerm, "not"))
@@ -604,7 +605,7 @@ private:
         }
       }
 
-      StringUtils::TrimLeft(strParsedSearchTerm);
+      strParsedSearchTerm = UnicodeUtils::TrimLeft(strParsedSearchTerm);
     }
 
     if (!strFragment.empty())

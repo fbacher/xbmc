@@ -36,6 +36,7 @@
 #include "utils/EndianSwap.h"
 #include "utils/StringUtils.h"
 #include "utils/SystemInfo.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
 
@@ -462,7 +463,7 @@ void CAirTunesServer::SetupRemoteControl()
       // were we are interested in the 56B29BB6CB904862 identifier
       if (StringUtils::StartsWithNoCase(service.GetName(), DACP_NAME_PREFIX))
       {
-        std::vector<std::string> tokens = StringUtils::Split(service.GetName(), DACP_NAME_PREFIX);
+        std::vector<std::string> tokens = UnicodeUtils::Split(service.GetName(), DACP_NAME_PREFIX);
         // if we found the service matching the given identifier
         if (tokens.size() > 1 && tokens[1] == m_dacp_id)
         {

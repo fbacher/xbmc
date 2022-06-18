@@ -173,63 +173,6 @@ TEST(TestStringUtils, EqualsNoCase_Normalize)
   EXPECT_TRUE(StringUtils::EqualsNoCase(refstr, varstr, StringOptions::FOLD_CASE_DEFAULT, true));
 }
 
-TEST(TestStringUtils, Trim)
-{
-  std::string refstr = "test test";
-
-  std::string varstr = " test test   ";
-  StringUtils::Trim(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
-
-  refstr = "";
-  varstr = " \n\r\t   ";
-  StringUtils::Trim(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
-
-  refstr = "\nx\r\t   x";
-  varstr = "$ \nx\r\t   x?\t";
-  StringUtils::Trim(varstr, "$? \t");
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
-}
-
-TEST(TestStringUtils, TrimLeft)
-{
-  std::string refstr = "test test   ";
-
-  std::string varstr = " test test   ";
-  StringUtils::TrimLeft(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
-
-  refstr = "";
-  varstr = " \n\r\t   ";
-  StringUtils::TrimLeft(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
-
-  refstr = "\nx\r\t   x?\t";
-  varstr = "$ \nx\r\t   x?\t";
-  StringUtils::TrimLeft(varstr, "$? \t");
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
-}
-
-TEST(TestStringUtils, TrimRight)
-{
-  std::string refstr = " test test";
-
-  std::string varstr = " test test   ";
-  StringUtils::TrimRight(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
-
-  refstr = "";
-  varstr = " \n\r\t   ";
-  StringUtils::TrimRight(varstr);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
-
-  refstr = "$ \nx\r\t   x";
-  varstr = "$ \nx\r\t   x?\t";
-  StringUtils::TrimRight(varstr, "$? \t");
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
-}
-
 TEST(TestStringUtils, Replace)
 {
   std::string refstr = "text text";
@@ -332,56 +275,6 @@ TEST(TestStringUtils, Normalize)
   EXPECT_EQ(cmp, 0);
 }
 
-TEST(TestStringUtils, Split)
-{
-  std::vector<std::string> varresults;
-
-  // test overload with string as delimiter
-  varresults = StringUtils::Split("g,h,ij,k,lm,,n", ",");
-  EXPECT_STREQ("g", varresults.at(0).c_str());
-  EXPECT_STREQ("h", varresults.at(1).c_str());
-  EXPECT_STREQ("ij", varresults.at(2).c_str());
-  EXPECT_STREQ("k", varresults.at(3).c_str());
-  EXPECT_STREQ("lm", varresults.at(4).c_str());
-  EXPECT_STREQ("", varresults.at(5).c_str());
-  EXPECT_STREQ("n", varresults.at(6).c_str());
-
-  EXPECT_TRUE(StringUtils::Split("", "|").empty());
-
-  EXPECT_EQ(4U, StringUtils::Split("a bc  d ef ghi ", " ", 4).size());
-  EXPECT_STREQ("d ef ghi ", StringUtils::Split("a bc  d ef ghi ", " ", 4).at(3).c_str())
-      << "Last part must include rest of the input string";
-  EXPECT_EQ(7U, StringUtils::Split("a bc  d ef ghi ", " ").size())
-      << "Result must be 7 strings including two empty strings";
-  EXPECT_STREQ("bc", StringUtils::Split("a bc  d ef ghi ", " ").at(1).c_str());
-  EXPECT_STREQ("", StringUtils::Split("a bc  d ef ghi ", " ").at(2).c_str());
-  EXPECT_STREQ("", StringUtils::Split("a bc  d ef ghi ", " ").at(6).c_str());
-
-  EXPECT_EQ(2U, StringUtils::Split("a bc  d ef ghi ", "  ").size());
-  EXPECT_EQ(2U, StringUtils::Split("a bc  d ef ghi ", "  ", 10).size());
-  EXPECT_STREQ("a bc", StringUtils::Split("a bc  d ef ghi ", "  ", 10).at(0).c_str());
-
-  EXPECT_EQ(1U, StringUtils::Split("a bc  d ef ghi ", " z").size());
-  EXPECT_STREQ("a bc  d ef ghi ", StringUtils::Split("a bc  d ef ghi ", " z").at(0).c_str());
-
-  EXPECT_EQ(1U, StringUtils::Split("a bc  d ef ghi ", "").size());
-  EXPECT_STREQ("a bc  d ef ghi ", StringUtils::Split("a bc  d ef ghi ", "").at(0).c_str());
-
-  // test overload with char as delimiter
-  EXPECT_EQ(4U, StringUtils::Split("a bc  d ef ghi ", ' ', 4).size());
-  EXPECT_STREQ("d ef ghi ", StringUtils::Split("a bc  d ef ghi ", ' ', 4).at(3).c_str());
-  EXPECT_EQ(7U, StringUtils::Split("a bc  d ef ghi ", ' ').size())
-      << "Result must be 7 strings including two empty strings";
-  EXPECT_STREQ("bc", StringUtils::Split("a bc  d ef ghi ", ' ').at(1).c_str());
-  EXPECT_STREQ("", StringUtils::Split("a bc  d ef ghi ", ' ').at(2).c_str());
-  EXPECT_STREQ("", StringUtils::Split("a bc  d ef ghi ", ' ').at(6).c_str());
-
-  EXPECT_EQ(1U, StringUtils::Split("a bc  d ef ghi ", 'z').size());
-  EXPECT_STREQ("a bc  d ef ghi ", StringUtils::Split("a bc  d ef ghi ", 'z').at(0).c_str());
-
-  EXPECT_EQ(1U, StringUtils::Split("a bc  d ef ghi ", "").size());
-  EXPECT_STREQ("a bc  d ef ghi ", StringUtils::Split("a bc  d ef ghi ", 'z').at(0).c_str());
-}
 
 TEST(TestStringUtils, FindNumber)
 {

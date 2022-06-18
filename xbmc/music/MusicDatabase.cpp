@@ -1675,7 +1675,7 @@ int CMusicDatabase::AddGenre(std::string& strGenre)
   std::string strSQL;
   try
   {
-    StringUtils::Trim(strGenre);
+    strGenre = UnicodeUtils::Trim(strGenre);
 
     if (strGenre.empty())
       strGenre = g_localizeStrings.Get(13205); // Unknown
@@ -2413,7 +2413,7 @@ void CMusicDatabase::AddSongContributors(int idSong,
   size_t countComposer = 0;
   if (!strSort.empty())
   {
-    composerSort = StringUtils::Split(
+    composerSort = UnicodeUtils::Split(
         strSort,
         CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_musicItemSeparator);
   }
@@ -2957,7 +2957,7 @@ CSong CMusicDatabase::GetSongFromDataset(const dbiplus::sql_record* const record
   song.strArtistDesc = record->at(offset + song_strArtists).get_asString();
   song.strArtistSort = record->at(offset + song_strArtistSort).get_asString();
   // Get the full genre string
-  song.genre = StringUtils::Split(
+  song.genre = UnicodeUtils::Split(
       record->at(offset + song_strGenres).get_asString(),
       CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_musicItemSeparator);
   // and the rest...
@@ -3126,7 +3126,7 @@ CAlbum CMusicDatabase::GetAlbumFromDataset(const dbiplus::sql_record* const reco
   album.strArtistDesc = record->at(offset + album_strArtists).get_asString();
   album.strArtistSort = record->at(offset + album_strArtistSort).get_asString();
   album.genre =
-      StringUtils::Split(record->at(offset + album_strGenres).get_asString(), itemSeparator);
+      UnicodeUtils::Split(record->at(offset + album_strGenres).get_asString(), itemSeparator);
   album.strReleaseDate = record->at(offset + album_strReleaseDate).get_asString();
   album.strOrigReleaseDate = record->at(offset + album_strOrigReleaseDate).get_asString();
   album.bBoxedSet = record->at(offset + album_bBoxedSet).get_asInt() == 1;
@@ -3137,11 +3137,11 @@ CAlbum CMusicDatabase::GetAlbumFromDataset(const dbiplus::sql_record* const reco
   album.iVotes = record->at(offset + album_iVotes).get_asInt();
   album.strReview = record->at(offset + album_strReview).get_asString();
   album.styles =
-      StringUtils::Split(record->at(offset + album_strStyles).get_asString(), itemSeparator);
+      UnicodeUtils::Split(record->at(offset + album_strStyles).get_asString(), itemSeparator);
   album.moods =
-      StringUtils::Split(record->at(offset + album_strMoods).get_asString(), itemSeparator);
+      UnicodeUtils::Split(record->at(offset + album_strMoods).get_asString(), itemSeparator);
   album.themes =
-      StringUtils::Split(record->at(offset + album_strThemes).get_asString(), itemSeparator);
+      UnicodeUtils::Split(record->at(offset + album_strThemes).get_asString(), itemSeparator);
   album.strLabel = record->at(offset + album_strLabel).get_asString();
   album.strType = record->at(offset + album_strType).get_asString();
   album.strReleaseStatus = record->at(offset + album_strReleaseStatus).get_asString();
@@ -3211,20 +3211,20 @@ CArtist CMusicDatabase::GetArtistFromDataset(const dbiplus::sql_record* const re
   artist.strGender = record->at(offset + artist_strGender).get_asString();
   artist.strDisambiguation = record->at(offset + artist_strDisambiguation).get_asString();
   artist.genre =
-      StringUtils::Split(record->at(offset + artist_strGenres).get_asString(), itemSeparator);
+      UnicodeUtils::Split(record->at(offset + artist_strGenres).get_asString(), itemSeparator);
   artist.strBiography = record->at(offset + artist_strBiography).get_asString();
   artist.styles =
-      StringUtils::Split(record->at(offset + artist_strStyles).get_asString(), itemSeparator);
+      UnicodeUtils::Split(record->at(offset + artist_strStyles).get_asString(), itemSeparator);
   artist.moods =
-      StringUtils::Split(record->at(offset + artist_strMoods).get_asString(), itemSeparator);
+      UnicodeUtils::Split(record->at(offset + artist_strMoods).get_asString(), itemSeparator);
   artist.strBorn = record->at(offset + artist_strBorn).get_asString();
   artist.strFormed = record->at(offset + artist_strFormed).get_asString();
   artist.strDied = record->at(offset + artist_strDied).get_asString();
   artist.strDisbanded = record->at(offset + artist_strDisbanded).get_asString();
   artist.yearsActive =
-      StringUtils::Split(record->at(offset + artist_strYearsActive).get_asString(), itemSeparator);
+      UnicodeUtils::Split(record->at(offset + artist_strYearsActive).get_asString(), itemSeparator);
   artist.instruments =
-      StringUtils::Split(record->at(offset + artist_strInstruments).get_asString(), itemSeparator);
+      UnicodeUtils::Split(record->at(offset + artist_strInstruments).get_asString(), itemSeparator);
   artist.bScrapedMBID = record->at(offset + artist_bScrapedMBID).get_asInt() == 1;
   artist.strLastScraped = record->at(offset + artist_lastScraped).get_asString();
   artist.SetDateAdded(record->at(offset + artist_dateAdded).get_asString());
@@ -6945,7 +6945,7 @@ bool CMusicDatabase::GetArtistsByWhereJSON(
               artistObj[JSONtoDBArtist[dbfieldindex[i]].fieldJSON] =
                   record->at(1 + i).get_asFloat();
             else if (JSONtoDBArtist[dbfieldindex[i]].formatJSON == "array")
-              artistObj[JSONtoDBArtist[dbfieldindex[i]].fieldJSON] = StringUtils::Split(
+              artistObj[JSONtoDBArtist[dbfieldindex[i]].fieldJSON] = UnicodeUtils::Split(
                   record->at(1 + i).get_asString(), CServiceBroker::GetSettingsComponent()
                                                         ->GetAdvancedSettings()
                                                         ->m_musicItemSeparator);
@@ -7430,7 +7430,7 @@ bool CMusicDatabase::GetAlbumsByWhereJSON(
           if (albumObj.isMember("sourceid"))
           {
             std::vector<std::string> sources =
-                StringUtils::Split(albumObj["sourceid"].asString(), ";");
+                UnicodeUtils::Split(albumObj["sourceid"].asString(), ";");
             albumObj["sourceid"] = CVariant(CVariant::VariantTypeArray);
             for (size_t i = 0; i < sources.size(); i++)
               albumObj["sourceid"].append(atoi(sources[i].c_str()));
@@ -7453,7 +7453,7 @@ bool CMusicDatabase::GetAlbumsByWhereJSON(
             {
               // Convert "20,Jazz,54,New Age,65,Rock" into array of objects
               std::vector<std::string> values =
-                  StringUtils::Split(record->at(1 + i).get_asString(), ",");
+                  UnicodeUtils::Split(record->at(1 + i).get_asString(), ",");
               if (values.size() % 2 == 0) // Must contain an even number of entries
               {
                 for (size_t j = 0; j + 1 < values.size(); j += 2)
@@ -7481,7 +7481,7 @@ bool CMusicDatabase::GetAlbumsByWhereJSON(
               albumObj[JSONtoDBAlbum[dbfieldindex[i]].fieldJSON] =
                   std::max(record->at(1 + i).get_asFloat(), 0.f);
             else if (JSONtoDBAlbum[dbfieldindex[i]].formatJSON == "array")
-              albumObj[JSONtoDBAlbum[dbfieldindex[i]].fieldJSON] = StringUtils::Split(
+              albumObj[JSONtoDBAlbum[dbfieldindex[i]].fieldJSON] = UnicodeUtils::Split(
                   record->at(1 + i).get_asString(), CServiceBroker::GetSettingsComponent()
                                                         ->GetAdvancedSettings()
                                                         ->m_musicItemSeparator);
@@ -8081,7 +8081,7 @@ bool CMusicDatabase::GetSongsByWhereJSON(
               songObj[JSONtoDBSong[dbfieldindex[i]].fieldJSON] =
                   std::max(record->at(1 + i).get_asFloat(), 0.f);
             else if (JSONtoDBSong[dbfieldindex[i]].formatJSON == "array")
-              songObj[JSONtoDBSong[dbfieldindex[i]].fieldJSON] = StringUtils::Split(
+              songObj[JSONtoDBSong[dbfieldindex[i]].fieldJSON] = UnicodeUtils::Split(
                   record->at(1 + i).get_asString(), CServiceBroker::GetSettingsComponent()
                                                         ->GetAdvancedSettings()
                                                         ->m_musicItemSeparator);
@@ -8095,7 +8095,7 @@ bool CMusicDatabase::GetSongsByWhereJSON(
         if (songObj.isMember("sourceid"))
         {
           std::vector<std::string> sources =
-              StringUtils::Split(songObj["sourceid"].asString(), ";");
+              UnicodeUtils::Split(songObj["sourceid"].asString(), ";");
           songObj["sourceid"] = CVariant(CVariant::VariantTypeArray);
           for (size_t i = 0; i < sources.size(); i++)
             songObj["sourceid"].append(atoi(sources[i].c_str()));

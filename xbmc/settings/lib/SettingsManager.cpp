@@ -34,7 +34,7 @@ bool ParseSettingIdentifier(const std::string& settingId, std::string& categoryT
   if (settingId.empty())
     return false;
 
-  auto parts = StringUtils::Split(settingId, Separator);
+  auto parts = UnicodeUtils::Split(settingId, Separator);
   if (parts.size() < 1 || parts.at(0).empty())
     return false;
 
@@ -970,7 +970,8 @@ SettingPtr CSettingsManager::CreateSetting(const std::string &settingType, const
            StringUtils::StartsWith(settingType, "list[") &&
            StringUtils::EndsWith(settingType, "]"))
   {
-    std::string elementType = StringUtils::Mid(settingType, 5, settingType.size() - 6);
+    // TODO:: Unicode Validate
+    std::string elementType = UnicodeUtils::Left(UnicodeUtils::Right(settingType, 5, false), 1, false);
     SettingPtr elementSetting = CreateSetting(elementType, settingId + ".definition", const_cast<CSettingsManager*>(this));
     if (elementSetting != nullptr)
       return std::make_shared<CSettingList>(settingId, elementSetting, const_cast<CSettingsManager*>(this));

@@ -46,6 +46,7 @@
 #include "utils/FileUtils.h"
 #include "utils/SortUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "video/VideoInfoScanner.h"
@@ -460,7 +461,7 @@ void CGUIDialogVideoInfo::Update()
               setting, CSettings::VIDEOLIBRARY_PLOTS_SHOW_UNWATCHED_TVSHOWEPISODES))))
       strTmp = g_localizeStrings.Get(20370);
 
-  StringUtils::Trim(strTmp);
+  strTmp = UnicodeUtils::Trim(strTmp);
   SetLabel(CONTROL_TEXTAREA, strTmp);
 
   CGUIMessage msg(GUI_MSG_LABEL_BIND, GetID(), CONTROL_LIST, 0, 0, m_castList);
@@ -2208,7 +2209,7 @@ bool CGUIDialogVideoInfo::ManageVideoItemArtwork(const CFileItemPtr &item, const
     result.clear();
   else if (StringUtils::StartsWith(result, "thumb://Remote"))
   {
-    int number = atoi(StringUtils::Mid(result, 14).c_str());
+    int number = atoi(UnicodeUtils::Mid(result, 14).c_str());
     result = thumbs[number];
   }
 

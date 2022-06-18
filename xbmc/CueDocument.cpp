@@ -51,6 +51,7 @@
 #include "settings/SettingsComponent.h"
 #include "utils/CharsetConverter.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
@@ -84,8 +85,7 @@ public:
     while (m_file.ReadString(m_szBuffer, 1023)) // Bigger than MAX_PATH_SIZE, for usage with relax!
     {
       // Remove the white space at the beginning and end of the line.
-      line = m_szBuffer;
-      StringUtils::Trim(line);
+      line = UnicodeUtils::Trim(m_szBuffer);
       if (!line.empty())
         return true;
       // If we are here, we have an empty line so try the next line
@@ -125,8 +125,13 @@ public:
     {
       // Remove the white space at the beginning of the line.
       char ch = m_data.at(m_pos++);
+
+      // TODO: This looks a bit odd. Trim will remove any whitespace from beginning
+      //       and end of string, but is being called only when the line starts with
+      //       \r or \n.
+
       if (ch == '\r' || ch == '\n') {
-        StringUtils::Trim(line);
+        line = UnicodeUtils::Trim(line);
         if (!line.empty())
           return true;
       }
@@ -136,7 +141,7 @@ public:
       }
     }
 
-    StringUtils::Trim(line);
+    line = UnicodeUtils::Trim(line);
     return !line.empty();
   }
   bool ready() const override
@@ -188,9 +193,9 @@ void CCueDocument::GetSongs(VECSONGS &songs)
     else
       aSong.strArtistDesc = track.strArtist;
     //Pass album artist to MusicInfoTag object by setting album artist vector.
-    aSong.SetAlbumArtist(StringUtils::Split(m_strArtist, advancedSettings->m_musicItemSeparator));
+    aSong.SetAlbumArtist(UnicodeUtils::Split(m_strArtist, advancedSettings->m_musicItemSeparator));
     aSong.strAlbum = m_strAlbum;
-    aSong.genre = StringUtils::Split(m_strGenre, advancedSettings->m_musicItemSeparator);
+    aSong.genre = UnicodeUtils::Split(m_strGenre, advancedSettings->m_musicItemSeparator);
     aSong.strReleaseDate = StringUtils::Format("{:04}", m_iYear);
     aSong.iTrack = track.iTrackNumber;
     if (m_iDiscNumber > 0)
@@ -407,8 +412,11 @@ std::string CCueDocument::ExtractInfo(const std::string &line)
     }
   }
   std::string text = line;
-  StringUtils::Trim(text);
+
+  // TODO:: Unicode. Can this be done earlier?
   g_charsetConverter.unknownToUTF8(text);
+
+  text = UnicodeUtils::Trim(text);
   return text;
 }
 
@@ -422,17 +430,16 @@ std::string CCueDocument::ExtractInfo(const std::string &line)
 int CCueDocument::ExtractTimeFromIndex(const std::string &index)
 {
   // Get rid of the index number and any whitespace
-  std::string numberTime = index.substr(5);
-  StringUtils::TrimLeft(numberTime);
+  std::string numberTime = UnicodeUtils::TrimLeft(index.substr(5));
   while (!numberTime.empty())
   {
     if (!StringUtils::isasciidigit(numberTime[0]))
       break;
     numberTime.erase(0, 1);
   }
-  StringUtils::TrimLeft(numberTime);
+  numberTime = UnicodeUtils::TrimLeft(numberTime);
   // split the resulting string
-  std::vector<std::string> time = StringUtils::Split(numberTime, ":");
+  std::vector<std::string> time = UnicodeUtils::Split(numberTime, ":");
   if (time.size() != 3)
     return -1;
 
@@ -449,8 +456,7 @@ int CCueDocument::ExtractTimeFromIndex(const std::string &index)
 ////////////////////////////////////////////////////////////////////////////////////
 int CCueDocument::ExtractNumericInfo(const std::string &info)
 {
-  std::string number(info);
-  StringUtils::TrimLeft(number);
+  std::string number = UnicodeUtils::TrimLeft(info);
   if (number.empty() || !StringUtils::isasciidigit(number[0]))
     return -1;
   return atoi(number.c_str());

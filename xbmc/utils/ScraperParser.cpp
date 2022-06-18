@@ -483,7 +483,7 @@ void CScraperParser::Clean(std::string& strDirty)
       strBuffer = strDirty.substr(i+11,i2-i-11);
       std::string strConverted(strBuffer);
       HTML::CHTMLUtil::RemoveTags(strConverted);
-      StringUtils::Trim(strConverted);
+      strConverted = UnicodeUtils::Trim(strConverted);
       strDirty.replace(i, i2-i+11, strConverted);
       i += strConverted.size();
     }
@@ -497,7 +497,7 @@ void CScraperParser::Clean(std::string& strDirty)
     if ((i2 = strDirty.find("!!!TRIM!!!",i+10)) != std::string::npos)
     {
       strBuffer = strDirty.substr(i+10,i2-i-10);
-      StringUtils::Trim(strBuffer);
+      strBuffer = UnicodeUtils::Trim(strBuffer);
       strDirty.replace(i, i2-i+10, strBuffer);
       i += strBuffer.size();
     }
@@ -516,7 +516,7 @@ void CScraperParser::Clean(std::string& strDirty)
       std::wstring wConverted;
       HTML::CHTMLUtil::ConvertHTMLToW(wbuffer,wConverted);
       g_charsetConverter.wToUTF8(wConverted, strBuffer, false);
-      StringUtils::Trim(strBuffer);
+      strBuffer = UnicodeUtils::Trim(strBuffer);
       ConvertJSON(strBuffer);
       strDirty.replace(i, i2-i+14, strBuffer);
       i += strBuffer.size();

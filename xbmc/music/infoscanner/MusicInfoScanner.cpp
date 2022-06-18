@@ -839,10 +839,10 @@ void CMusicInfoScanner::FileItemsToAlbums(CFileItemList& items, VECALBUMS& album
       album.strAlbum = songsByAlbumName.first;
 
       //Split the albumartist sort string to try and get sort names for individual artists
-      std::vector<std::string> sortnames = StringUtils::Split(albumartistsort, CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_musicItemSeparator);
+      std::vector<std::string> sortnames = UnicodeUtils::Split(albumartistsort, CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_musicItemSeparator);
       if (sortnames.size() != common.size())
           // Split artist sort names further using multiple possible delimiters, over single separator applied in Tag loader
-        sortnames = StringUtils::SplitMulti(sortnames, { ";", ":", "|", "#" });
+        sortnames = UnicodeUtils::SplitMulti(sortnames, { ";", ":", "|", "#" });
 
       for (size_t i = 0; i < common.size(); i++)
       {
@@ -856,11 +856,12 @@ void CMusicInfoScanner::FileItemsToAlbums(CFileItemList& items, VECALBUMS& album
           album.artistCredits.emplace_back(various, VARIOUSARTISTS_MBID);
         else
         {
-          album.artistCredits.emplace_back(StringUtils::Trim(common[i]));
+          common[i] = UnicodeUtils::Trim(common[i]);
+		   album.artistCredits.emplace_back(common[i]);
           // Set artist sort name providing we have as many as we have artists,
           // otherwise something is wrong with them so ignore rather than guess.
           if (sortnames.size() == common.size())
-            album.artistCredits.back().SetSortName(StringUtils::Trim(sortnames[i]));
+            album.artistCredits.back().SetSortName(UnicodeUtils::Trim(sortnames[i]));
         }
       }
       album.bCompilation = compilation;
@@ -2281,7 +2282,7 @@ bool CMusicInfoScanner::AddRemoteArtwork(std::map<std::string, std::string>& art
     { // Check whitelist for art type family e.g. "discart" for aspect="discart2"
       std::string strName = url.m_aspect;
       if (iArtLevel != CSettings::MUSICLIBRARY_ARTWORK_LEVEL_BASIC)
-        StringUtils::TrimRight(strName, "0123456789");
+        strName = UnicodeUtils::TrimRight(strName, "0123456789");
       if (std::find(whitelistarttypes.begin(), whitelistarttypes.end(), strName) ==
           whitelistarttypes.end())
         continue;

@@ -12,6 +12,7 @@
 #include "guilib/LocalizeStrings.h"
 #include "utils/Archive.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/XTimeUtils.h"
 #include "utils/log.h"
 
@@ -1073,8 +1074,7 @@ bool CDateTime::SetFromDBTime(const std::string &time)
 
 bool CDateTime::SetFromRFC1123DateTime(const std::string &dateTime)
 {
-  std::string date = dateTime;
-  StringUtils::Trim(date);
+  std::string date = UnicodeUtils::Trim(dateTime);
 
   if (date.size() != 29)
     return false;

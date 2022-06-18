@@ -18,6 +18,7 @@
 #include "utils/HTMLUtil.h"
 #include "utils/RegExp.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
@@ -99,13 +100,12 @@ bool CHTTPDirectory::GetDirectory(const CURL& url, CFileItemList &items)
 
       std::string strLink = reItem.GetMatch(1);
       std::string strName = reItem.GetMatch(2);
-      std::string strMetadata = reItem.GetMatch(3);
-      StringUtils::Trim(strMetadata);
+      std::string strMetadata = UnicodeUtils::Trim(reItem.GetMatch(3));
 
       if(strLink[0] == '/')
         strLink = strLink.substr(1);
 
-      std::string strNameTemp = StringUtils::Trim(strName);
+      std::string strNameTemp = UnicodeUtils::Trim(strName);
 
       std::wstring wName, wLink, wConverted;
       if (fileCharset.empty())

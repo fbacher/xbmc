@@ -1728,8 +1728,7 @@ int CVideoDatabase::AddActor(const std::string& name, const std::string& thumbUR
     int idActor = -1;
 
     // ATTENTION: the trimming of actor names should really not be done here but after the scraping / NFO-parsing
-    std::string trimmedName = name.c_str();
-    StringUtils::Trim(trimmedName);
+    std::string trimmedName = UnicodeUtils::Trim(name);
 
     std::string strSQL=PrepareSQL("select actor_id from actor where name like '%s'", trimmedName.substr(0, 255).c_str());
     m_pDS->query(strSQL);
@@ -3808,7 +3807,7 @@ void CVideoDatabase::GetDetailsFromDB(const dbiplus::sql_record* const record, i
     {
       std::string value = record->at(i+idxOffset).get_asString();
       if (!value.empty())
-        *(std::vector<std::string>*)(((char*)&details)+offsets[i].offset) = StringUtils::Split(value, CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoItemSeparator);
+        *(std::vector<std::string>*)(((char*)&details)+offsets[i].offset) = UnicodeUtils::Split(value, CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoItemSeparator);
       break;
     }
     case VIDEODB_TYPE_DATE:
@@ -4186,8 +4185,8 @@ CVideoInfoTag CVideoDatabase::GetDetailsForEpisode(const dbiplus::sql_record* co
   details.m_dateAdded.SetFromDBDateTime(record->at(VIDEODB_DETAILS_EPISODE_DATEADDED).get_asString());
   details.m_strMPAARating = record->at(VIDEODB_DETAILS_EPISODE_TVSHOW_MPAA).get_asString();
   details.m_strShowTitle = record->at(VIDEODB_DETAILS_EPISODE_TVSHOW_NAME).get_asString();
-  details.m_genre = StringUtils::Split(record->at(VIDEODB_DETAILS_EPISODE_TVSHOW_GENRE).get_asString(), CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoItemSeparator);
-  details.m_studio = StringUtils::Split(record->at(VIDEODB_DETAILS_EPISODE_TVSHOW_STUDIO).get_asString(), CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoItemSeparator);
+  details.m_genre = UnicodeUtils::Split(record->at(VIDEODB_DETAILS_EPISODE_TVSHOW_GENRE).get_asString(), CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoItemSeparator);
+  details.m_studio = UnicodeUtils::Split(record->at(VIDEODB_DETAILS_EPISODE_TVSHOW_STUDIO).get_asString(), CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoItemSeparator);
   details.SetPremieredFromDBDate(record->at(VIDEODB_DETAILS_EPISODE_TVSHOW_AIRED).get_asString());
 
   details.SetResumePoint(record->at(VIDEODB_DETAILS_EPISODE_RESUME_TIME).get_asInt(),
@@ -5016,7 +5015,7 @@ bool CVideoDatabase::GetStackTimes(const std::string &filePath, std::vector<uint
     if (m_pDS->num_rows() > 0)
     { // get the video settings info
       uint64_t timeTotal = 0;
-      std::vector<std::string> timeString = StringUtils::Split(m_pDS->fv("times").get_asString(), ",");
+      std::vector<std::string> timeString = UnicodeUtils::Split(m_pDS->fv("times").get_asString(), ",");
       times.clear();
       for (const auto &i : timeString)
       {
@@ -6255,7 +6254,7 @@ void CVideoDatabase::EraseAllVideoSettings(const std::string& path)
 
     if (!itemsToDelete.empty())
     {
-      itemsToDelete = "(" + StringUtils::TrimRight(itemsToDelete, ",") + ")";
+      itemsToDelete = "(" + UnicodeUtils::TrimRight(itemsToDelete, ",") + ")";
 
       sql = "DELETE FROM settings WHERE idFile IN " + itemsToDelete;
       m_pDS->exec(sql);
@@ -7319,8 +7318,8 @@ bool CVideoDatabase::GetSeasonsByWhere(const std::string& strBaseDir, const Filt
           pItem->GetVideoInfoTag()->SetPremiered(pItem->GetVideoInfoTag()->GetPremiered());
         else if (pItem->GetVideoInfoTag()->HasYear())
           pItem->GetVideoInfoTag()->SetYear(pItem->GetVideoInfoTag()->GetYear());
-        pItem->GetVideoInfoTag()->m_genre = StringUtils::Split(m_pDS->fv(VIDEODB_ID_SEASON_TVSHOW_GENRE).get_asString(), CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoItemSeparator);
-        pItem->GetVideoInfoTag()->m_studio = StringUtils::Split(m_pDS->fv(VIDEODB_ID_SEASON_TVSHOW_STUDIO).get_asString(), CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoItemSeparator);
+        pItem->GetVideoInfoTag()->m_genre = UnicodeUtils::Split(m_pDS->fv(VIDEODB_ID_SEASON_TVSHOW_GENRE).get_asString(), CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoItemSeparator);
+        pItem->GetVideoInfoTag()->m_studio = UnicodeUtils::Split(m_pDS->fv(VIDEODB_ID_SEASON_TVSHOW_STUDIO).get_asString(), CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoItemSeparator);
         pItem->GetVideoInfoTag()->m_strMPAARating = m_pDS->fv(VIDEODB_ID_SEASON_TVSHOW_MPAA).get_asString();
         pItem->GetVideoInfoTag()->m_iIdShow = showId;
 
@@ -9404,7 +9403,7 @@ void CVideoDatabase::CleanDatabase(CGUIDialogProgressBarHandle* handle, const st
 
     if (!filesToTestForDelete.empty())
     {
-      StringUtils::TrimRight(filesToTestForDelete, ",");
+      filesToTestForDelete = UnicodeUtils::TrimRight(filesToTestForDelete, ",");
 
       movieIDs = CleanMediaType(MediaTypeMovie, filesToTestForDelete, pathsDeleteDecisions, filesToDelete, !showProgress);
       episodeIDs = CleanMediaType(MediaTypeEpisode, filesToTestForDelete, pathsDeleteDecisions, filesToDelete, !showProgress);
@@ -9419,7 +9418,7 @@ void CVideoDatabase::CleanDatabase(CGUIDialogProgressBarHandle* handle, const st
 
     if (!filesToDelete.empty())
     {
-      filesToDelete = "(" + StringUtils::TrimRight(filesToDelete, ",") + ")";
+      filesToDelete = "(" + UnicodeUtils::TrimRight(filesToDelete, ",") + ")";
 
       // Clean hashes of all paths that files are deleted from
       // Otherwise there is a mismatch between the path contents and the hash in the
@@ -9445,7 +9444,7 @@ void CVideoDatabase::CleanDatabase(CGUIDialogProgressBarHandle* handle, const st
       std::string moviesToDelete;
       for (const auto &i : movieIDs)
         moviesToDelete += StringUtils::Format("{},", i);
-      moviesToDelete = "(" + StringUtils::TrimRight(moviesToDelete, ",") + ")";
+      moviesToDelete = "(" + UnicodeUtils::TrimRight(moviesToDelete, ",") + ")";
 
       CLog::Log(LOGDEBUG, LOGDATABASE, "{}: Cleaning movie table", __FUNCTION__);
       sql = "DELETE FROM movie WHERE idMovie IN " + moviesToDelete;
@@ -9457,7 +9456,7 @@ void CVideoDatabase::CleanDatabase(CGUIDialogProgressBarHandle* handle, const st
       std::string episodesToDelete;
       for (const auto &i : episodeIDs)
         episodesToDelete += StringUtils::Format("{},", i);
-      episodesToDelete = "(" + StringUtils::TrimRight(episodesToDelete, ",") + ")";
+      episodesToDelete = "(" + UnicodeUtils::TrimRight(episodesToDelete, ",") + ")";
 
       CLog::Log(LOGDEBUG, LOGDATABASE, "{}: Cleaning episode table", __FUNCTION__);
       sql = "DELETE FROM episode WHERE idEpisode IN " + episodesToDelete;
@@ -9504,7 +9503,7 @@ void CVideoDatabase::CleanDatabase(CGUIDialogProgressBarHandle* handle, const st
 
     if (!strIds.empty())
     {
-      sql = PrepareSQL("DELETE FROM path WHERE idPath IN (%s)", StringUtils::TrimRight(strIds, ",").c_str());
+      sql = PrepareSQL("DELETE FROM path WHERE idPath IN (%s)", UnicodeUtils::TrimRight(strIds, ",").c_str());
       m_pDS->exec(sql);
       sql = "DELETE FROM tvshowlinkpath WHERE NOT EXISTS (SELECT 1 FROM path WHERE path.idPath = tvshowlinkpath.idPath)";
       m_pDS->exec(sql);
@@ -9524,7 +9523,7 @@ void CVideoDatabase::CleanDatabase(CGUIDialogProgressBarHandle* handle, const st
     m_pDS->close();
     if (!tvshowsToDelete.empty())
     {
-      sql = "DELETE FROM tvshow WHERE idShow IN (" + StringUtils::TrimRight(tvshowsToDelete, ",") + ")";
+      sql = "DELETE FROM tvshow WHERE idShow IN (" + UnicodeUtils::TrimRight(tvshowsToDelete, ",") + ")";
       m_pDS->exec(sql);
     }
 
@@ -9533,7 +9532,7 @@ void CVideoDatabase::CleanDatabase(CGUIDialogProgressBarHandle* handle, const st
       std::string musicVideosToDelete;
       for (const auto &i : musicVideoIDs)
         musicVideosToDelete += StringUtils::Format("{},", i);
-      musicVideosToDelete = "(" + StringUtils::TrimRight(musicVideosToDelete, ",") + ")";
+      musicVideosToDelete = "(" + UnicodeUtils::TrimRight(musicVideosToDelete, ",") + ")";
 
       CLog::Log(LOGDEBUG, LOGDATABASE, "{}: Cleaning musicvideo table", __FUNCTION__);
       sql = "DELETE FROM musicvideo WHERE idMVideo IN " + musicVideosToDelete;
@@ -11152,7 +11151,7 @@ void CVideoDatabase::EraseAllForPath(const std::string& path)
 
     if (!itemsToDelete.empty())
     {
-      itemsToDelete = "(" + StringUtils::TrimRight(itemsToDelete, ",") + ")";
+      itemsToDelete = "(" + UnicodeUtils::TrimRight(itemsToDelete, ",") + ")";
 
       sql = "DELETE FROM files WHERE idFile IN " + itemsToDelete;
       m_pDS->exec(sql);

@@ -41,6 +41,7 @@
 #include "storage/MediaManager.h"
 #include "utils/FileExtensionProvider.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
 
@@ -729,7 +730,7 @@ bool CGUIControlListSetting::OnClick()
           strLabel, CVariant{ Localize(control->GetAddButtonLabel()) }, false))
         {
           // Validate new value is unique and truncate at any comma
-          StringUtils::Trim(strLabel);
+          strLabel = UnicodeUtils::Trim(strLabel);
           strLabel = strLabel.substr(0, strLabel.find(','));
           if (!strLabel.empty())
           {

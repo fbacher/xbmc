@@ -35,6 +35,7 @@
 #include "storage/MediaManager.h"
 #include "threads/IRunnable.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Variant.h"
 
 #include <utility>
@@ -287,7 +288,7 @@ static bool IsForeign(const std::string& languages)
   if (languages.empty())
     return false;
 
-  for (const auto& lang : StringUtils::Split(languages, " "))
+  for (const auto& lang : UnicodeUtils::Split(languages, " "))
   {
     if (lang == "en" || lang == g_langInfo.GetLocale().GetLanguageCode() ||
         lang == g_langInfo.GetLocale().ToShortString())

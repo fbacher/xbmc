@@ -142,8 +142,7 @@ bool CLangCodeExpander::ConvertISO6391ToISO6392B(const std::string& strISO6391,
   if (strISO6391.length() != 2)
     return false;
 
-  std::string strISO6391Lower(UnicodeUtils::FoldCase(strISO6391));
-  StringUtils::Trim(strISO6391Lower);
+  std::string strISO6391Lower(UnicodeUtils::Trim(UnicodeUtils::FoldCase(strISO6391)));
 
   for (const auto& codes : LanguageCodes)
   {
@@ -253,7 +252,7 @@ bool CLangCodeExpander::ConvertISO31661Alpha2ToISO31661Alpha3(const std::string&
     return false;
 
   std::string strLower(UnicodeUtils::FoldCase(strISO31661Alpha2));
-  StringUtils::Trim(strLower);
+  strLower = UnicodeUtils::Trim(strLower);
   for (const auto& codes : RegionCodes)
   {
     if (strLower == codes.alpha2)
@@ -354,8 +353,7 @@ bool CLangCodeExpander::ReverseLookup(const std::string& desc, std::string& code
   if (desc.empty())
     return false;
 
-  std::string descTmp(desc);
-  StringUtils::Trim(descTmp);
+  std::string descTmp(UnicodeUtils::Trim(desc));
   for (STRINGLOOKUPTABLE::const_iterator it = m_mapUser.begin(); it != m_mapUser.end(); ++it)
   {
     if (StringUtils::EqualsNoCase(descTmp, it->second))
@@ -392,8 +390,7 @@ bool CLangCodeExpander::LookupInUserMap(const std::string& code, std::string& de
     return false;
 
   // make sure we convert to lowercase before trying to find it
-  std::string sCode(UnicodeUtils::FoldCase(code));
-  StringUtils::Trim(sCode);
+  std::string sCode(UnicodeUtils::Trim(UnicodeUtils::FoldCase(code)));
 
   STRINGLOOKUPTABLE::iterator it = m_mapUser.find(sCode);
   if (it != m_mapUser.end())
@@ -411,8 +408,7 @@ bool CLangCodeExpander::LookupInISO639Tables(const std::string& code, std::strin
     return false;
 
   long longcode;
-  std::string sCode(UnicodeUtils::FoldCase(code));
-  StringUtils::Trim(sCode);
+  std::string sCode(UnicodeUtils::Trim(UnicodeUtils::FoldCase(code)));
 
   if (sCode.length() == 2)
   {

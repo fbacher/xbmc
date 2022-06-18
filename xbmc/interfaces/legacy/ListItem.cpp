@@ -661,7 +661,7 @@ namespace XBMCAddon
               continue;
             }
 
-            exifkey = StringUtils::Mid(exifkey, 5);
+            exifkey = UnicodeUtils::Mid(exifkey, 5);
             if (exifkey == "resolution")
               xbmc::InfoTagPicture::setResolutionRaw(item->GetPictureInfoTag(), value);
             else if (exifkey == "exiftime")
@@ -923,7 +923,7 @@ namespace XBMCAddon
       {
         if (value.empty())
           value = alt.former();
-        return StringUtils::Split(value, separator);
+        return UnicodeUtils::Split(value, separator);
       }
 
       std::vector<std::string> els;

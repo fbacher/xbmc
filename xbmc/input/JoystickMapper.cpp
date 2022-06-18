@@ -145,7 +145,7 @@ bool CJoystickMapper::DeserializeButton(const TiXmlElement* pButton,
     std::string strHotkeys;
     if (pButton->QueryValueAttribute(JOYSTICK_XML_ATTR_HOTKEY, &strHotkeys) == TIXML_SUCCESS)
     {
-      std::vector<std::string> vecHotkeys = StringUtils::Split(strHotkeys, ",");
+      std::vector<std::string> vecHotkeys = UnicodeUtils::Split(strHotkeys, ",");
       for (auto& hotkey : vecHotkeys)
         hotkeys.insert(std::move(hotkey));
     }

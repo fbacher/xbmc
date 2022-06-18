@@ -101,7 +101,7 @@ IFileDirectory* CFileDirectoryFactory::Create(const CURL& url, CFileItem* pItem,
     {
       if (vfsAddon->HasFileDirectories())
       {
-        auto exts = StringUtils::Split(vfsAddon->GetExtensions(), "|");
+        auto exts = UnicodeUtils::Split(vfsAddon->GetExtensions(), "|");
         if (std::find(exts.begin(), exts.end(), strExtension) != exts.end())
         {
           CVFSEntryIFileDirectoryWrapper* wrap = new CVFSEntryIFileDirectoryWrapper(vfsAddon);

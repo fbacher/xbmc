@@ -11,6 +11,7 @@
 #include "LangInfo.h"
 #include "utils/CharsetConverter.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Utf8Utils.h"
 #include "utils/log.h"
 
@@ -475,7 +476,7 @@ std::string CCharsetDetection::GetHtmlEncodingFromHead(const std::string& htmlCo
           contentCharset = ExtractEncodingFromHtmlMeta(attrValue);
         else if (attrName == "CHARSET")
         {
-          StringUtils::Trim(attrValue, m_HtmlWhitespaceChars.c_str()); // tab, LF, FF, CR, space
+          attrValue = UnicodeUtils::Trim(attrValue, m_HtmlWhitespaceChars.c_str()); // tab, LF, FF, CR, space
           if (!attrValue.empty())
             return attrValue;
         }
@@ -625,7 +626,7 @@ std::string CCharsetDetection::ExtractEncodingFromHtmlMeta(const std::string& me
   } while (pos < len);
 
   static const char* const htmlWhitespaceCharsC = m_HtmlWhitespaceChars.c_str();
-  StringUtils::Trim(charset, htmlWhitespaceCharsC);
+  charset = UnicodeUtils::Trim(charset, htmlWhitespaceCharsC);
 
   return charset;
 }

@@ -637,7 +637,7 @@ public:
    \param d_first the beginning of the destination range
    \param input Input string to be split
    \param delimiter Delimiter to be used to split the input string
-   \param iMaxStrings (optional) Maximum number of splitted strings. 0 means infinite
+   \param iMaxStrings (optional) Maximum number of strings to split. 0 means infinite
    \return output iterator to the element in the destination range, one past the last element
    *       that was put there
    */

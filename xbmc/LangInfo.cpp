@@ -1135,7 +1135,7 @@ std::string CLangInfo::PrepareTimeFormat(const std::string& timeFormat, bool use
     // replace all "H" with "h"
     StringUtils::Replace(preparedTimeFormat, 'H', 'h');
 
-  StringUtils::Trim(preparedTimeFormat);
+  preparedTimeFormat = UnicodeUtils::Trim(preparedTimeFormat);
 
   return preparedTimeFormat;
 }

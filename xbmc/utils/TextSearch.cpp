@@ -95,8 +95,7 @@ void CTextSearch::GetAndCutNextTerm(std::string &strSearchTerm, std::string &str
 
 void CTextSearch::ExtractSearchTerms(const std::string &strSearchTerm, TextSearchDefault defaultSearchMode)
 {
-  std::string strParsedSearchTerm(strSearchTerm);
-  StringUtils::Trim(strParsedSearchTerm);
+  std::string strParsedSearchTerm = UnicodeUtils::Trim(strSearchTerm);
 
   if (!m_bCaseSensitive)
     strParsedSearchTerm = UnicodeUtils::FoldCase(strParsedSearchTerm);
@@ -107,7 +106,7 @@ void CTextSearch::ExtractSearchTerms(const std::string &strSearchTerm, TextSearc
 
   while (strParsedSearchTerm.length() > 0)
   {
-    StringUtils::TrimLeft(strParsedSearchTerm);
+    strParsedSearchTerm = UnicodeUtils::TrimLeft(strParsedSearchTerm);
 
     if (StringUtils::StartsWith(strParsedSearchTerm, "!") || StringUtils::StartsWithNoCase(strParsedSearchTerm, "not"))
     {
@@ -150,6 +149,6 @@ void CTextSearch::ExtractSearchTerms(const std::string &strSearchTerm, TextSearc
       bNextNOT = (defaultSearchMode == SEARCH_DEFAULT_NOT);
     }
 
-    StringUtils::TrimLeft(strParsedSearchTerm);
+    strParsedSearchTerm = UnicodeUtils::TrimLeft(strParsedSearchTerm);
   }
 }

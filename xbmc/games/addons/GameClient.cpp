@@ -89,7 +89,7 @@ CGameClient::CGameClient(const ADDON::AddonInfoPtr& addonInfo)
 {
   using namespace ADDON;
 
-  std::vector<std::string> extensions = StringUtils::Split(
+  std::vector<std::string> extensions = UnicodeUtils::Split(
       Type(ADDON_GAMEDLL)->GetValue(GAME_PROPERTY_EXTENSIONS).asString(), EXTENSION_SEPARATOR);
   std::transform(extensions.begin(), extensions.end(),
                  std::inserter(m_extensions, m_extensions.begin()), NormalizeExtension);

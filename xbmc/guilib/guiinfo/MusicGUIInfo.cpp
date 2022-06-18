@@ -25,6 +25,7 @@
 #include "playlists/PlayList.h"
 #include "settings/AdvancedSettings.h"
 #include "settings/SettingsComponent.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
@@ -359,7 +360,7 @@ bool CMusicGUIInfo::GetLabel(std::string& value, const CFileItem *item, int cont
         if (info.m_info == LISTITEM_FILE_EXTENSION)
         {
           std::string strExtension = URIUtils::GetExtension(value);
-          value = StringUtils::TrimLeft(strExtension, ".");
+          value = UnicodeUtils::TrimLeft(strExtension, ".");
         }
         return true;
       case LISTITEM_FOLDERNAME:

@@ -30,6 +30,7 @@
 #include "settings/SettingsComponent.h"
 #include "settings/lib/Setting.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 #include "video/VideoInfoTag.h"
@@ -460,7 +461,7 @@ bool CVideoGUIInfo::GetLabel(std::string& value, const CFileItem *item, int cont
         if (info.m_info == LISTITEM_FILE_EXTENSION)
         {
           std::string strExtension = URIUtils::GetExtension(value);
-          value = StringUtils::TrimLeft(strExtension, ".");
+          value = UnicodeUtils::TrimLeft(strExtension, ".");
         }
         return true;
       case LISTITEM_FOLDERNAME:

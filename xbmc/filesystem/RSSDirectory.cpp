@@ -18,6 +18,7 @@
 #include "utils/FileExtensionProvider.h"
 #include "utils/HTMLUtil.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/XMLUtils.h"
@@ -181,7 +182,7 @@ static void ParseItemMRSS(CFileItem* item, SResources& resources, TiXmlElement* 
     else if(scheme == "urn:boxee:source")
       item->SetProperty("boxee:provider_source", text);
     else
-      vtag->m_genre = StringUtils::Split(text, CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoItemSeparator);
+      vtag->m_genre = UnicodeUtils::Split(text, CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoItemSeparator);
   }
   else if(name == "rating")
   {
@@ -207,7 +208,7 @@ static void ParseItemMRSS(CFileItem* item, SResources& resources, TiXmlElement* 
     }
   }
   else if(name == "copyright")
-    vtag->m_studio = StringUtils::Split(text, CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoItemSeparator);
+    vtag->m_studio = UnicodeUtils::Split(text, CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoItemSeparator);
   else if(name == "keywords")
     item->SetProperty("keywords", text);
 

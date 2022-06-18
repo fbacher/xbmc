@@ -25,6 +25,7 @@
 #include "utils/LangCodeExpander.h"
 #include "utils/MemUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 #include <string.h>
@@ -353,17 +354,17 @@ void Interface_General::kodi_version(void* kodiBase, char** compile_name, int* m
   if (StringUtils::StartsWithNoCase(tagStr, "alpha"))
   {
     *tag = strdup("alpha");
-    *tagversion = strdup(StringUtils::Mid(tagStr, 5).c_str());
+    *tagversion = strdup(UnicodeUtils::Mid(tagStr, 5).c_str());
   }
   else if (StringUtils::StartsWithNoCase(tagStr, "beta"))
   {
     *tag = strdup("beta");
-    *tagversion = strdup(StringUtils::Mid(tagStr, 4).c_str());
+    *tagversion = strdup(UnicodeUtils::Mid(tagStr, 4).c_str());
   }
   else if (StringUtils::StartsWithNoCase(tagStr, "rc"))
   {
     *tag = strdup("releasecandidate");
-    *tagversion = strdup(StringUtils::Mid(tagStr, 2).c_str());
+    *tagversion = strdup(UnicodeUtils::Mid(tagStr, 2).c_str());
   }
   else if (tagStr.empty())
     *tag = strdup("stable");

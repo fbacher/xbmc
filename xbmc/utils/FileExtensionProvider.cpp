@@ -224,7 +224,7 @@ void CFileExtensionProvider::SetAddonExtensions(const TYPE& type)
         if (addonInfo->Type(type)->GetValue("@encodedhostname").asBoolean())
         {
           std::string prot = addonInfo->Type(type)->GetValue("@protocols").asString();
-          auto prots = StringUtils::Split(prot, "|");
+          auto prots = UnicodeUtils::Split(prot, "|");
           for (const std::string& it : prots)
             m_encoded.push_back(it);
         }

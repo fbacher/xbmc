@@ -467,10 +467,10 @@ bool CWebServer::IsRequestCacheable(const HTTPRequest& request) const
       request.connection, MHD_HEADER_KIND, MHD_HTTP_HEADER_CACHE_CONTROL);
   if (!cacheControl.empty())
   {
-    std::vector<std::string> cacheControls = StringUtils::Split(cacheControl, ",");
+    std::vector<std::string> cacheControls = UnicodeUtils::Split(cacheControl, ",");
     for (auto control : cacheControls)
     {
-      control = StringUtils::Trim(control);
+      control = UnicodeUtils::Trim(control);
 
       // handle no-cache
       if (control.compare(HEADER_VALUE_NO_CACHE) == 0)

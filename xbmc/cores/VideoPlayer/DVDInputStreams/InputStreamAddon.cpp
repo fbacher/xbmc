@@ -56,7 +56,7 @@ CInputStreamAddon::CInputStreamAddon(const AddonInfoPtr& addonInfo,
   m_fileItemProps = StringUtils::Tokenize(listitemprops, "|");
   for (auto &key : m_fileItemProps)
   {
-    StringUtils::Trim(key);
+    key = UnicodeUtils::Trim(key);
     key = name + "." + key;
   }
   m_caps = {};
@@ -94,7 +94,7 @@ bool CInputStreamAddon::Supports(const AddonInfoPtr& addonInfo, const CFileItem&
       std::vector<std::string> protocolsList = StringUtils::Tokenize(protocols, "|");
       for (auto& value : protocolsList)
       {
-        StringUtils::Trim(value);
+        value = UnicodeUtils::Trim(value);
         if (value == protocol)
           return true;
       }
@@ -110,7 +110,7 @@ bool CInputStreamAddon::Supports(const AddonInfoPtr& addonInfo, const CFileItem&
       std::vector<std::string> extensionsList = StringUtils::Tokenize(extensions, "|");
       for (auto& value : extensionsList)
       {
-        StringUtils::Trim(value);
+        value = UnicodeUtils::Trim(value);
         if (value == filetype)
           return true;
       }

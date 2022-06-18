@@ -15,6 +15,7 @@
 #include "guilib/GUIListItem.h"
 #include "guilib/LocalizeStrings.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 using namespace KODI::GUILIB::GUIINFO;
@@ -246,7 +247,7 @@ void CGUIInfoLabel::Parse(const std::string &label, int context)
       if (pos2 != std::string::npos)
       {
         // decipher the block
-        std::vector<std::string> params = StringUtils::Split(work.substr(pos1 + len, pos2 - pos1 - len), ",");
+        std::vector<std::string> params = UnicodeUtils::Split(work.substr(pos1 + len, pos2 - pos1 - len), ",");
         if (!params.empty())
         {
           CGUIInfoManager& infoMgr = CServiceBroker::GetGUI()->GetInfoManager();

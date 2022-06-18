@@ -23,6 +23,7 @@
 #include "settings/lib/SettingDefinitions.h"
 #include "storage/MediaManager.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Variant.h"
 #include "utils/XMLUtils.h"
 #include "utils/log.h"
@@ -638,19 +639,21 @@ RESOLUTION CDisplaySettings::GetResolutionFromString(const std::string &strResol
     return RES_WINDOW;
   else if (strResolution.size() >= 20)
   {
+    // TODO: Unicode Should non-Unicode method be used?
+
     // format: WWWWWHHHHHRRR.RRRRRP333, where W = width, H = height, R = refresh, P = interlace, 3 = stereo mode
-    int width = std::strtol(StringUtils::Mid(strResolution, 0,5).c_str(), NULL, 10);
-    int height = std::strtol(StringUtils::Mid(strResolution, 5,5).c_str(), NULL, 10);
-    float refresh = (float)std::strtod(StringUtils::Mid(strResolution, 10,9).c_str(), NULL);
+    int width = std::strtol(UnicodeUtils::Mid(strResolution, 0,5).c_str(), NULL, 10);
+    int height = std::strtol(UnicodeUtils::Mid(strResolution, 5,5).c_str(), NULL, 10);
+    float refresh = (float)std::strtod(UnicodeUtils::Mid(strResolution, 10,9).c_str(), NULL);
     unsigned flags = 0;
 
     // look for 'i' and treat everything else as progressive,
-    if(StringUtils::Mid(strResolution, 19,1) == "i")
+    if(UnicodeUtils::Mid(strResolution, 19,1) == "i")
       flags |= D3DPRESENTFLAG_INTERLACED;
 
-    if(StringUtils::Mid(strResolution, 20,3) == "sbs")
+    if(UnicodeUtils::Mid(strResolution, 20,3) == "sbs")
       flags |= D3DPRESENTFLAG_MODE3DSBS;
-    else if(StringUtils::Mid(strResolution, 20,3) == "tab")
+    else if(UnicodeUtils::Mid(strResolution, 20,3) == "tab")
       flags |= D3DPRESENTFLAG_MODE3DTB;
 
     std::map<RESOLUTION, RESOLUTION_INFO> resolutionInfos;

@@ -1103,53 +1103,48 @@ public:
   /*!
    *  \brief Remove all whitespace from beginning and end of str
    *
-   *  TODO:  Create TrimCopy versions which do not modify the original string.
-   *         If, in order to avoid complications with redefining UnicodeUtils methods,
-   *         a replacement class, UnicodeUtils or some such is created. Then more
-   *         latitude will exist for naming, etc.
-   *
-   * \param str to trim in place
-   * \return trimmed string, same as str argument.
+   * \param str to trim
+   * \return trimmed string
    */
-  static std::string& Trim(std::string &str);
+  static std::string Trim(const std::string &str);
 
   /*!
    *  \brief Remove a set of characters from beginning and end of str
    *
    *  Ex: Trim("abc1234bxa", "acb") ==> "1234bx"
    *
-   * \param str to trim in place
+   * \param str to trim
    * \param chars (characters) to remove from str
-   * \return trimmed string, same as str argument.
+   * \return trimmed string
    */
-  static std::string& Trim(std::string &str, const char* const chars);
+  static std::string Trim(const std::string &str, const char* const chars);
 
   /*!
    * \brief Remove all whitespace from beginning of str
    *
-   * \param str to trim in place
-   * \return trimmed string, same as str argument.
+   * \param str to trim
+   * \return trimmed string
    */
-  static std::string& TrimLeft(std::string &str);
+  static std::string TrimLeft(const std::string &str);
 
   /*!
    * \brief Remove a set of characters from beginning of str
    *
    *  Ex: TrimLeft("abc1234bxa", "acb") ==> "1234bxa"
    *
-   * \param str to trim in place
+   * \param str to trim
    * \param chars (characters) to remove from str
-   * \return trimmed string, same as str argument.
+   * \return trimmed string
    */
-  static std::string& TrimLeft(std::string &str, const char* const chars);
+  static std::string TrimLeft(const std::string &str, const char* const chars);
 
   /*!
    * \brief Remove all whitespace from end of str
    *
-   * \param str to trim in place
-   * \return trimmed string, same as str argument.
+   * \param str to trim
+   * \return trimmed string
    */
-  static std::string& TrimRight(std::string &str);
+  static std::string TrimRight(const std::string &str);
 
   /*! \brief Remove a set of characters from end of str
    *
@@ -1157,11 +1152,11 @@ public:
    *
    *  Ex: TrimRight("abc1234bxa", "acb") ==> "abc1234bx"
    *
-   * \param str to trim in place
+   * \param str to trim
    * \param chars (characters) to remove from str
-   * \return trimmed string, same as str argument.
+   * \return trimmed string
    */
-  static std::string& TrimRight(std::string &str, const char* const chars);
+  static std::string TrimRight(const std::string &str, const char* const chars);
 
   /*! \brief Remove leading and trailing ASCII space and TAB characters from str
    *
@@ -1430,7 +1425,7 @@ public:
   an empty string).
 
   Delimiter strings are applied in order, so once the (optional) maximum number of
-  items is produced no other delimiters are applied. This produces different results
+  items is produced then no other delimiters are applied. This produces different results
   to applying all delimiters at once e.g. "a/b#c/d" becomes "a", "b#c", "d" rather
   than "a", "b", "c/d"
 

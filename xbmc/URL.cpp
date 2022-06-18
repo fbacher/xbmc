@@ -329,8 +329,7 @@ void CURL::SetFileName(const std::string& strFileName)
   else
     m_strShareName = m_strFileName.substr(0, slash);
 
-  StringUtils::Trim(m_strFileType);
-  m_strFileType = UnicodeUtils::FoldCase(m_strFileType);
+  m_strFileType = UnicodeUtils::FoldCase(UnicodeUtils::Trim(m_strFileType));
 }
 
 void CURL::SetProtocol(const std::string& strProtocol)

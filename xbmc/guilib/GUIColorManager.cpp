@@ -12,6 +12,7 @@
 #include "filesystem/SpecialProtocol.h"
 #include "utils/ColorUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/log.h"
@@ -92,8 +93,7 @@ bool CGUIColorManager::LoadXML(CXBMCTinyXML &xmlDoc)
 UTILS::COLOR::Color CGUIColorManager::GetColor(const std::string& color) const
 {
   // look in our color map
-  std::string trimmed(color);
-  StringUtils::TrimLeft(trimmed, "= ");
+  std::string trimmed(UnicodeUtils::TrimLeft(color, "= "));
   const auto it = m_colors.find(trimmed);
   if (it != m_colors.end())
     return (*it).second;

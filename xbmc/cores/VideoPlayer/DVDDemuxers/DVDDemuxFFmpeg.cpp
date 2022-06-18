@@ -951,14 +951,14 @@ AVDictionary* CDVDDemuxFFmpeg::GetFFMpegOptionsFromInput()
       }
 
       CURL tmpUrl = url;
-      std::vector<std::string> opts = StringUtils::Split(tmpUrl.Get(), " ");
+      std::vector<std::string> opts = UnicodeUtils::Split(tmpUrl.Get(), " ");
       if (opts.size() > 1) // inline rtmp options
       {
         std::string swfurl;
         bool swfvfy=false;
         for (size_t i = 1; i < opts.size(); ++i)
         {
-          std::vector<std::string> value = StringUtils::Split(opts[i], "=", 2);
+          std::vector<std::string> value = UnicodeUtils::Split(opts[i], "=", 2);
           value[0] = UnicodeUtils::FoldCase(value[0]);
           auto it = optionmap.find(value[0]);
           if (it != optionmap.end())
@@ -2455,7 +2455,7 @@ void CDVDDemuxFFmpeg::GetL16Parameters(int &channels, int &samplerate)
             len -= pos;
           std::string no_channels(content, pos, len);
           // as we don't support any charset with ';' in name
-          StringUtils::Trim(no_channels, " \t");
+          no_channels = UnicodeUtils::Trim(no_channels, " \t");
           if (!no_channels.empty())
           {
             int val = strtol(no_channels.c_str(), NULL, 0);
@@ -2473,7 +2473,7 @@ void CDVDDemuxFFmpeg::GetL16Parameters(int &channels, int &samplerate)
             len -= pos;
           std::string rate(content, pos, len);
           // as we don't support any charset with ';' in name
-          StringUtils::Trim(rate, " \t");
+          rate = UnicodeUtils::Trim(rate, " \t");
           if (!rate.empty())
           {
             int val = strtol(rate.c_str(), NULL, 0);

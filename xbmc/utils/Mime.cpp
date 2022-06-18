@@ -568,7 +568,7 @@ std::string CMime::GetMimeType(const CURL &url, bool lookup)
     size_t i = strmime.find(';');
     if(i != std::string::npos)
       strmime.erase(i, strmime.length() - i);
-    StringUtils::Trim(strmime);
+    strmime = UnicodeUtils::Trim(strmime);
     strMimeType = strmime;
   }
   else
@@ -683,8 +683,8 @@ bool CMime::parseMimeType(const std::string& mimeType, std::string& type, std::s
   if (semicolonPos != std::string::npos)
     subtype.erase(semicolonPos);
 
-  StringUtils::Trim(type, whitespaceChars);
-  StringUtils::Trim(subtype, whitespaceChars);
+  type = UnicodeUtils::Trim(type, whitespaceChars);
+  subtype = UnicodeUtils::Trim(subtype, whitespaceChars);
 
   if (type.empty() || subtype.empty())
   {

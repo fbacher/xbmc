@@ -14,6 +14,7 @@
 #include "guilib/LocalizeStrings.h"
 #include "utils/RegExp.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
@@ -216,7 +217,7 @@ void CAndroidStorageProvider::GetRemovableDrives(VECSOURCES &removableDrives)
               break;
             }
 
-            StringUtils::Trim(share.strName);
+            share.strName = UnicodeUtils::Trim(share.strName);
             if (share.strName.empty() || share.strName == "?" ||
                 StringUtils::EqualsNoCase(share.strName, "null"))
               share.strName = URIUtils::GetFileName(share.strPath);

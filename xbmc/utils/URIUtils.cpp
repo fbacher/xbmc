@@ -258,7 +258,7 @@ std::vector<std::string> URIUtils::SplitPath(const std::string& strPath)
   std::string sep(1, url.GetDirectorySeparator());
 
   // split the filename portion of the URL up into separate dirs
-  std::vector<std::string> dirs = StringUtils::Split(url.GetFileName(), sep);
+  std::vector<std::string> dirs = UnicodeUtils::Split(url.GetFileName(), sep);
 
   // we start with the root path
   std::string dir = url.GetWithoutFilename();
@@ -464,7 +464,7 @@ std::string URIUtils::GetBasePath(const std::string& strPath)
 
 std::string URLEncodePath(const std::string& strPath)
 {
-  std::vector<std::string> segments = StringUtils::Split(strPath, "/");
+  std::vector<std::string> segments = UnicodeUtils::Split(strPath, "/");
   for (std::vector<std::string>::iterator i = segments.begin(); i != segments.end(); ++i)
     *i = CURL::Encode(*i);
 
@@ -473,7 +473,7 @@ std::string URLEncodePath(const std::string& strPath)
 
 std::string URLDecodePath(const std::string& strPath)
 {
-  std::vector<std::string> segments = StringUtils::Split(strPath, "/");
+  std::vector<std::string> segments = UnicodeUtils::Split(strPath, "/");
   for (std::vector<std::string>::iterator i = segments.begin(); i != segments.end(); ++i)
     *i = CURL::Decode(*i);
 
@@ -1399,7 +1399,7 @@ CURL URIUtils::CreateArchivePath(const std::string& type,
    */
   std::string strBuffer(pathInArchive);
   StringUtils::Replace(strBuffer, '\\', '/');
-  StringUtils::TrimLeft(strBuffer, "/");
+  strBuffer = UnicodeUtils::TrimLeft(strBuffer, "/");
   url.SetFileName(strBuffer);
 
   return url;
@@ -1425,7 +1425,7 @@ std::string URIUtils::resolvePath(const std::string &path)
   size_t posSlash = path.find('/');
   size_t posBackslash = path.find('\\');
   std::string delim = posSlash < posBackslash ? "/" : "\\";
-  std::vector<std::string> parts = StringUtils::Split(path, delim);
+  std::vector<std::string> parts = UnicodeUtils::Split(path, delim);
   std::vector<std::string> realParts;
 
   for (std::vector<std::string>::const_iterator part = parts.begin(); part != parts.end(); ++part)

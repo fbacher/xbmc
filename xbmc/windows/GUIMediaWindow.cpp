@@ -141,7 +141,7 @@ bool CGUIMediaWindow::Load(TiXmlElement *pRootElement)
   if (element && element->FirstChild())
   { // format is <views>50,29,51,95</views>
     const std::string &allViews = element->FirstChild()->ValueStr();
-    std::vector<std::string> views = StringUtils::Split(allViews, ",");
+    std::vector<std::string> views = UnicodeUtils::Split(allViews, ",");
     for (std::vector<std::string>::const_iterator i = views.begin(); i != views.end(); ++i)
     {
       int controlID = atol(i->c_str());
@@ -2021,8 +2021,7 @@ bool CGUIMediaWindow::GetFilteredItems(const std::string &filter, CFileItemList 
   if (m_canFilterAdvanced)
     result = GetAdvanceFilteredItems(items);
 
-  std::string trimmedFilter(filter);
-  StringUtils::TrimLeft(trimmedFilter);
+  std::string trimmedFilter = UnicodeUtils::TrimLeft(filter);
 
   if (trimmedFilter.empty())
     return result;
