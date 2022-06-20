@@ -13,6 +13,7 @@
 #include "addons/interfaces/Filesystem.h"
 #include "network/ZeroconfBrowser.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 #include <mutex>

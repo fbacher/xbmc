@@ -10,6 +10,7 @@
 
 #include "URL.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 
 typedef struct Translator {
   const char *legacyPath;

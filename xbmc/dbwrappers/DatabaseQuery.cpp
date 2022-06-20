@@ -185,7 +185,7 @@ bool CDatabaseQueryRule::Save(CVariant &obj) const
 CDatabaseQueryRule::SEARCH_OPERATOR CDatabaseQueryRule::TranslateOperator(const char *oper)
 {
   for (const operatorField& o : operators)
-    if (StringUtils::EqualsNoCase(oper, o.string)) return o.op;
+    if (UnicodeUtils::EqualsNoCase(oper, o.string)) return o.op;
   return OPERATOR_CONTAINS;
 }
 

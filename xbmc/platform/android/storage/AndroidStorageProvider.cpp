@@ -219,7 +219,7 @@ void CAndroidStorageProvider::GetRemovableDrives(VECSOURCES &removableDrives)
 
             share.strName = UnicodeUtils::Trim(share.strName);
             if (share.strName.empty() || share.strName == "?" ||
-                StringUtils::EqualsNoCase(share.strName, "null"))
+                UnicodeUtils::EqualsNoCase(share.strName, "null"))
               share.strName = URIUtils::GetFileName(share.strPath);
 
             share.m_ignore = true;

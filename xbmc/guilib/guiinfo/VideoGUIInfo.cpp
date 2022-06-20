@@ -766,7 +766,7 @@ bool CVideoGUIInfo::GetBool(bool& value, const CGUIListItem *gitem, int contextW
         else if (tag->m_type == MediaTypeMusicVideo)
           strContent = "musicvideos";
       }
-      value = StringUtils::EqualsNoCase(info.GetData3(), strContent);
+      value = UnicodeUtils::EqualsNoCase(info.GetData3(), strContent);
       return value; // if no match for this provider, other providers shall be asked.
     }
     case VIDEOPLAYER_USING_OVERLAYS:

@@ -10,6 +10,7 @@
 
 #include "TextureDatabase.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 using namespace PVR;

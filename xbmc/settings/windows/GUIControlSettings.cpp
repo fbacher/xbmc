@@ -1178,7 +1178,7 @@ bool CGUIControlButtonSetting::GetPath(const std::shared_ptr<CSettingPath>& path
   const std::vector<std::string>& sources = pathSetting->GetSources();
   for (const auto& source : sources)
   {
-    if (StringUtils::EqualsNoCase(source, "local"))
+    if (UnicodeUtils::EqualsNoCase(source, "local"))
       localSharesOnly = true;
     else
     {

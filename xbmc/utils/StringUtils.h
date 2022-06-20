@@ -436,7 +436,7 @@ public:
    */
   static void FoldCase(std::string &str,
       const StringOptions opt = StringOptions::FOLD_CASE_DEFAULT);
-#endif
+
 
   /*!
    *  \brief Capitalizes a wstring using locale.
@@ -531,6 +531,7 @@ public:
    */
   static void ToCapitalize(std::string &str);
 
+
   /*!
    *  \brief TitleCase a wstring using locale.
    *
@@ -590,45 +591,7 @@ public:
    */
   static void TitleCase(std::string &str);
 
-  /*!
-   *  \brief Normalizes a wstring. Not expected to be used outside of StringUtils.
-   *
-   *  Made public to facilitate testing.
-   *
-   *  There are multiple Normalizations that can be performed on Unicode. Fortunately
-   *  normalization is not needed in many situations. An introduction can be found
-   *  at: https://unicode-org.github.io/icu/userguide/transforms/normalization/
-   *
-   *  \param str string to normalize.
-   *  \param options fine tunes behavior. See StringOptions. Frequently can leave
-   *         at default value.
-   *  \param normalizerType select the appropriate normalizer for the job
-   *  \return normalized string
-   */
-
-  static const std::wstring Normalize(const std::wstring &src, const StringOptions opt =
-      StringOptions::FOLD_CASE_DEFAULT, const NormalizerType normalizerType = NormalizerType::NFKC);
-
-  /*!
-   *  \brief Normalizes a string. Not expected to be used outside of StringUtils.
-   *
-   *  Made public to facilitate testing.
-   *
-   * There are multiple Normalizations that can be performed on Unicode. Fortunately
-   * normalization is not needed in many situations. An introduction can be found
-   * at: https://unicode-org.github.io/icu/userguide/transforms/normalization/
-   *
-   * \param str string to normalize.
-   * \param options fine tunes behavior. See StringOptions. Frequently can leave
-   *        at default value.
-   * \param normalizerType select the appropriate normalizer for the job
-   * \return normalized string
-   */
-
-  static const std::string Normalize(const std::string &src, const StringOptions opt =
-      StringOptions::FOLD_CASE_DEFAULT, const NormalizerType normalizerType = NormalizerType::NFKC);
-
-  /*!
+    /*!
    *  \brief Determines if two strings are identical in content.
    *
    * Performs a bitwise comparison of the two strings. Locale is
@@ -726,6 +689,7 @@ public:
    */
   static bool EqualsNoCase(const char *s1, const char *s2, StringOptions opt =
       StringOptions::FOLD_CASE_DEFAULT, const bool normalize = false);
+#endif
 
   /*!
    * \brief Compares two wstrings using codepoint order. Locale does not matter.

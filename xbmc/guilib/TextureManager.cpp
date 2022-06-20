@@ -17,6 +17,7 @@
 #include "guilib/TextureBundle.h"
 #include "guilib/TextureFormats.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 #include "windowing/GraphicContext.h"

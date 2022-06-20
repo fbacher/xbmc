@@ -65,6 +65,7 @@
 #endif
 #include "platform/Environment.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/XTimeUtils.h"
 
 #if defined(TARGET_WINDOWS)

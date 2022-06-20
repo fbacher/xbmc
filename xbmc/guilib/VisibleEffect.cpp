@@ -620,11 +620,11 @@ void CAnimation::Create(const TiXmlElement *node, const CRect &rect, int context
     type = XMLUtils::GetAttribute(node, "type");
 
   if (StringUtils::StartsWithNoCase(type, "visible")) m_type = ANIM_TYPE_VISIBLE;
-  else if (StringUtils::EqualsNoCase(type, "hidden")) m_type = ANIM_TYPE_HIDDEN;
-  else if (StringUtils::EqualsNoCase(type, "focus"))  m_type = ANIM_TYPE_FOCUS;
-  else if (StringUtils::EqualsNoCase(type, "unfocus"))  m_type = ANIM_TYPE_UNFOCUS;
-  else if (StringUtils::EqualsNoCase(type, "windowopen"))  m_type = ANIM_TYPE_WINDOW_OPEN;
-  else if (StringUtils::EqualsNoCase(type, "windowclose"))  m_type = ANIM_TYPE_WINDOW_CLOSE;
+  else if (UnicodeUtils::EqualsNoCase(type, "hidden")) m_type = ANIM_TYPE_HIDDEN;
+  else if (UnicodeUtils::EqualsNoCase(type, "focus"))  m_type = ANIM_TYPE_FOCUS;
+  else if (UnicodeUtils::EqualsNoCase(type, "unfocus"))  m_type = ANIM_TYPE_UNFOCUS;
+  else if (UnicodeUtils::EqualsNoCase(type, "windowopen"))  m_type = ANIM_TYPE_WINDOW_OPEN;
+  else if (UnicodeUtils::EqualsNoCase(type, "windowclose"))  m_type = ANIM_TYPE_WINDOW_CLOSE;
   // sanity check
   if (m_type == ANIM_TYPE_CONDITIONAL)
   {
@@ -673,17 +673,17 @@ void CAnimation::Create(const TiXmlElement *node, const CRect &rect, int context
 void CAnimation::AddEffect(const std::string &type, const TiXmlElement *node, const CRect &rect)
 {
   CAnimEffect *effect = NULL;
-  if (StringUtils::EqualsNoCase(type, "fade"))
+  if (UnicodeUtils::EqualsNoCase(type, "fade"))
     effect = new CFadeEffect(node, m_type < 0);
-  else if (StringUtils::EqualsNoCase(type, "slide"))
+  else if (UnicodeUtils::EqualsNoCase(type, "slide"))
     effect = new CSlideEffect(node);
-  else if (StringUtils::EqualsNoCase(type, "rotate"))
+  else if (UnicodeUtils::EqualsNoCase(type, "rotate"))
     effect = new CRotateEffect(node, CAnimEffect::EFFECT_TYPE_ROTATE_Z);
-  else if (StringUtils::EqualsNoCase(type, "rotatey"))
+  else if (UnicodeUtils::EqualsNoCase(type, "rotatey"))
     effect = new CRotateEffect(node, CAnimEffect::EFFECT_TYPE_ROTATE_Y);
-  else if (StringUtils::EqualsNoCase(type, "rotatex"))
+  else if (UnicodeUtils::EqualsNoCase(type, "rotatex"))
     effect = new CRotateEffect(node, CAnimEffect::EFFECT_TYPE_ROTATE_X);
-  else if (StringUtils::EqualsNoCase(type, "zoom"))
+  else if (UnicodeUtils::EqualsNoCase(type, "zoom"))
     effect = new CZoomEffect(node, rect);
 
   if (effect)

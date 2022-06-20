@@ -225,9 +225,9 @@ void CDateTimeSpan::SetFromPeriod(const std::string &period)
   if (pos != std::string::npos)
   {
     std::string units = period.substr(pos, 3);
-    if (StringUtils::EqualsNoCase(units, "wee"))
+    if (UnicodeUtils::EqualsNoCase(units, "wee"))
       days *= 7;
-    else if (StringUtils::EqualsNoCase(units, "mon"))
+    else if (UnicodeUtils::EqualsNoCase(units, "mon"))
       days *= 31;
   }
 
@@ -1573,7 +1573,7 @@ int CDateTime::MonthStringToMonthNum(const std::string& month)
   const char* abr_months[] = {"jan", "feb", "mar", "apr", "may", "jun", "jul", "aug", "sep", "oct", "nov", "dec"};
 
   int i = 0;
-  for (; i < 12 && !StringUtils::EqualsNoCase(month, months[i]) && !StringUtils::EqualsNoCase(month, abr_months[i]); i++);
+  for (; i < 12 && !UnicodeUtils::EqualsNoCase(month, months[i]) && !UnicodeUtils::EqualsNoCase(month, abr_months[i]); i++);
   i++;
 
   return i;

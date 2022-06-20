@@ -318,7 +318,7 @@ void GUIFontManager::Unload(const std::string& strFontName)
 {
   for (auto iFont = m_vecFonts.begin(); iFont != m_vecFonts.end(); ++iFont)
   {
-    if (StringUtils::EqualsNoCase((*iFont)->GetFontName(), strFontName))
+    if (UnicodeUtils::EqualsNoCase((*iFont)->GetFontName(), strFontName))
     {
       m_vecFonts.erase(iFont);
       return;
@@ -342,7 +342,7 @@ CGUIFontTTF* GUIFontManager::GetFontFile(const std::string& fontIdent)
 {
   for (const auto& it : m_vecFontFiles)
   {
-    if (StringUtils::EqualsNoCase(it->GetFontIdent(), fontIdent))
+    if (UnicodeUtils::EqualsNoCase(it->GetFontIdent(), fontIdent))
       return it.get();
   }
 
@@ -354,12 +354,12 @@ CGUIFont* GUIFontManager::GetFont(const std::string& strFontName, bool fallback 
   for (const auto& it : m_vecFonts)
   {
     CGUIFont* pFont = it.get();
-    if (StringUtils::EqualsNoCase(pFont->GetFontName(), strFontName))
+    if (UnicodeUtils::EqualsNoCase(pFont->GetFontName(), strFontName))
       return pFont;
   }
 
   // fall back to "font13" if we have none
-  if (fallback && !strFontName.empty() && !StringUtils::EqualsNoCase(strFontName, "font13"))
+  if (fallback && !strFontName.empty() && !UnicodeUtils::EqualsNoCase(strFontName, "font13"))
     return GetFont("font13");
 
   return nullptr;
@@ -438,7 +438,7 @@ void GUIFontManager::LoadFonts(const std::string& fontSet)
       if (firstFont.empty())
         firstFont = idAttr;
 
-      if (StringUtils::EqualsNoCase(fontSet, idAttr))
+      if (UnicodeUtils::EqualsNoCase(fontSet, idAttr))
       {
         LoadFonts(pChild->FirstChild("font"));
         return;

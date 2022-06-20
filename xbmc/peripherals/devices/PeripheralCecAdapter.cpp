@@ -547,7 +547,7 @@ bool CPeripheralCecAdapter::IsMuted(void)
 
 void CPeripheralCecAdapter::SetMenuLanguage(const char* strLanguage)
 {
-  if (StringUtils::EqualsNoCase(m_strMenuLanguage, strLanguage))
+  if (UnicodeUtils::EqualsNoCase(m_strMenuLanguage, strLanguage))
     return;
 
   std::string strGuiLanguage;
@@ -1149,7 +1149,7 @@ void CPeripheralCecAdapter::ResetButton(void)
 
 void CPeripheralCecAdapter::OnSettingChanged(const std::string& strChangedSetting)
 {
-  if (StringUtils::EqualsNoCase(strChangedSetting, "enabled"))
+  if (UnicodeUtils::EqualsNoCase(strChangedSetting, "enabled"))
   {
     bool bEnabled(GetSettingBool("enabled"));
     if (!bEnabled && IsRunning())

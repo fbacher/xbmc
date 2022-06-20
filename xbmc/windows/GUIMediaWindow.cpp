@@ -521,8 +521,8 @@ bool CGUIMediaWindow::OnMessage(CGUIMessage& message)
       std::string dir = message.GetStringParam(0);
       const std::string& ret = message.GetStringParam(1);
       const std::string& swap = message.GetStringParam(message.GetNumStringParams() - 1);
-      const bool returning = StringUtils::EqualsNoCase(ret, "return");
-      const bool replacing = StringUtils::EqualsNoCase(swap, "replace");
+      const bool returning = UnicodeUtils::EqualsNoCase(ret, "return");
+      const bool replacing = UnicodeUtils::EqualsNoCase(swap, "replace");
 
       if (!dir.empty())
       {
@@ -1523,7 +1523,7 @@ bool CGUIMediaWindow::OnPlayAndQueueMedia(const CFileItemPtr& item, const std::s
     for (int i = 0; i < m_vecItems->Size(); i++)
     {
       std::string path = URIUtils::GetFileName(m_vecItems->Get(i)->GetDynPath());
-      if (StringUtils::EqualsNoCase(path, "VIDEO_TS.IFO"))
+      if (UnicodeUtils::EqualsNoCase(path, "VIDEO_TS.IFO"))
       {
         mainDVD = path;
         break;
@@ -2172,8 +2172,8 @@ bool CGUIMediaWindow::Filter(bool advanced /* = true */)
 
 std::string CGUIMediaWindow::GetStartFolder(const std::string &dir)
 {
-  if (StringUtils::EqualsNoCase(dir, "$root") ||
-      StringUtils::EqualsNoCase(dir, "root"))
+  if (UnicodeUtils::EqualsNoCase(dir, "$root") ||
+      UnicodeUtils::EqualsNoCase(dir, "root"))
     return "";
 
   // Let plugins handle their own urls themselves

@@ -32,6 +32,7 @@
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
@@ -275,7 +276,7 @@ bool IsDirectoryMember(const std::string& strDirectory,
 
   // Case-insensitive comparison since sub folders are created with case-insensitive matching (GetSubDirectories)
   if (bGrouped)
-    return StringUtils::EqualsNoCase(strUseDirectory, strUseEntryDirectory);
+    return UnicodeUtils::EqualsNoCase(strUseDirectory, strUseEntryDirectory);
   else
     return StringUtils::StartsWithNoCase(strUseEntryDirectory, strUseDirectory);
 }

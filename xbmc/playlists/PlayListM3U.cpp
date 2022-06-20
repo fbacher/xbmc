@@ -145,7 +145,7 @@ bool CPlayListM3U::Load(const std::string& strFileName)
 
       // Skip self - do not load playlist recursively
       // We compare case-less in case user has input incorrect case of the current playlist
-      if (StringUtils::EqualsNoCase(URIUtils::GetFileName(strFileName), m_strPlayListName))
+      if (UnicodeUtils::EqualsNoCase(URIUtils::GetFileName(strFileName), m_strPlayListName))
         continue;
 
       if (strFileName.length() > 0)

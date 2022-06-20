@@ -20,6 +20,7 @@
 #include "input/KeyboardTranslator.h"
 #include "utils/StringUtils.h"
 #include "utils/TimeUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 #include "windowing/GraphicContext.h"
 

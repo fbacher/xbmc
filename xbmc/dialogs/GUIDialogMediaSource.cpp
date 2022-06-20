@@ -18,6 +18,7 @@
 #include "Util.h"
 #include "utils/URIUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Variant.h"
 #include "filesystem/Directory.h"
 #include "filesystem/PVRDirectory.h"
@@ -154,7 +155,7 @@ bool CGUIDialogMediaSource::ShowAndEditMediaSource(const std::string &type, cons
   {
     for (unsigned int i = 0;i<pShares->size();++i)
     {
-      if (StringUtils::EqualsNoCase((*pShares)[i].strName, share))
+      if (UnicodeUtils::EqualsNoCase((*pShares)[i].strName, share))
         return ShowAndEditMediaSource(type, (*pShares)[i]);
     }
   }
@@ -176,7 +177,7 @@ bool CGUIDialogMediaSource::ShowAndEditMediaSource(const std::string &type, cons
     // Update media source
     // Get unique new source name when changed
     std::string strName(dialog->m_name);
-    if (!StringUtils::EqualsNoCase(dialog->m_name, strOldName))
+    if (!UnicodeUtils::EqualsNoCase(dialog->m_name, strOldName))
       strName = dialog->GetUniqueMediaSourceName();
 
     CMediaSource newShare;
@@ -200,7 +201,7 @@ std::string CGUIDialogMediaSource::GetUniqueMediaSourceName()
   {
     for (i = 0; i<pShares->size(); ++i)
     {
-      if (StringUtils::EqualsNoCase((*pShares)[i].strName, strName))
+      if (UnicodeUtils::EqualsNoCase((*pShares)[i].strName, strName))
         break;
     }
     if (i < pShares->size())

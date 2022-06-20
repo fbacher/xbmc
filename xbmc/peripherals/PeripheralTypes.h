@@ -327,7 +327,7 @@ public:
   {
     return m_iVendorId == right.m_iVendorId && m_iProductId == right.m_iProductId &&
            m_type == right.m_type && m_busType == right.m_busType &&
-           StringUtils::EqualsNoCase(m_strLocation, right.m_strLocation);
+           UnicodeUtils::EqualsNoCase(m_strLocation, right.m_strLocation);
   }
 
   bool operator!=(const PeripheralScanResult& right) const { return !(*this == right); }

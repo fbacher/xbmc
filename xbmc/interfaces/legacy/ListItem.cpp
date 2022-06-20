@@ -678,7 +678,7 @@ namespace XBMCAddon
                                 "use the respective setter in InfoTagPicture.");
         }
       }
-      else if (StringUtils::EqualsNoCase(type, "game"))
+      else if (UnicodeUtils::EqualsNoCase(type, "game"))
       {
         auto gametag = item->GetGameInfoTag();
         for (const auto& it : infoLabels)

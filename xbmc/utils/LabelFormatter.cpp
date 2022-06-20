@@ -21,6 +21,7 @@
 #include "settings/AdvancedSettings.h"
 #include "settings/Settings.h"
 #include "settings/SettingsComponent.h"
+#include "utils/UnicodeUtils.h"
 #include "video/VideoInfoTag.h"
 
 #include <cassert>

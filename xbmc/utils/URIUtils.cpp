@@ -795,10 +795,10 @@ bool URIUtils::IsRAR(const std::string& strFile)
   if (strExtension == ".001" && !StringUtils::EndsWithNoCase(strFile, ".ts.001"))
     return true;
 
-  if (StringUtils::EqualsNoCase(strExtension, ".cbr"))
+  if (UnicodeUtils::EqualsNoCase(strExtension, ".cbr"))
     return true;
 
-  if (StringUtils::EqualsNoCase(strExtension, ".rar"))
+  if (UnicodeUtils::EqualsNoCase(strExtension, ".rar"))
     return true;
 
   return false;
@@ -1267,7 +1267,7 @@ bool URIUtils::CompareWithoutSlashAtEnd(const std::string& strPath1, const std::
   std::string strc1 = strPath1, strc2 = strPath2;
   RemoveSlashAtEnd(strc1);
   RemoveSlashAtEnd(strc2);
-  return StringUtils::EqualsNoCase(strc1, strc2);
+  return UnicodeUtils::EqualsNoCase(strc1, strc2);
 }
 
 

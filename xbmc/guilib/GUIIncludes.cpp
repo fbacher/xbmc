@@ -120,7 +120,7 @@ bool CGUIIncludes::Load_Internal(const std::string &file)
   }
 
   TiXmlElement *root = doc.RootElement();
-  if (!root || !StringUtils::EqualsNoCase(root->Value(), "includes"))
+  if (!root || !UnicodeUtils::EqualsNoCase(root->Value(), "includes"))
   {
     CLog::Log(LOGERROR, "Error loading include file {}: Root element <includes> required.", file);
     return false;

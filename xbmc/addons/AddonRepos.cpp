@@ -18,6 +18,7 @@
 #include "ServiceBroker.h"
 #include "messaging/helpers/DialogOKHelper.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 #include <algorithm>

@@ -134,7 +134,7 @@ bool CSkinSettingBool::Deserialize(const TiXmlElement* element)
     return false;
 
   if (element->FirstChild() != nullptr)
-    value = StringUtils::EqualsNoCase(element->FirstChild()->ValueStr(), "true");
+    value = UnicodeUtils::EqualsNoCase(element->FirstChild()->ValueStr(), "true");
 
   return true;
 }
@@ -471,7 +471,7 @@ void CSkinInfo::SettingOptionsSkinColorsFiller(const SettingConstPtr& setting,
   for (int i = 0; i < items.Size(); ++i)
   {
     CFileItemPtr pItem = items[i];
-    if (!pItem->m_bIsFolder && !StringUtils::EqualsNoCase(pItem->GetLabel(), "defaults.xml"))
+    if (!pItem->m_bIsFolder && !UnicodeUtils::EqualsNoCase(pItem->GetLabel(), "defaults.xml"))
     { // not the default one
       vecColors.push_back(pItem->GetLabel().substr(0, pItem->GetLabel().size() - 4));
     }
@@ -483,7 +483,7 @@ void CSkinInfo::SettingOptionsSkinColorsFiller(const SettingConstPtr& setting,
   // try to find the best matching value
   for (const auto& elem : list)
   {
-    if (StringUtils::EqualsNoCase(elem.value, settingValue))
+    if (UnicodeUtils::EqualsNoCase(elem.value, settingValue))
       current = settingValue;
   }
 }
@@ -526,7 +526,7 @@ void CSkinInfo::SettingOptionsSkinFontsFiller(const SettingConstPtr& setting,
       else
         list.emplace_back(idAttr, idAttr);
 
-      if (StringUtils::EqualsNoCase(idAttr, settingValue))
+      if (UnicodeUtils::EqualsNoCase(idAttr, settingValue))
         currentValueSet = true;
     }
     pChild = pChild->NextSiblingElement("fontset");
@@ -570,7 +570,7 @@ void CSkinInfo::SettingOptionsSkinThemesFiller(const SettingConstPtr& setting,
   // try to find the best matching value
   for (const auto& elem : list)
   {
-    if (StringUtils::EqualsNoCase(elem.value, settingValue))
+    if (UnicodeUtils::EqualsNoCase(elem.value, settingValue))
       current = settingValue;
   }
 }
@@ -616,7 +616,7 @@ int CSkinInfo::TranslateString(const std::string &setting)
   // run through and see if we have this setting
   for (const auto& it : m_strings)
   {
-    if (StringUtils::EqualsNoCase(setting, it.second->name))
+    if (UnicodeUtils::EqualsNoCase(setting, it.second->name))
       return it.first;
   }
 
@@ -670,7 +670,7 @@ int CSkinInfo::TranslateBool(const std::string &setting)
   // run through and see if we have this setting
   for (const auto& it : m_bools)
   {
-    if (StringUtils::EqualsNoCase(setting, it.second->name))
+    if (UnicodeUtils::EqualsNoCase(setting, it.second->name))
       return it.first;
   }
 
@@ -742,7 +742,7 @@ void CSkinInfo::Reset(const std::string &setting)
   // run through and see if we have this setting as a string
   for (auto& it : m_strings)
   {
-    if (StringUtils::EqualsNoCase(setting, it.second->name))
+    if (UnicodeUtils::EqualsNoCase(setting, it.second->name))
     {
       it.second->value.clear();
       m_settingsUpdateHandler->TriggerSave();
@@ -753,7 +753,7 @@ void CSkinInfo::Reset(const std::string &setting)
   // and now check for the skin bool
   for (auto& it : m_bools)
   {
-    if (StringUtils::EqualsNoCase(setting, it.second->name))
+    if (UnicodeUtils::EqualsNoCase(setting, it.second->name))
     {
       it.second->value = false;
       m_settingsUpdateHandler->TriggerSave();

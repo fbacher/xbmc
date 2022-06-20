@@ -41,6 +41,7 @@
 #include "utils/FileExtensionProvider.h"
 #include "utils/ProgressJob.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 
 using namespace XFILE;
@@ -815,7 +816,7 @@ void CGUIDialogMusicInfo::OnGetArt()
         {
           std::string strCandidate = URIUtils::GetFileName(items[j]->GetPath());
           URIUtils::RemoveExtension(strCandidate);
-          if (StringUtils::EqualsNoCase(strCandidate, type))
+          if (UnicodeUtils::EqualsNoCase(strCandidate, type))
           {
             localArt = items[j]->GetPath();
             break;

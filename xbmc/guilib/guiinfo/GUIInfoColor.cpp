@@ -15,6 +15,7 @@
 #include "guilib/GUIColorManager.h"
 #include "guilib/GUIComponent.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 
 using namespace KODI::GUILIB::GUIINFO;
 

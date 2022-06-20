@@ -136,7 +136,7 @@ bool CGUIWindow::LoadXML(const std::string &strPath, const std::string &strLower
     }
 
     // xml need a <window> root element
-    if (!StringUtils::EqualsNoCase(xmlDoc.RootElement()->Value(), "window"))
+    if (!UnicodeUtils::EqualsNoCase(xmlDoc.RootElement()->Value(), "window"))
     {
       CLog::Log(LOGERROR, "XML file {} does not contain a <window> root element",
                 GetProperty("xmlfile").asString());
@@ -196,7 +196,7 @@ bool CGUIWindow::Load(TiXmlElement *pRootElement)
     else if (strValue == "defaultcontrol" && pChild->FirstChild())
     {
       const char *always = pChild->Attribute("always");
-      if (always && StringUtils::EqualsNoCase(always, "true"))
+      if (always && UnicodeUtils::EqualsNoCase(always, "true"))
         m_defaultAlways = true;
       m_defaultControl = atoi(pChild->FirstChild()->Value());
     }
@@ -256,7 +256,7 @@ bool CGUIWindow::Load(TiXmlElement *pRootElement)
       TiXmlElement *pControl = pChild->FirstChildElement();
       while (pControl)
       {
-        if (StringUtils::EqualsNoCase(pControl->Value(), "control"))
+        if (UnicodeUtils::EqualsNoCase(pControl->Value(), "control"))
         {
           LoadControl(pControl, nullptr, CRect(0, 0, static_cast<float>(m_coordsRes.iWidth), static_cast<float>(m_coordsRes.iHeight)));
         }

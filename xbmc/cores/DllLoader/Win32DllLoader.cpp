@@ -15,6 +15,7 @@
 #include "exports/emu_msvcrt.h"
 #include "filesystem/SpecialProtocol.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 #include "platform/win32/CharsetConverter.h"

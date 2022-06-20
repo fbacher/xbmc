@@ -657,7 +657,7 @@ InputVerificationResult CGUIDialogNumeric::ShowAndVerifyInput(std::string& strTo
     return InputVerificationResult::SUCCESS;
   }
 
-  return StringUtils::EqualsNoCase(strToVerify, md5pword2) ? InputVerificationResult::SUCCESS : InputVerificationResult::FAILED;
+  return UnicodeUtils::EqualsNoCase(strToVerify, md5pword2) ? InputVerificationResult::SUCCESS : InputVerificationResult::FAILED;
 }
 
 bool CGUIDialogNumeric::IsConfirmed() const

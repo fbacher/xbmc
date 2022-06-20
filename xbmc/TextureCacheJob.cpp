@@ -23,6 +23,7 @@
 #include "settings/SettingsComponent.h"
 #include "utils/EmbeddedArt.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 #include "video/VideoThumbLoader.h"
@@ -214,7 +215,7 @@ std::unique_ptr<CTexture> CTextureCacheJob::LoadImage(const std::string& image,
   CFileItem file(image, false);
   file.FillInMimeType();
   if (!(file.IsPicture() && !(file.IsZIP() || file.IsRAR() || file.IsCBR() || file.IsCBZ() ))
-      && !StringUtils::StartsWithNoCase(file.GetMimeType(), "image/") && !StringUtils::EqualsNoCase(file.GetMimeType(), "application/octet-stream")) // ignore non-pictures
+      && !StringUtils::StartsWithNoCase(file.GetMimeType(), "image/") && !UnicodeUtils::EqualsNoCase(file.GetMimeType(), "application/octet-stream")) // ignore non-pictures
     return NULL;
 
   std::unique_ptr<CTexture> texture =

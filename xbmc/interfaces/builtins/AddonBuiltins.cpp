@@ -28,6 +28,7 @@
 #include "interfaces/generic/ScriptInvocationManager.h"
 #include "messaging/helpers/DialogHelper.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 

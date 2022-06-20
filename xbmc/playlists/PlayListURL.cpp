@@ -10,6 +10,7 @@
 
 #include "filesystem/File.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 
 using namespace PLAYLIST;

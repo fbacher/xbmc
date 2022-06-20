@@ -675,7 +675,7 @@ bool CSystemGUIInfo::GetBool(bool& value, const CGUIListItem *gitem, int context
       return true;
     case SYSTEM_SETTING:
     {
-      if (StringUtils::EqualsNoCase(info.GetData3(), "hidewatched"))
+      if (UnicodeUtils::EqualsNoCase(info.GetData3(), "hidewatched"))
       {
         CGUIMediaWindow* window = GUIINFO::GetMediaWindow(contextWindow);
         if (window)

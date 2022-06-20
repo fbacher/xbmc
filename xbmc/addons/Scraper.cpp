@@ -950,7 +950,7 @@ std::vector<CScraperUrl> CScraper::FindMovie(XFILE::CCurlFile &fcurl,
     {
       const char *sorted = xhResults.Element()->Attribute("sorted");
       if (sorted != NULL)
-        fSort = !StringUtils::EqualsNoCase(sorted, "yes");
+        fSort = !UnicodeUtils::EqualsNoCase(sorted, "yes");
     }
 
     for (TiXmlElement *pxeMovie = xhResults.FirstChild("entity").Element(); pxeMovie;

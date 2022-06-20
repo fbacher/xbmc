@@ -559,7 +559,7 @@ void CUtil::GetFileAndProtocol(const std::string& strURL, std::string& strDir)
 int CUtil::GetDVDIfoTitle(const std::string& strFile)
 {
   std::string strFilename = URIUtils::GetFileName(strFile);
-  if (StringUtils::EqualsNoCase(strFilename, "video_ts.ifo")) return 0;
+  if (UnicodeUtils::EqualsNoCase(strFilename, "video_ts.ifo")) return 0;
   //VTS_[TITLE]_0.IFO
   return atoi(strFilename.substr(4, 2).c_str());
 }
@@ -1170,7 +1170,7 @@ int CUtil::GetMatchingSource(const std::string& strPath1, VECSOURCES& VECSOURCES
       if (iPos != std::string::npos && iPos > 1)
         strName = strName.substr(0, iPos - 1);
     }
-    if (StringUtils::EqualsNoCase(strPath, strName))
+    if (UnicodeUtils::EqualsNoCase(strPath, strName))
     {
       bIsSourceName = true;
       return i;
@@ -1528,7 +1528,7 @@ void CUtil::GetSkinThemes(std::vector<std::string>& vecTheme)
     {
       std::string strExtension = URIUtils::GetExtension(pItem->GetPath());
       std::string strLabel = pItem->GetLabel();
-      if ((strExtension == ".xbt" && !StringUtils::EqualsNoCase(strLabel, TexturesXbt)))
+      if ((strExtension == ".xbt" && !UnicodeUtils::EqualsNoCase(strLabel, TexturesXbt)))
         // TODO: Unicode BROKEN Left operates on character counts, not bytes
         // Only works if strExtension is single-byte chars
         vecTheme.push_back(UnicodeUtils::Left(strLabel, strExtension.size(), false));
@@ -1541,7 +1541,7 @@ void CUtil::GetSkinThemes(std::vector<std::string>& vecTheme)
         continue;
 
       std::string strLabel = URIUtils::GetFileName(itemUrl.GetHostName());
-      if (!StringUtils::EqualsNoCase(strLabel, TexturesXbt))
+      if (!UnicodeUtils::EqualsNoCase(strLabel, TexturesXbt))
         // TODO: Unicode BROKEN Left operates on character counts, not bytes
         // Only works if strExtension is single-byte chars
         vecTheme.push_back(UnicodeUtils::Left(strLabel, URIUtils::GetExtension(strLabel).size(), false));
@@ -1849,7 +1849,7 @@ void CUtil::GetItemsToScan(const std::string& videoPath,
   {
     for (const auto& subdir : sub_dirs)
     {
-      if (StringUtils::EqualsNoCase(item->GetLabel(), subdir))
+      if (UnicodeUtils::EqualsNoCase(item->GetLabel(), subdir))
         additionalPaths.push_back(item->GetPath());
     }
   }
@@ -1947,7 +1947,7 @@ int CUtil::ScanArchiveForAssociatedItems(const std::string& strArchivePath,
 
     for (const auto& ext : item_exts)
     {
-      if (StringUtils::EqualsNoCase(strExt, ext))
+      if (UnicodeUtils::EqualsNoCase(strExt, ext))
       {
         CLog::Log(LOGINFO, "{}: found associated file {}", __FUNCTION__,
                   CURL::GetRedacted(strPathInRar));
@@ -2157,7 +2157,7 @@ bool CUtil::FindVobSubPair(const std::vector<std::string>& vecSubtitles, const s
           (URIUtils::PathEquals(URIUtils::ReplaceExtension(strIdxPath,""),
                                 URIUtils::ReplaceExtension(subtitlePath,"")) ||
            (strSubDirectory.size() >= 11 &&
-            StringUtils::EqualsNoCase(strSubDirectory.substr(6, strSubDirectory.length()-11), URIUtils::ReplaceExtension(strIdxPath,"")))))
+            UnicodeUtils::EqualsNoCase(strSubDirectory.substr(6, strSubDirectory.length()-11), URIUtils::ReplaceExtension(strIdxPath,"")))))
       {
         strSubPath = subtitlePath;
         return true;
@@ -2187,7 +2187,7 @@ bool CUtil::IsVobSub(const std::vector<std::string>& vecSubtitles, const std::st
           (URIUtils::PathEquals(URIUtils::ReplaceExtension(subtitlePath,""),
                                 URIUtils::ReplaceExtension(strSubPath,"")) ||
            (strSubDirectory.size() >= 11 &&
-            StringUtils::EqualsNoCase(strSubDirectory.substr(6, strSubDirectory.length()-11), URIUtils::ReplaceExtension(subtitlePath,"")))))
+            UnicodeUtils::EqualsNoCase(strSubDirectory.substr(6, strSubDirectory.length()-11), URIUtils::ReplaceExtension(subtitlePath,"")))))
         return true;
     }
   }

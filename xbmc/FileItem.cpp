@@ -906,9 +906,9 @@ bool CFileItem::IsVideo() const
   if(StringUtils::StartsWithNoCase(m_mimetype, "application/"))
   { /* check for some standard types */
     extension = m_mimetype.substr(12);
-    if( StringUtils::EqualsNoCase(extension, "ogg")
-     || StringUtils::EqualsNoCase(extension, "mp4")
-     || StringUtils::EqualsNoCase(extension, "mxf") )
+    if( UnicodeUtils::EqualsNoCase(extension, "ogg")
+     || UnicodeUtils::EqualsNoCase(extension, "mp4")
+     || UnicodeUtils::EqualsNoCase(extension, "mxf") )
      return true;
   }
 
@@ -993,9 +993,9 @@ bool CFileItem::IsAudio() const
   if(StringUtils::StartsWithNoCase(m_mimetype, "application/"))
   { /* check for some standard types */
     std::string extension = m_mimetype.substr(12);
-    if( StringUtils::EqualsNoCase(extension, "ogg")
-     || StringUtils::EqualsNoCase(extension, "mp4")
-     || StringUtils::EqualsNoCase(extension, "mxf") )
+    if( UnicodeUtils::EqualsNoCase(extension, "ogg")
+     || UnicodeUtils::EqualsNoCase(extension, "mp4")
+     || UnicodeUtils::EqualsNoCase(extension, "mxf") )
      return true;
   }
 
@@ -1192,14 +1192,14 @@ bool CFileItem::IsDVDFile(bool bVobs /*= true*/, bool bIfos /*= true*/) const
   std::string strFileName = URIUtils::GetFileName(GetDynPath());
   if (bIfos)
   {
-    if (StringUtils::EqualsNoCase(strFileName, "video_ts.ifo"))
+    if (UnicodeUtils::EqualsNoCase(strFileName, "video_ts.ifo"))
       return true;
     if (StringUtils::StartsWithNoCase(strFileName, "vts_") && StringUtils::EndsWithNoCase(strFileName, "_0.ifo") && strFileName.length() == 12)
       return true;
   }
   if (bVobs)
   {
-    if (StringUtils::EqualsNoCase(strFileName, "video_ts.vob"))
+    if (UnicodeUtils::EqualsNoCase(strFileName, "video_ts.vob"))
       return true;
     if (StringUtils::StartsWithNoCase(strFileName, "vts_") && StringUtils::EndsWithNoCase(strFileName, ".vob"))
       return true;
@@ -1211,8 +1211,8 @@ bool CFileItem::IsDVDFile(bool bVobs /*= true*/, bool bIfos /*= true*/) const
 bool CFileItem::IsBDFile() const
 {
   std::string strFileName = URIUtils::GetFileName(GetDynPath());
-  return (StringUtils::EqualsNoCase(strFileName, "index.bdmv") || StringUtils::EqualsNoCase(strFileName, "MovieObject.bdmv")
-          || StringUtils::EqualsNoCase(strFileName, "INDEX.BDM") || StringUtils::EqualsNoCase(strFileName, "MOVIEOBJ.BDM"));
+  return (UnicodeUtils::EqualsNoCase(strFileName, "index.bdmv") || UnicodeUtils::EqualsNoCase(strFileName, "MovieObject.bdmv")
+          || UnicodeUtils::EqualsNoCase(strFileName, "INDEX.BDM") || UnicodeUtils::EqualsNoCase(strFileName, "MOVIEOBJ.BDM"));
 }
 
 bool CFileItem::IsRAR() const
@@ -2997,12 +2997,12 @@ void CFileItemList::StackFiles()
                         Extension2  = expr->GetMatch(4);
             if (offset)
               Title2 = file2.substr(0, expr->GetSubStart(2));
-            if (StringUtils::EqualsNoCase(Title1, Title2))
+            if (UnicodeUtils::EqualsNoCase(Title1, Title2))
             {
-              if (!StringUtils::EqualsNoCase(Volume1, Volume2))
+              if (!UnicodeUtils::EqualsNoCase(Volume1, Volume2))
               {
-                if (StringUtils::EqualsNoCase(Ignore1, Ignore2) &&
-                    StringUtils::EqualsNoCase(Extension1, Extension2))
+                if (UnicodeUtils::EqualsNoCase(Ignore1, Ignore2) &&
+                    UnicodeUtils::EqualsNoCase(Extension1, Extension2))
                 {
                   if (stack.empty())
                   {
@@ -3020,7 +3020,7 @@ void CFileItemList::StackFiles()
                   break;
                 }
               }
-              else if (!StringUtils::EqualsNoCase(Ignore1, Ignore2)) // False positive, try again with offset
+              else if (!UnicodeUtils::EqualsNoCase(Ignore1, Ignore2)) // False positive, try again with offset
               {
                 offset = expr->GetSubStart(3);
                 break;
@@ -3608,7 +3608,7 @@ std::string CFileItem::GetLocalFanart() const
       URIUtils::RemoveExtension(strCandidate);
       std::string strFanart = *i;
       URIUtils::RemoveExtension(strFanart);
-      if (StringUtils::EqualsNoCase(strCandidate, strFanart))
+      if (UnicodeUtils::EqualsNoCase(strCandidate, strFanart))
         return items[j]->m_strPath;
     }
   }
@@ -3625,7 +3625,7 @@ std::string CFileItem::GetLocalMetadataPath() const
   std::string parentFolder(parent);
   URIUtils::RemoveSlashAtEnd(parentFolder);
   parentFolder = URIUtils::GetFileName(parentFolder);
-  if (StringUtils::EqualsNoCase(parentFolder, "VIDEO_TS") || StringUtils::EqualsNoCase(parentFolder, "BDMV"))
+  if (UnicodeUtils::EqualsNoCase(parentFolder, "VIDEO_TS") || UnicodeUtils::EqualsNoCase(parentFolder, "BDMV"))
   { // go back up another one
     parent = URIUtils::GetParentPath(parent);
   }
@@ -3886,9 +3886,9 @@ std::string CFileItem::FindTrailer() const
   {
     std::string strCandidate = items[i]->m_strPath;
     URIUtils::RemoveExtension(strCandidate);
-    if (StringUtils::EqualsNoCase(strCandidate, strFile) ||
-        StringUtils::EqualsNoCase(strCandidate, strFile2) ||
-        StringUtils::EqualsNoCase(strCandidate, strFile3))
+    if (UnicodeUtils::EqualsNoCase(strCandidate, strFile) ||
+        UnicodeUtils::EqualsNoCase(strCandidate, strFile2) ||
+        UnicodeUtils::EqualsNoCase(strCandidate, strFile3))
     {
       strTrailer = items[i]->m_strPath;
       break;

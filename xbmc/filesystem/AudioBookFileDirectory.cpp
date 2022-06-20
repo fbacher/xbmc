@@ -15,6 +15,7 @@
 #include "guilib/LocalizeStrings.h"
 #include "music/tags/MusicInfoTag.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 
 using namespace XFILE;
 

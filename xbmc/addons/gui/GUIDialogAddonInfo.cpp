@@ -41,6 +41,7 @@
 #include "utils/Digest.h"
 #include "utils/JobManager.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
 
@@ -378,7 +379,7 @@ void CGUIDialogAddonInfo::OnSelectVersion()
             // usually this happens when the package filename gets malformed on the fs
             // e.g. downloading "http://localhost/a+b.zip" ends up in "a b.zip"
             const AddonVersion version(versionString);
-            if (StringUtils::EqualsNoCase(sha256, hash) && !version.empty())
+            if (UnicodeUtils::EqualsNoCase(sha256, hash) && !version.empty())
               versions.emplace_back(version, LOCAL_CACHE);
           }
         }

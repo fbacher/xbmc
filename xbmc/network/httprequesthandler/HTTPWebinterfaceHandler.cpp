@@ -16,6 +16,7 @@
 #include "filesystem/File.h"
 #include "utils/FileUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 
 #define WEBSERVER_DIRECTORY_SEPARATOR "/"

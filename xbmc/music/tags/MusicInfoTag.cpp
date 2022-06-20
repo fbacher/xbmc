@@ -1200,7 +1200,7 @@ void CMusicInfoTag::AppendArtist(const std::string &artist)
 {
   for (unsigned int index = 0; index < m_artist.size(); index++)
   {
-    if (StringUtils::EqualsNoCase(artist, m_artist.at(index)))
+    if (UnicodeUtils::EqualsNoCase(artist, m_artist.at(index)))
       return;
   }
 
@@ -1211,7 +1211,7 @@ void CMusicInfoTag::AppendAlbumArtist(const std::string &albumArtist)
 {
   for (unsigned int index = 0; index < m_albumArtist.size(); index++)
   {
-    if (StringUtils::EqualsNoCase(albumArtist, m_albumArtist.at(index)))
+    if (UnicodeUtils::EqualsNoCase(albumArtist, m_albumArtist.at(index)))
       return;
   }
 
@@ -1222,7 +1222,7 @@ void CMusicInfoTag::AppendGenre(const std::string &genre)
 {
   for (unsigned int index = 0; index < m_genre.size(); index++)
   {
-    if (StringUtils::EqualsNoCase(genre, m_genre.at(index)))
+    if (UnicodeUtils::EqualsNoCase(genre, m_genre.at(index)))
       return;
   }
 
@@ -1258,7 +1258,7 @@ const std::string CMusicInfoTag::GetArtistStringForRole(const std::string& strRo
   std::vector<std::string> artistvector;
   for (const auto& credit : m_musicRoles)
   {
-    if (StringUtils::EqualsNoCase(credit.GetRoleDesc(), strRole))
+    if (UnicodeUtils::EqualsNoCase(credit.GetRoleDesc(), strRole))
       artistvector.push_back(credit.GetArtist());
   }
   return StringUtils::Join(artistvector, CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_musicItemSeparator);

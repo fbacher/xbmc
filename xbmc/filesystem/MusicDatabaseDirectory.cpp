@@ -20,6 +20,7 @@
 #include "utils/Crc32.h"
 #include "utils/LegacyPathTranslation.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 
 using namespace XFILE;

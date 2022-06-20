@@ -602,7 +602,7 @@ void CPeripherals::GetSettingsFromMappingsFile(
       float fMax = currentNode->Attribute("max") ? (float)atof(currentNode->Attribute("max")) : 0;
       setting = std::make_shared<CSettingNumber>(strKey, iLabelId, fValue, fMin, fStep, fMax);
     }
-    else if (StringUtils::EqualsNoCase(strSettingsType, "enum"))
+    else if (UnicodeUtils::EqualsNoCase(strSettingsType, "enum"))
     {
       std::string strEnums = XMLUtils::GetAttribute(currentNode, "lvalues");
       if (!strEnums.empty())
@@ -665,8 +665,8 @@ void CPeripherals::GetDirectory(const std::string& strPath, CFileItemList& items
   std::unique_lock<CCriticalSection> lock(m_critSectionBusses);
   for (const auto& bus : m_busses)
   {
-    if (StringUtils::EqualsNoCase(strBus, "all") ||
-        StringUtils::EqualsNoCase(strBus, PeripheralTypeTranslator::BusTypeToString(bus->Type())))
+    if (UnicodeUtils::EqualsNoCase(strBus, "all") ||
+        UnicodeUtils::EqualsNoCase(strBus, PeripheralTypeTranslator::BusTypeToString(bus->Type())))
       bus->GetDirectory(strPath, items);
   }
 }
@@ -684,7 +684,7 @@ PeripheralPtr CPeripherals::GetByPath(const std::string& strPath) const
   std::unique_lock<CCriticalSection> lock(m_critSectionBusses);
   for (const auto& bus : m_busses)
   {
-    if (StringUtils::EqualsNoCase(strBus, PeripheralTypeTranslator::BusTypeToString(bus->Type())))
+    if (UnicodeUtils::EqualsNoCase(strBus, PeripheralTypeTranslator::BusTypeToString(bus->Type())))
     {
       result = bus->GetByPath(strPath);
       break;

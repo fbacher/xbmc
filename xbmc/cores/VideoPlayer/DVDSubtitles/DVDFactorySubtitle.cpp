@@ -17,6 +17,7 @@
 #include "DVDSubtitleStream.h"
 #include "SubtitleParserWebVTT.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 
 #include <cstring>
 #include <memory>

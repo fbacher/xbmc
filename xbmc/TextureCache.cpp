@@ -20,6 +20,7 @@
 #include "utils/Crc32.h"
 #include "utils/Job.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 

@@ -25,6 +25,7 @@
 #include "games/controllers/Controller.h"
 #include "pvr/addons/PVRClient.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 
 using namespace KODI;
 

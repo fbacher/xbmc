@@ -47,7 +47,7 @@ void CAlarmClock::Start(const std::string& strName, float n_secs, const std::str
 
   uint32_t labelAlarmClock;
   uint32_t labelStarted;
-  if (StringUtils::EqualsNoCase(strName, "shutdowntimer"))
+  if (UnicodeUtils::EqualsNoCase(strName, "shutdowntimer"))
   {
     labelAlarmClock = 20144;
     labelStarted = 20146;
@@ -89,7 +89,7 @@ void CAlarmClock::Stop(const std::string& strName, bool bSilent /* false */)
     return;
 
   uint32_t labelAlarmClock;
-  if (StringUtils::EqualsNoCase(strName, "shutdowntimer"))
+  if (UnicodeUtils::EqualsNoCase(strName, "shutdowntimer"))
     labelAlarmClock = 20144;
   else
     labelAlarmClock = 13208;

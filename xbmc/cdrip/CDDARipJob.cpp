@@ -27,6 +27,7 @@
 #include "storage/MediaManager.h"
 #include "utils/StringUtils.h"
 #include "utils/SystemInfo.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 #if defined(TARGET_WINDOWS)

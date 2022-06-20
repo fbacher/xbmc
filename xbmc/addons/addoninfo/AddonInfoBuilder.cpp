@@ -111,7 +111,7 @@ bool CAddonInfoBuilder::ParseXML(const AddonInfoPtr& addon, const TiXmlElement* 
    * - std::string origin;
    */
 
-  if (!StringUtils::EqualsNoCase(element->Value(), "addon"))
+  if (!UnicodeUtils::EqualsNoCase(element->Value(), "addon"))
   {
     CLog::Log(LOGERROR, "CAddonInfoBuilder::{}: file from '{}' doesn't contain <addon>", __FUNCTION__, addonPath);
     return false;

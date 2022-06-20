@@ -557,10 +557,10 @@ bool CLangInfo::UseLocaleCollation()
     // Determine collation to use. When using MySQL/MariaDB or a platform that does not support
     // locale language collation then use accent folding internal equivalent of utf8_general_ci
     m_collationtype = 1;
-    if (!StringUtils::EqualsNoCase(
+    if (!UnicodeUtils::EqualsNoCase(
             CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_databaseMusic.type,
             "mysql") &&
-        !StringUtils::EqualsNoCase(
+        !UnicodeUtils::EqualsNoCase(
             CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_databaseVideo.type,
             "mysql") &&
         CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_useLocaleCollation)
@@ -752,9 +752,9 @@ const std::string& CLangInfo::GetAudioLanguage() const
 void CLangInfo::SetAudioLanguage(const std::string& language)
 {
   if (language.empty()
-    || StringUtils::EqualsNoCase(language, "default")
-    || StringUtils::EqualsNoCase(language, "original")
-    || StringUtils::EqualsNoCase(language, "mediadefault")
+    || UnicodeUtils::EqualsNoCase(language, "default")
+    || UnicodeUtils::EqualsNoCase(language, "original")
+    || UnicodeUtils::EqualsNoCase(language, "mediadefault")
     || !g_LangCodeExpander.ConvertToISO6392B(language, m_audioLanguage))
     m_audioLanguage.clear();
 }
@@ -771,8 +771,8 @@ const std::string& CLangInfo::GetSubtitleLanguage() const
 void CLangInfo::SetSubtitleLanguage(const std::string& language)
 {
   if (language.empty()
-    || StringUtils::EqualsNoCase(language, "default")
-    || StringUtils::EqualsNoCase(language, "original")
+    || UnicodeUtils::EqualsNoCase(language, "default")
+    || UnicodeUtils::EqualsNoCase(language, "original")
     || !g_LangCodeExpander.ConvertToISO6392B(language, m_subtitleLanguage))
     m_subtitleLanguage.clear();
 }

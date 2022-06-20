@@ -17,6 +17,7 @@
 #include "settings/AdvancedSettings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
@@ -209,7 +210,7 @@ int CNfsConnection::getContextForExport(const std::string &exportname)
 bool CNfsConnection::splitUrlIntoExportAndPath(const CURL& url, std::string &exportPath, std::string &relativePath)
 {
   //refresh exportlist if empty or hostname change
-  if(m_exportList.empty() || !StringUtils::EqualsNoCase(url.GetHostName(), m_hostName))
+  if(m_exportList.empty() || !UnicodeUtils::EqualsNoCase(url.GetHostName(), m_hostName))
   {
     m_exportList = GetExportList(url);
   }

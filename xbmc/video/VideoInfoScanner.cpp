@@ -291,7 +291,7 @@ namespace VIDEO
       if (CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_bVideoLibraryUseFastHash && !URIUtils::IsPlugin(strDirectory))
         fastHash = GetFastHash(strDirectory, regexps);
 
-      if (m_database.GetPathHash(strDirectory, dbHash) && !fastHash.empty() && StringUtils::EqualsNoCase(fastHash, dbHash))
+      if (m_database.GetPathHash(strDirectory, dbHash) && !fastHash.empty() && UnicodeUtils::EqualsNoCase(fastHash, dbHash))
       { // fast hashes match - no need to process anything
         hash = fastHash;
       }
@@ -308,7 +308,7 @@ namespace VIDEO
           hash = fastHash;
       }
 
-      if (StringUtils::EqualsNoCase(hash, dbHash))
+      if (UnicodeUtils::EqualsNoCase(hash, dbHash))
       { // hash matches - skipping
         CLog::Log(LOGDEBUG, "VideoInfoScanner: Skipping dir '{}' due to no change{}",
                   CURL::GetRedacted(strDirectory), !fastHash.empty() ? " (fasthash)" : "");
@@ -347,7 +347,7 @@ namespace VIDEO
         items.SetPath(strDirectory);
         GetPathHash(items, hash);
         bSkip = true;
-        if (!m_database.GetPathHash(strDirectory, dbHash) || !StringUtils::EqualsNoCase(dbHash, hash))
+        if (!m_database.GetPathHash(strDirectory, dbHash) || !UnicodeUtils::EqualsNoCase(dbHash, hash))
           bSkip = false;
         else
           items.Clear();
@@ -383,7 +383,7 @@ namespace VIDEO
                   CURL::GetRedacted(strDirectory));
       }
     }
-    else if (!StringUtils::EqualsNoCase(hash, dbHash) && (content == CONTENT_MOVIES || content == CONTENT_MUSICVIDEOS))
+    else if (!UnicodeUtils::EqualsNoCase(hash, dbHash) && (content == CONTENT_MOVIES || content == CONTENT_MUSICVIDEOS))
     { // update the hash either way - we may have changed the hash to a fast version
       m_database.SetPathHash(strDirectory, hash);
     }
@@ -880,7 +880,7 @@ namespace VIDEO
       else if (CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_bVideoLibraryUseFastHash)
         hash = GetRecursiveFastHash(item->GetPath(), regexps);
 
-      if (m_database.GetPathHash(item->GetPath(), dbHash) && (allowEmptyHash || !hash.empty()) && StringUtils::EqualsNoCase(dbHash, hash))
+      if (m_database.GetPathHash(item->GetPath(), dbHash) && (allowEmptyHash || !hash.empty()) && UnicodeUtils::EqualsNoCase(dbHash, hash))
       {
         // fast hashes match - no need to process anything
         bSkip = true;
@@ -899,7 +899,7 @@ namespace VIDEO
         if (hash.empty())
         {
           GetPathHash(items, hash);
-          if (StringUtils::EqualsNoCase(dbHash, hash))
+          if (UnicodeUtils::EqualsNoCase(dbHash, hash))
           {
             // slow hashes match - no need to process anything
             bSkip = true;
@@ -963,7 +963,7 @@ namespace VIDEO
       //CLog::Log(LOGDEBUG,"{}:{}:{}", x, strPathX, strFileX);
 
       const int y = x + 1;
-      if (StringUtils::EqualsNoCase(strFileX, "VIDEO_TS.IFO"))
+      if (UnicodeUtils::EqualsNoCase(strFileX, "VIDEO_TS.IFO"))
       {
         while (y < items.Size())
         {
@@ -971,7 +971,7 @@ namespace VIDEO
           URIUtils::Split(items[y]->GetPath(), strPathY, strFileY);
           //CLog::Log(LOGDEBUG," {}:{}:{}", y, strPathY, strFileY);
 
-          if (StringUtils::EqualsNoCase(strPathY, strPathX))
+          if (UnicodeUtils::EqualsNoCase(strPathY, strPathX))
             /*
             remove everything sorted below the video_ts.ifo file in the same path.
             understandably this wont stack correctly if there are other files in the the dvd folder.
@@ -994,7 +994,7 @@ namespace VIDEO
       std::string strPath = URIUtils::GetDirectory(items[i]->GetPath());
       URIUtils::RemoveSlashAtEnd(strPath); // want no slash for the test that follows
 
-      if (StringUtils::EqualsNoCase(URIUtils::GetFileName(strPath), "sample"))
+      if (UnicodeUtils::EqualsNoCase(URIUtils::GetFileName(strPath), "sample"))
         continue;
 
       // Discard all exclude files defined by regExExcludes
@@ -1547,7 +1547,7 @@ namespace VIDEO
 
       // move 'folder' to thumb / poster / banner based on aspect ratio
       // if such artwork doesn't already exist
-      if (!matchesFilename && StringUtils::EqualsNoCase(candidate, "folder") &&
+      if (!matchesFilename && UnicodeUtils::EqualsNoCase(candidate, "folder") &&
         !CVideoThumbLoader::IsArtTypeInWhitelist("folder", wantedArtTypes, exactName))
       {
         // cache the image to determine sizing
@@ -1832,12 +1832,12 @@ namespace VIDEO
           continue;
         }
         if (!guide->cScraperUrl.GetTitle().empty() &&
-            StringUtils::EqualsNoCase(guide->cScraperUrl.GetTitle(), file->strTitle))
+            UnicodeUtils::EqualsNoCase(guide->cScraperUrl.GetTitle(), file->strTitle))
         {
           bFound = true;
           break;
         }
-        if (!guide->strTitle.empty() && StringUtils::EqualsNoCase(guide->strTitle, file->strTitle))
+        if (!guide->strTitle.empty() && UnicodeUtils::EqualsNoCase(guide->strTitle, file->strTitle))
         {
           bFound = true;
           break;

@@ -161,16 +161,16 @@ TEST(TestStringUtils, EqualsNoCase)
 {
   std::string refstr = "TeSt";
 
-  EXPECT_TRUE(StringUtils::EqualsNoCase(refstr, "TeSt"));
-  EXPECT_TRUE(StringUtils::EqualsNoCase(refstr, "tEsT"));
+  EXPECT_TRUE(UnicodeUtils::EqualsNoCase(refstr, "TeSt"));
+  EXPECT_TRUE(UnicodeUtils::EqualsNoCase(refstr, "tEsT"));
 }
 
 TEST(TestStringUtils, EqualsNoCase_Normalize)
 {
   const std::string refstr = TestStringUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5;
   const std::string varstr = std::string(TestStringUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
-  EXPECT_FALSE(StringUtils::EqualsNoCase(refstr, varstr));
-  EXPECT_TRUE(StringUtils::EqualsNoCase(refstr, varstr, StringOptions::FOLD_CASE_DEFAULT, true));
+  EXPECT_FALSE(UnicodeUtils::EqualsNoCase(refstr, varstr));
+  EXPECT_TRUE(UnicodeUtils::EqualsNoCase(refstr, varstr, StringOptions::FOLD_CASE_DEFAULT, true));
 }
 
 TEST(TestStringUtils, Replace)
@@ -242,39 +242,6 @@ TEST(TestStringUtils, Join)
   varstr = StringUtils::Join(strarray, ",");
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
-
-TEST(TestStringUtils, Normalize)
-{
-  // TODO: These tests are all on essentially the same caseless string.
-  // The FOLD_CASE_DEFAULT option (which only impacts NFKD and maybe NFKC)
-  // is not being tested, neither are the other alternatives to it.
-
-  std::string s1 = TestStringUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
-  std::string result = StringUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFD);
-  int cmp = StringUtils::Compare(result, TestStringUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_2);
-  EXPECT_EQ(cmp, 0);
-
-  s1 = TestStringUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
-  result = StringUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFC);
-  cmp = StringUtils::Compare(result, TestStringUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5);
-  EXPECT_EQ(cmp, 0);
-
-  s1 = TestStringUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
-  result = StringUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFKC);
-  cmp = StringUtils::Compare(result, TestStringUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5);
-  EXPECT_EQ(cmp, 0);
-
-  s1 = TestStringUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
-  result = StringUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFD);
-  cmp = StringUtils::Compare(result, TestStringUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_2);
-  EXPECT_EQ(cmp, 0);
-
-  s1 = TestStringUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
-  result = StringUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFKD);
-  cmp = StringUtils::Compare(result, TestStringUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_2);
-  EXPECT_EQ(cmp, 0);
-}
-
 
 TEST(TestStringUtils, FindNumber)
 {

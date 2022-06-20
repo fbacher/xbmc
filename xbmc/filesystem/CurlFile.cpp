@@ -726,7 +726,7 @@ void CCurlFile::SetCorrectHeaders(CReadState* state)
   }
 
   /* hack for google video */
-  if (StringUtils::EqualsNoCase(h.GetMimeType(),"text/html")
+  if (UnicodeUtils::EqualsNoCase(h.GetMimeType(),"text/html")
   &&  !h.GetValue("Content-Disposition").empty() )
   {
     std::string strValue = h.GetValue("Content-Disposition");
@@ -1123,7 +1123,7 @@ bool CCurlFile::Open(const CURL& url)
   // since we can't know the stream size up front if we're gzipped/deflated
   // flag the stream with an unknown file size rather than the compressed
   // file size.
-  if (!m_state->m_httpheader.GetValue("Content-Encoding").empty() && !StringUtils::EqualsNoCase(m_state->m_httpheader.GetValue("Content-Encoding"), "identity"))
+  if (!m_state->m_httpheader.GetValue("Content-Encoding").empty() && !UnicodeUtils::EqualsNoCase(m_state->m_httpheader.GetValue("Content-Encoding"), "identity"))
     m_state->m_fileSize = 0;
 
   // check if this stream is a shoutcast stream. sometimes checking the protocol line is not enough so examine other headers as well.
@@ -1150,7 +1150,7 @@ bool CCurlFile::Open(const CURL& url)
     }
   }
 
-  if(StringUtils::EqualsNoCase(m_state->m_httpheader.GetValue("Transfer-Encoding"), "chunked"))
+  if(UnicodeUtils::EqualsNoCase(m_state->m_httpheader.GetValue("Transfer-Encoding"), "chunked"))
     m_state->m_fileSize = 0;
 
   if(m_state->m_fileSize <= 0)
@@ -1161,7 +1161,7 @@ bool CCurlFile::Open(const CURL& url)
     || url2.IsProtocol("https"))
     {
       // if server says explicitly it can't seek, respect that
-      if(StringUtils::EqualsNoCase(m_state->m_httpheader.GetValue("Accept-Ranges"),"none"))
+      if(UnicodeUtils::EqualsNoCase(m_state->m_httpheader.GetValue("Accept-Ranges"),"none"))
         m_seekable = false;
     }
   }

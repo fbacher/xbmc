@@ -18,6 +18,7 @@
 #include "input/Key.h"
 #include "messaging/ApplicationMessenger.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
 

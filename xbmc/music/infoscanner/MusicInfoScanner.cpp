@@ -501,7 +501,7 @@ bool CMusicInfoScanner::DoScan(const std::string& strDirectory)
 
   // check whether we need to rescan or not
   std::string dbHash;
-  if ((m_flags & SCAN_RESCAN) || !m_musicDatabase.GetPathHash(strDirectory, dbHash) || !StringUtils::EqualsNoCase(dbHash, hash))
+  if ((m_flags & SCAN_RESCAN) || !m_musicDatabase.GetPathHash(strDirectory, dbHash) || !UnicodeUtils::EqualsNoCase(dbHash, hash))
   { // path has changed - rescan
     if (dbHash.empty())
       CLog::Log(LOGDEBUG, "{} Scanning dir '{}' as not in the database", __FUNCTION__,
@@ -743,9 +743,9 @@ void CMusicInfoScanner::FileItemsToAlbums(CFileItemList& items, VECALBUMS& album
     {
       std::string artist = artists.begin()->first;
       artist = UnicodeUtils::ToLower(artist);
-      if (!StringUtils::EqualsNoCase(artist, "various") &&
-        !StringUtils::EqualsNoCase(artist, "various artists") &&
-        !StringUtils::EqualsNoCase(artist, various)) // 3a
+      if (!UnicodeUtils::EqualsNoCase(artist, "various") &&
+        !UnicodeUtils::EqualsNoCase(artist, "various artists") &&
+        !UnicodeUtils::EqualsNoCase(artist, various)) // 3a
         compilation = false;
       else
         // Grab name for use in "various artist" artist

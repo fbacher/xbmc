@@ -278,7 +278,7 @@ void CAlbum::MergeScrapedAlbum(const CAlbum& source, bool override /* = true */)
       {
         for (const auto& sourceartistCredit : source.artistCredits)
         {
-          if (StringUtils::EqualsNoCase(artistCredit.GetArtist(), sourceartistCredit.GetArtist()))
+          if (UnicodeUtils::EqualsNoCase(artistCredit.GetArtist(), sourceartistCredit.GetArtist()))
           {
             artistCredit.SetMusicBrainzArtistID(sourceartistCredit.GetMusicBrainzArtistID());
             artistCredit.SetScrapedMBID(true);

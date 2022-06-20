@@ -16,6 +16,7 @@
 #include "utils/log.h"
 #include "utils/SortUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "view/ViewState.h"
 
@@ -71,7 +72,7 @@ void CViewDatabase::UpdateTables(int version)
         else if (StringUtils::StartsWithNoCase(path, "videodb://"))
           path = CLegacyPathTranslation::TranslateVideoDbPath(path);
 
-        if (!StringUtils::EqualsNoCase(path, originalPath))
+        if (!UnicodeUtils::EqualsNoCase(path, originalPath))
           paths.emplace_back(m_pDS->fv(0).get_asInt(), path);
         m_pDS->next();
       }

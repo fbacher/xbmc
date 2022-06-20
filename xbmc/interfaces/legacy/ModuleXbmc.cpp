@@ -42,6 +42,7 @@
 #include "utils/StringUtils.h"
 #include "utils/SystemInfo.h"
 #include "utils/Unicode.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/XTimeUtils.h"
 #include "utils/log.h"
 
@@ -98,8 +99,8 @@ namespace XBMCAddon
       std::string execute;
       std::vector<std::string> params;
       CUtil::SplitExecFunction(function, execute, params);
-      if (StringUtils::EqualsNoCase(execute, "activatewindow") ||
-          StringUtils::EqualsNoCase(execute, "closedialog"))
+      if (UnicodeUtils::EqualsNoCase(execute, "activatewindow") ||
+          UnicodeUtils::EqualsNoCase(execute, "closedialog"))
       {
         int win = CWindowTranslator::TranslateWindow(params[0]);
         if (win == WINDOW_DIALOG_BUSY)

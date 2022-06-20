@@ -13,6 +13,7 @@
 #include "filesystem/File.h"
 #include "filesystem/XbtManager.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 
 namespace ADDON
@@ -42,8 +43,8 @@ bool CImageResource::IsAllowed(const std::string &file) const
 
   std::string ext = URIUtils::GetExtension(file);
   return file.empty() ||
-         StringUtils::EqualsNoCase(ext, ".png") ||
-         StringUtils::EqualsNoCase(ext, ".jpg");
+         UnicodeUtils::EqualsNoCase(ext, ".png") ||
+         UnicodeUtils::EqualsNoCase(ext, ".jpg");
 }
 
 std::string CImageResource::GetFullPath(const std::string &filePath) const

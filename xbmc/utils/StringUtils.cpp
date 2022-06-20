@@ -159,60 +159,6 @@ std::wstring StringUtils::FormatV(const wchar_t *fmt, va_list args) {
 	return L"";
 }
 
-const std::wstring StringUtils::Normalize(const std::wstring &src,
-		const StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */,
-		const NormalizerType normalizerType) {
-	return Unicode::normalize(src, opt, normalizerType);
-}
-
-const std::string StringUtils::Normalize(const std::string &src,
-		const StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */,
-		const NormalizerType normalizerType) {
-	return Unicode::normalize(src, opt, normalizerType);
-}
-
-bool StringUtils::Equals(const std::string &str1, const std::string &str2) {
-	int8_t rc = Unicode::strcmp(str1, 0, str1.length(), str2, 0, str2.length());
-	return rc == (int8_t) 0;
-}
-
-bool StringUtils::Equals(const std::wstring &str1, const std::wstring &str2) {
-	int8_t rc = Unicode::strcmp(str1, 0, str1.length(), str2, 0, str2.length());
-	return rc == 0;
-}
-
-bool StringUtils::EqualsNoCase(const std::string &str1, const std::string &str2,
-		StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */, const bool normalize /* = false */) {
-	// before we do the char-by-char comparison, first compare sizes of both strings.
-	// This led to a 33% improvement in benchmarking on average. (size() just returns a member of std::string)
-	if (str1.size() == 0 and str2.size() == 0)
-		return true;
-
-	if (str1.size() == 0 or str2.size() == 0)
-		return false;
-
-	int8_t rc = Unicode::utf8_strcasecmp(str1, str2, opt, normalize);
-
-	rc = rc == 0;
-   //std::cout << "EqualsNoCase 1 str1: " << str1 << " str2: " << str2 << " rc: "
-	//		<< (int) rc << std::endl;
-	return rc;
-}
-
-bool StringUtils::EqualsNoCase(const std::string &str1, const char *s2, StringOptions opt /* StringOptions::FOLD_CASE_DEFAULT */,
-		const bool normalize /* = false */) {
-	std::string str2 = std::string(s2);
-	return EqualsNoCase(str1, str2, opt, normalize);
-}
-
-bool StringUtils::EqualsNoCase(const char *s1, const char *s2, StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */,
-		const bool normalize /* = false */) {
-	std::string str1 = std::string(s1);
-	std::string str2 = std::string(s2);
-	return EqualsNoCase(str1, str2, opt, normalize);
-}
-
-
 int StringUtils::Compare(const std::wstring &str1, const std::wstring &str2) {
 
 	int32_t str1_length = str1.length();

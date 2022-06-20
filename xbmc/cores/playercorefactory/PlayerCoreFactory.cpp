@@ -189,16 +189,16 @@ int CPlayerCoreFactory::GetPlayerIndex(const std::string& strCoreName) const
   {
     // Dereference "*default*player" aliases
     std::string strRealCoreName;
-    if (StringUtils::EqualsNoCase(strCoreName, "audiodefaultplayer"))
+    if (UnicodeUtils::EqualsNoCase(strCoreName, "audiodefaultplayer"))
       strRealCoreName = CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_audioDefaultPlayer;
-    else if (StringUtils::EqualsNoCase(strCoreName, "videodefaultplayer"))
+    else if (UnicodeUtils::EqualsNoCase(strCoreName, "videodefaultplayer"))
       strRealCoreName = CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoDefaultPlayer;
     else
       strRealCoreName = strCoreName;
 
     for(size_t i = 0; i < m_vecPlayerConfigs.size(); i++)
     {
-      if (StringUtils::EqualsNoCase(m_vecPlayerConfigs[i]->GetName(), strRealCoreName))
+      if (UnicodeUtils::EqualsNoCase(m_vecPlayerConfigs[i]->GetName(), strRealCoreName))
         return i;
     }
     CLog::Log(LOGWARNING, "CPlayerCoreFactory::GetPlayer({}): no such player: {}", strCoreName,

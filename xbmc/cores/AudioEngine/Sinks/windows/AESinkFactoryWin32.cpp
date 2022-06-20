@@ -6,7 +6,7 @@
  *  See LICENSES/README.md for more information.
  */
 #include "AESinkFactoryWin.h"
-#include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 #include "platform/win32/CharsetConverter.h"
@@ -192,7 +192,7 @@ struct AEWASAPIDeviceWin32 : public IAEWASAPIDevice
     hr = pProperty->GetValue(PKEY_Device_EnumeratorName, &varName);
 
     std::string str = KODI::PLATFORM::WINDOWS::FromW(varName.pwszVal);
-    ret = StringUtils::EqualsNoCase(str, "USB");
+    ret = UnicodeUtils::EqualsNoCase(str, "USB");
     PropVariantClear(&varName);
     return ret;
   }

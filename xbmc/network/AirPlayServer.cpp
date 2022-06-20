@@ -716,7 +716,7 @@ bool CAirPlayServer::CTCPClient::checkAuthorization(const std::string& authStr,
      std::string realm = AUTH_REALM;
      std::string ourResponse = calcResponse(username, ServerInstance->m_password, realm, method, uri, m_authNonce);
      std::string theirResponse = getFieldFromString(authStr, "response");
-     if (!StringUtils::EqualsNoCase(theirResponse, ourResponse))
+     if (!UnicodeUtils::EqualsNoCase(theirResponse, ourResponse))
      {
        authValid = false;
        CLog::Log(LOGDEBUG, "AirAuth: response mismatch - our: {} theirs: {}", ourResponse,

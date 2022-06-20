@@ -9971,7 +9971,7 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
       {
         for (const infomap& player_proces : player_process)
         {
-          if (StringUtils::EqualsNoCase(prop.param(), player_proces.str))
+          if (UnicodeUtils::EqualsNoCase(prop.param(), player_proces.str))
             return player_proces.val;
         }
       }
@@ -10160,7 +10160,7 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
         return AddMultiInfo(CGUIInfo(MUSICPLAYER_CONTENT, prop.param(), 0));
       else if (prop.name == "property")
       {
-        if (StringUtils::EqualsNoCase(prop.param(), "fanart_image"))
+        if (UnicodeUtils::EqualsNoCase(prop.param(), "fanart_image"))
           return AddMultiInfo(CGUIInfo(PLAYER_ITEM_ART, "fanart"));
 
         return AddMultiInfo(CGUIInfo(MUSICPLAYER_PROPERTY, prop.param()));
@@ -10233,9 +10233,9 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
       if (prop.name == "sortdirection")
       {
         SortOrder order = SortOrderNone;
-        if (StringUtils::EqualsNoCase(prop.param(), "ascending"))
+        if (UnicodeUtils::EqualsNoCase(prop.param(), "ascending"))
           order = SortOrderAscending;
-        else if (StringUtils::EqualsNoCase(prop.param(), "descending"))
+        else if (UnicodeUtils::EqualsNoCase(prop.param(), "descending"))
           order = SortOrderDescending;
         return AddMultiInfo(CGUIInfo(CONTAINER_SORT_DIRECTION, order));
       }
@@ -10353,9 +10353,9 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
         else
         {
           int playlistid = PLAYLIST_NONE;
-          if (StringUtils::EqualsNoCase(prop.param(), "video"))
+          if (UnicodeUtils::EqualsNoCase(prop.param(), "video"))
             playlistid = PLAYLIST_VIDEO;
-          else if (StringUtils::EqualsNoCase(prop.param(), "music"))
+          else if (UnicodeUtils::EqualsNoCase(prop.param(), "music"))
             playlistid = PLAYLIST_MUSIC;
 
           if (playlistid > PLAYLIST_NONE)
@@ -10501,7 +10501,7 @@ int CGUIInfoManager::TranslateListItem(const Property& cat, const Property& prop
   if (prop.num_params() == 1)
   {
     // special case: map 'property(fanart_image)' to 'art(fanart)'
-    if (prop.name == "property" && StringUtils::EqualsNoCase(prop.param(), "fanart_image"))
+    if (prop.name == "property" && UnicodeUtils::EqualsNoCase(prop.param(), "fanart_image"))
     {
       ret = LISTITEM_ART;
       data3 = "fanart";
@@ -10590,35 +10590,35 @@ TIME_FORMAT CGUIInfoManager::TranslateTimeFormat(const std::string &format)
 {
   if (format.empty())
     return TIME_FORMAT_GUESS;
-  else if (StringUtils::EqualsNoCase(format, "hh"))
+  else if (UnicodeUtils::EqualsNoCase(format, "hh"))
     return TIME_FORMAT_HH;
-  else if (StringUtils::EqualsNoCase(format, "mm"))
+  else if (UnicodeUtils::EqualsNoCase(format, "mm"))
     return TIME_FORMAT_MM;
-  else if (StringUtils::EqualsNoCase(format, "ss"))
+  else if (UnicodeUtils::EqualsNoCase(format, "ss"))
     return TIME_FORMAT_SS;
-  else if (StringUtils::EqualsNoCase(format, "hh:mm"))
+  else if (UnicodeUtils::EqualsNoCase(format, "hh:mm"))
     return TIME_FORMAT_HH_MM;
-  else if (StringUtils::EqualsNoCase(format, "mm:ss"))
+  else if (UnicodeUtils::EqualsNoCase(format, "mm:ss"))
     return TIME_FORMAT_MM_SS;
-  else if (StringUtils::EqualsNoCase(format, "hh:mm:ss"))
+  else if (UnicodeUtils::EqualsNoCase(format, "hh:mm:ss"))
     return TIME_FORMAT_HH_MM_SS;
-  else if (StringUtils::EqualsNoCase(format, "hh:mm:ss xx"))
+  else if (UnicodeUtils::EqualsNoCase(format, "hh:mm:ss xx"))
     return TIME_FORMAT_HH_MM_SS_XX;
-  else if (StringUtils::EqualsNoCase(format, "h"))
+  else if (UnicodeUtils::EqualsNoCase(format, "h"))
     return TIME_FORMAT_H;
-  else if (StringUtils::EqualsNoCase(format, "m"))
+  else if (UnicodeUtils::EqualsNoCase(format, "m"))
     return TIME_FORMAT_M;
-  else if (StringUtils::EqualsNoCase(format, "h:mm:ss"))
+  else if (UnicodeUtils::EqualsNoCase(format, "h:mm:ss"))
     return TIME_FORMAT_H_MM_SS;
-  else if (StringUtils::EqualsNoCase(format, "h:mm:ss xx"))
+  else if (UnicodeUtils::EqualsNoCase(format, "h:mm:ss xx"))
     return TIME_FORMAT_H_MM_SS_XX;
-  else if (StringUtils::EqualsNoCase(format, "xx"))
+  else if (UnicodeUtils::EqualsNoCase(format, "xx"))
     return TIME_FORMAT_XX;
-  else if (StringUtils::EqualsNoCase(format, "secs"))
+  else if (UnicodeUtils::EqualsNoCase(format, "secs"))
     return TIME_FORMAT_SECS;
-  else if (StringUtils::EqualsNoCase(format, "mins"))
+  else if (UnicodeUtils::EqualsNoCase(format, "mins"))
     return TIME_FORMAT_MINS;
-  else if (StringUtils::EqualsNoCase(format, "hours"))
+  else if (UnicodeUtils::EqualsNoCase(format, "hours"))
     return TIME_FORMAT_HOURS;
   return TIME_FORMAT_GUESS;
 }
@@ -10817,7 +10817,7 @@ bool CGUIInfoManager::GetMultiInfoBool(const CGUIInfo &info, int contextWindow, 
           else if (condition == STRING_CONTAINS)
             bReturn = label.find(compare) != std::string::npos;
           else
-            bReturn = StringUtils::EqualsNoCase(label, compare);
+            bReturn = UnicodeUtils::EqualsNoCase(label, compare);
         }
         break;
       case INTEGER_IS_EQUAL:
@@ -11212,7 +11212,7 @@ std::string CGUIInfoManager::GetMultiInfoItemLabel(const CFileItem *item, int co
 
         // FOLD_CASE_DEFAULT only impacts case-folding normalizer. Here a no-op
 
-        StringUtils::Normalize(label, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFKD);
+        UnicodeUtils::Normalize(label, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFKD);
 
         std::wstring character = label.substr(0, 1);
         g_charsetConverter.wToUTF8(character, letter);
@@ -11340,7 +11340,7 @@ int CGUIInfoManager::TranslateSkinVariableString(const std::string& name, int co
   for (std::vector<CSkinVariableString>::const_iterator it = m_skinVariableStrings.begin();
        it != m_skinVariableStrings.end(); ++it)
   {
-    if (StringUtils::EqualsNoCase(it->GetName(), name) && it->GetContext() == context)
+    if (UnicodeUtils::EqualsNoCase(it->GetName(), name) && it->GetContext() == context)
       return it - m_skinVariableStrings.begin() + CONDITIONAL_LABEL_START;
   }
   return 0;

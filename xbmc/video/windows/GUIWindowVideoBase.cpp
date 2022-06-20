@@ -1379,7 +1379,7 @@ void CGUIWindowVideoBase::GetGroupedItems(CFileItemList &items)
     mixed = items.GetProperty(PROPERTY_GROUP_MIXED).asBoolean();
 
   // group == "none" completely suppresses any grouping
-  if (!StringUtils::EqualsNoCase(group, "none"))
+  if (!UnicodeUtils::EqualsNoCase(group, "none"))
   {
     CQueryParams params;
     CVideoDatabaseDirectory dir;
@@ -1388,7 +1388,7 @@ void CGUIWindowVideoBase::GetGroupedItems(CFileItemList &items)
     const std::shared_ptr<CSettings> settings = CServiceBroker::GetSettingsComponent()->GetSettings();
     if (items.GetContent() == "movies" && params.GetSetId() <= 0 &&
         nodeType == NODE_TYPE_TITLE_MOVIES &&
-       (settings->GetBool(CSettings::SETTING_VIDEOLIBRARY_GROUPMOVIESETS) || (StringUtils::EqualsNoCase(group, "sets") && mixed)))
+       (settings->GetBool(CSettings::SETTING_VIDEOLIBRARY_GROUPMOVIESETS) || (UnicodeUtils::EqualsNoCase(group, "sets") && mixed)))
     {
       CFileItemList groupedItems;
       GroupAttribute groupAttributes = settings->GetBool(CSettings::SETTING_VIDEOLIBRARY_GROUPSINGLEITEMSETS) ? GroupAttributeNone : GroupAttributeIgnoreSingleItems;
@@ -1411,10 +1411,10 @@ bool CGUIWindowVideoBase::CheckFilterAdvanced(CFileItemList &items) const
 {
   const std::string& content = items.GetContent();
   if ((items.IsVideoDb() || CanContainFilter(m_strFilterPath)) &&
-      (StringUtils::EqualsNoCase(content, "movies")   ||
-       StringUtils::EqualsNoCase(content, "tvshows")  ||
-       StringUtils::EqualsNoCase(content, "episodes") ||
-       StringUtils::EqualsNoCase(content, "musicvideos")))
+      (UnicodeUtils::EqualsNoCase(content, "movies")   ||
+       UnicodeUtils::EqualsNoCase(content, "tvshows")  ||
+       UnicodeUtils::EqualsNoCase(content, "episodes") ||
+       UnicodeUtils::EqualsNoCase(content, "musicvideos")))
     return true;
 
   return false;

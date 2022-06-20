@@ -20,6 +20,7 @@
 #include "utils/CharsetDetection.h"
 #include "utils/Mime.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/log.h"
 
@@ -390,7 +391,7 @@ bool CScraperUrl::Get(const SUrlEntry& scrURL,
     }
   }
   else if (ftype == CMime::FileTypePlainText ||
-           StringUtils::EqualsNoCase(mimeType.substr(0, 5), "text/"))
+           UnicodeUtils::EqualsNoCase(mimeType.substr(0, 5), "text/"))
   {
     std::string realTextCharset;
     std::string converted;

@@ -30,6 +30,7 @@
 #include "messaging/ApplicationMessenger.h"
 #include "peripherals/Peripherals.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 
 #include <algorithm>
 #include <assert.h>

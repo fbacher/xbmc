@@ -10,6 +10,7 @@
 #include "AddonManager.h"
 #include "interfaces/generic/ScriptInvocationManager.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 #include <mutex>

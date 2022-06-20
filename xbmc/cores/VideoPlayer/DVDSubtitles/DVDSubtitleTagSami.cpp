@@ -255,11 +255,11 @@ void CDVDSubtitleTagSami::LoadHead(CDVDSubtitleStream* samiStream)
   {
     line = UnicodeUtils::Trim(line);
 
-    if (StringUtils::EqualsNoCase(line, "<BODY>"))
+    if (UnicodeUtils::EqualsNoCase(line, "<BODY>"))
       break;
     if (inSTYLE)
     {
-      if (StringUtils::EqualsNoCase(line, "</STYLE>"))
+      if (UnicodeUtils::EqualsNoCase(line, "</STYLE>"))
         break;
       else
       {
@@ -276,7 +276,7 @@ void CDVDSubtitleTagSami::LoadHead(CDVDSubtitleStream* samiStream)
     }
     else
     {
-      if (StringUtils::EqualsNoCase(line, "<STYLE TYPE=\"text/css\">"))
+      if (UnicodeUtils::EqualsNoCase(line, "<STYLE TYPE=\"text/css\">"))
         inSTYLE = true;
     }
   }

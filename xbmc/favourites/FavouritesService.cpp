@@ -20,6 +20,7 @@
 #include "settings/SettingsComponent.h"
 #include "utils/ContentUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/log.h"
@@ -44,9 +45,9 @@ bool IsMediasourceOfFavItemUnlocked(const std::shared_ptr<CFileItem>& item)
   CUtil::SplitExecFunction(execString, execute, params);
 
   FavAction favAction;
-  if (StringUtils::EqualsNoCase(execute, "Favourites://PlayMedia"))
+  if (UnicodeUtils::EqualsNoCase(execute, "Favourites://PlayMedia"))
     favAction = FavAction::PLAYMEDIA;
-  else if (StringUtils::EqualsNoCase(execute, "Favourites://ShowPicture"))
+  else if (UnicodeUtils::EqualsNoCase(execute, "Favourites://ShowPicture"))
     favAction = FavAction::SHOWPICTURE;
   else
     return true;

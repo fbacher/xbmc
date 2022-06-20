@@ -13,6 +13,7 @@
 #include "utils/CharsetConverter.h"
 #include "utils/ColorUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 
 using namespace KODI::GUILIB;
 

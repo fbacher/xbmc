@@ -13,6 +13,7 @@
 #include "URL.h"
 #include "events/EventLog.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 
 using namespace XFILE;
 

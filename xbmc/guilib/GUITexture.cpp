@@ -12,6 +12,7 @@
 #include "TextureManager.h"
 #include "utils/MathUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "windowing/GraphicContext.h"
 
 #include <stdexcept>

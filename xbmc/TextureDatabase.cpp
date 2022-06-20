@@ -13,6 +13,7 @@
 #include "dbwrappers/dataset.h"
 #include "utils/DatabaseUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
 
@@ -56,7 +57,7 @@ static const size_t NUM_FIELDS = sizeof(fields) / sizeof(translateField);
 int CTextureRule::TranslateField(const char *field) const
 {
   for (const translateField& f : fields)
-    if (StringUtils::EqualsNoCase(field, f.string)) return f.field;
+    if (UnicodeUtils::EqualsNoCase(field, f.string)) return f.field;
   return FieldNone;
 }
 

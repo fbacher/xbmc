@@ -73,12 +73,12 @@ bool CCharsetDetection::DetectXmlEncoding(const char* const xmlContent, const si
   if (GetXmlEncodingFromDeclaration(xmlContent, contentLength, detectedEncoding))
   {
     /* make some safety checks */
-    if (StringUtils::EqualsNoCase(detectedEncoding,"UTF-8"))
+    if (UnicodeUtils::EqualsNoCase(detectedEncoding,"UTF-8"))
       return true; // fast track for most common case
 
     if (StringUtils::StartsWithNoCase(detectedEncoding, "UCS-") || StringUtils::StartsWithNoCase(detectedEncoding, "UTF-"))
     {
-      if (StringUtils::EqualsNoCase(detectedEncoding, "UTF-7"))
+      if (UnicodeUtils::EqualsNoCase(detectedEncoding, "UTF-7"))
         return true;
 
       /* XML declaration was detected in UTF-8 mode (by 'GetXmlEncodingFromDeclaration') so we know
@@ -112,7 +112,7 @@ bool CCharsetDetection::DetectXmlEncoding(const char* const xmlContent, const si
 
   /* found encoding in converted XML declaration, we know correct endianness and number of bytes per char */
   /* make some safety checks */
-  if (StringUtils::EqualsNoCase(declaredEncoding, guessedEncoding))
+  if (UnicodeUtils::EqualsNoCase(declaredEncoding, guessedEncoding))
     return true;
 
   if (StringUtils::StartsWithNoCase(guessedEncoding, "UCS-4"))

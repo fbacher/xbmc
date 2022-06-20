@@ -94,7 +94,7 @@ bool CPlayListPLS::Load(const std::string &strFile)
     }
     strLine = szLine;
     strLine = UnicodeUtils::Trim(strLine);
-    if(StringUtils::EqualsNoCase(strLine, START_PLAYLIST_MARKER))
+    if(UnicodeUtils::EqualsNoCase(strLine, START_PLAYLIST_MARKER))
       break;
 
     // if there is something else before playlist marker, this isn't a pls file
@@ -130,7 +130,7 @@ bool CPlayListPLS::Load(const std::string &strFile)
         }
 
         // Skip self - do not load playlist recursively
-        if (StringUtils::EqualsNoCase(URIUtils::GetFileName(strValue),
+        if (UnicodeUtils::EqualsNoCase(URIUtils::GetFileName(strValue),
                                       URIUtils::GetFileName(strFileName)))
           continue;
 

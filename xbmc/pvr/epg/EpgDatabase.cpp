@@ -177,7 +177,7 @@ void CPVREpgDatabase::UpdateTables(int iVersion)
 
   if (iVersion < 13)
   {
-    const bool isMySQL = StringUtils::EqualsNoCase(
+    const bool isMySQL = UnicodeUtils::EqualsNoCase(
         CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_databaseEpg.type, "mysql");
 
     m_pDS->exec(

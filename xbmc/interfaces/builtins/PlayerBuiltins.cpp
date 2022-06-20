@@ -289,7 +289,7 @@ static int PlayerControl(const std::vector<std::string>& params)
       return 0;
 
     // check to see if we should notify the user
-    bool notify = (params.size() == 2 && StringUtils::EqualsNoCase(params[1], "notify"));
+    bool notify = (params.size() == 2 && UnicodeUtils::EqualsNoCase(params[1], "notify"));
     CServiceBroker::GetPlaylistPlayer().SetShuffle(iPlaylist, !shuffled, notify);
 
     // save settings for now playing windows
@@ -336,7 +336,7 @@ static int PlayerControl(const std::vector<std::string>& params)
       return 0;
 
     // check to see if we should notify the user
-    bool notify = (params.size() == 2 && StringUtils::EqualsNoCase(params[1], "notify"));
+    bool notify = (params.size() == 2 && UnicodeUtils::EqualsNoCase(params[1], "notify"));
     CServiceBroker::GetPlaylistPlayer().SetRepeat(iPlaylist, state, notify);
 
     // save settings for now playing windows
@@ -395,7 +395,7 @@ static int PlayDVD(const std::vector<std::string>& params)
 {
 #ifdef HAS_DVD_DRIVE
   bool restart = false;
-  if (!params.empty() && StringUtils::EqualsNoCase(params[0], "restart"))
+  if (!params.empty() && UnicodeUtils::EqualsNoCase(params[0], "restart"))
     restart = true;
   MEDIA_DETECT::CAutorun::PlayDisc(CServiceBroker::GetMediaManager().GetDiscPath(), true, restart);
 #endif
@@ -434,17 +434,17 @@ static int PlayMedia(const std::vector<std::string>& params)
   int playOffset = 0;
   for (unsigned int i = 1 ; i < params.size() ; i++)
   {
-    if (StringUtils::EqualsNoCase(params[i], "isdir"))
+    if (UnicodeUtils::EqualsNoCase(params[i], "isdir"))
       item.m_bIsFolder = true;
     else if (params[i] == "1") // set fullscreen or windowed
       CMediaSettings::GetInstance().SetMediaStartWindowed(true);
-    else if (StringUtils::EqualsNoCase(params[i], "resume"))
+    else if (UnicodeUtils::EqualsNoCase(params[i], "resume"))
     {
       // force the item to resume (if applicable) (see CApplication::PlayMedia)
       item.m_lStartOffset = STARTOFFSET_RESUME;
       askToResume = false;
     }
-    else if (StringUtils::EqualsNoCase(params[i], "noresume"))
+    else if (UnicodeUtils::EqualsNoCase(params[i], "noresume"))
     {
       // force the item to start at the beginning (m_lStartOffset is initialized to 0)
       askToResume = false;

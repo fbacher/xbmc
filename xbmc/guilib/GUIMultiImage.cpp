@@ -20,6 +20,7 @@
 #include "utils/JobManager.h"
 #include "utils/Random.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 
 #include <mutex>

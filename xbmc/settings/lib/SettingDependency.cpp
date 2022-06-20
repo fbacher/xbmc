@@ -13,6 +13,7 @@
 #include "SettingDefinitions.h"
 #include "SettingsManager.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/log.h"
 
@@ -206,9 +207,9 @@ bool CSettingDependencyCondition::Check() const
 
 bool CSettingDependencyCondition::setTarget(const std::string &target)
 {
-  if (StringUtils::EqualsNoCase(target, "setting"))
+  if (UnicodeUtils::EqualsNoCase(target, "setting"))
     m_target = SettingDependencyTarget::Setting;
-  else if (StringUtils::EqualsNoCase(target, "property"))
+  else if (UnicodeUtils::EqualsNoCase(target, "property"))
     m_target = SettingDependencyTarget::Property;
   else
     return false;
@@ -408,11 +409,11 @@ CSettingDependencyConditionCombinationPtr CSettingDependency::Or()
 
 bool CSettingDependency::setType(const std::string &type)
 {
-  if (StringUtils::EqualsNoCase(type, "enable"))
+  if (UnicodeUtils::EqualsNoCase(type, "enable"))
     m_type = SettingDependencyType::Enable;
-  else if (StringUtils::EqualsNoCase(type, "update"))
+  else if (UnicodeUtils::EqualsNoCase(type, "update"))
     m_type = SettingDependencyType::Update;
-  else if (StringUtils::EqualsNoCase(type, "visible"))
+  else if (UnicodeUtils::EqualsNoCase(type, "visible"))
     m_type = SettingDependencyType::Visible;
   else
     return false;

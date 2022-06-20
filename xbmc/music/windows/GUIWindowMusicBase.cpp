@@ -271,14 +271,14 @@ bool CGUIWindowMusicBase::OnAction(const CAction &action)
 
 void CGUIWindowMusicBase::OnItemInfoAll(const std::string& strPath, bool refresh)
 {
-  if (StringUtils::EqualsNoCase(m_vecItems->GetContent(), "albums"))
+  if (UnicodeUtils::EqualsNoCase(m_vecItems->GetContent(), "albums"))
   {
     if (CMusicLibraryQueue::GetInstance().IsScanningLibrary())
       return;
 
     CMusicLibraryQueue::GetInstance().StartAlbumScan(strPath, refresh);
   }
-  else if (StringUtils::EqualsNoCase(m_vecItems->GetContent(), "artists"))
+  else if (UnicodeUtils::EqualsNoCase(m_vecItems->GetContent(), "artists"))
   {
     if (CMusicLibraryQueue::GetInstance().IsScanningLibrary())
       return;
@@ -1052,9 +1052,9 @@ bool CGUIWindowMusicBase::CheckFilterAdvanced(CFileItemList &items) const
 {
   const std::string& content = items.GetContent();
   if ((items.IsMusicDb() || CanContainFilter(m_strFilterPath)) &&
-      (StringUtils::EqualsNoCase(content, "artists") ||
-       StringUtils::EqualsNoCase(content, "albums")  ||
-       StringUtils::EqualsNoCase(content, "songs")))
+      (UnicodeUtils::EqualsNoCase(content, "artists") ||
+       UnicodeUtils::EqualsNoCase(content, "albums")  ||
+       UnicodeUtils::EqualsNoCase(content, "songs")))
     return true;
 
   return false;

@@ -46,7 +46,7 @@ void CGUIColorManager::Load(const std::string &colorFile)
     LoadXML(xmlDoc);
 
   // now the color map requested
-  if (StringUtils::EqualsNoCase(colorFile, "SKINDEFAULT"))
+  if (UnicodeUtils::EqualsNoCase(colorFile, "SKINDEFAULT"))
     return; // nothing to do
 
   path = URIUtils::AddFileToFolder(g_SkinInfo->Path(), "colors", colorFile);

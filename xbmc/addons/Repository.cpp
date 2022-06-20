@@ -215,7 +215,7 @@ bool CRepository::FetchIndex(const DirInfo& repo,
   if (repo.checksumType != CDigest::Type::INVALID)
   {
     std::string actualDigest = CDigest::Calculate(repo.checksumType, response);
-    if (!StringUtils::EqualsNoCase(digest, actualDigest))
+    if (!UnicodeUtils::EqualsNoCase(digest, actualDigest))
     {
       CLog::Log(LOGERROR, "CRepository: {} index has wrong digest {}, expected: {}", repo.info, actualDigest, digest);
       return false;

@@ -626,8 +626,8 @@ void CGUIWindowMusicNav::GetContextButtons(int itemNumber, CContextButtons &butt
           }
 
           //Change information provider
-          if (StringUtils::EqualsNoCase(m_vecItems->GetContent(), "albums") ||
-              StringUtils::EqualsNoCase(m_vecItems->GetContent(), "artists"))
+          if (UnicodeUtils::EqualsNoCase(m_vecItems->GetContent(), "albums") ||
+              UnicodeUtils::EqualsNoCase(m_vecItems->GetContent(), "artists"))
           {
             // we allow the user to set information provider for albums and artists
             buttons.Add(CONTEXT_BUTTON_SET_CONTENT, 20195);

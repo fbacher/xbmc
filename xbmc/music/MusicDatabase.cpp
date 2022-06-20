@@ -320,7 +320,7 @@ void CMusicDatabase::CreateAnalytics()
      Recursion avoided using WHEN but SQLite has PRAGMA recursive-triggers off by default anyway.
     // ! @todo: once on SQLite v3.31 we could use a generated column for dateModified as real
   */
-  bool bisMySQL = StringUtils::EqualsNoCase(
+  bool bisMySQL = UnicodeUtils::EqualsNoCase(
       CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_databaseMusic.type, "mysql");
 
   if (!bisMySQL)
@@ -546,7 +546,7 @@ void CMusicDatabase::CreateViews()
 void CMusicDatabase::CreateNativeDBFunctions()
 {
   // Create native functions in MySQL/MariaDB database only
-  if (!StringUtils::EqualsNoCase(
+  if (!UnicodeUtils::EqualsNoCase(
           CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_databaseMusic.type,
           "mysql"))
     return;
@@ -1509,7 +1509,7 @@ int CMusicDatabase::UpdateAlbum(int idAlbum,
   // Art URLs limited on MySQL databases to 65535 characters (TEXT field)
   // Truncate value cleaning up xml when URLs exceeds this
   std::string strImageURLs = strImage;
-  if (StringUtils::EqualsNoCase(
+  if (UnicodeUtils::EqualsNoCase(
           CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_databaseMusic.type,
           "mysql"))
     TrimImageURLs(strImageURLs, 65535);
@@ -1956,7 +1956,7 @@ int CMusicDatabase::UpdateArtist(int idArtist,
   // Art URLs limited on MySQL databases to 65535 characters (TEXT field)
   // Truncate value cleaning up xml when URLs exceeds this
   std::string strImageURLs = strImage;
-  if (StringUtils::EqualsNoCase(
+  if (UnicodeUtils::EqualsNoCase(
           CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_databaseMusic.type,
           "mysql"))
     TrimImageURLs(strImageURLs, 65535);
@@ -8322,7 +8322,7 @@ std::string CMusicDatabase::AlphanumericSortSQL(const std::string& strField,
     DESC = " DESC";
   std::string strSort;
 
-  if (StringUtils::EqualsNoCase(
+  if (UnicodeUtils::EqualsNoCase(
           CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_databaseMusic.type,
           "mysql"))
     strSort = PrepareSQL("udfNaturalSortFormat(%s, 8, '.')%s", strField.c_str(), DESC.c_str());
@@ -9215,7 +9215,7 @@ void CMusicDatabase::UpdateTables(int version)
                 "aspect=\"fanart\" preview')");
     // Art URLs limited on MySQL databases to 65535 characters (TEXT field)
     // Truncate the fanart when total URLs exceeds this
-    bool bisMySQL = StringUtils::EqualsNoCase(
+    bool bisMySQL = UnicodeUtils::EqualsNoCase(
         CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_databaseMusic.type,
         "mysql");
     if (bisMySQL)
@@ -10808,7 +10808,7 @@ bool CMusicDatabase::UpdateArtistSortNames(int idArtist /*=-1*/)
 
   // MySQL syntax for GROUP_CONCAT with order is different from that in SQLite
   // (not handled by PrepareSQL)
-  bool bisMySQL = StringUtils::EqualsNoCase(
+  bool bisMySQL = UnicodeUtils::EqualsNoCase(
       CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_databaseMusic.type, "mysql");
 
   BeginMultipleExecute();
@@ -11450,11 +11450,11 @@ bool CMusicDatabase::SetScraperAll(const std::string& strBaseDir, const ADDON::S
       return false;
 
     std::string itemType = musicUrl.GetType();
-    if (StringUtils::EqualsNoCase(itemType, "artists"))
+    if (UnicodeUtils::EqualsNoCase(itemType, "artists"))
     {
       content = CONTENT_ARTISTS;
     }
-    else if (StringUtils::EqualsNoCase(itemType, "albums"))
+    else if (UnicodeUtils::EqualsNoCase(itemType, "albums"))
     {
       content = CONTENT_ALBUMS;
     }
@@ -11672,24 +11672,24 @@ bool CMusicDatabase::GetItems(const std::string& strBaseDir,
                               const Filter& filter /* = Filter() */,
                               const SortDescription& sortDescription /* = SortDescription() */)
 {
-  if (StringUtils::EqualsNoCase(itemType, "genres"))
+  if (UnicodeUtils::EqualsNoCase(itemType, "genres"))
     return GetGenresNav(strBaseDir, items, filter);
-  else if (StringUtils::EqualsNoCase(itemType, "sources"))
+  else if (UnicodeUtils::EqualsNoCase(itemType, "sources"))
     return GetSourcesNav(strBaseDir, items, filter);
-  else if (StringUtils::EqualsNoCase(itemType, "years"))
+  else if (UnicodeUtils::EqualsNoCase(itemType, "years"))
     return GetYearsNav(strBaseDir, items, filter);
-  else if (StringUtils::EqualsNoCase(itemType, "roles"))
+  else if (UnicodeUtils::EqualsNoCase(itemType, "roles"))
     return GetRolesNav(strBaseDir, items, filter);
-  else if (StringUtils::EqualsNoCase(itemType, "artists"))
+  else if (UnicodeUtils::EqualsNoCase(itemType, "artists"))
     return GetArtistsNav(strBaseDir, items,
                          !CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
                              CSettings::SETTING_MUSICLIBRARY_SHOWCOMPILATIONARTISTS),
                          -1, -1, -1, filter, sortDescription);
-  else if (StringUtils::EqualsNoCase(itemType, "albums"))
+  else if (UnicodeUtils::EqualsNoCase(itemType, "albums"))
     return GetAlbumsByWhere(strBaseDir, filter, items, sortDescription);
-  else if (StringUtils::EqualsNoCase(itemType, "discs"))
+  else if (UnicodeUtils::EqualsNoCase(itemType, "discs"))
     return GetDiscsByWhere(strBaseDir, filter, items, sortDescription);
-  else if (StringUtils::EqualsNoCase(itemType, "songs"))
+  else if (UnicodeUtils::EqualsNoCase(itemType, "songs"))
     return GetSongsFullByWhere(strBaseDir, filter, items, sortDescription, true);
 
   return false;
@@ -11697,17 +11697,17 @@ bool CMusicDatabase::GetItems(const std::string& strBaseDir,
 
 std::string CMusicDatabase::GetItemById(const std::string& itemType, int id)
 {
-  if (StringUtils::EqualsNoCase(itemType, "genres"))
+  if (UnicodeUtils::EqualsNoCase(itemType, "genres"))
     return GetGenreById(id);
-  else if (StringUtils::EqualsNoCase(itemType, "sources"))
+  else if (UnicodeUtils::EqualsNoCase(itemType, "sources"))
     return GetSourceById(id);
-  else if (StringUtils::EqualsNoCase(itemType, "years"))
+  else if (UnicodeUtils::EqualsNoCase(itemType, "years"))
     return std::to_string(id);
-  else if (StringUtils::EqualsNoCase(itemType, "artists"))
+  else if (UnicodeUtils::EqualsNoCase(itemType, "artists"))
     return GetArtistById(id);
-  else if (StringUtils::EqualsNoCase(itemType, "albums"))
+  else if (UnicodeUtils::EqualsNoCase(itemType, "albums"))
     return GetAlbumById(id);
-  else if (StringUtils::EqualsNoCase(itemType, "roles"))
+  else if (UnicodeUtils::EqualsNoCase(itemType, "roles"))
     return GetRoleById(id);
 
   return "";

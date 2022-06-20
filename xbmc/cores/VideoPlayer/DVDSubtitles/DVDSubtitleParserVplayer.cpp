@@ -11,6 +11,7 @@
 #include "cores/VideoPlayer/Interface/TimingConstants.h"
 #include "utils/RegExp.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 
 #include <cstdlib>
 

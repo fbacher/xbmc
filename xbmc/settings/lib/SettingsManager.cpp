@@ -86,7 +86,7 @@ bool CSettingsManager::Initialize(const TiXmlElement *root)
   if (m_initialized || root == nullptr)
     return false;
 
-  if (!StringUtils::EqualsNoCase(root->ValueStr(), SETTING_XML_ROOT))
+  if (!UnicodeUtils::EqualsNoCase(root->ValueStr(), SETTING_XML_ROOT))
   {
     m_logger->error("error reading settings definition: doesn't contain <" SETTING_XML_ROOT
                     "> tag");
@@ -942,9 +942,9 @@ void CSettingsManager::OnSettingPropertyChanged(const std::shared_ptr<const CSet
   // check the changed property and if it may have an influence on the
   // children of the setting
   SettingDependencyType dependencyType = SettingDependencyType::Unknown;
-  if (StringUtils::EqualsNoCase(propertyName, "enabled"))
+  if (UnicodeUtils::EqualsNoCase(propertyName, "enabled"))
     dependencyType = SettingDependencyType::Enable;
-  else if (StringUtils::EqualsNoCase(propertyName, "visible"))
+  else if (UnicodeUtils::EqualsNoCase(propertyName, "visible"))
     dependencyType = SettingDependencyType::Visible;
 
   if (dependencyType != SettingDependencyType::Unknown)
@@ -956,15 +956,15 @@ void CSettingsManager::OnSettingPropertyChanged(const std::shared_ptr<const CSet
 
 SettingPtr CSettingsManager::CreateSetting(const std::string &settingType, const std::string &settingId, CSettingsManager *settingsManager /* = nullptr */) const
 {
-  if (StringUtils::EqualsNoCase(settingType, "boolean"))
+  if (UnicodeUtils::EqualsNoCase(settingType, "boolean"))
     return std::make_shared<CSettingBool>(settingId, const_cast<CSettingsManager*>(this));
-  else if (StringUtils::EqualsNoCase(settingType, "integer"))
+  else if (UnicodeUtils::EqualsNoCase(settingType, "integer"))
     return std::make_shared<CSettingInt>(settingId, const_cast<CSettingsManager*>(this));
-  else if (StringUtils::EqualsNoCase(settingType, "number"))
+  else if (UnicodeUtils::EqualsNoCase(settingType, "number"))
     return std::make_shared<CSettingNumber>(settingId, const_cast<CSettingsManager*>(this));
-  else if (StringUtils::EqualsNoCase(settingType, "string"))
+  else if (UnicodeUtils::EqualsNoCase(settingType, "string"))
     return std::make_shared<CSettingString>(settingId, const_cast<CSettingsManager*>(this));
-  else if (StringUtils::EqualsNoCase(settingType, "action"))
+  else if (UnicodeUtils::EqualsNoCase(settingType, "action"))
     return std::make_shared<CSettingAction>(settingId, const_cast<CSettingsManager*>(this));
   else if (settingType.size() > 6 &&
            StringUtils::StartsWith(settingType, "list[") &&
@@ -1096,7 +1096,7 @@ bool CSettingsManager::LoadSetting(const TiXmlNode* node, const SettingPtr& sett
 
   // check if the default="true" attribute is set for the value
   auto isDefaultAttribute = settingElement->Attribute(SETTING_XML_ELM_DEFAULT);
-  bool isDefault = isDefaultAttribute != nullptr && StringUtils::EqualsNoCase(isDefaultAttribute, "true");
+  bool isDefault = isDefaultAttribute != nullptr && UnicodeUtils::EqualsNoCase(isDefaultAttribute, "true");
 
   if (!setting->FromString(settingElement->FirstChild() != nullptr ? settingElement->FirstChild()->ValueStr() : StringUtils::Empty))
   {

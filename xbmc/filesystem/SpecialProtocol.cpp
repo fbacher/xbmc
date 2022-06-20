@@ -22,6 +22,7 @@
 #ifdef TARGET_POSIX
 #include <dirent.h>
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #endif
 
 const CProfileManager *CSpecialProtocol::m_profileManager = nullptr;

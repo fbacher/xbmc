@@ -1085,13 +1085,13 @@ void CGUIDialogVideoInfo::OnGetFanart()
   CServiceBroker::GetMediaManager().GetLocalDrives(sources);
   bool flip=false;
   if (!CGUIDialogFileBrowser::ShowAndGetImage(items, sources, g_localizeStrings.Get(20437), result, &flip, 20445) ||
-    StringUtils::EqualsNoCase(result, "fanart://Current"))
+    UnicodeUtils::EqualsNoCase(result, "fanart://Current"))
     return;   // user cancelled
 
-  if (StringUtils::EqualsNoCase(result, "fanart://Local"))
+  if (UnicodeUtils::EqualsNoCase(result, "fanart://Local"))
     result = strLocal;
 
-  if (StringUtils::EqualsNoCase(result, "fanart://Embedded"))
+  if (UnicodeUtils::EqualsNoCase(result, "fanart://Embedded"))
   {
     unsigned int current = m_movieItem->GetVideoInfoTag()->m_fanart.GetNumFanarts();
     int found = -1;
@@ -1128,7 +1128,7 @@ void CGUIDialogVideoInfo::OnGetFanart()
     }
     result = m_movieItem->GetVideoInfoTag()->m_fanart.GetImageURL();
   }
-  else if (StringUtils::EqualsNoCase(result, "fanart://None") || !CFile::Exists(result))
+  else if (UnicodeUtils::EqualsNoCase(result, "fanart://None") || !CFile::Exists(result))
     result.clear();
 
   // set the fanart image
@@ -1614,7 +1614,7 @@ bool CGUIDialogVideoInfo::DeleteVideoItem(const CFileItemPtr &item, bool unavail
   {
     std::string strDeletePath = item->GetVideoInfoTag()->GetPath();
 
-    if (StringUtils::EqualsNoCase(URIUtils::GetFileName(strDeletePath), "VIDEO_TS.IFO"))
+    if (UnicodeUtils::EqualsNoCase(URIUtils::GetFileName(strDeletePath), "VIDEO_TS.IFO"))
     {
       strDeletePath = URIUtils::GetDirectory(strDeletePath);
       if (StringUtils::EndsWithNoCase(strDeletePath, "video_ts/"))
@@ -2003,7 +2003,7 @@ std::string FindLocalMovieSetArtworkFile(const CFileItemPtr& item, const std::st
   {
     std::string candidate = URIUtils::GetFileName(artFile->GetPath());
     URIUtils::RemoveExtension(candidate);
-    if (StringUtils::EqualsNoCase(candidate, artType))
+    if (UnicodeUtils::EqualsNoCase(candidate, artType))
       return artFile->GetPath();
   }
   return "";
@@ -2384,10 +2384,10 @@ bool CGUIDialogVideoInfo::OnGetFanart(const CFileItemPtr &videoItem)
   AddItemPathToFileBrowserSources(sources, item);
   bool flip = false;
   if (!CGUIDialogFileBrowser::ShowAndGetImage(items, sources, g_localizeStrings.Get(20437), result, &flip, 20445) ||
-      StringUtils::EqualsNoCase(result, "fanart://Current"))
+      UnicodeUtils::EqualsNoCase(result, "fanart://Current"))
     return false;
 
-  else if (StringUtils::EqualsNoCase(result, "fanart://None") || !CFile::Exists(result))
+  else if (UnicodeUtils::EqualsNoCase(result, "fanart://None") || !CFile::Exists(result))
     result.clear();
   if (!result.empty() && flip)
     result = CTextureUtils::GetWrappedImageURL(result, "", "flipped");

@@ -154,7 +154,7 @@ CAddonSettings::CAddonSettings(const std::shared_ptr<const IAddon>& addon)
 
 std::shared_ptr<CSetting> CAddonSettings::CreateSetting(const std::string &settingType, const std::string &settingId, CSettingsManager *settingsManager /* = NULL */) const
 {
-  if (StringUtils::EqualsNoCase(settingType, "urlencodedstring"))
+  if (UnicodeUtils::EqualsNoCase(settingType, "urlencodedstring"))
     return std::make_shared<CSettingUrlEncodedString>(settingId, settingsManager);
 
   return CSettingCreator::CreateSetting(settingType, settingId, settingsManager);
@@ -441,7 +441,7 @@ bool CAddonSettings::ParseSettingVersion(const CXBMCTinyXML& doc, uint32_t& vers
   if (root == nullptr)
     return false;
 
-  if (!StringUtils::EqualsNoCase(root->ValueStr(), SETTING_XML_ROOT))
+  if (!UnicodeUtils::EqualsNoCase(root->ValueStr(), SETTING_XML_ROOT))
   {
     m_logger->error("error reading setting definitions: no <settings> tag");
     return false;
@@ -590,18 +590,18 @@ std::shared_ptr<CSettingGroup> CAddonSettings::ParseOldSettingElement(
 
         // parse enable status
         const auto conditionEnable = XMLUtils::GetAttribute(settingElement, "enable");
-        if (StringUtils::EqualsNoCase(conditionEnable, "true"))
+        if (UnicodeUtils::EqualsNoCase(conditionEnable, "true"))
           setting->SetEnabled(true);
-        else if (StringUtils::EqualsNoCase(conditionEnable, "false"))
+        else if (UnicodeUtils::EqualsNoCase(conditionEnable, "false"))
           setting->SetEnabled(false);
         else if (!conditionEnable.empty())
           settingWithConditions.enableCondition = conditionEnable;
 
         // parse visible status
         const auto conditionVisible = XMLUtils::GetAttribute(settingElement, "visible");
-        if (StringUtils::EqualsNoCase(conditionVisible, "true"))
+        if (UnicodeUtils::EqualsNoCase(conditionVisible, "true"))
           setting->SetVisible(true);
-        else if (StringUtils::EqualsNoCase(conditionVisible, "false"))
+        else if (UnicodeUtils::EqualsNoCase(conditionVisible, "false"))
           setting->SetVisible(false);
         else if (!conditionVisible.empty())
           settingWithConditions.visibleCondition = conditionVisible;
@@ -773,7 +773,7 @@ SettingPtr CAddonSettings::InitializeFromOldSettingAction(const std::string& set
   // get any options
   std::string option = XMLUtils::GetAttribute(settingElement, "option");
   // handle the "close" option
-  if (StringUtils::EqualsNoCase(option, "close"))
+  if (UnicodeUtils::EqualsNoCase(option, "close"))
     control->SetCloseDialog(true);
 
   setting->SetControl(control);
@@ -823,7 +823,7 @@ SettingPtr CAddonSettings::InitializeFromOldSettingTextIpAddress(const std::stri
   else if (settingType == "text")
   {
 
-    if (StringUtils::EqualsNoCase(option, "urlencoded"))
+    if (UnicodeUtils::EqualsNoCase(option, "urlencoded"))
     {
       setting = std::make_shared<CSettingUrlEncodedString>(settingId, GetSettingsManager());
       control->SetFormat("urlencoded");
@@ -832,7 +832,7 @@ SettingPtr CAddonSettings::InitializeFromOldSettingTextIpAddress(const std::stri
     {
       setting = std::make_shared<CSettingString>(settingId, GetSettingsManager());
       control->SetFormat("string");
-      control->SetHidden(StringUtils::EqualsNoCase(option, "hidden"));
+      control->SetHidden(UnicodeUtils::EqualsNoCase(option, "hidden"));
     }
   }
 
@@ -900,7 +900,7 @@ SettingPtr CAddonSettings::InitializeFromOldSettingPath(const std::string& setti
 
   // parse options
   const auto option = XMLUtils::GetAttribute(settingElement, "option");
-  setting->SetWritable(StringUtils::EqualsNoCase(option, "writeable"));
+  setting->SetWritable(UnicodeUtils::EqualsNoCase(option, "writeable"));
 
   auto control = std::make_shared<CSettingControlButton>();
   if (settingType == "folder")
@@ -1256,7 +1256,7 @@ SettingPtr CAddonSettings::InitializeFromOldSettingSlider(const std::string& set
 
   // parse option
   auto option = XMLUtils::GetAttribute(settingElement, "option");
-  if (option.empty() || StringUtils::EqualsNoCase(option, "float"))
+  if (option.empty() || UnicodeUtils::EqualsNoCase(option, "float"))
   {
     auto setting = std::make_shared<CSettingNumber>(settingId, GetSettingsManager());
     if (setting->FromString(defaultValue))
@@ -1274,7 +1274,7 @@ SettingPtr CAddonSettings::InitializeFromOldSettingSlider(const std::string& set
     return setting;
   }
 
-  if (StringUtils::EqualsNoCase(option, "int") || StringUtils::EqualsNoCase(option, "percent"))
+  if (UnicodeUtils::EqualsNoCase(option, "int") || UnicodeUtils::EqualsNoCase(option, "percent"))
   {
     auto setting = std::make_shared<CSettingInt>(settingId, GetSettingsManager());
     if (setting->FromString(defaultValue))
@@ -1285,7 +1285,7 @@ SettingPtr CAddonSettings::InitializeFromOldSettingSlider(const std::string& set
     setting->SetMaximum(static_cast<int>(max));
 
     auto control = std::make_shared<CSettingControlSlider>();
-    control->SetFormat(StringUtils::EqualsNoCase(option, "int") ? "integer" : "percentage");
+    control->SetFormat(UnicodeUtils::EqualsNoCase(option, "int") ? "integer" : "percentage");
     control->SetPopup(false);
     setting->SetControl(control);
 
@@ -1316,7 +1316,7 @@ SettingPtr CAddonSettings::InitializeFromOldSettingFileWithSource(const std::str
 
   // process option
   std::string option = XMLUtils::GetAttribute(settingElement, "option");
-  setting->SetHideExtension(StringUtils::EqualsNoCase(option, "hideext"));
+  setting->SetHideExtension(UnicodeUtils::EqualsNoCase(option, "hideext"));
 
   setting->SetOptionsFiller(FileEnumSettingOptionsFiller);
 
@@ -1516,11 +1516,11 @@ bool CAddonSettings::ParseOldConditionExpression(std::string str, ConditionExpre
     op = op.substr(1);
 
   // parse the operator
-  if (StringUtils::EqualsNoCase(op, "eq"))
+  if (UnicodeUtils::EqualsNoCase(op, "eq"))
     expression.m_operator = SettingDependencyOperator::Equals;
-  else if (StringUtils::EqualsNoCase(op, "gt"))
+  else if (UnicodeUtils::EqualsNoCase(op, "gt"))
     expression.m_operator = SettingDependencyOperator::GreaterThan;
-  else if (StringUtils::EqualsNoCase(op, "lt"))
+  else if (UnicodeUtils::EqualsNoCase(op, "lt"))
     expression.m_operator = SettingDependencyOperator::LessThan;
   else
     return false;

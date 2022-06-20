@@ -20,6 +20,7 @@
 #include "pvr/epg/EpgInfoTag.h"
 #include "pvr/providers/PVRProviders.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
 

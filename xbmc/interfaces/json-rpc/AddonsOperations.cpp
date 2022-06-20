@@ -17,6 +17,7 @@
 #include "filesystem/File.h"
 #include "messaging/ApplicationMessenger.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Variant.h"
 
 using namespace JSONRPC;

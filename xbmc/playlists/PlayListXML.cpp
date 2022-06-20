@@ -12,6 +12,7 @@
 #include "filesystem/File.h"
 #include "media/MediaLockState.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/XMLUtils.h"

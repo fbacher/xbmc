@@ -145,7 +145,7 @@ bool CDisplaySettings::Load(const TiXmlNode *settings)
     bool found = false;
     for (ResolutionInfos::const_iterator  it = m_calibrations.begin(); it != m_calibrations.end(); ++it)
     {
-      if (StringUtils::EqualsNoCase(it->strMode, cal.strMode))
+      if (UnicodeUtils::EqualsNoCase(it->strMode, cal.strMode))
       {
         found = true;
         break;
@@ -519,7 +519,7 @@ void CDisplaySettings::ApplyCalibrations()
     // find resolutions
     for (size_t res = RES_DESKTOP; res < m_resolutions.size(); ++res)
     {
-      if (StringUtils::EqualsNoCase(itCal->strMode, m_resolutions[res].strMode))
+      if (UnicodeUtils::EqualsNoCase(itCal->strMode, m_resolutions[res].strMode))
       {
         // overscan
         m_resolutions[res].Overscan.left = itCal->Overscan.left;
@@ -573,13 +573,13 @@ void CDisplaySettings::UpdateCalibrations()
   // Add new (unique) resolutions
   for (ResolutionInfos::const_iterator res(m_resolutions.cbegin() + RES_CUSTOM); res != m_resolutions.cend(); ++res)
     if (std::find_if(m_calibrations.cbegin(), m_calibrations.cend(),
-      [&](const RESOLUTION_INFO& info) { return StringUtils::EqualsNoCase(res->strMode, info.strMode); }) == m_calibrations.cend())
+      [&](const RESOLUTION_INFO& info) { return UnicodeUtils::EqualsNoCase(res->strMode, info.strMode); }) == m_calibrations.cend())
         m_calibrations.push_back(*res);
 
   for (auto &cal : m_calibrations)
   {
     ResolutionInfos::const_iterator res(std::find_if(m_resolutions.cbegin() + RES_DESKTOP, m_resolutions.cend(),
-    [&](const RESOLUTION_INFO& info) { return StringUtils::EqualsNoCase(cal.strMode, info.strMode); }));
+    [&](const RESOLUTION_INFO& info) { return UnicodeUtils::EqualsNoCase(cal.strMode, info.strMode); }));
 
     if (res != m_resolutions.cend())
     {
@@ -762,7 +762,7 @@ void CDisplaySettings::SettingOptionsRefreshRatesFiller(const SettingConstPtr& s
   for (std::vector<REFRESHRATE>::const_iterator refreshrate = refreshrates.begin(); refreshrate != refreshrates.end(); ++refreshrate)
   {
     std::string screenmode = GetStringFromResolution((RESOLUTION)refreshrate->ResInfo_Index, refreshrate->RefreshRate);
-    if (!match && StringUtils::EqualsNoCase(std::static_pointer_cast<const CSettingString>(setting)->GetValue(), screenmode))
+    if (!match && UnicodeUtils::EqualsNoCase(std::static_pointer_cast<const CSettingString>(setting)->GetValue(), screenmode))
       match = true;
     list.emplace_back(StringUtils::Format("{:.2f}", refreshrate->RefreshRate), screenmode);
   }

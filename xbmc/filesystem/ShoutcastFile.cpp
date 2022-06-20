@@ -224,7 +224,7 @@ bool CShoutcastFile::ExtractTagInfo(const char* buf)
             if (http.Get(dataURL.Get(), extData))
             {
               const std::string contentType = http.GetHttpHeader().GetMimeType();
-              if (StringUtils::EqualsNoCase(contentType, "application/json"))
+              if (UnicodeUtils::EqualsNoCase(contentType, "application/json"))
               {
                 CVariant json;
                 if (CJSONVariantParser::Parse(extData, json))

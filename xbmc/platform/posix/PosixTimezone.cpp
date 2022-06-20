@@ -261,7 +261,7 @@ void CPosixTimezone::SettingOptionsTimezonesFiller(const std::shared_ptr<const C
   std::vector<std::string> timezones = g_timezone.GetTimezonesByCountry(CServiceBroker::GetSettingsComponent()->GetSettings()->GetString(CSettings::SETTING_LOCALE_TIMEZONECOUNTRY));
   for (unsigned int i = 0; i < timezones.size(); i++)
   {
-    if (!found && StringUtils::EqualsNoCase(timezones[i], current))
+    if (!found && UnicodeUtils::EqualsNoCase(timezones[i], current))
       found = true;
 
     list.emplace_back(timezones[i], timezones[i]);

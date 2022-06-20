@@ -12,6 +12,7 @@
 #include "cores/FFmpeg.h"
 #include "filesystem/File.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 
 using namespace MUSIC_INFO;
 using namespace XFILE;

@@ -12,6 +12,7 @@
 #include "filesystem/File.h"
 #include "guilib/WindowIDs.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "view/ViewState.h"
 #include "windowing/GraphicContext.h"

@@ -16,6 +16,7 @@
 #include "input/Key.h"
 #include "utils/ColorUtils.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 #include <algorithm>
