@@ -126,7 +126,7 @@ CFileItemPtr CBlurayDirectory::GetTitle(const BLURAY_TITLE_INFO* title, const st
   item->m_strTitle = buf;
   item->SetLabel(buf);
   chap = StringUtils::Format(g_localizeStrings.Get(25007), title->chapter_count,
-                             StringUtils::SecondsToTimeString(duration));
+                             UnicodeUtils::SecondsToTimeString(duration));
   item->SetLabel2(chap);
   item->m_dwSize = 0;
   item->SetArt("icon", "DefaultVideo.png");

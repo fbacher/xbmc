@@ -1444,7 +1444,6 @@ long UnicodeUtils::TimeStringToSeconds(const std::string &timeString) {
 	}
 }
 
-#ifdef UNICODE_STRING_DISABLE
 std::string UnicodeUtils::SecondsToTimeString(long lSeconds, TIME_FORMAT format)
 {
   bool isNegative = lSeconds < 0;
@@ -1469,13 +1468,13 @@ std::string UnicodeUtils::SecondsToTimeString(long lSeconds, TIME_FORMAT format)
     if (format == TIME_FORMAT_GUESS)
       format = (hh >= 1) ? TIME_FORMAT_HH_MM_SS : TIME_FORMAT_MM_SS;
     if (format & TIME_FORMAT_HH)
-      strHMS += UnicodeUtils::Format("{:02}", hh);
+      strHMS += StringUtils::Format("{:02}", hh);
     else if (format & TIME_FORMAT_H)
       strHMS += std::to_string(hh);
     if (format & TIME_FORMAT_MM)
-      strHMS += UnicodeUtils::Format(strHMS.empty() ? "{:02}" : ":{:02}", mm);
+      strHMS += StringUtils::Format(strHMS.empty() ? "{:02}" : ":{:02}", mm);
     if (format & TIME_FORMAT_SS)
-      strHMS += UnicodeUtils::Format(strHMS.empty() ? "{:02}" : ":{:02}", ss);
+      strHMS += StringUtils::Format(strHMS.empty() ? "{:02}" : ":{:02}", ss);
   }
 
   if (isNegative)
@@ -1483,7 +1482,6 @@ std::string UnicodeUtils::SecondsToTimeString(long lSeconds, TIME_FORMAT format)
 
   return strHMS;
 }
-#endif
 
 bool UnicodeUtils::IsNaturalNumber(const std::string& str)
 {

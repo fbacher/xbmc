@@ -1106,6 +1106,7 @@ std::string StringUtils::ISODateToLocalizedDate(const std::string &strIsoDate) {
 	return formattedDate;
 }
 
+#if defined(UNICODE_STRING_DISABLE)
 long StringUtils::TimeStringToSeconds(const std::string &timeString) {
 	std::string strCopy(timeString);
 	strCopy = UnicodeUtils::Trim(strCopy);
@@ -1125,6 +1126,7 @@ long StringUtils::TimeStringToSeconds(const std::string &timeString) {
 		return timeInSecs;
 	}
 }
+
 
 std::string StringUtils::SecondsToTimeString(long lSeconds, TIME_FORMAT format)
 {
@@ -1164,6 +1166,7 @@ std::string StringUtils::SecondsToTimeString(long lSeconds, TIME_FORMAT format)
 
   return strHMS;
 }
+#endif
 
 bool StringUtils::IsNaturalNumber(const std::string& str)
 {

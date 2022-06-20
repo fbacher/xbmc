@@ -234,7 +234,7 @@ static void ParseItemItunes(CFileItem* item, SResources& resources, TiXmlElement
   else if(name == "author")
     vtag->m_writingCredits.push_back(text);
   else if(name == "duration")
-    vtag->SetDuration(StringUtils::TimeStringToSeconds(text));
+    vtag->SetDuration(UnicodeUtils::TimeStringToSeconds(text));
   else if(name == "keywords")
     item->SetProperty("keywords", text);
 }
@@ -333,7 +333,7 @@ static void ParseItemBoxee(CFileItem* item, SResources& resources, TiXmlElement*
   else if(name == "content_type")
     item->SetMimeType(text);
   else if(name == "runtime")
-    vtag->SetDuration(StringUtils::TimeStringToSeconds(text));
+    vtag->SetDuration(UnicodeUtils::TimeStringToSeconds(text));
   else if(name == "episode")
     vtag->m_iEpisode = atoi(text.c_str());
   else if(name == "season")
@@ -363,7 +363,7 @@ static void ParseItemZink(CFileItem* item, SResources& resources, TiXmlElement* 
   else if(name == "duration")
     vtag->SetDuration(atoi(text.c_str()));
   else if(name == "durationstr")
-    vtag->SetDuration(StringUtils::TimeStringToSeconds(text));
+    vtag->SetDuration(UnicodeUtils::TimeStringToSeconds(text));
 }
 
 static void ParseItemSVT(CFileItem* item, SResources& resources, TiXmlElement* element, const std::string& name, const std::string& xmlns, const std::string& path)
@@ -498,7 +498,7 @@ static void ParseItem(CFileItem* item, TiXmlElement* root, const std::string& pa
     item->m_dwSize  = best->size;
 
     if(best->duration)
-      item->SetProperty("duration", StringUtils::SecondsToTimeString(best->duration));
+      item->SetProperty("duration", UnicodeUtils::SecondsToTimeString(best->duration));
 
     /* handling of mimetypes fo directories are sub optimal at best */
     if(best->mime == "application/rss+xml" && UnicodeUtils::StartsWithNoCase(item->GetPath(), "http://"))
@@ -522,7 +522,7 @@ static void ParseItem(CFileItem* item, TiXmlElement* root, const std::string& pa
     CVideoInfoTag* vtag = item->GetVideoInfoTag();
 
     if(item->HasProperty("duration")    && !vtag->GetDuration())
-      vtag->SetDuration(StringUtils::TimeStringToSeconds(item->GetProperty("duration").asString()));
+      vtag->SetDuration(UnicodeUtils::TimeStringToSeconds(item->GetProperty("duration").asString()));
 
     if(item->HasProperty("description") && vtag->m_strPlot.empty())
       vtag->m_strPlot = item->GetProperty("description").asString();
@@ -537,7 +537,7 @@ static void ParseItem(CFileItem* item, TiXmlElement* root, const std::string& pa
     }
 
     if(!vtag->GetDuration())
-      item->SetLabel2(StringUtils::SecondsToTimeString(vtag->GetDuration()));
+      item->SetLabel2(UnicodeUtils::SecondsToTimeString(vtag->GetDuration()));
   }
 }
 

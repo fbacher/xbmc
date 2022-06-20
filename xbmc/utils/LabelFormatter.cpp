@@ -227,7 +227,7 @@ std::string CLabelFormatter::GetMaskContent(const CMaskString &mask, const CFile
       if (movie)
         nDuration = movie->GetDuration();
       if (nDuration > 0)
-        value = StringUtils::SecondsToTimeString(nDuration, (nDuration >= 3600) ? TIME_FORMAT_H_MM_SS : TIME_FORMAT_MM_SS);
+        value = UnicodeUtils::SecondsToTimeString(nDuration, (nDuration >= 3600) ? TIME_FORMAT_H_MM_SS : TIME_FORMAT_MM_SS);
       else if (item->m_dwSize > 0)
         value = StringUtils::SizeToString(item->m_dwSize);
     }
@@ -463,7 +463,7 @@ void CLabelFormatter::FillMusicMaskContent(const char mask, const std::string &v
     tag->SetYear(atol(value.c_str()));
     break;
   case 'D':
-    tag->SetDuration(StringUtils::TimeStringToSeconds(value));
+    tag->SetDuration(UnicodeUtils::TimeStringToSeconds(value));
     break;
   case 'R': // rating
     tag->SetRating(value[0]);

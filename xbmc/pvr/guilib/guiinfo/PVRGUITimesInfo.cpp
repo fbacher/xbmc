@@ -264,13 +264,13 @@ std::string CPVRGUITimesInfo::GetTimeshiftPlayTime(TIME_FORMAT format) const
 std::string CPVRGUITimesInfo::GetTimeshiftOffset(TIME_FORMAT format) const
 {
   std::unique_lock<CCriticalSection> lock(m_critSection);
-  return StringUtils::SecondsToTimeString(m_iTimeshiftOffset, format);
+  return UnicodeUtils::SecondsToTimeString(m_iTimeshiftOffset, format);
 }
 
 std::string CPVRGUITimesInfo::GetTimeshiftProgressDuration(TIME_FORMAT format) const
 {
   std::unique_lock<CCriticalSection> lock(m_critSection);
-  return StringUtils::SecondsToTimeString(m_iTimeshiftProgressDuration, format);
+  return UnicodeUtils::SecondsToTimeString(m_iTimeshiftProgressDuration, format);
 }
 
 std::string CPVRGUITimesInfo::GetTimeshiftProgressStartTime(TIME_FORMAT format) const
@@ -288,7 +288,7 @@ std::string CPVRGUITimesInfo::GetTimeshiftProgressEndTime(TIME_FORMAT format) co
 std::string CPVRGUITimesInfo::GetEpgEventDuration(const std::shared_ptr<CPVREpgInfoTag>& epgTag, TIME_FORMAT format) const
 {
   std::unique_lock<CCriticalSection> lock(m_critSection);
-  return StringUtils::SecondsToTimeString(GetEpgEventDuration(epgTag), format);
+  return UnicodeUtils::SecondsToTimeString(GetEpgEventDuration(epgTag), format);
 }
 
 std::string CPVRGUITimesInfo::GetEpgEventElapsedTime(const std::shared_ptr<CPVREpgInfoTag>& epgTag, TIME_FORMAT format) const
@@ -300,13 +300,13 @@ std::string CPVRGUITimesInfo::GetEpgEventElapsedTime(const std::shared_ptr<CPVRE
   else
     iElapsed = GetElapsedTime();
 
-  return StringUtils::SecondsToTimeString(iElapsed, format);
+  return UnicodeUtils::SecondsToTimeString(iElapsed, format);
 }
 
 std::string CPVRGUITimesInfo::GetEpgEventRemainingTime(const std::shared_ptr<CPVREpgInfoTag>& epgTag, TIME_FORMAT format) const
 {
   std::unique_lock<CCriticalSection> lock(m_critSection);
-  return StringUtils::SecondsToTimeString(GetRemainingTime(epgTag), format);
+  return UnicodeUtils::SecondsToTimeString(GetRemainingTime(epgTag), format);
 }
 
 std::string CPVRGUITimesInfo::GetEpgEventFinishTime(const std::shared_ptr<CPVREpgInfoTag>& epgTag, TIME_FORMAT format) const
@@ -318,7 +318,7 @@ std::string CPVRGUITimesInfo::GetEpgEventFinishTime(const std::shared_ptr<CPVREp
 
 std::string CPVRGUITimesInfo::GetEpgEventSeekTime(int iSeekSize, TIME_FORMAT format) const
 {
-  return StringUtils::SecondsToTimeString(GetElapsedTime() + iSeekSize, format);
+  return UnicodeUtils::SecondsToTimeString(GetElapsedTime() + iSeekSize, format);
 }
 
 int CPVRGUITimesInfo::GetElapsedTime() const

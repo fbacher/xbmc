@@ -157,21 +157,6 @@ TEST(TestStringUtils, FormatEnumWidth)
   EXPECT_STREQ(one, varstr.c_str());
 }
 
-TEST(TestStringUtils, EqualsNoCase)
-{
-  std::string refstr = "TeSt";
-
-  EXPECT_TRUE(UnicodeUtils::EqualsNoCase(refstr, "TeSt"));
-  EXPECT_TRUE(UnicodeUtils::EqualsNoCase(refstr, "tEsT"));
-}
-
-TEST(TestStringUtils, EqualsNoCase_Normalize)
-{
-  const std::string refstr = TestStringUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5;
-  const std::string varstr = std::string(TestStringUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
-  EXPECT_FALSE(UnicodeUtils::EqualsNoCase(refstr, varstr));
-  EXPECT_TRUE(UnicodeUtils::EqualsNoCase(refstr, varstr, StringOptions::FOLD_CASE_DEFAULT, true));
-}
 
 TEST(TestStringUtils, Replace)
 {
@@ -190,39 +175,6 @@ TEST(TestStringUtils, Replace)
 
   EXPECT_EQ(StringUtils::Replace(varstr, "s", "x"), 0);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
-}
-
-TEST(TestStringUtils, StartsWith)
-{
-  std::string refstr = "test";
-
-  // TODO: Test with FoldCase option
-  EXPECT_FALSE(StringUtils::StartsWithNoCase(refstr, "x"));
-
-  EXPECT_TRUE(StringUtils::StartsWith(refstr, "te"));
-  EXPECT_TRUE(StringUtils::StartsWith(refstr, "test"));
-  EXPECT_FALSE(StringUtils::StartsWith(refstr, "Te"));
-
-  EXPECT_TRUE(StringUtils::StartsWithNoCase(refstr, "Te"));
-  EXPECT_TRUE(StringUtils::StartsWithNoCase(refstr, "TesT"));
-}
-
-TEST(TestStringUtils, EndsWith)
-{
-  std::string refstr = "test";
-  EXPECT_TRUE(StringUtils::EndsWith(refstr, "st"));
-  EXPECT_TRUE(StringUtils::EndsWith(refstr, "test"));
-  EXPECT_FALSE(StringUtils::EndsWith(refstr, "sT"));
-}
-
-TEST(TestStringUtils, EndsWithNoCase)
-{
-  // TODO: Test with FoldCase option
-
-  std::string refstr = "test";
-  EXPECT_FALSE(StringUtils::EndsWithNoCase(refstr, "x"));
-  EXPECT_TRUE(StringUtils::EndsWithNoCase(refstr, "sT"));
-  EXPECT_TRUE(StringUtils::EndsWithNoCase(refstr, "TesT"));
 }
 
 TEST(TestStringUtils, Join)
@@ -249,54 +201,6 @@ TEST(TestStringUtils, FindNumber)
   EXPECT_EQ(1, StringUtils::FindNumber("aabcaadeaa", "b"));
 }
 
-TEST(TestStringUtils, Collate)
-{
-  int32_t ref = 0;
-  int32_t var;
-  EXPECT_TRUE(Unicode::InitializeCollator(getUSEnglishLocale(), false));
-
-  const std::wstring s1 = std::wstring(L"The Farmer's Daughter");
-  const std::wstring s2 = std::wstring(L"Ate Pie");
-  var = StringUtils::Collate(s1, s2);
-  EXPECT_GT(var, ref);
-
-  EXPECT_TRUE(Unicode::InitializeCollator(getTurkicLocale(), true));
-  const std::wstring s3 = std::wstring(
-      Unicode::utf8_to_wstring(TestStringUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5));
-  const std::wstring s4 = std::wstring(
-      Unicode::utf8_to_wstring(TestStringUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1));
-  var = StringUtils::Collate(s3, s4);
-  EXPECT_EQ(var, 0);
-
-  EXPECT_TRUE(Unicode::InitializeCollator(getTurkicLocale(), false));
-  var = StringUtils::Collate(s3, s4); // No (extra) Normalization
-  EXPECT_NE(var, 0);
-}
-TEST(TestStringUtils, AlphaNumericCompare)
-{
-  int64_t ref;
-  int64_t var;
-
-  ref = 0;
-  var = StringUtils::AlphaNumericCompare(L"123abc", L"abc123");
-  EXPECT_LT(var, ref);
-}
-
-TEST(TestStringUtils, TimeStringToSeconds)
-{
-  EXPECT_EQ(77455, StringUtils::TimeStringToSeconds("21:30:55"));
-  EXPECT_EQ(7 * 60, StringUtils::TimeStringToSeconds("7 min"));
-  EXPECT_EQ(7 * 60, StringUtils::TimeStringToSeconds("7 min\t"));
-  EXPECT_EQ(154 * 60, StringUtils::TimeStringToSeconds("   154 min"));
-  EXPECT_EQ(1 * 60 + 1, StringUtils::TimeStringToSeconds("1:01"));
-  EXPECT_EQ(4 * 60 + 3, StringUtils::TimeStringToSeconds("4:03"));
-  EXPECT_EQ(2 * 3600 + 4 * 60 + 3, StringUtils::TimeStringToSeconds("2:04:03"));
-  EXPECT_EQ(2 * 3600 + 4 * 60 + 3, StringUtils::TimeStringToSeconds("   2:4:3"));
-  EXPECT_EQ(2 * 3600 + 4 * 60 + 3, StringUtils::TimeStringToSeconds("  \t\t 02:04:03 \n "));
-  EXPECT_EQ(1 * 3600 + 5 * 60 + 2, StringUtils::TimeStringToSeconds("01:05:02:04:03 \n "));
-  EXPECT_EQ(0, StringUtils::TimeStringToSeconds("blah"));
-  EXPECT_EQ(0, StringUtils::TimeStringToSeconds("ля-ля"));
-}
 
 TEST(TestStringUtils, RemoveCRLF)
 {
@@ -317,16 +221,6 @@ TEST(TestStringUtils, utf8_strlen)
   ref = 9;
   var = StringUtils::utf8_strlen("ｔｅｓｔ＿ＵＴＦ８");
   EXPECT_EQ(ref, var);
-}
-
-TEST(TestStringUtils, SecondsToTimeString)
-{
-  std::string refstr;
-  std::string varstr;
-
-  refstr = "21:30:55";
-  varstr = StringUtils::SecondsToTimeString(77455);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
 
 TEST(TestStringUtils, IsNaturalNumber)
@@ -545,19 +439,6 @@ TEST(TestStringUtils, Tokenize)
   EXPECT_STREQ("should", result[3].data());
   EXPECT_STREQ("not", result[4].data());
   EXPECT_STREQ("die", result[5].data());
-}
-
-TEST(TestStringUtils, sortstringbyname)
-{
-  std::vector<std::string> strarray;
-  strarray.emplace_back("B");
-  strarray.emplace_back("c");
-  strarray.emplace_back("a");
-  std::sort(strarray.begin(), strarray.end(), sortstringbyname());
-
-  EXPECT_STREQ("a", strarray[0].c_str());
-  EXPECT_STREQ("B", strarray[1].c_str());
-  EXPECT_STREQ("c", strarray[2].c_str());
 }
 
 TEST(TestStringUtils, FileSizeFormat)

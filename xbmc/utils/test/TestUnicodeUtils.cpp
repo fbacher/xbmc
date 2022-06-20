@@ -1222,7 +1222,6 @@ TEST(TestUnicodeUtils, AlphaNumericCompare)
   var = UnicodeUtils::AlphaNumericCompare(L"123abc", L"abc123");
   EXPECT_LT(var, ref);
 }
-#ifdef UNICODE_STRING_DISABLE
 TEST(TestUnicodeUtils, TimeStringToSeconds)
 {
   EXPECT_EQ(77455, UnicodeUtils::TimeStringToSeconds("21:30:55"));
@@ -1261,7 +1260,6 @@ TEST(TestUnicodeUtils, utf8_strlen)
   EXPECT_EQ(ref, var);
 }
 
-#ifdef UNICODE_STRING_DISABLE
 TEST(TestUnicodeUtils, SecondsToTimeString)
 {
   std::string refstr;

@@ -167,7 +167,7 @@ static int AlarmClock(const std::vector<std::string>& params)
     if (params[2].find(':') == std::string::npos)
       seconds = static_cast<float>(atoi(params[2].c_str())*60);
     else
-      seconds = (float)StringUtils::TimeStringToSeconds(params[2]);
+      seconds = (float)UnicodeUtils::TimeStringToSeconds(params[2]);
   }
   else
   { // check if shutdown is specified in particular, and get the time for it

@@ -76,7 +76,7 @@ std::string CPlayerGUIInfo::GetCurrentPlayTime(TIME_FORMAT format) const
   if (format == TIME_FORMAT_GUESS && GetTotalPlayTime() >= 3600)
     format = TIME_FORMAT_HH_MM_SS;
 
-  return StringUtils::SecondsToTimeString(std::lrint(GetPlayTime()), format);
+  return UnicodeUtils::SecondsToTimeString(std::lrint(GetPlayTime()), format);
 }
 
 std::string CPlayerGUIInfo::GetCurrentPlayTimeRemaining(TIME_FORMAT format) const
@@ -86,7 +86,7 @@ std::string CPlayerGUIInfo::GetCurrentPlayTimeRemaining(TIME_FORMAT format) cons
 
   int iTimeRemaining = GetPlayTimeRemaining();
   if (iTimeRemaining)
-    return StringUtils::SecondsToTimeString(iTimeRemaining, format);
+    return UnicodeUtils::SecondsToTimeString(iTimeRemaining, format);
 
   return std::string();
 }
@@ -98,7 +98,7 @@ std::string CPlayerGUIInfo::GetDuration(TIME_FORMAT format) const
   {
     if (format == TIME_FORMAT_GUESS && iTotal >= 3600)
       format = TIME_FORMAT_HH_MM_SS;
-    return StringUtils::SecondsToTimeString(iTotal, format);
+    return UnicodeUtils::SecondsToTimeString(iTotal, format);
   }
   return std::string();
 }
@@ -108,7 +108,7 @@ std::string CPlayerGUIInfo::GetCurrentSeekTime(TIME_FORMAT format) const
   if (format == TIME_FORMAT_GUESS && GetTotalPlayTime() >= 3600)
     format = TIME_FORMAT_HH_MM_SS;
 
-  return StringUtils::SecondsToTimeString(g_application.GetTime() + g_application.GetAppPlayer().GetSeekHandler().GetSeekSize(), format);
+  return UnicodeUtils::SecondsToTimeString(g_application.GetTime() + g_application.GetAppPlayer().GetSeekHandler().GetSeekSize(), format);
 }
 
 std::string CPlayerGUIInfo::GetSeekTime(TIME_FORMAT format) const
@@ -120,7 +120,7 @@ std::string CPlayerGUIInfo::GetSeekTime(TIME_FORMAT format) const
   if (format == TIME_FORMAT_GUESS && iSeekTimeCode >= 3600)
     format = TIME_FORMAT_HH_MM_SS;
 
-  return StringUtils::SecondsToTimeString(iSeekTimeCode, format);
+  return UnicodeUtils::SecondsToTimeString(iSeekTimeCode, format);
 }
 
 void CPlayerGUIInfo::SetShowInfo(bool showinfo)
@@ -158,7 +158,7 @@ bool CPlayerGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
     case PLAYER_SEEKOFFSET:
     {
       int lastSeekOffset = CServiceBroker::GetDataCacheCore().GetSeekOffSet();
-      std::string seekOffset = StringUtils::SecondsToTimeString(
+      std::string seekOffset = UnicodeUtils::SecondsToTimeString(
           std::abs(lastSeekOffset / 1000), static_cast<TIME_FORMAT>(info.GetData1()));
       if (lastSeekOffset < 0)
         value = "-" + seekOffset;
@@ -256,7 +256,7 @@ bool CPlayerGUIInfo::GetLabel(std::string& value, const CFileItem *item, int con
     case PLAYER_SEEKSTEPSIZE:
     {
       int seekSize = g_application.GetAppPlayer().GetSeekHandler().GetSeekSize();
-      std::string strSeekSize = StringUtils::SecondsToTimeString(abs(seekSize), static_cast<TIME_FORMAT>(info.GetData1()));
+      std::string strSeekSize = UnicodeUtils::SecondsToTimeString(abs(seekSize), static_cast<TIME_FORMAT>(info.GetData1()));
       if (seekSize < 0)
         value = "-" + strSeekSize;
       if (seekSize > 0)

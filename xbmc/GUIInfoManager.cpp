@@ -10104,11 +10104,11 @@ int CGUIInfoManager::TranslateSingleString(const std::string &strCondition, bool
         {
           TIME_FORMAT timeFormat = TranslateTimeFormat(prop.param(0));
           if (timeFormat == TIME_FORMAT_GUESS)
-            return AddMultiInfo(CGUIInfo(SYSTEM_TIME, StringUtils::TimeStringToSeconds(prop.param(0))));
+            return AddMultiInfo(CGUIInfo(SYSTEM_TIME, UnicodeUtils::TimeStringToSeconds(prop.param(0))));
           return AddMultiInfo(CGUIInfo(SYSTEM_TIME, timeFormat));
         }
         else
-          return AddMultiInfo(CGUIInfo(SYSTEM_TIME, StringUtils::TimeStringToSeconds(prop.param(0)), StringUtils::TimeStringToSeconds(prop.param(1))));
+          return AddMultiInfo(CGUIInfo(SYSTEM_TIME, UnicodeUtils::TimeStringToSeconds(prop.param(0)), UnicodeUtils::TimeStringToSeconds(prop.param(1))));
       }
     }
     else if (cat.name == "library")
@@ -10841,7 +10841,7 @@ bool CGUIInfoManager::GetMultiInfoBool(const CGUIInfo &info, int contextWindow, 
               // Handle the case when a value contains time separator (:). This makes Integer.IsGreater
               // useful for Player.Time* members without adding a separate set of members returning time in seconds
               if (value.find_first_of(':') != value.npos)
-                intValue = StringUtils::TimeStringToSeconds(value);
+                intValue = UnicodeUtils::TimeStringToSeconds(value);
               else
                 std::from_chars(value.data(), value.data() + value.size(), intValue);
             }

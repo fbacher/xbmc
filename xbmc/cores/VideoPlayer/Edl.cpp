@@ -159,7 +159,7 @@ bool CEdl::ReadEdl(const std::string& strMovie, const float fFramesPerSecond)
         std::vector<std::string> fieldParts = UnicodeUtils::Split(strFields[i], '.');
         if (fieldParts.size() == 1) // No ms
         {
-          editStartEnd[i] = StringUtils::TimeStringToSeconds(fieldParts[0]) *
+          editStartEnd[i] = UnicodeUtils::TimeStringToSeconds(fieldParts[0]) *
                             static_cast<int64_t>(1000); // seconds to ms
         }
         else if (fieldParts.size() == 2) // Has ms. Everything after the dot (.) is ms
@@ -180,7 +180,7 @@ bool CEdl::ReadEdl(const std::string& strMovie, const float fFramesPerSecond)
             fieldParts[1] = fieldParts[1].substr(0, 3);
           }
           editStartEnd[i] =
-              static_cast<int64_t>(StringUtils::TimeStringToSeconds(fieldParts[0])) * 1000 +
+              static_cast<int64_t>(UnicodeUtils::TimeStringToSeconds(fieldParts[0])) * 1000 +
               std::atoi(fieldParts[1].c_str()); // seconds to ms
         }
         else
@@ -930,7 +930,7 @@ bool CEdl::GetNextSceneMarker(bool bPlus, const int iClock, int *iSceneMarker)
 
 std::string CEdl::MillisecondsToTimeString(const int iMilliseconds)
 {
-  std::string strTimeString = StringUtils::SecondsToTimeString((long)(iMilliseconds / 1000), TIME_FORMAT_HH_MM_SS); // milliseconds to seconds
+  std::string strTimeString = UnicodeUtils::SecondsToTimeString((long)(iMilliseconds / 1000), TIME_FORMAT_HH_MM_SS); // milliseconds to seconds
   strTimeString += StringUtils::Format(".{:03}", iMilliseconds % 1000);
   return strTimeString;
 }

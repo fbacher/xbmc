@@ -1229,6 +1229,8 @@ public:
      */
   static int AlphaNumericCollation(int nKey1, const void* pKey1, int nKey2, const void* pKey2);
 
+#if defined(UNICODE_STRING_DISABLE)
+
   /*! \brief converts timeString (hh:mm:ss or nnn min) to seconds.
    *
    * timeString is expected to be of the form:
@@ -1241,6 +1243,7 @@ public:
    * \return parsed value in seconds
    */
   static long TimeStringToSeconds(const std::string &timeString);
+#endif
 
   /*! \brief Strip any trailing \n or \r characters.
    *
@@ -1254,6 +1257,8 @@ public:
    */
   static size_t utf8_strlen(const char *s);
 
+#if defined(UNICODE_STRING_DISABLE)
+
   /*! \brief convert a time in seconds to a string based on the given time format
    \param seconds time in seconds
    \param format the format we want the time in.
@@ -1261,6 +1266,7 @@ public:
    \sa TIME_FORMAT
    */
   static std::string SecondsToTimeString(long seconds, TIME_FORMAT format = TIME_FORMAT_GUESS);
+#endif
 
   /*! \brief check whether a string is a natural number.
    Matches [ \t]*[0-9]+[ \t]*

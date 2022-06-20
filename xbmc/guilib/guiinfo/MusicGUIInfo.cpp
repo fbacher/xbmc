@@ -255,7 +255,7 @@ bool CMusicGUIInfo::GetLabel(std::string& value, const CFileItem *item, int cont
         int iDuration = tag->GetDuration();
         if (iDuration > 0)
         {
-          value = StringUtils::SecondsToTimeString(iDuration,
+          value = UnicodeUtils::SecondsToTimeString(iDuration,
                                                    static_cast<TIME_FORMAT>(info.m_info == LISTITEM_DURATION
                                                                             ? info.GetData4()
                                                                             : info.GetData1()));

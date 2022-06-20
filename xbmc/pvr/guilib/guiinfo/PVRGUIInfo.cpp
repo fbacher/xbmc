@@ -373,7 +373,7 @@ bool CPVRGUIInfo::GetListItemAndPlayerLabel(const CFileItem* item, const CGUIInf
       case LISTITEM_DURATION:
         if (timer->GetDuration() > 0)
         {
-          strValue = StringUtils::SecondsToTimeString(timer->GetDuration(), static_cast<TIME_FORMAT>(info.GetData4()));
+          strValue = UnicodeUtils::SecondsToTimeString(timer->GetDuration(), static_cast<TIME_FORMAT>(info.GetData4()));
           return true;
         }
         return false;
@@ -645,7 +645,7 @@ bool CPVRGUIInfo::GetListItemAndPlayerLabel(const CFileItem* item, const CGUIInf
       case LISTITEM_NEXT_DURATION:
         if (epgTag->GetDuration() > 0)
         {
-          strValue = StringUtils::SecondsToTimeString(epgTag->GetDuration(), static_cast<TIME_FORMAT>(info.GetData4()));
+          strValue = UnicodeUtils::SecondsToTimeString(epgTag->GetDuration(), static_cast<TIME_FORMAT>(info.GetData4()));
           return true;
         }
         return false;
