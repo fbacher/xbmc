@@ -129,7 +129,7 @@ static int PlayerControl(const std::vector<std::string>& params)
   {
     g_application.StopPlaying();
   }
-  else if (StringUtils::StartsWithNoCase(params[0], "frameadvance"))
+  else if (UnicodeUtils::StartsWithNoCase(params[0], "frameadvance"))
   {
     std::string strFrames;
     if (params[0].size() == 12)
@@ -183,7 +183,7 @@ static int PlayerControl(const std::vector<std::string>& params)
       g_application.GetAppPlayer().SetTempo(playTempo);
     }
   }
-  else if (StringUtils::StartsWithNoCase(params[0], "tempo"))
+  else if (UnicodeUtils::StartsWithNoCase(params[0], "tempo"))
   {
     if (params[0].size() == 5)
       CLog::Log(LOGERROR, "PlayerControl(tempo(n)) called with no argument");
@@ -231,7 +231,7 @@ static int PlayerControl(const std::vector<std::string>& params)
     if (g_application.GetAppPlayer().IsPlaying())
       g_application.GetAppPlayer().Seek(true, false);
   }
-  else if (StringUtils::StartsWithNoCase(params[0], "seekpercentage"))
+  else if (UnicodeUtils::StartsWithNoCase(params[0], "seekpercentage"))
   {
     std::string offset;
     if (params[0].size() == 14)
@@ -257,16 +257,16 @@ static int PlayerControl(const std::vector<std::string>& params)
     if( g_application.GetAppPlayer().IsPlaying() )
       g_application.GetAppPlayer().OnAction(CAction(ACTION_SHOW_VIDEOMENU));
   }
-  else if (StringUtils::StartsWithNoCase(params[0], "partymode"))
+  else if (UnicodeUtils::StartsWithNoCase(params[0], "partymode"))
   {
     std::string strXspPath;
     //empty param=music, "music"=music, "video"=video, else xsp path
     PartyModeContext context = PARTYMODECONTEXT_MUSIC;
     if (params[0].size() > 9)
     {
-      if (params[0].size() == 16 && StringUtils::EndsWithNoCase(params[0], "video)"))
+      if (params[0].size() == 16 && UnicodeUtils::EndsWithNoCase(params[0], "video)"))
         context = PARTYMODECONTEXT_VIDEO;
-      else if (params[0].size() != 16 || !StringUtils::EndsWithNoCase(params[0], "music)"))
+      else if (params[0].size() != 16 || !UnicodeUtils::EndsWithNoCase(params[0], "music)"))
       {
         strXspPath = params[0].substr(10);
         strXspPath = UnicodeUtils::TrimRight(strXspPath, ")");
@@ -310,7 +310,7 @@ static int PlayerControl(const std::vector<std::string>& params)
     CGUIMessage msg(GUI_MSG_PLAYLISTPLAYER_RANDOM, 0, 0, iPlaylist, CServiceBroker::GetPlaylistPlayer().IsShuffled(iPlaylist));
     CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
   }
-  else if (StringUtils::StartsWithNoCase(params[0], "repeat"))
+  else if (UnicodeUtils::StartsWithNoCase(params[0], "repeat"))
   {
     // get current playlist
     int iPlaylist = CServiceBroker::GetPlaylistPlayer().GetCurrentPlaylist();
@@ -355,7 +355,7 @@ static int PlayerControl(const std::vector<std::string>& params)
     CGUIMessage msg(GUI_MSG_PLAYLISTPLAYER_REPEAT, 0, 0, iPlaylist, (int)state);
     CServiceBroker::GetGUI()->GetWindowManager().SendThreadMessage(msg);
   }
-  else if (StringUtils::StartsWithNoCase(params[0], "resumelivetv"))
+  else if (UnicodeUtils::StartsWithNoCase(params[0], "resumelivetv"))
   {
     CFileItem& fileItem(g_application.CurrentFileItem());
     std::shared_ptr<PVR::CPVRChannel> channel = fileItem.HasPVRRecordingInfoTag() ? fileItem.GetPVRRecordingInfoTag()->Channel() : std::shared_ptr<PVR::CPVRChannel>();
@@ -449,7 +449,7 @@ static int PlayMedia(const std::vector<std::string>& params)
       // force the item to start at the beginning (m_lStartOffset is initialized to 0)
       askToResume = false;
     }
-    else if (StringUtils::StartsWithNoCase(params[i], "playoffset=")) {
+    else if (UnicodeUtils::StartsWithNoCase(params[i], "playoffset=")) {
       playOffset = atoi(params[i].substr(11).c_str()) - 1;
       item.SetProperty("playlist_starting_track", playOffset);
     }

@@ -111,7 +111,7 @@ TYPE ScraperTypeFromContent(const CONTENT_TYPE &content)
 // if the XML root is <error>, throw CScraperError with enclosed <title>/<message> values
 static void CheckScraperError(const TiXmlElement *pxeRoot)
 {
-  if (!pxeRoot || StringUtils::CompareNoCase(pxeRoot->Value(), "error"))
+  if (!pxeRoot || UnicodeUtils::CompareNoCase(pxeRoot->Value(), "error"))
     return;
   std::string sTitle;
   std::string sMessage;

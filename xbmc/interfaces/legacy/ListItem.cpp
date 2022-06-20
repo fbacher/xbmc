@@ -374,7 +374,7 @@ namespace XBMCAddon
       XBMCAddonUtils::GuiLock lock(languageHook, m_offscreen);
 
       bool hasDeprecatedInfoLabel = false;
-      if (StringUtils::CompareNoCase(type, "video") == 0)
+      if (UnicodeUtils::CompareNoCase(type, "video") == 0)
       {
         using InfoTagVideo = xbmc::InfoTagVideo;
         auto videotag = GetVideoInfoTag();
@@ -542,7 +542,7 @@ namespace XBMCAddon
             "removed in future Kodi versions. Please use the respective setter in InfoTagVideo.");
         }
       }
-      else if (StringUtils::CompareNoCase(type, "music") == 0)
+      else if (UnicodeUtils::CompareNoCase(type, "music") == 0)
       {
         String mediaType;
         int dbId = -1;
@@ -632,7 +632,7 @@ namespace XBMCAddon
               "removed in future Kodi versions. Please use the respective setter in InfoTagMusic.");
         }
       }
-      else if (StringUtils::CompareNoCase(type, "pictures") == 0)
+      else if (UnicodeUtils::CompareNoCase(type, "pictures") == 0)
       {
         for (const auto& it : infoLabels)
         {
@@ -655,7 +655,7 @@ namespace XBMCAddon
             hasDeprecatedInfoLabel = true;
 
             String exifkey = key;
-            if (!StringUtils::StartsWithNoCase(exifkey, "exif:") || exifkey.length() < 6)
+            if (!UnicodeUtils::StartsWithNoCase(exifkey, "exif:") || exifkey.length() < 6)
             {
               CLog::Log(LOGWARNING, "ListItem.setInfo: unknown pictures info key \"{}\"", key);
               continue;
@@ -808,7 +808,7 @@ namespace XBMCAddon
       XBMCAddonUtils::GuiLock lock(languageHook, m_offscreen);
 
       auto infoTag = GetVideoInfoTag();
-      if (StringUtils::CompareNoCase(cType, "video") == 0)
+      if (UnicodeUtils::CompareNoCase(cType, "video") == 0)
       {
         CStreamDetailVideo* video = new CStreamDetailVideo;
         for (const auto& it : dictionary)
@@ -833,7 +833,7 @@ namespace XBMCAddon
         }
         xbmc::InfoTagVideo::addStreamRaw(infoTag, video);
       }
-      else if (StringUtils::CompareNoCase(cType, "audio") == 0)
+      else if (UnicodeUtils::CompareNoCase(cType, "audio") == 0)
       {
         CStreamDetailAudio* audio = new CStreamDetailAudio;
         for (const auto& it : dictionary)
@@ -850,7 +850,7 @@ namespace XBMCAddon
         }
         xbmc::InfoTagVideo::addStreamRaw(infoTag, audio);
       }
-      else if (StringUtils::CompareNoCase(cType, "subtitle") == 0)
+      else if (UnicodeUtils::CompareNoCase(cType, "subtitle") == 0)
       {
         CStreamDetailSubtitle* subtitle = new CStreamDetailSubtitle;
         for (const auto& it : dictionary)

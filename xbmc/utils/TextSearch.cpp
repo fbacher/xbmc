@@ -74,7 +74,7 @@ void CTextSearch::GetAndCutNextTerm(std::string &strSearchTerm, std::string &str
 {
   std::string strFindNext(" ");
 
-  if (StringUtils::EndsWith(strSearchTerm, "\""))
+  if (UnicodeUtils::EndsWith(strSearchTerm, "\""))
   {
     strSearchTerm.erase(0, 1);
     strFindNext = "\"";
@@ -108,19 +108,19 @@ void CTextSearch::ExtractSearchTerms(const std::string &strSearchTerm, TextSearc
   {
     strParsedSearchTerm = UnicodeUtils::TrimLeft(strParsedSearchTerm);
 
-    if (StringUtils::StartsWith(strParsedSearchTerm, "!") || StringUtils::StartsWithNoCase(strParsedSearchTerm, "not"))
+    if (UnicodeUtils::StartsWith(strParsedSearchTerm, "!") || UnicodeUtils::StartsWithNoCase(strParsedSearchTerm, "not"))
     {
       std::string strDummy;
       GetAndCutNextTerm(strParsedSearchTerm, strDummy);
       bNextNOT = true;
     }
-    else if (StringUtils::StartsWith(strParsedSearchTerm, "+") || StringUtils::StartsWithNoCase(strParsedSearchTerm, "and"))
+    else if (UnicodeUtils::StartsWith(strParsedSearchTerm, "+") || UnicodeUtils::StartsWithNoCase(strParsedSearchTerm, "and"))
     {
       std::string strDummy;
       GetAndCutNextTerm(strParsedSearchTerm, strDummy);
       bNextAND = true;
     }
-    else if (StringUtils::StartsWith(strParsedSearchTerm, "|") || StringUtils::StartsWithNoCase(strParsedSearchTerm, "or"))
+    else if (UnicodeUtils::StartsWith(strParsedSearchTerm, "|") || UnicodeUtils::StartsWithNoCase(strParsedSearchTerm, "or"))
     {
       std::string strDummy;
       GetAndCutNextTerm(strParsedSearchTerm, strDummy);

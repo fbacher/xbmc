@@ -159,6 +159,8 @@ std::wstring StringUtils::FormatV(const wchar_t *fmt, va_list args) {
 	return L"";
 }
 
+#if defined(UNICODE_STRING_DISABLE)
+
 int StringUtils::Compare(const std::wstring &str1, const std::wstring &str2) {
 
 	int32_t str1_length = str1.length();
@@ -240,6 +242,7 @@ int StringUtils::CompareNoCase(const char *s1, const char *s2,
 	std::string str2 = std::string(s2);
 	return StringUtils::CompareNoCase(str1, str2, n, opt, normalize);
 }
+#endif
 
 int StringUtils::ReturnDigits(const std::string &str)
 {
@@ -400,6 +403,8 @@ int StringUtils::Replace(std::wstring &str, const std::wstring &oldStr,
 	str.swap(result_w);
 	return changes;
 }
+#if defined(UNICODE_STRING_DISABLE)
+
 
 bool StringUtils::StartsWith(const std::string &str1, const std::string &str2) {
 	return Unicode::StartsWith(str1, str2);
@@ -435,6 +440,7 @@ bool StringUtils::StartsWithNoCase(const char *s1, const char *s2, StringOptions
 	return StartsWithNoCase(std::string(s1), std::string(s2), opt);
 }
 
+
 bool StringUtils::EndsWith(const std::string &str1, const std::string &str2) {
 	const bool result = Unicode::EndsWith(str1, str2);
 	return result;
@@ -454,6 +460,7 @@ bool StringUtils::EndsWithNoCase(const std::string &str1, const char *s2, String
 	std::string str2 = std::string(s2);
 	return EndsWithNoCase(str1, str2, opt);
 }
+#endif
 
 // returns the number of occurrences of strFind in strInput.
 int StringUtils::FindNumber(const std::string &strInput,
@@ -704,6 +711,8 @@ static const uint16_t* const planemap[256] = {
 };
 // clang-format on
 
+#if defined(UNICODE_STRING_DISABLE)
+
 bool StringUtils::InitializeCollator(bool normalize /* = false */)
 {
   return Unicode::InitializeCollator(Unicode::getDefaultICULocale(), normalize);
@@ -723,6 +732,7 @@ int32_t StringUtils::Collate(const std::wstring &left, const std::wstring &right
 {
 	return Unicode::Collate(left, right);
 }
+#endif
 
 static wchar_t GetCollationWeight(const wchar_t &r) {
 	// Lookup the "weight" of a UTF8 char, equivalent lowercase ascii letter, in the plane map,
@@ -736,6 +746,8 @@ static wchar_t GetCollationWeight(const wchar_t &r) {
 		return r;
 	return static_cast<wchar_t>(plane[r & 0xFF]);
 }
+
+#if defined(UNICODE_STRING_DISABLE)
 
 // Not sure what the real goal is here. I think it is just to see if the
 // strings are the same after case folding. (Normalizing might be a good
@@ -757,6 +769,7 @@ int64_t StringUtils::AlphaNumericCompare(const wchar_t *left, const wchar_t *rig
 #endif
 	return result;
 }
+#endif
 
 // Not sure what the real goal is here. I think it is just to see if the
 // strings are the same after case folding. (Normalizing might be a good

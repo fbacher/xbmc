@@ -33,7 +33,7 @@ bool CEventsDirectory::GetDirectory(const CURL& url, CFileItemList &items)
     bool includeHigherLevels = false;
     // check if we should only retrieve events from a specific level or
     // also from all higher levels
-    if (StringUtils::EndsWith(hostname, "+"))
+    if (UnicodeUtils::EndsWith(hostname, "+"))
     {
       includeHigherLevels = true;
 

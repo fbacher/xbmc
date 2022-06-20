@@ -461,7 +461,7 @@ void CAirTunesServer::SetupRemoteControl()
 #define DACP_NAME_PREFIX "iTunes_Ctrl_"
       // name has the form "iTunes_Ctrl_56B29BB6CB904862"
       // were we are interested in the 56B29BB6CB904862 identifier
-      if (StringUtils::StartsWithNoCase(service.GetName(), DACP_NAME_PREFIX))
+      if (UnicodeUtils::StartsWithNoCase(service.GetName(), DACP_NAME_PREFIX))
       {
         std::vector<std::string> tokens = UnicodeUtils::Split(service.GetName(), DACP_NAME_PREFIX);
         // if we found the service matching the given identifier

@@ -499,7 +499,7 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
   }
 
   TiXmlElement *pRootElement = advancedXML.RootElement();
-  if (!pRootElement || StringUtils::CompareNoCase(pRootElement->Value(), "advancedsettings") != 0)
+  if (!pRootElement || UnicodeUtils::CompareNoCase(pRootElement->Value(), "advancedsettings") != 0)
   {
     CLog::Log(LOGERROR, "Error loading {}, no <advancedsettings> node", file);
     return;
@@ -910,7 +910,7 @@ void CAdvancedSettings::ParseSettingsFile(const std::string &file)
     // as altering it will do nothing - we don't write to advancedsettings.xml
     XMLUtils::GetInt(pRootElement, "loglevel", m_logLevelHint, LOG_LEVEL_NONE, LOG_LEVEL_MAX);
     const char* hide = pElement->Attribute("hide");
-    if (hide == NULL || ! StringUtils::StartsWithNoCase(hide, "false"))
+    if (hide == NULL || ! UnicodeUtils::StartsWithNoCase(hide, "false"))
     {
       SettingPtr setting = CServiceBroker::GetSettingsComponent()->GetSettings()->GetSetting(CSettings::SETTING_DEBUG_SHOWLOGINFO);
       if (setting != NULL)
@@ -1296,16 +1296,16 @@ void CAdvancedSettings::GetCustomTVRegexps(TiXmlElement *pRootElement, SETTINGS_
     int iAction = 0; // overwrite
     // for backward compatibility
     const char* szAppend = pElement->Attribute("append");
-    if ((szAppend && StringUtils::CompareNoCase(szAppend, "yes") == 0))
+    if ((szAppend && UnicodeUtils::CompareNoCase(szAppend, "yes") == 0))
       iAction = 1;
     // action takes precedence if both attributes exist
     const char* szAction = pElement->Attribute("action");
     if (szAction)
     {
       iAction = 0; // overwrite
-      if (StringUtils::CompareNoCase(szAction, "append") == 0)
+      if (UnicodeUtils::CompareNoCase(szAction, "append") == 0)
         iAction = 1; // append
-      else if (StringUtils::CompareNoCase(szAction, "prepend") == 0)
+      else if (UnicodeUtils::CompareNoCase(szAction, "prepend") == 0)
         iAction = 2; // prepend
     }
     if (iAction == 0)
@@ -1360,16 +1360,16 @@ void CAdvancedSettings::GetCustomRegexps(TiXmlElement *pRootElement, std::vector
     int iAction = 0; // overwrite
     // for backward compatibility
     const char* szAppend = pElement->Attribute("append");
-    if ((szAppend && StringUtils::CompareNoCase(szAppend, "yes") == 0))
+    if ((szAppend && UnicodeUtils::CompareNoCase(szAppend, "yes") == 0))
       iAction = 1;
     // action takes precedence if both attributes exist
     const char* szAction = pElement->Attribute("action");
     if (szAction)
     {
       iAction = 0; // overwrite
-      if (StringUtils::CompareNoCase(szAction, "append") == 0)
+      if (UnicodeUtils::CompareNoCase(szAction, "append") == 0)
         iAction = 1; // append
-      else if (StringUtils::CompareNoCase(szAction, "prepend") == 0)
+      else if (UnicodeUtils::CompareNoCase(szAction, "prepend") == 0)
         iAction = 2; // prepend
     }
     if (iAction == 0)

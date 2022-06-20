@@ -559,8 +559,8 @@ bool CGUIPassword::IsDatabasePathUnlocked(const std::string& strPath, VECSOURCES
 bool CGUIPassword::IsMediaPathUnlocked(const std::shared_ptr<CProfileManager>& profileManager,
                                        const std::string& strType) const
 {
-  if (!StringUtils::StartsWithNoCase(m_strMediaSourcePath, "root") &&
-      !StringUtils::StartsWithNoCase(m_strMediaSourcePath, "library://"))
+  if (!UnicodeUtils::StartsWithNoCase(m_strMediaSourcePath, "root") &&
+      !UnicodeUtils::StartsWithNoCase(m_strMediaSourcePath, "library://"))
   {
     if (!g_passwordManager.bMasterUser &&
         profileManager->GetMasterProfile().getLockMode() != LOCK_MODE_EVERYONE)

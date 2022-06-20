@@ -10811,9 +10811,9 @@ bool CGUIInfoManager::GetMultiInfoBool(const CGUIInfo &info, int contextWindow, 
             label = UnicodeUtils::FoldCase(GetImage(info.GetData1(), contextWindow));
 
           if (condition == STRING_STARTS_WITH)
-            bReturn = StringUtils::StartsWith(label, compare);
+            bReturn = UnicodeUtils::StartsWith(label, compare);
           else if (condition == STRING_ENDS_WITH)
-            bReturn = StringUtils::EndsWith(label, compare);
+            bReturn = UnicodeUtils::EndsWith(label, compare);
           else if (condition == STRING_CONTAINS)
             bReturn = label.find(compare) != std::string::npos;
           else

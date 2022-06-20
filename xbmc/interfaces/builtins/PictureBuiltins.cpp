@@ -65,7 +65,7 @@ static int Slideshow(const std::vector<std::string>& params)
         flags |= 4;
       else if (UnicodeUtils::EqualsNoCase(params[i], "pause"))
         flags |= 8;
-      else if (StringUtils::StartsWithNoCase(params[i], "beginslide="))
+      else if (UnicodeUtils::StartsWithNoCase(params[i], "beginslide="))
         beginSlidePath = params[i].substr(11);
     }
   }

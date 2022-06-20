@@ -328,7 +328,7 @@ bool CPVRChannel::SetArchive(bool bHasArchive)
 
 bool CPVRChannel::SetIconPath(const std::string& strIconPath, bool bIsUserSetIcon /* = false */)
 {
-  if (StringUtils::StartsWith(strIconPath, "image://"))
+  if (UnicodeUtils::StartsWith(strIconPath, "image://"))
   {
     CLog::LogF(LOGERROR, "Not allowed to call this method with an image URL");
     return false;

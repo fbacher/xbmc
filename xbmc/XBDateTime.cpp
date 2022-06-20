@@ -707,7 +707,7 @@ bool CDateTime::SetFromDateString(const std::string &date)
   size_t iPos2 = date.find(',');
   std::string strDay = (date.size() >= iPos) ? date.substr(iPos, iPos2-iPos) : "";
   std::string strYear = date.substr(date.find(' ', iPos2) + 1);
-  while (months[j] && StringUtils::CompareNoCase(strMonth, months[j]) != 0)
+  while (months[j] && UnicodeUtils::CompareNoCase(strMonth, months[j]) != 0)
     j++;
   if (!months[j])
     return false;
@@ -994,7 +994,7 @@ bool CDateTime::SetFromW3CDateTime(const std::string &dateTime, bool ignoreTimez
   if (!ignoreTimezone && !zone.empty())
   {
     // check if the timezone is UTC
-    if (StringUtils::StartsWith(zone, "Z"))
+    if (UnicodeUtils::StartsWith(zone, "Z"))
       return SetFromUTCDateTime(tmpDateTime);
     else
     {
@@ -1002,9 +1002,9 @@ bool CDateTime::SetFromW3CDateTime(const std::string &dateTime, bool ignoreTimez
       CDateTimeSpan zoneSpan; zoneSpan.SetFromTimeString(zone.substr(1));
       if (zoneSpan.GetSecondsTotal() != 0)
       {
-        if (StringUtils::StartsWith(zone, "+"))
+        if (UnicodeUtils::StartsWith(zone, "+"))
           tmpDateTime -= zoneSpan;
-        else if (StringUtils::StartsWith(zone, "-"))
+        else if (UnicodeUtils::StartsWith(zone, "-"))
           tmpDateTime += zoneSpan;
       }
     }

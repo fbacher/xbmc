@@ -758,75 +758,6 @@ public:
   static int Compare(const std::string &str1, const std::string &str2);
 
   /*!
-   * \brief Initializes the Collator for this thread, such as before sorting a
-   * table.
-   *
-   * Assumes that all collation will occur in this thread.
-   *
-   * \param icuLocale Collation order will be based on the given locale.
-   * \param normalize Controls whether normalization is performed prior to collation.
-   *                  Frequently not required. Some free normalization always occurs.
-   * \return true of initialization was successful, otherwise false.
-   */
-  static bool InitializeCollator(const icu::Locale &icuLocale, bool normalize /* = false */);
-
-  /*!
-   * \brief Initializes the Collator for this thread, such as before sorting a
-   * table.
-   *
-   * Assumes that all collation will occur in this thread.
-   *
-   * \param locale Collation order will be based on the given locale.
-   * \param normalize Controls whether normalization is performed prior to collation.
-   *                  Frequently not required. Some free normalization always occurs.
-   * \return true of initialization was successful, otherwise false.
-   */
-  static bool InitializeCollator(const std::locale &locale, bool normalize /* = false */);
-
-  /*!
-   * \brief Initializes the Collator for this thread using LangInfo::GetSystemLocale,
-   * such as before sorting a table.
-   *
-   * Assumes that all collation will occur in this thread.
-   *
-   * \param normalize Controls whether normalization is performed prior to collation.
-   *                  Frequently not required. Some free normalization always occurs.
-   * \return true of initialization was successful, otherwise false.
-   */
-  static bool InitializeCollator(bool normalize = false);
-
-  /*!
-   * \brief Performs locale sensitive string comparison.
-   *
-   * Must be run in the same thread that InitializeCollator that configured the Collator
-   * for this was run.
-   *
-   * \param left string to compare
-   * \param right string to compare
-   * \return  < 0 if left collates < right
-   *         == 0 if left collates the same as right
-   *          > 0 if left collates > right
-   */
-  static int32_t Collate(const std::wstring &left, const std::wstring &right);
-
-  /*!
-   * \brief Performs locale sensitive wstring comparison.
-   *
-   * Must be run in the same thread that InitializeCollator that configured the Collator
-   * for this was run.
-   *
-   * \param left string to compare
-   * \param right string to compare
-   * \return  < 0 if left collates < right
-   *         == 0 if left collates the same as right
-   *          > 0 if left collates > right
-   */
-  static int32_t Collate(const wchar_t *left, const wchar_t *right)
-  {
-    return UnicodeUtils::Collate(std::wstring(left), std::wstring(right));
-  }
-
-  /*!
    * \brief Performs a bit-wise comparison of two wstrings, after case folding each.
    *
    * Logically equivalent to Compare(FoldCase(str1, opt)), FoldCase(str2, opt))
@@ -976,6 +907,75 @@ public:
   [[deprecated("StartsWith/EndsWith may be better choices. Multibyte characters, case folding and byte lengths don't mix.") ]] static int CompareNoCase(
       const char *s1, const char *s2, size_t n,
       StringOptions opt = StringOptions::FOLD_CASE_DEFAULT, const bool normalize = false);
+
+  /*!
+   * \brief Initializes the Collator for this thread, such as before sorting a
+   * table.
+   *
+   * Assumes that all collation will occur in this thread.
+   *
+   * \param icuLocale Collation order will be based on the given locale.
+   * \param normalize Controls whether normalization is performed prior to collation.
+   *                  Frequently not required. Some free normalization always occurs.
+   * \return true of initialization was successful, otherwise false.
+   */
+  static bool InitializeCollator(const icu::Locale &icuLocale, bool normalize /* = false */);
+
+  /*!
+   * \brief Initializes the Collator for this thread, such as before sorting a
+   * table.
+   *
+   * Assumes that all collation will occur in this thread.
+   *
+   * \param locale Collation order will be based on the given locale.
+   * \param normalize Controls whether normalization is performed prior to collation.
+   *                  Frequently not required. Some free normalization always occurs.
+   * \return true of initialization was successful, otherwise false.
+   */
+  static bool InitializeCollator(const std::locale &locale, bool normalize /* = false */);
+
+  /*!
+   * \brief Initializes the Collator for this thread using LangInfo::GetSystemLocale,
+   * such as before sorting a table.
+   *
+   * Assumes that all collation will occur in this thread.
+   *
+   * \param normalize Controls whether normalization is performed prior to collation.
+   *                  Frequently not required. Some free normalization always occurs.
+   * \return true of initialization was successful, otherwise false.
+   */
+  static bool InitializeCollator(bool normalize = false);
+
+  /*!
+   * \brief Performs locale sensitive string comparison.
+   *
+   * Must be run in the same thread that InitializeCollator that configured the Collator
+   * for this was run.
+   *
+   * \param left string to compare
+   * \param right string to compare
+   * \return  < 0 if left collates < right
+   *         == 0 if left collates the same as right
+   *          > 0 if left collates > right
+   */
+  static int32_t Collate(const std::wstring &left, const std::wstring &right);
+
+  /*!
+   * \brief Performs locale sensitive wstring comparison.
+   *
+   * Must be run in the same thread that InitializeCollator that configured the Collator
+   * for this was run.
+   *
+   * \param left string to compare
+   * \param right string to compare
+   * \return  < 0 if left collates < right
+   *         == 0 if left collates the same as right
+   *          > 0 if left collates > right
+   */
+  static int32_t Collate(const wchar_t *left, const wchar_t *right)
+  {
+    return UnicodeUtils::Collate(std::wstring(left), std::wstring(right));
+  }
 
   // TODO: consider renaming to ParseInt
 
@@ -1755,8 +1755,6 @@ private:
 
 };
 
-#if defined(UNICODE_STRING_DISABLE)
-
 struct sortstringbyname
 {
   bool operator()(const std::string& strItem1, const std::string& strItem2) const
@@ -1764,4 +1762,3 @@ struct sortstringbyname
     return UnicodeUtils::CompareNoCase(strItem1, strItem2) < 0;
   }
 };
-#endif

@@ -115,7 +115,7 @@ void CScriptInvocationManager::RegisterLanguageInvocationHandler(ILanguageInvoca
     return;
 
   std::string ext = UnicodeUtils::FoldCase(extension);
-  if (!StringUtils::StartsWithNoCase(ext, "."))
+  if (!UnicodeUtils::StartsWithNoCase(ext, "."))
     ext = "." + ext;
 
   std::unique_lock<CCriticalSection> lock(m_critSection);

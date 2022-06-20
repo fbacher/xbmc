@@ -252,7 +252,7 @@ void CGUIDialogVideoInfo::OnInitWindow()
   const std::shared_ptr<CProfileManager> profileManager = CServiceBroker::GetSettingsComponent()->GetProfileManager();
 
   const std::string uniqueId = m_movieItem->GetProperty("xxuniqueid").asString();
-  if (uniqueId.empty() || !StringUtils::StartsWithNoCase(uniqueId.c_str(), "xx"))
+  if (uniqueId.empty() || !UnicodeUtils::StartsWithNoCase(uniqueId.c_str(), "xx"))
     CONTROL_ENABLE_ON_CONDITION(CONTROL_BTN_REFRESH,
         (profileManager->GetCurrentProfile().canWriteDatabases() ||
         g_passwordManager.bMasterUser));
@@ -260,7 +260,7 @@ void CGUIDialogVideoInfo::OnInitWindow()
     CONTROL_DISABLE(CONTROL_BTN_REFRESH);
   CONTROL_ENABLE_ON_CONDITION(CONTROL_BTN_GET_THUMB,
       (profileManager->GetCurrentProfile().canWriteDatabases() || g_passwordManager.bMasterUser) &&
-      !StringUtils::StartsWithNoCase(m_movieItem->GetVideoInfoTag()->
+      !UnicodeUtils::StartsWithNoCase(m_movieItem->GetVideoInfoTag()->
       GetUniqueID().c_str(), "plugin"));
   // Disable video user rating button for plugins and sets as they don't have tables to save this
   CONTROL_ENABLE_ON_CONDITION(CONTROL_BTN_USERRATING, !m_movieItem->IsPlugin() && m_movieItem->GetVideoInfoTag()->m_type != MediaTypeVideoCollection);
@@ -269,7 +269,7 @@ void CGUIDialogVideoInfo::OnInitWindow()
   if (type == VIDEODB_CONTENT_TVSHOWS || type == VIDEODB_CONTENT_MOVIES)
     CONTROL_ENABLE_ON_CONDITION(CONTROL_BTN_GET_FANART, (profileManager->
         GetCurrentProfile().canWriteDatabases() || g_passwordManager.bMasterUser) &&
-        !StringUtils::StartsWithNoCase(m_movieItem->GetVideoInfoTag()->
+        !UnicodeUtils::StartsWithNoCase(m_movieItem->GetVideoInfoTag()->
         GetUniqueID().c_str(), "plugin"));
   else
     CONTROL_DISABLE(CONTROL_BTN_GET_FANART);
@@ -963,7 +963,7 @@ void CGUIDialogVideoInfo::OnGetArt()
         result != "thumb://Current") // user didn't choose the one they have
     {
       std::string newThumb;
-      if (StringUtils::StartsWith(result, "thumb://Remote"))
+      if (UnicodeUtils::StartsWith(result, "thumb://Remote"))
       {
         int number = atoi(result.substr(14).c_str());
         newThumb = thumbs[number];
@@ -1115,7 +1115,7 @@ void CGUIDialogVideoInfo::OnGetFanart()
     result = embeddedArt;
   }
 
-  if (StringUtils::StartsWith(result, "fanart://Remote"))
+  if (UnicodeUtils::StartsWith(result, "fanart://Remote"))
   {
     int iFanart = atoi(result.substr(15).c_str());
     // set new primary fanart, and update our database accordingly
@@ -1617,7 +1617,7 @@ bool CGUIDialogVideoInfo::DeleteVideoItem(const CFileItemPtr &item, bool unavail
     if (UnicodeUtils::EqualsNoCase(URIUtils::GetFileName(strDeletePath), "VIDEO_TS.IFO"))
     {
       strDeletePath = URIUtils::GetDirectory(strDeletePath);
-      if (StringUtils::EndsWithNoCase(strDeletePath, "video_ts/"))
+      if (UnicodeUtils::EndsWithNoCase(strDeletePath, "video_ts/"))
       {
         URIUtils::RemoveSlashAtEnd(strDeletePath);
         strDeletePath = URIUtils::GetDirectory(strDeletePath);
@@ -2207,7 +2207,7 @@ bool CGUIDialogVideoInfo::ManageVideoItemArtwork(const CFileItemPtr &item, const
   // new thumbnail
   if (result == "thumb://None")
     result.clear();
-  else if (StringUtils::StartsWith(result, "thumb://Remote"))
+  else if (UnicodeUtils::StartsWith(result, "thumb://Remote"))
   {
     int number = atoi(UnicodeUtils::Mid(result, 14).c_str());
     result = thumbs[number];

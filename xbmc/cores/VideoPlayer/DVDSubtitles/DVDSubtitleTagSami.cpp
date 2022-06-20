@@ -102,7 +102,7 @@ void CDVDSubtitleTagSami::ConvertLine(std::string& strUTF8, const char* langClas
       strUTF8.insert(pos, "{\\c}");
       pos += 4;
     }
-    else if (StringUtils::StartsWith(fullTag, "<font"))
+    else if (UnicodeUtils::StartsWith(fullTag, "<font"))
     {
       int pos2 = 5;
       while ((pos2 = m_tagOptions->RegFind(fullTag.c_str(), pos2)) >= 0)
@@ -145,7 +145,7 @@ void CDVDSubtitleTagSami::ConvertLine(std::string& strUTF8, const char* langClas
       }
     }
     // Parse specific SAMI Tags (all below)
-    else if (langClassID && (StringUtils::StartsWith(fullTag, "<p ")))
+    else if (langClassID && (UnicodeUtils::StartsWith(fullTag, "<p ")))
     {
       int pos2 = 3;
       while ((pos2 = m_tagOptions->RegFind(fullTag.c_str(), pos2)) >= 0)
@@ -181,7 +181,7 @@ void CDVDSubtitleTagSami::ConvertLine(std::string& strUTF8, const char* langClas
       pos = del_start;
       m_flag[FLAG_LANGUAGE] = false;
     }
-    else if ((fullTag == "\\n") || (StringUtils::StartsWith(fullTag, "<br") && !strUTF8.empty()))
+    else if ((fullTag == "\\n") || (UnicodeUtils::StartsWith(fullTag, "<br") && !strUTF8.empty()))
     {
       strUTF8.insert(pos, "\n");
       pos += 1;

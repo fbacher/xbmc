@@ -812,7 +812,7 @@ void CWakeOnAccess::LoadFromXML()
   }
 
   TiXmlElement* pRootElement = xmlDoc.RootElement();
-  if (StringUtils::CompareNoCase(pRootElement->Value(), "onaccesswakeup"))
+  if (UnicodeUtils::CompareNoCase(pRootElement->Value(), "onaccesswakeup"))
   {
     CLog::Log(LOGERROR, "{} - XML file {} doesn't contain <onaccesswakeup>", __FUNCTION__,
               GetSettingFile());

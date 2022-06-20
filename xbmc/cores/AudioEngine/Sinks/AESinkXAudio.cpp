@@ -639,7 +639,7 @@ bool CAESinkXAudio::InitializeInternal(std::string deviceId, AEAudioFormat &form
     wfxex.SubFormat                   = KSDATAFORMAT_SUBTYPE_PCM;
   }
 
-  bool bdefault = StringUtils::EndsWithNoCase(deviceId, std::string("default"));
+  bool bdefault = UnicodeUtils::EndsWithNoCase(deviceId, std::string("default"));
 
   HRESULT hr;
   IXAudio2MasteringVoice* pMasterVoice = nullptr;

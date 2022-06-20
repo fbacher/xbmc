@@ -630,9 +630,9 @@ int CGUIWindowAddonBrowser::SelectAddonID(const std::vector<ADDON::TYPE>& types,
 
 std::string CGUIWindowAddonBrowser::GetStartFolder(const std::string& dir)
 {
-  if (StringUtils::StartsWith(dir, "addons://"))
+  if (UnicodeUtils::StartsWith(dir, "addons://"))
   {
-    if (StringUtils::StartsWith(dir, "addons://default_binary_addons_source/"))
+    if (UnicodeUtils::StartsWith(dir, "addons://default_binary_addons_source/"))
     {
       const bool all = CServiceBroker::GetPlatform().SupportsUserInstalledBinaryAddons();
       std::string startDir = dir;

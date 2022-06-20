@@ -357,7 +357,7 @@ std::string CPeripheralBusAndroid::GetDeviceLocation(int deviceId)
 bool CPeripheralBusAndroid::GetDeviceId(const std::string& deviceLocation, int& deviceId)
 {
   if (deviceLocation.empty() ||
-      !StringUtils::StartsWith(deviceLocation, DeviceLocationPrefix) ||
+      !UnicodeUtils::StartsWith(deviceLocation, DeviceLocationPrefix) ||
       deviceLocation.size() <= DeviceLocationPrefix.size())
     return false;
 

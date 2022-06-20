@@ -255,7 +255,7 @@ void CWebVTTHandler::DecodeLine(std::string line, std::vector<subtitleData>* sub
     {
       m_currentSection = WebvttSection::NOTE;
     }
-    else if (StringUtils::StartsWith(line, "X-TIMESTAMP-MAP")) // HLS streaming spec
+    else if (UnicodeUtils::StartsWith(line, "X-TIMESTAMP-MAP")) // HLS streaming spec
     {
       // Get the HLS timestamp values to sync the subtitles with video
       CRegExp regLocal;
@@ -913,7 +913,7 @@ void CWebVTTHandler::ConvertSubtitle(std::string& text)
     if (fullTag.substr(1, 1) == "/")
       InsertCssStyleCloseTag(tagName, text, pos, flagTags, cssTagsOpened, baseStyle);
 
-    if (fullTag == "<b>" || StringUtils::StartsWith(fullTag, "<b."))
+    if (fullTag == "<b>" || UnicodeUtils::StartsWith(fullTag, "<b."))
     {
       if (flagTags[FLAG_TAG_BOLD] == 0)
         InsertTextPos(text, "{\\b1}", pos);
@@ -925,7 +925,7 @@ void CWebVTTHandler::ConvertSubtitle(std::string& text)
       if (flagTags[FLAG_TAG_BOLD] == 0)
         InsertTextPos(text, "{\\b0}", pos);
     }
-    else if (fullTag == "<i>" || StringUtils::StartsWith(fullTag, "<i."))
+    else if (fullTag == "<i>" || UnicodeUtils::StartsWith(fullTag, "<i."))
     {
       if (flagTags[FLAG_TAG_ITALIC] == 0)
         InsertTextPos(text, "{\\i1}", pos);
@@ -938,7 +938,7 @@ void CWebVTTHandler::ConvertSubtitle(std::string& text)
       if (flagTags[FLAG_TAG_ITALIC] == 0)
         InsertTextPos(text, "{\\i0}", pos);
     }
-    else if (fullTag == "<u>" || StringUtils::StartsWith(fullTag, "<u."))
+    else if (fullTag == "<u>" || UnicodeUtils::StartsWith(fullTag, "<u."))
     {
       if (flagTags[FLAG_TAG_UNDERLINE] == 0)
         InsertTextPos(text, "{\\u1}", pos);

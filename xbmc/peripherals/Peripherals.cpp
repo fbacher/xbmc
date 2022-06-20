@@ -510,7 +510,7 @@ bool CPeripherals::LoadMappings()
   }
 
   TiXmlElement* pRootElement = xmlDoc.RootElement();
-  if (!pRootElement || StringUtils::CompareNoCase(pRootElement->Value(), "peripherals") != 0)
+  if (!pRootElement || UnicodeUtils::CompareNoCase(pRootElement->Value(), "peripherals") != 0)
   {
     CLog::Log(LOGERROR, "{} - peripherals.xml does not contain <peripherals>", __FUNCTION__);
     return false;
@@ -656,7 +656,7 @@ void CPeripherals::GetSettingsFromMappingsFile(
 
 void CPeripherals::GetDirectory(const std::string& strPath, CFileItemList& items) const
 {
-  if (!StringUtils::StartsWithNoCase(strPath, "peripherals://"))
+  if (!UnicodeUtils::StartsWithNoCase(strPath, "peripherals://"))
     return;
 
   std::string strPathCut = strPath.substr(14);
@@ -675,7 +675,7 @@ PeripheralPtr CPeripherals::GetByPath(const std::string& strPath) const
 {
   PeripheralPtr result;
 
-  if (!StringUtils::StartsWithNoCase(strPath, "peripherals://"))
+  if (!UnicodeUtils::StartsWithNoCase(strPath, "peripherals://"))
     return result;
 
   std::string strPathCut = strPath.substr(14);

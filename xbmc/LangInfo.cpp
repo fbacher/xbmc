@@ -171,7 +171,7 @@ struct SortLanguage
 {
   bool operator()(const StringSettingOption &left, const StringSettingOption &right) const
   {
-    return StringUtils::CompareNoCase(left.label, right.label) < 0;
+    return UnicodeUtils::CompareNoCase(left.label, right.label) < 0;
   }
 };
 

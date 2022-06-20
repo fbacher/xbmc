@@ -311,7 +311,7 @@ std::vector<BLURAY_TITLE_INFO*> CBlurayDirectory::GetUserPlaylists()
     while ((maxLines > 0) && file.ReadString(buffer, 1024))
     {
       maxLines--;
-      if (StringUtils::StartsWithNoCase(buffer, "playlists"))
+      if (UnicodeUtils::StartsWithNoCase(buffer, "playlists"))
       {
         int pos = 0;
         while ((pos = pl.RegFind(buffer, static_cast<unsigned int>(pos))) >= 0)

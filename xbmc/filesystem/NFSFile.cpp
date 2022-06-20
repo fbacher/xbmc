@@ -883,8 +883,8 @@ bool CNFSFile::OpenForWrite(const CURL& url, bool bOverWrite)
 bool CNFSFile::IsValidFile(const std::string& strFileName)
 {
   if (strFileName.find('/') == std::string::npos || /* doesn't have sharename */
-      StringUtils::EndsWith(strFileName, "/.") || /* not current folder */
-      StringUtils::EndsWith(strFileName, "/.."))  /* not parent folder */
+      UnicodeUtils::EndsWith(strFileName, "/.") || /* not current folder */
+      UnicodeUtils::EndsWith(strFileName, "/.."))  /* not parent folder */
     return false;
   return true;
 }

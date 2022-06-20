@@ -967,8 +967,8 @@ SettingPtr CSettingsManager::CreateSetting(const std::string &settingType, const
   else if (UnicodeUtils::EqualsNoCase(settingType, "action"))
     return std::make_shared<CSettingAction>(settingId, const_cast<CSettingsManager*>(this));
   else if (settingType.size() > 6 &&
-           StringUtils::StartsWith(settingType, "list[") &&
-           StringUtils::EndsWith(settingType, "]"))
+           UnicodeUtils::StartsWith(settingType, "list[") &&
+           UnicodeUtils::EndsWith(settingType, "]"))
   {
     // TODO:: Unicode Validate
     std::string elementType = UnicodeUtils::Left(UnicodeUtils::Right(settingType, 5, false), 1, false);

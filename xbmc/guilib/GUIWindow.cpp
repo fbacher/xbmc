@@ -35,7 +35,7 @@
 
 bool CGUIWindow::icompare::operator()(const std::string &s1, const std::string &s2) const
 {
-  return StringUtils::CompareNoCase(s1, s2) < 0;
+  return UnicodeUtils::CompareNoCase(s1, s2) < 0;
 }
 
 CGUIWindow::CGUIWindow(int id, const std::string &xmlFile)

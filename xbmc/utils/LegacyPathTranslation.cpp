@@ -18,7 +18,7 @@ typedef struct Translator {
 } Translator;
 
 // ATTENTION: Make sure the longer match strings go first
-// because the string match is performed with StringUtils::StartsWith()
+// because the string match is performed with UnicodeUtils::StartsWith()
 static Translator s_videoDbTranslator[] = {
   { "videodb://1/1",  "videodb://movies/genres" },
   { "videodb://1/2",  "videodb://movies/titles" },
@@ -52,7 +52,7 @@ static Translator s_videoDbTranslator[] = {
 #define VideoDbTranslatorSize sizeof(s_videoDbTranslator) / sizeof(Translator)
 
 // ATTENTION: Make sure the longer match strings go first
-// because the string match is performed with StringUtils::StartsWith()
+// because the string match is performed with UnicodeUtils::StartsWith()
 static Translator s_musicDbTranslator[] = {
   { "musicdb://10",   "musicdb://singles" },
   { "musicdb://1",    "musicdb://genres" },
@@ -95,7 +95,7 @@ std::string CLegacyPathTranslation::TranslatePath(const std::string &legacyPath,
   std::string newPath = legacyPath;
   for (size_t index = 0; index < translationMapSize; index++)
   {
-    if (StringUtils::StartsWithNoCase(newPath, translationMap[index].legacyPath))
+    if (UnicodeUtils::StartsWithNoCase(newPath, translationMap[index].legacyPath))
     {
       StringUtils::Replace(newPath, translationMap[index].legacyPath, translationMap[index].newPath);
       break;

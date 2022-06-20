@@ -48,13 +48,13 @@ bool CPlayListURL::Load(const std::string& strFileName)
     strLine = szLine;
     StringUtils::RemoveCRLF(strLine);
 
-    if (StringUtils::StartsWith(strLine, "[InternetShortcut]"))
+    if (UnicodeUtils::StartsWith(strLine, "[InternetShortcut]"))
     {
       if (file.ReadString(szLine,1024))
       {
         strLine  = szLine;
         StringUtils::RemoveCRLF(strLine);
-        if (StringUtils::StartsWith(strLine, "URL="))
+        if (UnicodeUtils::StartsWith(strLine, "URL="))
         {
           CFileItemPtr newItem(new CFileItem(strLine.substr(4), false));
           Add(newItem);

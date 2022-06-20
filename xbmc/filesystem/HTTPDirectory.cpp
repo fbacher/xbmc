@@ -159,8 +159,8 @@ bool CHTTPDirectory::GetDirectory(const CURL& url, CFileItemList &items)
       URIUtils::RemoveSlashAtEnd(strLinkTemp);
       strLinkTemp = CURL::Decode(strLinkTemp);
 
-      if (StringUtils::EndsWith(strNameTemp, "..>") &&
-          StringUtils::StartsWith(strLinkTemp, strNameTemp.substr(0, strNameTemp.length() - 3)))
+      if (UnicodeUtils::EndsWith(strNameTemp, "..>") &&
+          UnicodeUtils::StartsWith(strLinkTemp, strNameTemp.substr(0, strNameTemp.length() - 3)))
         strName = strNameTemp = strLinkTemp;
 
       /* Per RFC 1808 § 5.3, relative paths containing a colon ":" should be either prefixed with

@@ -126,7 +126,7 @@ static int RunAddon(const std::vector<std::string>& params)
       std::string urlParameters;
       std::vector<std::string> parameters;
       if (params.size() == 2 &&
-          (StringUtils::StartsWith(params[1], "/") || StringUtils::StartsWith(params[1], "?")))
+          (UnicodeUtils::StartsWith(params[1], "/") || UnicodeUtils::StartsWith(params[1], "?")))
         urlParameters = params[1];
       else if (params.size() > 1)
       {

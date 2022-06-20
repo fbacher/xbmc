@@ -86,7 +86,7 @@ bool CPlayListM3U::Load(const std::string& strFileName)
     strLine = szLine;
     strLine = UnicodeUtils::Trim(strLine);
 
-    if (StringUtils::StartsWith(strLine, InfoMarker))
+    if (UnicodeUtils::StartsWith(strLine, InfoMarker))
     {
       // start of info
       size_t iColon = strLine.find(':');
@@ -104,7 +104,7 @@ bool CPlayListM3U::Load(const std::string& strFileName)
         g_charsetConverter.unknownToUTF8(strInfo);
       }
     }
-    else if (StringUtils::StartsWith(strLine, OffsetMarker))
+    else if (UnicodeUtils::StartsWith(strLine, OffsetMarker))
     {
       size_t iColon = strLine.find(':');
       size_t iComma = strLine.find(',');
@@ -119,8 +119,8 @@ bool CPlayListM3U::Load(const std::string& strFileName)
         iEndOffset = atoi(strLine.substr(iComma).c_str());
       }
     }
-    else if (StringUtils::StartsWith(strLine, PropertyMarker)
-    || StringUtils::StartsWith(strLine, VLCOptMarker))
+    else if (UnicodeUtils::StartsWith(strLine, PropertyMarker)
+    || UnicodeUtils::StartsWith(strLine, VLCOptMarker))
     {
       size_t iColon = strLine.find(':');
       size_t iEqualSign = strLine.find('=');
@@ -135,8 +135,8 @@ bool CPlayListM3U::Load(const std::string& strFileName)
       }
     }
     else if (strLine != StartMarker &&
-             !StringUtils::StartsWith(strLine, ArtistMarker) &&
-             !StringUtils::StartsWith(strLine, AlbumMarker))
+             !UnicodeUtils::StartsWith(strLine, ArtistMarker) &&
+             !UnicodeUtils::StartsWith(strLine, AlbumMarker))
     {
       std::string strFileName = strLine;
 

@@ -358,7 +358,7 @@ bool CPlayerCoreFactory::LoadConfiguration(const std::string &file, bool clear)
     m_vecPlayerConfigs.emplace_back(std::move(retroPlayer));
   }
 
-  if (StringUtils::CompareNoCase(pConfig->Value(), "playercorefactory") != 0)
+  if (UnicodeUtils::CompareNoCase(pConfig->Value(), "playercorefactory") != 0)
   {
     CLog::Log(LOGERROR, "Error loading configuration, no <playercorefactory> node");
     return false;
@@ -409,11 +409,11 @@ bool CPlayerCoreFactory::LoadConfiguration(const std::string &file, bool clear)
     const char* szAction = pRule->Attribute("action");
     if (szAction)
     {
-      if (StringUtils::CompareNoCase(szAction, "append") == 0)
+      if (UnicodeUtils::CompareNoCase(szAction, "append") == 0)
       {
         m_vecCoreSelectionRules.emplace_back(std::make_unique<CPlayerSelectionRule>(pRule));
       }
-      else if (StringUtils::CompareNoCase(szAction, "prepend") == 0)
+      else if (UnicodeUtils::CompareNoCase(szAction, "prepend") == 0)
       {
         m_vecCoreSelectionRules.emplace_front(std::make_unique<CPlayerSelectionRule>(pRule));
       }

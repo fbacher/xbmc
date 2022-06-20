@@ -380,7 +380,7 @@ static void ParseItemSVT(CFileItem* item, SResources& resources, TiXmlElement* e
   else if (name == "broadcasts")
   {
     CURL url(path);
-    if(StringUtils::StartsWith(url.GetFileName(), "v1/"))
+    if(UnicodeUtils::StartsWith(url.GetFileName(), "v1/"))
     {
       SResource res;
       res.tag  = "svtplay:broadcasts";
@@ -425,7 +425,7 @@ static bool FindMime(const SResources& resources, const std::string& mime)
 {
   for (const auto& it : resources)
   {
-    if (StringUtils::StartsWithNoCase(it.mime, mime))
+    if (UnicodeUtils::StartsWithNoCase(it.mime, mime))
       return true;
   }
   return false;
@@ -457,7 +457,7 @@ static void ParseItem(CFileItem* item, TiXmlElement* root, const std::string& pa
   {
     for(SResources::iterator it = resources.begin(); it != resources.end(); it++)
     {
-      if(!StringUtils::StartsWith(it->mime, mime))
+      if(!UnicodeUtils::StartsWith(it->mime, mime))
         continue;
 
       if(it->tag == *type)
@@ -501,14 +501,14 @@ static void ParseItem(CFileItem* item, TiXmlElement* root, const std::string& pa
       item->SetProperty("duration", StringUtils::SecondsToTimeString(best->duration));
 
     /* handling of mimetypes fo directories are sub optimal at best */
-    if(best->mime == "application/rss+xml" && StringUtils::StartsWithNoCase(item->GetPath(), "http://"))
+    if(best->mime == "application/rss+xml" && UnicodeUtils::StartsWithNoCase(item->GetPath(), "http://"))
       item->SetPath("rss://" + item->GetPath().substr(7));
 
-    if(best->mime == "application/rss+xml" && StringUtils::StartsWithNoCase(item->GetPath(), "https://"))
+    if(best->mime == "application/rss+xml" && UnicodeUtils::StartsWithNoCase(item->GetPath(), "https://"))
       item->SetPath("rsss://" + item->GetPath().substr(8));
 
-    if(StringUtils::StartsWithNoCase(item->GetPath(), "rss://")
-      || StringUtils::StartsWithNoCase(item->GetPath(), "rsss://"))
+    if(UnicodeUtils::StartsWithNoCase(item->GetPath(), "rss://")
+      || UnicodeUtils::StartsWithNoCase(item->GetPath(), "rsss://"))
       item->m_bIsFolder = true;
     else
       item->m_bIsFolder = false;

@@ -215,15 +215,15 @@ int CWindowTranslator::TranslateWindow(const std::string& window)
   strWindow = UnicodeUtils::FoldCase(strWindow);
 
   // Eliminate .xml
-  if (StringUtils::EndsWith(strWindow, ".xml"))
+  if (UnicodeUtils::EndsWith(strWindow, ".xml"))
     strWindow = strWindow.substr(0, strWindow.size() - 4);
 
   // window12345, for custom window to be keymapped
-  if (strWindow.length() > 6 && StringUtils::StartsWith(strWindow, "window"))
+  if (strWindow.length() > 6 && UnicodeUtils::StartsWith(strWindow, "window"))
     strWindow = strWindow.substr(6);
 
   // Drop "my" prefix
-  if (StringUtils::StartsWith(strWindow, "my"))
+  if (UnicodeUtils::StartsWith(strWindow, "my"))
     strWindow = strWindow.substr(2);
 
   if (StringUtils::IsNaturalNumber(strWindow))

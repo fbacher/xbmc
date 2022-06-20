@@ -282,7 +282,7 @@ bool CMusicGUIInfo::GetLabel(std::string& value, const CFileItem *item, int cont
       // LISTITEM_*
       /////////////////////////////////////////////////////////////////////////////////////////////
       case LISTITEM_PROPERTY:
-        if (StringUtils::StartsWithNoCase(info.GetData3(), "Role."))
+        if (UnicodeUtils::StartsWithNoCase(info.GetData3(), "Role."))
         {
           // "Role.xxxx" properties are held in music tag
           std::string property = info.GetData3();
@@ -406,7 +406,7 @@ bool CMusicGUIInfo::GetLabel(std::string& value, const CFileItem *item, int cont
     // MUSICPLAYER_*
     ///////////////////////////////////////////////////////////////////////////////////////////////
     case MUSICPLAYER_PROPERTY:
-      if (StringUtils::StartsWithNoCase(info.GetData3(), "Role.") && item->HasMusicInfoTag())
+      if (UnicodeUtils::StartsWithNoCase(info.GetData3(), "Role.") && item->HasMusicInfoTag())
       {
         // "Role.xxxx" properties are held in music tag
         std::string property = info.GetData3();

@@ -211,11 +211,11 @@ bool CShoutcastFile::ExtractTagInfo(const char* buf)
       if (haveStreamUrlData) // track has changed and extra metadata might be available
       {
         const std::string streamUrlData = reURL.GetMatch(1);
-        if (StringUtils::StartsWithNoCase(streamUrlData, "http://") ||
-            StringUtils::StartsWithNoCase(streamUrlData, "https://"))
+        if (UnicodeUtils::StartsWithNoCase(streamUrlData, "http://") ||
+            UnicodeUtils::StartsWithNoCase(streamUrlData, "https://"))
         {
           // Bauer Media Radio listenapi null event to erase current data
-          if (!StringUtils::EndsWithNoCase(streamUrlData, "eventdata/-1"))
+          if (!UnicodeUtils::EndsWithNoCase(streamUrlData, "eventdata/-1"))
           {
             const CURL dataURL(streamUrlData);
             XFILE::CCurlFile http;
@@ -239,7 +239,7 @@ bool CShoutcastFile::ExtractTagInfo(const char* buf)
             }
           }
         }
-        else if (StringUtils::StartsWithNoCase(streamUrlData, "&"))
+        else if (UnicodeUtils::StartsWithNoCase(streamUrlData, "&"))
         {
           // Check for SAM Cast meta data.
           // Example: StreamUrl='&artist=RECLAM&title=BOLORDURAN%2017&album=&duration=17894&songtype=S&overlay=no&buycd=&website=&picture='
@@ -287,8 +287,8 @@ bool CShoutcastFile::ExtractTagInfo(const char* buf)
           if (title.empty())
           {
             // Do not display Bauer Media Radio SteamTitle values to mark start/stop of ad breaks.
-            if (!StringUtils::StartsWithNoCase(newtitle, "START ADBREAK ") &&
-                !StringUtils::StartsWithNoCase(newtitle, "STOP ADBREAK "))
+            if (!UnicodeUtils::StartsWithNoCase(newtitle, "START ADBREAK ") &&
+                !UnicodeUtils::StartsWithNoCase(newtitle, "STOP ADBREAK "))
               title = newtitle;
           }
         }

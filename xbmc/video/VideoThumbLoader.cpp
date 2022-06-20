@@ -445,7 +445,7 @@ bool CVideoThumbLoader::LoadItemLookup(CFileItem* pItem)
   {
     // An auto-generated thumb may have been cached on a different device - check we have it here
     std::string url = pItem->GetArt("thumb");
-    if (StringUtils::StartsWith(url, "image://video@") &&
+    if (UnicodeUtils::StartsWith(url, "image://video@") &&
         !CServiceBroker::GetTextureCache()->HasCachedImage(url))
       pItem->SetArt("thumb", "");
 

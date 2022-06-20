@@ -191,18 +191,18 @@ void CScraperParser::ParseExpression(const std::string& input, std::string& dest
     bool bInsensitive=true;
     const char* sensitive = pExpression->Attribute("cs");
     if (sensitive)
-      if (StringUtils::CompareNoCase(sensitive, "yes") == 0)
+      if (UnicodeUtils::CompareNoCase(sensitive, "yes") == 0)
         bInsensitive=false; // match case sensitive
 
     CRegExp::utf8Mode eUtf8 = CRegExp::autoUtf8;
     const char* const strUtf8 = pExpression->Attribute("utf8");
     if (strUtf8)
     {
-      if (StringUtils::CompareNoCase(strUtf8, "yes") == 0)
+      if (UnicodeUtils::CompareNoCase(strUtf8, "yes") == 0)
         eUtf8 = CRegExp::forceUtf8;
-      else if (StringUtils::CompareNoCase(strUtf8, "no") == 0)
+      else if (UnicodeUtils::CompareNoCase(strUtf8, "no") == 0)
         eUtf8 = CRegExp::asciiOnly;
-      else if (StringUtils::CompareNoCase(strUtf8, "auto") == 0)
+      else if (UnicodeUtils::CompareNoCase(strUtf8, "auto") == 0)
         eUtf8 = CRegExp::autoUtf8;
     }
 
@@ -223,12 +223,12 @@ void CScraperParser::ParseExpression(const std::string& input, std::string& dest
     bool bRepeat = false;
     const char* szRepeat = pExpression->Attribute("repeat");
     if (szRepeat)
-      if (StringUtils::CompareNoCase(szRepeat, "yes") == 0)
+      if (UnicodeUtils::CompareNoCase(szRepeat, "yes") == 0)
         bRepeat = true;
 
     const char* szClear = pExpression->Attribute("clear");
     if (szClear)
-      if (StringUtils::CompareNoCase(szClear, "yes") == 0)
+      if (UnicodeUtils::CompareNoCase(szClear, "yes") == 0)
         dest=""; // clear no matter if regexp fails
 
     bool bClean[MAX_SCRAPER_BUFFERS];
@@ -465,7 +465,7 @@ const std::string CScraperParser::Parse(const std::string& strTag,
   std::string tmp = m_param[iResult-1];
 
   const char* szClearBuffers = pChildElement->Attribute("clearbuffers");
-  if (!szClearBuffers || StringUtils::CompareNoCase(szClearBuffers, "no") != 0)
+  if (!szClearBuffers || UnicodeUtils::CompareNoCase(szClearBuffers, "no") != 0)
     ClearBuffers();
 
   return tmp;

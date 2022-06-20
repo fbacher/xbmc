@@ -388,7 +388,7 @@ std::string CWIN32Util::GetProfilePath(const bool platformDirectories)
 std::string CWIN32Util::UncToSmb(const std::string &strPath)
 {
   std::string strRetPath(strPath);
-  if(StringUtils::StartsWith(strRetPath, "\\\\"))
+  if(UnicodeUtils::StartsWith(strRetPath, "\\\\"))
   {
     strRetPath = "smb:" + strPath;
     StringUtils::Replace(strRetPath, '\\', '/');
@@ -399,7 +399,7 @@ std::string CWIN32Util::UncToSmb(const std::string &strPath)
 std::string CWIN32Util::SmbToUnc(const std::string &strPath)
 {
   std::string strRetPath(strPath);
-  if(StringUtils::StartsWithNoCase(strRetPath, "smb://"))
+  if(UnicodeUtils::StartsWithNoCase(strRetPath, "smb://"))
   {
     StringUtils::Replace(strRetPath, "smb://", "\\\\");
     StringUtils::Replace(strRetPath, '/', '\\');
@@ -987,7 +987,7 @@ extern "C" {
     for (; n1 != NULL; n1 = n2, n2 = NULL) {
       for (i = 0; i < c; i++, n1++) {
         len = strlen(*n1);
-        if (StringUtils::StartsWithNoCase((const char*)bp, *n1))
+        if (UnicodeUtils::StartsWithNoCase((const char*)bp, *n1))
         {
           *tgt = i;
           return bp + len;

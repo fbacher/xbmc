@@ -291,7 +291,7 @@ bool CCueDocument::Parse(CueReader& reader, const std::string& strFile)
   // Run through the .CUE file and extract the tracks...
   while (reader.ReadLine(strLine))
   {
-    if (StringUtils::StartsWithNoCase(strLine, "INDEX 01"))
+    if (UnicodeUtils::StartsWithNoCase(strLine, "INDEX 01"))
     {
       if (bCurrentFileChanged)
       {
@@ -312,21 +312,21 @@ bool CCueDocument::Parse(CueReader& reader, const std::string& strFile)
       if (totalTracks >= 0) // start time of the next track
         m_tracks[totalTracks].iStartTime = time;
     }
-    else if (StringUtils::StartsWithNoCase(strLine, "TITLE"))
+    else if (UnicodeUtils::StartsWithNoCase(strLine, "TITLE"))
     {
       if (totalTracks == -1) // No tracks yet
         m_strAlbum = ExtractInfo(strLine.substr(5));
       else
         m_tracks[totalTracks].strTitle = ExtractInfo(strLine.substr(5));
     }
-    else if (StringUtils::StartsWithNoCase(strLine, "PERFORMER"))
+    else if (UnicodeUtils::StartsWithNoCase(strLine, "PERFORMER"))
     {
       if (totalTracks == -1) // No tracks yet
         m_strArtist = ExtractInfo(strLine.substr(9));
       else // New Artist for this track
         m_tracks[totalTracks].strArtist = ExtractInfo(strLine.substr(9));
     }
-    else if (StringUtils::StartsWithNoCase(strLine, "TRACK"))
+    else if (UnicodeUtils::StartsWithNoCase(strLine, "TRACK"))
     {
       int iTrackNumber = ExtractNumericInfo(strLine.substr(5));
 
@@ -342,13 +342,13 @@ bool CCueDocument::Parse(CueReader& reader, const std::string& strFile)
 
       bCurrentFileChanged = false;
     }
-    else if (StringUtils::StartsWithNoCase(strLine, "REM DISCNUMBER"))
+    else if (UnicodeUtils::StartsWithNoCase(strLine, "REM DISCNUMBER"))
     {
       int iDiscNumber = ExtractNumericInfo(strLine.substr(14));
       if (iDiscNumber > 0)
         m_iDiscNumber = iDiscNumber;
     }
-    else if (StringUtils::StartsWithNoCase(strLine, "FILE"))
+    else if (UnicodeUtils::StartsWithNoCase(strLine, "FILE"))
     {
       numberFiles++;
       // already a file name? then the time computation will be changed
@@ -361,23 +361,23 @@ bool CCueDocument::Parse(CueReader& reader, const std::string& strFile)
       if (!strFile.empty() && !strCurrentFile.empty())
         ResolvePath(strCurrentFile, strFile);
     }
-    else if (StringUtils::StartsWithNoCase(strLine, "REM DATE"))
+    else if (UnicodeUtils::StartsWithNoCase(strLine, "REM DATE"))
     {
       int iYear = ExtractNumericInfo(strLine.substr(8));
       if (iYear > 0)
         m_iYear = iYear;
     }
-    else if (StringUtils::StartsWithNoCase(strLine, "REM GENRE"))
+    else if (UnicodeUtils::StartsWithNoCase(strLine, "REM GENRE"))
     {
       m_strGenre = ExtractInfo(strLine.substr(9));
     }
-    else if (StringUtils::StartsWithNoCase(strLine, "REM REPLAYGAIN_ALBUM_GAIN"))
+    else if (UnicodeUtils::StartsWithNoCase(strLine, "REM REPLAYGAIN_ALBUM_GAIN"))
       m_albumReplayGain.SetGain(strLine.substr(26));
-    else if (StringUtils::StartsWithNoCase(strLine, "REM REPLAYGAIN_ALBUM_PEAK"))
+    else if (UnicodeUtils::StartsWithNoCase(strLine, "REM REPLAYGAIN_ALBUM_PEAK"))
       m_albumReplayGain.SetPeak(strLine.substr(26));
-    else if (StringUtils::StartsWithNoCase(strLine, "REM REPLAYGAIN_TRACK_GAIN") && totalTracks >= 0)
+    else if (UnicodeUtils::StartsWithNoCase(strLine, "REM REPLAYGAIN_TRACK_GAIN") && totalTracks >= 0)
       m_tracks[totalTracks].replayGain.SetGain(strLine.substr(26));
-    else if (StringUtils::StartsWithNoCase(strLine, "REM REPLAYGAIN_TRACK_PEAK") && totalTracks >= 0)
+    else if (UnicodeUtils::StartsWithNoCase(strLine, "REM REPLAYGAIN_TRACK_PEAK") && totalTracks >= 0)
       m_tracks[totalTracks].replayGain.SetPeak(strLine.substr(26));
   }
 

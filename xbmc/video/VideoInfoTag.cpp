@@ -1229,7 +1229,7 @@ void CVideoInfoTag::ParseNative(const TiXmlElement* movie, bool prioritise)
         thumb = thumb->NextSiblingElement("thumb");
       }
       const char* clear=node->Attribute("clear");
-      if (clear && StringUtils::CompareNoCase(clear, "true"))
+      if (clear && UnicodeUtils::CompareNoCase(clear, "true"))
         m_cast.clear();
       m_cast.push_back(info);
     }
@@ -1278,7 +1278,7 @@ void CVideoInfoTag::ParseNative(const TiXmlElement* movie, bool prioritise)
     if (pValue)
     {
       const char* clear=node->Attribute("clear");
-      if (clear && StringUtils::CompareNoCase(clear, "true") == 0)
+      if (clear && UnicodeUtils::CompareNoCase(clear, "true") == 0)
         artist.clear();
       std::vector<std::string> newArtists = UnicodeUtils::Split(pValue, itemSeparator);
       artist.insert(artist.end(), newArtists.begin(), newArtists.end());
@@ -1353,7 +1353,7 @@ void CVideoInfoTag::ParseNative(const TiXmlElement* movie, bool prioritise)
     {
       // DEPRECIATE ME - support for old XML-encoded <episodeguide> blocks.
       if (epguide->FirstChild() &&
-          StringUtils::StartsWithNoCase(epguide->FirstChild()->Value(), "<episodeguide"))
+          UnicodeUtils::StartsWithNoCase(epguide->FirstChild()->Value(), "<episodeguide"))
       {
         m_strEpisodeGuide = epguide->FirstChild()->Value();
       }
@@ -1657,7 +1657,7 @@ void CVideoInfoTag::SetOriginalTitle(std::string originalTitle)
 
 void CVideoInfoTag::SetEpisodeGuide(std::string episodeGuide)
 {
-  if (StringUtils::StartsWith(episodeGuide, "<episodeguide"))
+  if (UnicodeUtils::StartsWith(episodeGuide, "<episodeguide"))
     m_strEpisodeGuide = Trim(std::move(episodeGuide));
   else
     m_strEpisodeGuide =

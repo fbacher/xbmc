@@ -126,7 +126,7 @@ void CVideoDatabaseDirectory::ClearDirectoryCache(const std::string& strDirector
 
 bool CVideoDatabaseDirectory::IsAllItem(const std::string& strDirectory)
 {
-  if (StringUtils::EndsWith(strDirectory, "/-1/"))
+  if (UnicodeUtils::EndsWith(strDirectory, "/-1/"))
     return true;
   return false;
 }

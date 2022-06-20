@@ -1142,7 +1142,7 @@ bool CGUIMediaWindow::OnClick(int iItem, const std::string &player)
       CServiceBroker::GetGUI()->GetWindowManager().ActivateWindow(WINDOW_MUSIC_PLAYLIST_EDITOR,"newplaylist://");
       return true;
     }
-    else if (StringUtils::StartsWithNoCase(pItem->GetPath(), "newsmartplaylist://"))
+    else if (UnicodeUtils::StartsWithNoCase(pItem->GetPath(), "newsmartplaylist://"))
     {
       m_vecItems->RemoveDiscCache(GetID());
       if (CGUIDialogSmartPlaylistEditor::NewPlaylist(pItem->GetPath().substr(19)))
@@ -1261,7 +1261,7 @@ bool CGUIMediaWindow::GoParentFolder()
   // Keep going until there's nothing left or they dont match anymore.
   while (!parentPath.empty() &&
          (URIUtils::PathEquals(parentPath, currentPath, true) ||
-          StringUtils::EndsWith(parentPath, ".xml/") || StringUtils::EndsWith(parentPath, ".xml")))
+          UnicodeUtils::EndsWith(parentPath, ".xml/") || UnicodeUtils::EndsWith(parentPath, ".xml")))
   {
     m_history.RemoveParentPath();
     parentPath = m_history.GetParentPath();
@@ -2177,7 +2177,7 @@ std::string CGUIMediaWindow::GetStartFolder(const std::string &dir)
     return "";
 
   // Let plugins handle their own urls themselves
-  if (StringUtils::StartsWith(dir, "plugin://"))
+  if (UnicodeUtils::StartsWith(dir, "plugin://"))
     return dir;
 
 //! @todo This ifdef block probably belongs somewhere else. Move it to a better place!

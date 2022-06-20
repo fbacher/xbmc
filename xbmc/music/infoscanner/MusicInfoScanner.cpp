@@ -355,7 +355,7 @@ void CMusicInfoScanner::FetchAlbumInfo(const std::string& strDirectory,
           dir.GetDirectory(pathToUrl, items);
       }
     }
-    else if (StringUtils::EndsWith(strDirectory, ".xsp"))
+    else if (UnicodeUtils::EndsWith(strDirectory, ".xsp"))
     {
       CSmartPlaylistDirectory dir;
       dir.GetDirectory(pathToUrl, items);
@@ -417,7 +417,7 @@ void CMusicInfoScanner::FetchArtistInfo(const std::string& strDirectory,
           dir.GetDirectory(pathToUrl, items);
       }
     }
-    else if (StringUtils::EndsWith(strDirectory, ".xsp"))
+    else if (UnicodeUtils::EndsWith(strDirectory, ".xsp"))
     {
       CSmartPlaylistDirectory dir;
       dir.GetDirectory(pathToUrl, items);
@@ -1101,7 +1101,7 @@ void CMusicInfoScanner::FindArtForAlbums(VECALBUMS &albums, const std::string &p
      without having read some tags (and tags are not read from streams) we can safely check for
      that case and set the IsHTTPDirectory property to enable scanning for art.
     */
-    if (StringUtils::StartsWithNoCase(path, "http") && StringUtils::EndsWith(path, "/"))
+    if (UnicodeUtils::StartsWithNoCase(path, "http") && UnicodeUtils::EndsWith(path, "/"))
       album.SetProperty("IsHTTPDirectory", true);
     albumArt = album.GetUserMusicThumb(true);
     if (!albumArt.empty())
@@ -2037,7 +2037,7 @@ bool CMusicInfoScanner::AddAlbumArtwork(CAlbum& album)
   {
     // When "prefer online album art" enabled and we have a thumb as embedded art
     // then replace it if we find a scraped cover
-    if (thumb != album.art.end() && StringUtils::StartsWith(thumb->second, "image://"))
+    if (thumb != album.art.end() && UnicodeUtils::StartsWith(thumb->second, "image://"))
       replaceThumb = true;
   }
 
@@ -2192,7 +2192,7 @@ bool CMusicInfoScanner::AddLocalArtwork(std::map<std::string, std::string>& art,
       continue;
     std::string strCandidate = URIUtils::GetFileName(artFile->GetPath());
     // Strip media name
-    if (!mediaName.empty() && StringUtils::StartsWith(strCandidate, mediaName))
+    if (!mediaName.empty() && UnicodeUtils::StartsWith(strCandidate, mediaName))
       strCandidate.erase(0, mediaName.length());
     strCandidate = UnicodeUtils::FoldCase(strCandidate);
     // Skip files already used as "thumb"

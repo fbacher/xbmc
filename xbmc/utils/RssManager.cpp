@@ -128,7 +128,7 @@ bool CRssManager::Load()
     {
       RssSet set;
       set.rtl = pSet->Attribute("rtl") != NULL &&
-                StringUtils::CompareNoCase(pSet->Attribute("rtl"), "true") == 0;
+                UnicodeUtils::CompareNoCase(pSet->Attribute("rtl"), "true") == 0;
       const TiXmlElement* pFeed = pSet->FirstChildElement("feed");
       while (pFeed != NULL)
       {

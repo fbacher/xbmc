@@ -40,7 +40,7 @@ CTVOSFile::~CTVOSFile()
 bool CTVOSFile::WantsFile(const CURL& url)
 {
   if (!UnicodeUtils::EqualsNoCase(url.GetFileType(), "xml") ||
-      StringUtils::StartsWithNoCase(url.GetFileNameWithoutPath(), "customcontroller.SiriRemote"))
+      UnicodeUtils::StartsWithNoCase(url.GetFileNameWithoutPath(), "customcontroller.SiriRemote"))
     return false;
   return CTVOSNSUserDefaults::IsKeyFromPath(url.Get());
 }

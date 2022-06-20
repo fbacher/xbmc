@@ -242,9 +242,9 @@ void ClearPhotoAssetCache()
     CFileItemPtr pItem = items[i];
     if (!pItem->m_bIsFolder)
     {
-      if (StringUtils::StartsWithNoCase(pItem->GetLabel(), "airplayasset") &&
-          (StringUtils::EndsWithNoCase(pItem->GetLabel(), ".jpg") ||
-           StringUtils::EndsWithNoCase(pItem->GetLabel(), ".png") ))
+      if (UnicodeUtils::StartsWithNoCase(pItem->GetLabel(), "airplayasset") &&
+          (UnicodeUtils::EndsWithNoCase(pItem->GetLabel(), ".jpg") ||
+           UnicodeUtils::EndsWithNoCase(pItem->GetLabel(), ".png") ))
       {
         XFILE::CFile::Delete(pItem->GetPath());
       }

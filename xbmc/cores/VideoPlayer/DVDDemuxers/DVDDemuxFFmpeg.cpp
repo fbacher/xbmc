@@ -373,7 +373,7 @@ bool CDVDDemuxFFmpeg::Open(const std::shared_ptr<CDVDInputStream>& pInput, bool 
 
     std::string content = m_pInput->GetContent();
     content = UnicodeUtils::FoldCase(content);
-    if (StringUtils::StartsWith(content, "audio/l16"))
+    if (UnicodeUtils::StartsWith(content, "audio/l16"))
       iformat = av_find_input_format("s16be");
 
     if (iformat == nullptr)
@@ -490,7 +490,7 @@ bool CDVDDemuxFFmpeg::Open(const std::shared_ptr<CDVDInputStream>& pInput, bool 
       av_dict_set(&options, "usetoc", "0", 0);
     }
 
-    if (StringUtils::StartsWith(content, "audio/l16"))
+    if (UnicodeUtils::StartsWith(content, "audio/l16"))
     {
       int channels = 2;
       int samplerate = 44100;

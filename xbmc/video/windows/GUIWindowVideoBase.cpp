@@ -516,7 +516,7 @@ void CGUIWindowVideoBase::AddItemToPlayList(const CFileItemPtr &pItem, CFileItem
       {
         std::string strPath = items[i]->GetPath();
         URIUtils::RemoveSlashAtEnd(strPath);
-        if (StringUtils::EndsWithNoCase(strPath, "sample")) // skip sample folders
+        if (UnicodeUtils::EndsWithNoCase(strPath, "sample")) // skip sample folders
         {
           continue;
         }
@@ -633,10 +633,10 @@ bool CGUIWindowVideoBase::OnSelect(int iItem)
 
   std::string path = item->GetPath();
   if (!item->m_bIsFolder && path != "add" &&
-      !StringUtils::StartsWith(path, "newsmartplaylist://") &&
-      !StringUtils::StartsWith(path, "newplaylist://") &&
-      !StringUtils::StartsWith(path, "newtag://") &&
-      !StringUtils::StartsWith(path, "script://"))
+      !UnicodeUtils::StartsWith(path, "newsmartplaylist://") &&
+      !UnicodeUtils::StartsWith(path, "newplaylist://") &&
+      !UnicodeUtils::StartsWith(path, "newtag://") &&
+      !UnicodeUtils::StartsWith(path, "script://"))
     return OnFileAction(iItem, CServiceBroker::GetSettingsComponent()->GetSettings()->GetInt(CSettings::SETTING_MYVIDEOS_SELECTACTION), "");
 
   return CGUIMediaWindow::OnSelect(iItem);
@@ -728,7 +728,7 @@ bool CGUIWindowVideoBase::OnItemInfo(int iItem)
 
   if (item->m_bIsFolder &&
       item->IsVideoDb() &&
-      StringUtils::StartsWith(item->GetPath(), "videodb://movies/sets/"))
+      UnicodeUtils::StartsWith(item->GetPath(), "videodb://movies/sets/"))
     return ShowIMDB(item, nullptr, true);
 
   ADDON::ScraperPtr scraper;
@@ -883,7 +883,7 @@ void CGUIWindowVideoBase::GetContextButtons(int itemNumber, CContextButtons &but
           buttons.Add(CONTEXT_BUTTON_PLAY_ITEM, 208);
         }
 
-        if (!m_vecItems->GetPath().empty() && !StringUtils::StartsWithNoCase(item->GetPath(), "newsmartplaylist://") && !StringUtils::StartsWithNoCase(item->GetPath(), "newtag://")
+        if (!m_vecItems->GetPath().empty() && !UnicodeUtils::StartsWithNoCase(item->GetPath(), "newsmartplaylist://") && !UnicodeUtils::StartsWithNoCase(item->GetPath(), "newtag://")
             && !m_vecItems->IsSourcesPath())
         {
           buttons.Add(CONTEXT_BUTTON_QUEUE_ITEM, 13347);      // Add to Playlist

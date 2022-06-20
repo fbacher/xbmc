@@ -525,7 +525,7 @@ std::vector<Tuple<String, String>> getICULanguage(std::vector<String>& propertyN
       XBMC_TRACE;
       std::string result;
 
-      if (StringUtils::CompareNoCase(id, "datelong") == 0)
+      if (UnicodeUtils::CompareNoCase(id, "datelong") == 0)
       {
         result = g_langInfo.GetDateFormat(true);
         StringUtils::Replace(result, "DDDD", "%A");
@@ -533,7 +533,7 @@ std::vector<Tuple<String, String>> getICULanguage(std::vector<String>& propertyN
         StringUtils::Replace(result, "D", "%d");
         StringUtils::Replace(result, "YYYY", "%Y");
         }
-        else if (StringUtils::CompareNoCase(id, "dateshort") == 0)
+        else if (UnicodeUtils::CompareNoCase(id, "dateshort") == 0)
         {
           result = g_langInfo.GetDateFormat(false);
           StringUtils::Replace(result, "MM", "%m");
@@ -547,14 +547,14 @@ std::vector<Tuple<String, String>> getICULanguage(std::vector<String>& propertyN
 #endif
           StringUtils::Replace(result, "YYYY", "%Y");
         }
-        else if (StringUtils::CompareNoCase(id, "tempunit") == 0)
+        else if (UnicodeUtils::CompareNoCase(id, "tempunit") == 0)
           result = g_langInfo.GetTemperatureUnitString();
-        else if (StringUtils::CompareNoCase(id, "speedunit") == 0)
+        else if (UnicodeUtils::CompareNoCase(id, "speedunit") == 0)
           result = g_langInfo.GetSpeedUnitString();
-        else if (StringUtils::CompareNoCase(id, "time") == 0)
+        else if (UnicodeUtils::CompareNoCase(id, "time") == 0)
         {
           result = g_langInfo.GetTimeFormat();
-          if (StringUtils::StartsWith(result, "HH"))
+          if (UnicodeUtils::StartsWith(result, "HH"))
             StringUtils::Replace(result, "HH", "%H");
           else
             StringUtils::Replace(result, "H", "%H");
@@ -563,7 +563,7 @@ std::vector<Tuple<String, String>> getICULanguage(std::vector<String>& propertyN
           StringUtils::Replace(result, "ss", "%S");
           StringUtils::Replace(result, "xx", "%p");
         }
-        else if (StringUtils::CompareNoCase(id, "meridiem") == 0)
+        else if (UnicodeUtils::CompareNoCase(id, "meridiem") == 0)
           result = StringUtils::Format("{}/{}", g_langInfo.GetMeridiemSymbol(MeridiemSymbolAM),
                                        g_langInfo.GetMeridiemSymbol(MeridiemSymbolPM));
 
@@ -575,11 +575,11 @@ std::vector<Tuple<String, String>> getICULanguage(std::vector<String>& propertyN
     {
       XBMC_TRACE;
       String result;
-      if (StringUtils::CompareNoCase(mediaType, "video") == 0)
+      if (UnicodeUtils::CompareNoCase(mediaType, "video") == 0)
         result = CServiceBroker::GetFileExtensionProvider().GetVideoExtensions();
-      else if (StringUtils::CompareNoCase(mediaType, "music") == 0)
+      else if (UnicodeUtils::CompareNoCase(mediaType, "music") == 0)
         result = CServiceBroker::GetFileExtensionProvider().GetMusicExtensions();
-      else if (StringUtils::CompareNoCase(mediaType, "picture") == 0)
+      else if (UnicodeUtils::CompareNoCase(mediaType, "picture") == 0)
         result = CServiceBroker::GetFileExtensionProvider().GetPictureExtensions();
 
       //! @todo implement

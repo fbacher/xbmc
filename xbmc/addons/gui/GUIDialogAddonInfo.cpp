@@ -759,7 +759,7 @@ void CGUIDialogAddonInfo::ShowSupportList()
   for (const auto& entry : list)
   {
     // Ignore included extension about track support
-    if (StringUtils::EndsWith(entry.m_name, KODI_ADDON_AUDIODECODER_TRACK_EXT))
+    if (UnicodeUtils::EndsWith(entry.m_name, KODI_ADDON_AUDIODECODER_TRACK_EXT))
       continue;
 
     std::string label;

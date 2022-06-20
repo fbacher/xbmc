@@ -570,7 +570,7 @@ int CVideoDatabase::GetPathId(const std::string& strPath)
       return -1;
 
     std::string strPath1(strPath);
-    if (URIUtils::IsStack(strPath) || StringUtils::StartsWithNoCase(strPath, "rar://") || StringUtils::StartsWithNoCase(strPath, "zip://"))
+    if (URIUtils::IsStack(strPath) || UnicodeUtils::StartsWithNoCase(strPath, "rar://") || UnicodeUtils::StartsWithNoCase(strPath, "zip://"))
       URIUtils::GetParentPath(strPath,strPath1);
 
     URIUtils::AddSlashAtEnd(strPath1);
@@ -783,7 +783,7 @@ int CVideoDatabase::AddPath(const std::string& strPath, const std::string &paren
       return -1;
 
     std::string strPath1(strPath);
-    if (URIUtils::IsStack(strPath) || StringUtils::StartsWithNoCase(strPath, "rar://") || StringUtils::StartsWithNoCase(strPath, "zip://"))
+    if (URIUtils::IsStack(strPath) || UnicodeUtils::StartsWithNoCase(strPath, "rar://") || UnicodeUtils::StartsWithNoCase(strPath, "zip://"))
       URIUtils::GetParentPath(strPath,strPath1);
 
     URIUtils::AddSlashAtEnd(strPath1);
@@ -2489,7 +2489,7 @@ int CVideoDatabase::SetDetailsForMovie(CVideoInfoTag& details,
       {
         for (const auto &it : artwork)
         {
-          if (StringUtils::StartsWith(it.first, "set."))
+          if (UnicodeUtils::StartsWith(it.first, "set."))
             SetArtForItem(idSet, MediaTypeVideoCollection, it.first.substr(4), it.second);
         }
       }
@@ -4806,7 +4806,7 @@ std::vector<std::string> GetBasicItemAvailableArtTypes(int mediaId,
     if (artType.empty())
       artType = tag.m_type == MediaTypeEpisode ? "thumb" : "poster";
     if (urlEntry.m_type == CScraperUrl::UrlType::General && // exclude season artwork for TV shows
-        !StringUtils::StartsWith(artType, "set.") && // exclude movie set artwork for movies
+        !UnicodeUtils::StartsWith(artType, "set.") && // exclude movie set artwork for movies
         std::find(result.cbegin(), result.cend(), artType) == result.cend())
     {
       result.push_back(artType);
@@ -4853,7 +4853,7 @@ std::vector<std::string> GetMovieSetAvailableArtTypes(int mediaId, CVideoDatabas
 
       for (const auto& urlEntry : pTag->m_strPictureURL.GetUrls())
       {
-        if (!StringUtils::StartsWith(urlEntry.m_aspect, "set."))
+        if (!UnicodeUtils::StartsWith(urlEntry.m_aspect, "set."))
           continue;
 
         std::string artType = urlEntry.m_aspect.substr(4);
@@ -4888,7 +4888,7 @@ std::vector<CScraperUrl::SUrlEntry> GetBasicItemAvailableArt(
     if (urlEntry.m_aspect.empty())
       urlEntry.m_aspect = tag.m_type == MediaTypeEpisode ? "thumb" : "poster";
     if ((urlEntry.m_aspect == artType ||
-         (artType.empty() && !StringUtils::StartsWith(urlEntry.m_aspect, "set."))) &&
+         (artType.empty() && !UnicodeUtils::StartsWith(urlEntry.m_aspect, "set."))) &&
         urlEntry.m_type == CScraperUrl::UrlType::General)
     {
       result.push_back(urlEntry);
@@ -4940,7 +4940,7 @@ std::vector<CScraperUrl::SUrlEntry> GetMovieSetAvailableArt(
       for (auto urlEntry : pTag->m_strPictureURL.GetUrls())
       {
         bool isSetArt = !artType.empty() ? urlEntry.m_aspect == "set." + artType :
-          StringUtils::StartsWith(urlEntry.m_aspect, "set.");
+          UnicodeUtils::StartsWith(urlEntry.m_aspect, "set.");
         if (isSetArt && addedURLs.insert(urlEntry.m_url).second)
         {
           urlEntry.m_aspect = urlEntry.m_aspect.substr(4);
@@ -5752,7 +5752,7 @@ void CVideoDatabase::UpdateTables(int iVersion)
         if (!uniqueid.empty())
         {
           int mediaid = pDS->fv(0).get_asInt();
-          if (StringUtils::StartsWith(uniqueid, "tt"))
+          if (UnicodeUtils::StartsWith(uniqueid, "tt"))
             m_pDS2->exec(PrepareSQL("INSERT INTO uniqueid(media_id, media_type, type, value) VALUES (%i, '%s', 'imdb', '%s')", mediaid, mediatype.c_str(), uniqueid.c_str()));
           else
             m_pDS2->exec(PrepareSQL("INSERT INTO uniqueid(media_id, media_type, type, value) VALUES (%i, '%s', 'unknown', '%s')", mediaid, mediatype.c_str(), uniqueid.c_str()));
@@ -6565,7 +6565,7 @@ bool CVideoDatabase::GetMusicVideoAlbumsNav(const std::string& strBaseDir, CFile
     extFilter.fields += ", path.strPath";
     extFilter.AppendJoin("join files on files.idFile = musicvideo_view.idFile join path on path.idPath = files.idPath");
 
-    if (StringUtils::EndsWith(strBaseDir,"albums/"))
+    if (UnicodeUtils::EndsWith(strBaseDir,"albums/"))
       extFilter.AppendWhere(PrepareSQL("musicvideo_view.c%02d != ''", VIDEODB_ID_MUSICVIDEO_ALBUM));
 
     if (idArtist > -1)
@@ -6784,7 +6784,7 @@ bool CVideoDatabase::GetPeopleNav(const std::string& strBaseDir, CFileItemList& 
       {
         bMainArtistOnly = !CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
             CSettings::SETTING_VIDEOLIBRARY_SHOWPERFORMERS);
-        if (StringUtils::EndsWith(strBaseDir, "directors/"))
+        if (UnicodeUtils::EndsWith(strBaseDir, "directors/"))
           // only set this to true if getting artists and show all performers is false
           bMainArtistOnly = false;
         view       = MediaTypeMusicVideo;
@@ -6839,7 +6839,7 @@ bool CVideoDatabase::GetPeopleNav(const std::string& strBaseDir, CFileItemList& 
       {
         bMainArtistOnly = !CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(
             CSettings::SETTING_VIDEOLIBRARY_SHOWPERFORMERS);
-        if (StringUtils::EndsWith(strBaseDir, "directors/"))
+        if (UnicodeUtils::EndsWith(strBaseDir, "directors/"))
           // only set this to true if getting artists and show all performers is false
           bMainArtistOnly = false;
         view       = MediaTypeMusicVideo;
@@ -9876,7 +9876,7 @@ void CVideoDatabase::ExportToXML(const std::string &path, bool singleFile /* = t
     {
       CVideoInfoTag movie = GetDetailsForMovie(m_pDS, VideoDbDetailsAll);
       // strip paths to make them relative
-      if (StringUtils::StartsWith(movie.m_strTrailer, movie.m_strPath))
+      if (UnicodeUtils::StartsWith(movie.m_strTrailer, movie.m_strPath))
         movie.m_strTrailer = movie.m_strTrailer.substr(movie.m_strPath.size());
       std::map<std::string, std::string> artwork;
       if (GetArtForItem(movie.m_iDbId, movie.m_type, artwork) && singleFile)
@@ -10428,9 +10428,9 @@ void CVideoDatabase::ImportFromXML(const std::string &path)
     // first count the number of items...
     while (movie)
     {
-      if (StringUtils::StartsWithNoCase(movie->Value(), MediaTypeMovie) ||
-          StringUtils::StartsWithNoCase(movie->Value(), MediaTypeTvShow) ||
-          StringUtils::StartsWithNoCase(movie->Value(), MediaTypeMusicVideo))
+      if (UnicodeUtils::StartsWithNoCase(movie->Value(), MediaTypeMovie) ||
+          UnicodeUtils::StartsWithNoCase(movie->Value(), MediaTypeTvShow) ||
+          UnicodeUtils::StartsWithNoCase(movie->Value(), MediaTypeMusicVideo))
         total++;
       movie = movie->NextSiblingElement();
     }
@@ -10474,7 +10474,7 @@ void CVideoDatabase::ImportFromXML(const std::string &path)
     while (movie)
     {
       CVideoInfoTag info;
-      if (StringUtils::StartsWithNoCase(movie->Value(), MediaTypeMovie))
+      if (UnicodeUtils::StartsWithNoCase(movie->Value(), MediaTypeMovie))
       {
         info.Load(movie);
         CFileItem item(info);
@@ -10508,7 +10508,7 @@ void CVideoDatabase::ImportFromXML(const std::string &path)
         scanner.AddVideo(&item, CONTENT_MOVIES, useFolders, true, NULL, true);
         current++;
       }
-      else if (StringUtils::StartsWithNoCase(movie->Value(), MediaTypeMusicVideo))
+      else if (UnicodeUtils::StartsWithNoCase(movie->Value(), MediaTypeMusicVideo))
       {
         info.Load(movie);
         CFileItem item(info);
@@ -10523,7 +10523,7 @@ void CVideoDatabase::ImportFromXML(const std::string &path)
         scanner.AddVideo(&item, CONTENT_MUSICVIDEOS, useFolders, true, NULL, true);
         current++;
       }
-      else if (StringUtils::StartsWithNoCase(movie->Value(), MediaTypeTvShow))
+      else if (UnicodeUtils::StartsWithNoCase(movie->Value(), MediaTypeTvShow))
       {
         // load the TV show in.  NOTE: This deletes all episodes under the TV Show, which may not be
         // what we desire.  It may make better sense to only delete (or even better, update) the show information
@@ -10611,7 +10611,7 @@ void CVideoDatabase::ConstructPath(std::string& strDest, const std::string& strP
 
 void CVideoDatabase::SplitPath(const std::string& strFileNameAndPath, std::string& strPath, std::string& strFileName)
 {
-  if (URIUtils::IsStack(strFileNameAndPath) || StringUtils::StartsWithNoCase(strFileNameAndPath, "rar://") || StringUtils::StartsWithNoCase(strFileNameAndPath, "zip://"))
+  if (URIUtils::IsStack(strFileNameAndPath) || UnicodeUtils::StartsWithNoCase(strFileNameAndPath, "rar://") || UnicodeUtils::StartsWithNoCase(strFileNameAndPath, "zip://"))
   {
     URIUtils::GetParentPath(strFileNameAndPath,strPath);
     strFileName = strFileNameAndPath;

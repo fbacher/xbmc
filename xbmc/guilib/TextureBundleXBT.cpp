@@ -142,7 +142,7 @@ std::vector<std::string> CTextureBundleXBT::GetTexturesFromPath(const std::strin
   for (size_t i = 0; i < files.size(); i++)
   {
     std::string filePath = files[i].GetPath();
-    if (StringUtils::StartsWithNoCase(filePath, testPath))
+    if (UnicodeUtils::StartsWithNoCase(filePath, testPath))
       textures.emplace_back(std::move(filePath));
   }
 

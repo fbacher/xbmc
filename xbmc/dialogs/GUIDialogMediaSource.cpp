@@ -216,9 +216,9 @@ std::string CGUIDialogMediaSource::GetUniqueMediaSourceName()
 void CGUIDialogMediaSource::OnMediaSourceChanged(const std::string& type, const std::string& oldName, const CMediaSource& share)
 {
   // Processing once media source added/edited - library scraping and scanning
-  if (!StringUtils::StartsWithNoCase(share.strPath, "rss://") &&
-    !StringUtils::StartsWithNoCase(share.strPath, "rsss://") &&
-    !StringUtils::StartsWithNoCase(share.strPath, "upnp://"))
+  if (!UnicodeUtils::StartsWithNoCase(share.strPath, "rss://") &&
+    !UnicodeUtils::StartsWithNoCase(share.strPath, "rsss://") &&
+    !UnicodeUtils::StartsWithNoCase(share.strPath, "upnp://"))
   {
     if (type == "video" && !URIUtils::IsLiveTV(share.strPath))
       // Assign content to a path, refresh scraper information optionally start a scan
@@ -446,7 +446,7 @@ void CGUIDialogMediaSource::OnOK()
   CMediaSource share;
   share.FromNameAndPaths(m_type, m_name, GetPaths());
 
-  if (StringUtils::StartsWithNoCase(share.strPath, "plugin://") ||
+  if (UnicodeUtils::StartsWithNoCase(share.strPath, "plugin://") ||
     CDirectory::GetDirectory(share.strPath, items, "", DIR_FLAG_NO_FILE_DIRS | DIR_FLAG_ALLOW_PROMPT) ||
     CGUIDialogYesNo::ShowAndGetInput(CVariant{ 1001 }, CVariant{ 1025 }))
   {

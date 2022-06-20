@@ -57,7 +57,7 @@ bool CPlayListPLS::Load(const std::string &strFile)
   Clear();
 
   bool bShoutCast = false;
-  if( StringUtils::StartsWithNoCase(strFileName, "shout://") )
+  if( UnicodeUtils::StartsWithNoCase(strFileName, "shout://") )
   {
     strFileName.replace(0, 8, "http://");
     m_strBasePath = "";
@@ -120,7 +120,7 @@ bool CPlayListPLS::Load(const std::string &strFile)
       {
         m_vecItems.reserve(atoi(strValue.c_str()));
       }
-      else if (StringUtils::StartsWith(strLeft, "file"))
+      else if (UnicodeUtils::StartsWith(strLeft, "file"))
       {
         std::vector <int>::size_type idx = atoi(strLeft.c_str() + 4);
         if (!Resize(idx))
@@ -145,7 +145,7 @@ bool CPlayListPLS::Load(const std::string &strFile)
         g_charsetConverter.unknownToUTF8(strValue);
         m_vecItems[idx - 1]->SetPath(strValue);
       }
-      else if (StringUtils::StartsWith(strLeft, "title"))
+      else if (UnicodeUtils::StartsWith(strLeft, "title"))
       {
         std::vector <int>::size_type idx = atoi(strLeft.c_str() + 5);
         if (!Resize(idx))
@@ -156,7 +156,7 @@ bool CPlayListPLS::Load(const std::string &strFile)
         g_charsetConverter.unknownToUTF8(strValue);
         m_vecItems[idx - 1]->SetLabel(strValue);
       }
-      else if (StringUtils::StartsWith(strLeft, "length"))
+      else if (UnicodeUtils::StartsWith(strLeft, "length"))
       {
         std::vector <int>::size_type idx = atoi(strLeft.c_str() + 6);
         if (!Resize(idx))

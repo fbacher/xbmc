@@ -226,7 +226,7 @@ namespace XBMCAddon
       if (!shares)
       {
         CServiceBroker::GetMediaManager().GetLocalDrives(localShares);
-        if (StringUtils::CompareNoCase(s_shares, "local") != 0)
+        if (UnicodeUtils::CompareNoCase(s_shares, "local") != 0)
           CServiceBroker::GetMediaManager().GetNetworkLocations(localShares);
       }
       else // always append local drives
@@ -261,7 +261,7 @@ namespace XBMCAddon
       if (!shares)
       {
         CServiceBroker::GetMediaManager().GetLocalDrives(localShares);
-        if (StringUtils::CompareNoCase(s_shares, "local") != 0)
+        if (UnicodeUtils::CompareNoCase(s_shares, "local") != 0)
           CServiceBroker::GetMediaManager().GetNetworkLocations(localShares);
       }
       else // always append local drives

@@ -404,7 +404,7 @@ void CFileItemHandler::HandleFileItem(const char* ID,
       else if (item->HasVideoInfoTag() && item->GetVideoInfoTag()->m_iDbId > 0)
         object[ID] = item->GetVideoInfoTag()->m_iDbId;
 
-      if (StringUtils::CompareNoCase(ID, "id") == 0)
+      if (UnicodeUtils::CompareNoCase(ID, "id") == 0)
       {
         if (item->HasPVRChannelInfoTag())
           object["type"] = "channel";

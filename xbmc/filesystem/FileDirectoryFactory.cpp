@@ -75,7 +75,7 @@ IFileDirectory* CFileDirectoryFactory::Create(const CURL& url, CFileItem* pItem,
      * @note: Do not check audio decoder files that are already open, they cannot
      * contain any further sub-folders.
      */
-    if (!StringUtils::EndsWith(strExtension, KODI_ADDON_AUDIODECODER_TRACK_EXT))
+    if (!UnicodeUtils::EndsWith(strExtension, KODI_ADDON_AUDIODECODER_TRACK_EXT))
     {
       auto addonInfos = CServiceBroker::GetExtsMimeSupportList().GetExtensionSupportedAddonInfos(
           strExtension, CExtsMimeSupportList::FilterSelect::hasTracks);

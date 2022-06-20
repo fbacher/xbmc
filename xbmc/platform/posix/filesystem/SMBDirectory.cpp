@@ -141,10 +141,10 @@ bool CSMBDirectory::GetDirectory(const CURL& url, CFileItemList &items)
       int64_t lTimeDate = 0;
       bool hidden = false;
 
-      if(StringUtils::EndsWith(strFile, "$") && aDir.type == SMBC_FILE_SHARE )
+      if(UnicodeUtils::EndsWith(strFile, "$") && aDir.type == SMBC_FILE_SHARE )
         continue;
 
-      if (StringUtils::StartsWith(strFile, "."))
+      if (UnicodeUtils::StartsWith(strFile, "."))
         hidden = true;
 
       // only stat files that can give proper responses

@@ -635,7 +635,7 @@ void CGUIBaseContainer::OnJumpLetter(const std::string& letter, bool skip /*=fal
     std::string label = item->GetLabel();
     if (CServiceBroker::GetSettingsComponent()->GetSettings()->GetBool(CSettings::SETTING_FILELISTS_IGNORETHEWHENSORTING))
       label = SortUtils::RemoveArticles(label);
-    if (StringUtils::StartsWith(label, m_match))
+    if (UnicodeUtils::StartsWith(label, m_match))
     {
       SelectItem(i);
       return;

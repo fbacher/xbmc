@@ -284,7 +284,7 @@ void URIUtils::GetCommonPath(std::string& strParent, const std::string& strPath)
   //       it would be better to use something like "StartsWithNoCase" if possible.
 
   while (j <= std::min(strParent.size(), strPath.size()) &&
-         StringUtils::CompareNoCase(strParent, strPath, j) == 0)
+         UnicodeUtils::CompareNoCase(strParent, strPath, j) == 0)
     j++;
   strParent.erase(j - 1);
   // they should at least share a / at the end, though for things such as path/cd1 and path/cd2 there won't be
@@ -456,7 +456,7 @@ std::string URIUtils::GetBasePath(const std::string& strPath)
   {
     strCheck = strDirectory;
     RemoveSlashAtEnd(strCheck);
-    if (GetFileName(strCheck).size() == 3 && StringUtils::StartsWithNoCase(GetFileName(strCheck), "cd"))
+    if (GetFileName(strCheck).size() == 3 && UnicodeUtils::StartsWithNoCase(GetFileName(strCheck), "cd"))
       strDirectory = GetDirectory(strCheck);
   }
   return strDirectory;
@@ -547,7 +547,7 @@ std::string URIUtils::SubstitutePath(const std::string& strPath, bool reverse /*
 
 bool URIUtils::IsProtocol(const std::string& url, const std::string &type)
 {
-  return StringUtils::StartsWithNoCase(url, type + "://");
+  return UnicodeUtils::StartsWithNoCase(url, type + "://");
 }
 
 bool URIUtils::PathHasParent(std::string path, std::string parent, bool translate /* = false */)
@@ -567,7 +567,7 @@ bool URIUtils::PathHasParent(std::string path, std::string parent, bool translat
   // Make sure parent has a trailing slash
   AddSlashAtEnd(parent);
 
-  return StringUtils::StartsWith(path, parent);
+  return UnicodeUtils::StartsWith(path, parent);
 }
 
 bool URIUtils::PathEquals(std::string path1, std::string path2, bool ignoreTrailingSlash /* = false */, bool ignoreURLOptions /* = false */)
@@ -792,7 +792,7 @@ bool URIUtils::IsRAR(const std::string& strFile)
 {
   std::string strExtension = GetExtension(strFile);
 
-  if (strExtension == ".001" && !StringUtils::EndsWithNoCase(strFile, ".ts.001"))
+  if (strExtension == ".001" && !UnicodeUtils::EndsWithNoCase(strFile, ".ts.001"))
     return true;
 
   if (UnicodeUtils::EqualsNoCase(strExtension, ".cbr"))
@@ -1000,7 +1000,7 @@ bool URIUtils::IsPVRGuideItem(const std::string& strFile)
   if (IsStack(strFile))
     return IsPVRGuideItem(CStackDirectory::GetFirstStackedFile(strFile));
 
-  return StringUtils::StartsWithNoCase(strFile, "pvr://guide");
+  return UnicodeUtils::StartsWithNoCase(strFile, "pvr://guide");
 }
 
 bool URIUtils::IsDAV(const std::string& strFile)
@@ -1108,8 +1108,8 @@ bool URIUtils::IsLiveTV(const std::string& strFile)
   std::string strFileWithoutSlash(strFile);
   RemoveSlashAtEnd(strFileWithoutSlash);
 
-  if (StringUtils::EndsWithNoCase(strFileWithoutSlash, ".pvr") &&
-      !StringUtils::StartsWith(strFileWithoutSlash, "pvr://recordings"))
+  if (UnicodeUtils::EndsWithNoCase(strFileWithoutSlash, ".pvr") &&
+      !UnicodeUtils::StartsWith(strFileWithoutSlash, "pvr://recordings"))
     return true;
 
   return false;
@@ -1120,13 +1120,13 @@ bool URIUtils::IsPVRRecording(const std::string& strFile)
   std::string strFileWithoutSlash(strFile);
   RemoveSlashAtEnd(strFileWithoutSlash);
 
-  return StringUtils::EndsWithNoCase(strFileWithoutSlash, ".pvr") &&
-         StringUtils::StartsWith(strFile, "pvr://recordings");
+  return UnicodeUtils::EndsWithNoCase(strFileWithoutSlash, ".pvr") &&
+         UnicodeUtils::StartsWith(strFile, "pvr://recordings");
 }
 
 bool URIUtils::IsPVRRecordingFileOrFolder(const std::string& strFile)
 {
-  return StringUtils::StartsWith(strFile, "pvr://recordings");
+  return UnicodeUtils::StartsWith(strFile, "pvr://recordings");
 }
 
 bool URIUtils::IsMusicDb(const std::string& strFile)
@@ -1175,7 +1175,7 @@ bool URIUtils::IsLibraryContent(const std::string &strFile)
   return (IsProtocol(strFile, "library") ||
           IsProtocol(strFile, "videodb") ||
           IsProtocol(strFile, "musicdb") ||
-          StringUtils::EndsWith(strFile, ".xsp"));
+          UnicodeUtils::EndsWith(strFile, ".xsp"));
 }
 
 bool URIUtils::IsDOSPath(const std::string &path)

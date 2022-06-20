@@ -223,7 +223,7 @@ char* Interface_General::get_region(void* kodiBase, const char* id)
   }
 
   std::string result;
-  if (StringUtils::CompareNoCase(id, "datelong") == 0)
+  if (UnicodeUtils::CompareNoCase(id, "datelong") == 0)
   {
     result = g_langInfo.GetDateFormat(true);
     StringUtils::Replace(result, "DDDD", "%A");
@@ -231,7 +231,7 @@ char* Interface_General::get_region(void* kodiBase, const char* id)
     StringUtils::Replace(result, "D", "%d");
     StringUtils::Replace(result, "YYYY", "%Y");
   }
-  else if (StringUtils::CompareNoCase(id, "dateshort") == 0)
+  else if (UnicodeUtils::CompareNoCase(id, "dateshort") == 0)
   {
     result = g_langInfo.GetDateFormat(false);
     StringUtils::Replace(result, "MM", "%m");
@@ -245,11 +245,11 @@ char* Interface_General::get_region(void* kodiBase, const char* id)
 #endif
     StringUtils::Replace(result, "YYYY", "%Y");
   }
-  else if (StringUtils::CompareNoCase(id, "tempunit") == 0)
+  else if (UnicodeUtils::CompareNoCase(id, "tempunit") == 0)
     result = g_langInfo.GetTemperatureUnitString();
-  else if (StringUtils::CompareNoCase(id, "speedunit") == 0)
+  else if (UnicodeUtils::CompareNoCase(id, "speedunit") == 0)
     result = g_langInfo.GetSpeedUnitString();
-  else if (StringUtils::CompareNoCase(id, "time") == 0)
+  else if (UnicodeUtils::CompareNoCase(id, "time") == 0)
   {
     result = g_langInfo.GetTimeFormat();
     StringUtils::Replace(result, "H", "%H");
@@ -258,7 +258,7 @@ char* Interface_General::get_region(void* kodiBase, const char* id)
     StringUtils::Replace(result, "ss", "%S");
     StringUtils::Replace(result, "xx", "%p");
   }
-  else if (StringUtils::CompareNoCase(id, "meridiem") == 0)
+  else if (UnicodeUtils::CompareNoCase(id, "meridiem") == 0)
     result = StringUtils::Format("{}/{}", g_langInfo.GetMeridiemSymbol(MeridiemSymbolAM),
                                  g_langInfo.GetMeridiemSymbol(MeridiemSymbolPM));
   else
@@ -351,17 +351,17 @@ void Interface_General::kodi_version(void* kodiBase, char** compile_name, int* m
   *minor = CCompileInfo::GetMinor();
   *revision = strdup(CCompileInfo::GetSCMID());
   std::string tagStr = CCompileInfo::GetSuffix();
-  if (StringUtils::StartsWithNoCase(tagStr, "alpha"))
+  if (UnicodeUtils::StartsWithNoCase(tagStr, "alpha"))
   {
     *tag = strdup("alpha");
     *tagversion = strdup(UnicodeUtils::Mid(tagStr, 5).c_str());
   }
-  else if (StringUtils::StartsWithNoCase(tagStr, "beta"))
+  else if (UnicodeUtils::StartsWithNoCase(tagStr, "beta"))
   {
     *tag = strdup("beta");
     *tagversion = strdup(UnicodeUtils::Mid(tagStr, 4).c_str());
   }
-  else if (StringUtils::StartsWithNoCase(tagStr, "rc"))
+  else if (UnicodeUtils::StartsWithNoCase(tagStr, "rc"))
   {
     *tag = strdup("releasecandidate");
     *tagversion = strdup(UnicodeUtils::Mid(tagStr, 2).c_str());

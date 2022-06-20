@@ -540,7 +540,7 @@ void Xcddb::parseData(const char *buffer)
       m_strYear = TrimToUTF8(strValue);
     else if (strKeyword== "DGENRE")
       m_strGenre = TrimToUTF8(strValue);
-    else if (StringUtils::StartsWith(strKeyword, "TTITLE"))
+    else if (UnicodeUtils::StartsWith(strKeyword, "TTITLE"))
       addTitle((strKeyword + "=" + strValue).c_str());
     else if (strKeyword == "EXTD")
     {
@@ -572,7 +572,7 @@ void Xcddb::parseData(const char *buffer)
         }
       }
     }
-    else if (StringUtils::StartsWith(strKeyword, "EXTT"))
+    else if (UnicodeUtils::StartsWith(strKeyword, "EXTT"))
       addExtended((strKeyword + "=" + strValue).c_str());
   }
 

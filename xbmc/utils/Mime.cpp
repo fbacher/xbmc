@@ -560,7 +560,7 @@ std::string CMime::GetMimeType(const CURL &url, bool lookup)
     // try to get mime-type again but with an NSPlayer User-Agent
     // in order for server to provide correct mime-type.  Allows us
     // to properly detect an MMS stream
-    if (StringUtils::StartsWithNoCase(strmime, "video/x-ms-"))
+    if (UnicodeUtils::StartsWithNoCase(strmime, "video/x-ms-"))
       XFILE::CCurlFile::GetMimeType(url, strmime, "NSPlayer/11.00.6001.7000");
 
     // make sure there are no options set in mime-type
@@ -622,9 +622,9 @@ CMime::EFileType CMime::GetFileTypeFromMime(const std::string& mimeType)
       return FileTypeJpeg;
   }
 
-  if (StringUtils::EndsWith(subtype, "+zip"))
+  if (UnicodeUtils::EndsWith(subtype, "+zip"))
     return FileTypeZip;
-  if (StringUtils::EndsWith(subtype, "+xml"))
+  if (UnicodeUtils::EndsWith(subtype, "+xml"))
     return FileTypeXml;
 
   return FileTypeUnknown;

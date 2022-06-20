@@ -122,7 +122,7 @@ std::string CLanguageResource::GetAddonId(const std::string& locale)
     return "";
 
   std::string addonId = locale;
-  if (!StringUtils::StartsWith(addonId, LANGUAGE_ADDON_PREFIX))
+  if (!UnicodeUtils::StartsWith(addonId, LANGUAGE_ADDON_PREFIX))
     addonId = LANGUAGE_ADDON_PREFIX + locale;
 
   return UnicodeUtils::FoldCase(addonId);

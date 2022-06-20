@@ -76,7 +76,7 @@ bool CCharsetDetection::DetectXmlEncoding(const char* const xmlContent, const si
     if (UnicodeUtils::EqualsNoCase(detectedEncoding,"UTF-8"))
       return true; // fast track for most common case
 
-    if (StringUtils::StartsWithNoCase(detectedEncoding, "UCS-") || StringUtils::StartsWithNoCase(detectedEncoding, "UTF-"))
+    if (UnicodeUtils::StartsWithNoCase(detectedEncoding, "UCS-") || UnicodeUtils::StartsWithNoCase(detectedEncoding, "UTF-"))
     {
       if (UnicodeUtils::EqualsNoCase(detectedEncoding, "UTF-7"))
         return true;
@@ -115,41 +115,41 @@ bool CCharsetDetection::DetectXmlEncoding(const char* const xmlContent, const si
   if (UnicodeUtils::EqualsNoCase(declaredEncoding, guessedEncoding))
     return true;
 
-  if (StringUtils::StartsWithNoCase(guessedEncoding, "UCS-4"))
+  if (UnicodeUtils::StartsWithNoCase(guessedEncoding, "UCS-4"))
   {
     if (declaredEncoding.length() < 5 ||
-        (!StringUtils::StartsWithNoCase(declaredEncoding, "UTF-32") && !StringUtils::StartsWithNoCase(declaredEncoding, "UCS-4")))
+        (!UnicodeUtils::StartsWithNoCase(declaredEncoding, "UTF-32") && !UnicodeUtils::StartsWithNoCase(declaredEncoding, "UCS-4")))
     { /* Guessed encoding was correct because we can convert and read XML declaration, but declaration itself is wrong (not 4-bytes encoding) */
       detectedEncoding = guessedEncoding;
       return true;
     }
   }
-  else if (StringUtils::StartsWithNoCase(guessedEncoding, "UTF-16"))
+  else if (UnicodeUtils::StartsWithNoCase(guessedEncoding, "UTF-16"))
   {
     if (declaredEncoding.length() < 5 ||
-        (!StringUtils::StartsWithNoCase(declaredEncoding, "UTF-16") && !StringUtils::StartsWithNoCase(declaredEncoding, "UCS-2")))
+        (!UnicodeUtils::StartsWithNoCase(declaredEncoding, "UTF-16") && !UnicodeUtils::StartsWithNoCase(declaredEncoding, "UCS-2")))
     { /* Guessed encoding was correct because we can read XML declaration, but declaration is wrong (not 2-bytes encoding) */
       detectedEncoding = guessedEncoding;
       return true;
     }
   }
 
-  if (StringUtils::StartsWithNoCase(guessedEncoding, "UCS-4") || StringUtils::StartsWithNoCase(guessedEncoding, "UTF-16"))
+  if (UnicodeUtils::StartsWithNoCase(guessedEncoding, "UCS-4") || UnicodeUtils::StartsWithNoCase(guessedEncoding, "UTF-16"))
   {
     /* Check endianness in declared encoding. We already know correct endianness as XML declaration was detected after conversion. */
     /* Guessed UTF/UCS encoding always ends with endianness */
     std::string guessedEndianness(guessedEncoding, guessedEncoding.length() - 2);
 
-    if (!StringUtils::EndsWithNoCase(declaredEncoding, "BE") && !StringUtils::EndsWithNoCase(declaredEncoding, "LE")) /* Declared encoding without endianness */
+    if (!UnicodeUtils::EndsWithNoCase(declaredEncoding, "BE") && !UnicodeUtils::EndsWithNoCase(declaredEncoding, "LE")) /* Declared encoding without endianness */
       detectedEncoding = declaredEncoding + guessedEndianness; /* add guessed endianness */
-    else if (!StringUtils::EndsWithNoCase(declaredEncoding, guessedEndianness)) /* Wrong endianness in declared encoding */
+    else if (!UnicodeUtils::EndsWithNoCase(declaredEncoding, guessedEndianness)) /* Wrong endianness in declared encoding */
       detectedEncoding = declaredEncoding.substr(0, declaredEncoding.length() - 2) + guessedEndianness; /* replace endianness by guessed endianness */
     else
       detectedEncoding = declaredEncoding; /* declared encoding with correct endianness */
 
     return true;
   }
-  else if (StringUtils::StartsWithNoCase(guessedEncoding, "EBCDIC"))
+  else if (UnicodeUtils::StartsWithNoCase(guessedEncoding, "EBCDIC"))
   {
     if (declaredEncoding.find("EBCDIC") != std::string::npos)
       detectedEncoding = declaredEncoding; /* Declared encoding is some specific EBCDIC encoding */

@@ -238,7 +238,7 @@ bool CHttpRanges::Parse(const std::string& header, uint64_t totalLength)
 {
   m_ranges.clear();
 
-  if (header.empty() || totalLength == 0 || !StringUtils::StartsWithNoCase(header, "bytes="))
+  if (header.empty() || totalLength == 0 || !UnicodeUtils::StartsWithNoCase(header, "bytes="))
     return false;
 
   uint64_t lastPossiblePosition = totalLength - 1;

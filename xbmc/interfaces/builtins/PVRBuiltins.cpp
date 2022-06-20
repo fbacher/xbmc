@@ -131,7 +131,7 @@ int EpgGridControl(const std::vector<std::string>& params)
   {
     guideWindow->OpenDateSelectionDialog();
   }
-  else if (StringUtils::StartsWithNoCase(param, "+") || StringUtils::StartsWithNoCase(param, "-"))
+  else if (UnicodeUtils::StartsWithNoCase(param, "+") || UnicodeUtils::StartsWithNoCase(param, "-"))
   {
     // jump back/forward n hours
     if (std::regex_match(param, std::regex("[(-|+)|][0-9]+")))

@@ -243,7 +243,7 @@ static int SetFile(const std::vector<std::string>& params)
     std::string replace;
     if (CGUIDialogFileBrowser::ShowAndGetFile(url.Get(), strMask, CAddonInfo::TranslateType(type, true), replace, true, true, true))
     {
-      if (StringUtils::StartsWithNoCase(replace, "addons://"))
+      if (UnicodeUtils::StartsWithNoCase(replace, "addons://"))
         CSkinSettings::GetInstance().SetString(string, URIUtils::GetFileName(replace));
       else
         CSkinSettings::GetInstance().SetString(string, replace);

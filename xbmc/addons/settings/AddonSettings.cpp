@@ -1511,7 +1511,7 @@ bool CAddonSettings::ParseOldConditionExpression(std::string str, ConditionExpre
   auto op = str.substr(0, posOpen);
 
   // check if the operator is negated
-  expression.m_negated = StringUtils::StartsWith(op, "!");
+  expression.m_negated = UnicodeUtils::StartsWith(op, "!");
   if (expression.m_negated)
     op = op.substr(1);
 

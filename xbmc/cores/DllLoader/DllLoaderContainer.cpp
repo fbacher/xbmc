@@ -73,10 +73,10 @@ LibraryLoader* DllLoaderContainer::GetModule(const char* sName)
 {
   for (int i = 0; i < m_iNrOfDlls && m_dlls[i] != NULL; i++)
   {
-    if (StringUtils::CompareNoCase(m_dlls[i]->GetName(), sName) == 0)
+    if (UnicodeUtils::CompareNoCase(m_dlls[i]->GetName(), sName) == 0)
       return m_dlls[i];
     if (!m_dlls[i]->IsSystemDll() &&
-        StringUtils::CompareNoCase(m_dlls[i]->GetFileName(), sName) == 0)
+        UnicodeUtils::CompareNoCase(m_dlls[i]->GetFileName(), sName) == 0)
       return m_dlls[i];
   }
 
@@ -268,7 +268,7 @@ bool DllLoaderContainer::IsSystemDll(const char* sName)
 {
   for (int i = 0; i < m_iNrOfDlls && m_dlls[i] != NULL; i++)
   {
-    if (m_dlls[i]->IsSystemDll() && StringUtils::CompareNoCase(m_dlls[i]->GetName(), sName) == 0)
+    if (m_dlls[i]->IsSystemDll() && UnicodeUtils::CompareNoCase(m_dlls[i]->GetName(), sName) == 0)
       return true;
   }
 

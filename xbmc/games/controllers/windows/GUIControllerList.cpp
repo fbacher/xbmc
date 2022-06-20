@@ -227,7 +227,7 @@ bool CGUIControllerList::RefreshControllers(void)
                 if (i->ID() != DEFAULT_CONTROLLER_ID && j->ID() == DEFAULT_CONTROLLER_ID)
                   return false;
 
-                return StringUtils::CompareNoCase(i->Layout().Label(), j->Layout().Label()) < 0;
+                return UnicodeUtils::CompareNoCase(i->Layout().Label(), j->Layout().Label()) < 0;
               });
   }
 

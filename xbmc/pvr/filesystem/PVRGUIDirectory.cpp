@@ -48,7 +48,7 @@ bool CPVRGUIDirectory::Exists() const
   if (!CServiceBroker::GetPVRManager().IsStarted())
     return false;
 
-  return m_url.IsProtocol("pvr") && StringUtils::StartsWith(m_url.GetFileName(), "recordings");
+  return m_url.IsProtocol("pvr") && UnicodeUtils::StartsWith(m_url.GetFileName(), "recordings");
 }
 
 bool CPVRGUIDirectory::SupportsWriteFileOperations() const
@@ -175,7 +175,7 @@ bool CPVRGUIDirectory::GetDirectory(CFileItemList& results) const
     }
     return true;
   }
-  else if (StringUtils::StartsWith(fileName, "tv"))
+  else if (UnicodeUtils::StartsWith(fileName, "tv"))
   {
     if (CServiceBroker::GetPVRManager().IsStarted())
     {
@@ -183,7 +183,7 @@ bool CPVRGUIDirectory::GetDirectory(CFileItemList& results) const
     }
     return true;
   }
-  else if (StringUtils::StartsWith(fileName, "radio"))
+  else if (UnicodeUtils::StartsWith(fileName, "radio"))
   {
     if (CServiceBroker::GetPVRManager().IsStarted())
     {
@@ -191,7 +191,7 @@ bool CPVRGUIDirectory::GetDirectory(CFileItemList& results) const
     }
     return true;
   }
-  else if (StringUtils::StartsWith(fileName, "recordings"))
+  else if (UnicodeUtils::StartsWith(fileName, "recordings"))
   {
     if (CServiceBroker::GetPVRManager().IsStarted())
     {
@@ -199,7 +199,7 @@ bool CPVRGUIDirectory::GetDirectory(CFileItemList& results) const
     }
     return true;
   }
-  else if (StringUtils::StartsWith(fileName, "channels"))
+  else if (UnicodeUtils::StartsWith(fileName, "channels"))
   {
     if (CServiceBroker::GetPVRManager().IsStarted())
     {
@@ -207,7 +207,7 @@ bool CPVRGUIDirectory::GetDirectory(CFileItemList& results) const
     }
     return true;
   }
-  else if (StringUtils::StartsWith(fileName, "timers"))
+  else if (UnicodeUtils::StartsWith(fileName, "timers"))
   {
     if (CServiceBroker::GetPVRManager().IsStarted())
     {
@@ -278,7 +278,7 @@ bool IsDirectoryMember(const std::string& strDirectory,
   if (bGrouped)
     return UnicodeUtils::EqualsNoCase(strUseDirectory, strUseEntryDirectory);
   else
-    return StringUtils::StartsWithNoCase(strUseEntryDirectory, strUseDirectory);
+    return UnicodeUtils::StartsWithNoCase(strUseEntryDirectory, strUseDirectory);
 }
 
 void GetSubDirectories(const CPVRRecordingsPath& recParentPath,

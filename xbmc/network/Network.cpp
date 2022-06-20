@@ -134,7 +134,7 @@ bool CNetworkBase::IsLocalHost(const std::string& hostname)
   if (hostname.empty())
     return false;
 
-  if (StringUtils::StartsWith(hostname, "127.")
+  if (UnicodeUtils::StartsWith(hostname, "127.")
       || (hostname == "::1")
       || UnicodeUtils::EqualsNoCase(hostname, "localhost"))
     return true;

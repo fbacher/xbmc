@@ -269,7 +269,7 @@ bool CApplicationSkinHandling::LoadCustomWindows()
           continue;
 
         std::string skinFile = URIUtils::GetFileName(item->GetPath());
-        if (StringUtils::StartsWithNoCase(skinFile, "custom"))
+        if (UnicodeUtils::StartsWithNoCase(skinFile, "custom"))
         {
           CXBMCTinyXML xmlDoc;
           if (!xmlDoc.LoadFile(item->GetPath()))

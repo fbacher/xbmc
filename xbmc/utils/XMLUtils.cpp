@@ -118,7 +118,7 @@ bool XMLUtils::GetString(const TiXmlNode* pRootNode, const char* strTag, std::st
   if (pNode != NULL)
   {
     strStringValue = pNode->ValueStr();
-    if (encoded && StringUtils::CompareNoCase(encoded, "yes") == 0)
+    if (encoded && UnicodeUtils::CompareNoCase(encoded, "yes") == 0)
       strStringValue = CURL::Decode(strStringValue);
     return true;
   }
@@ -157,7 +157,7 @@ bool XMLUtils::GetAdditiveString(const TiXmlNode* pRootNode, const char* strTag,
       bResult = true;
       strTemp = node->FirstChild()->Value();
       const char* clear=node->Attribute("clear");
-      if (strStringValue.empty() || (clear && StringUtils::CompareNoCase(clear, "true") == 0))
+      if (strStringValue.empty() || (clear && UnicodeUtils::CompareNoCase(clear, "true") == 0))
         strStringValue = strTemp;
       else
         strStringValue += strSeparator+strTemp;
@@ -187,7 +187,7 @@ bool XMLUtils::GetStringArray(const TiXmlNode* pRootNode, const char* strTag, st
       strTemp = node->FirstChild()->ValueStr();
 
       const char* clearAttr = node->Attribute("clear");
-      if (clearAttr && StringUtils::CompareNoCase(clearAttr, "true") == 0)
+      if (clearAttr && UnicodeUtils::CompareNoCase(clearAttr, "true") == 0)
         arrayValue.clear();
 
       if (strTemp.empty())
@@ -217,7 +217,7 @@ bool XMLUtils::GetPath(const TiXmlNode* pRootNode, const char* strTag, std::stri
   if (pNode != NULL)
   {
     strStringValue = pNode->Value();
-    if (encoded && StringUtils::CompareNoCase(encoded, "yes") == 0)
+    if (encoded && UnicodeUtils::CompareNoCase(encoded, "yes") == 0)
       strStringValue = CURL::Decode(strStringValue);
     return true;
   }

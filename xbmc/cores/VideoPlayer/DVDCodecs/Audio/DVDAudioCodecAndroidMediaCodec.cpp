@@ -53,7 +53,7 @@ static bool IsDownmixDecoder(const std::string &name)
   };
   for (const char **ptr = downmixDecoders; *ptr; ptr++)
   {
-    if (StringUtils::StartsWithNoCase(name, *ptr))
+    if (UnicodeUtils::StartsWithNoCase(name, *ptr))
       return true;
   }
   return false;
@@ -67,7 +67,7 @@ static bool IsDecoderWhitelisted(const std::string &name)
   };
   for (const char **ptr = whitelistDecoders; *ptr; ptr++)
   {
-    if (StringUtils::StartsWithNoCase(name, *ptr))
+    if (UnicodeUtils::StartsWithNoCase(name, *ptr))
       return true;
   }
   return false;

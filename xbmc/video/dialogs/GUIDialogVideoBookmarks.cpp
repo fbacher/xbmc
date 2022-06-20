@@ -272,7 +272,7 @@ void CGUIDialogVideoBookmarks::OnRefreshList()
     std::string time = StringUtils::SecondsToTimeString((long) pos, TIME_FORMAT_HH_MM_SS);
 
     if (chapterName.empty() ||
-        StringUtils::StartsWithNoCase(chapterName, time) ||
+        UnicodeUtils::StartsWithNoCase(chapterName, time) ||
         StringUtils::IsNaturalNumber(chapterName))
       chapterName = StringUtils::Format(g_localizeStrings.Get(25010), i);
 

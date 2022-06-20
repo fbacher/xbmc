@@ -64,8 +64,8 @@ bool IDirectory::IsAllowed(const CURL& url) const
 
     return UnicodeUtils::EqualsNoCase(fileName, "video_ts.ifo") ||
           (fileName.length() == 12 &&
-           StringUtils::StartsWithNoCase(fileName, "vts_") &&
-           StringUtils::EndsWithNoCase(fileName, "_0.ifo"));
+           UnicodeUtils::StartsWithNoCase(fileName, "vts_") &&
+           UnicodeUtils::EndsWithNoCase(fileName, "_0.ifo"));
   }
 
   if (URIUtils::HasExtension(url, ".dat"))
@@ -81,9 +81,9 @@ bool IDirectory::IsAllowed(const CURL& url) const
       // Allow filenames of the form AVSEQ##(#).DAT, ITEM###(#).DAT
       // and MUSIC##(#).DAT
       return (fileName.length() == 11 || fileName.length() == 12) &&
-             (StringUtils::StartsWithNoCase(fileName, "AVSEQ") ||
-              StringUtils::StartsWithNoCase(fileName, "MUSIC") ||
-              StringUtils::StartsWithNoCase(fileName, "ITEM"));
+             (UnicodeUtils::StartsWithNoCase(fileName, "AVSEQ") ||
+              UnicodeUtils::StartsWithNoCase(fileName, "MUSIC") ||
+              UnicodeUtils::StartsWithNoCase(fileName, "ITEM"));
     }
   }
   return true;

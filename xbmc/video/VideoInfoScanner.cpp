@@ -1536,7 +1536,7 @@ namespace VIDEO
       std::string candidate = URIUtils::GetFileName(artFile->GetPath());
 
       bool matchesFilename =
-        !baseFilename.empty() && StringUtils::StartsWith(candidate, baseFilename);
+        !baseFilename.empty() && UnicodeUtils::StartsWith(candidate, baseFilename);
       if (!baseFilename.empty() && !matchesFilename)
         continue;
 

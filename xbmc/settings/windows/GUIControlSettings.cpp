@@ -88,13 +88,13 @@ static CFileItemPtr GetFileItem(const std::string& label,
 template<class SettingOption>
 static bool CompareSettingOptionAseconding(const SettingOption& lhs, const SettingOption& rhs)
 {
-  return StringUtils::CompareNoCase(lhs.label, rhs.label) < 0;
+  return UnicodeUtils::CompareNoCase(lhs.label, rhs.label) < 0;
 }
 
 template<class SettingOption>
 static bool CompareSettingOptionDeseconding(const SettingOption& lhs, const SettingOption& rhs)
 {
-  return StringUtils::CompareNoCase(lhs.label, rhs.label) > 0;
+  return UnicodeUtils::CompareNoCase(lhs.label, rhs.label) > 0;
 }
 
 static bool GetIntegerOptions(const SettingConstPtr& setting,

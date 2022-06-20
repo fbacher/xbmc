@@ -439,7 +439,7 @@ void CPVRRecording::Update(const CPVRRecording& tag, const CPVRClient& client)
 
   //Old Method of identifying TV show title and subtitle using m_strDirectory and strPlotOutline (deprecated)
   std::string strShow = StringUtils::Format("{} - ", g_localizeStrings.Get(20364));
-  if (StringUtils::StartsWithNoCase(m_strPlotOutline, strShow))
+  if (UnicodeUtils::StartsWithNoCase(m_strPlotOutline, strShow))
   {
     CLog::Log(LOGWARNING, "PVR addon provides episode name in strPlotOutline which is deprecated");
     std::string strEpisode = m_strPlotOutline;

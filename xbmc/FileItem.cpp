@@ -876,7 +876,7 @@ bool CFileItem::Exists(bool bUseCache /* = true */) const
 bool CFileItem::IsVideo() const
 {
   /* check preset mime type */
-  if(StringUtils::StartsWithNoCase(m_mimetype, "video/"))
+  if(UnicodeUtils::StartsWithNoCase(m_mimetype, "video/"))
     return true;
 
   if (HasVideoInfoTag())
@@ -903,7 +903,7 @@ bool CFileItem::IsVideo() const
     return true;
 
   std::string extension;
-  if(StringUtils::StartsWithNoCase(m_mimetype, "application/"))
+  if(UnicodeUtils::StartsWithNoCase(m_mimetype, "application/"))
   { /* check for some standard types */
     extension = m_mimetype.substr(12);
     if( UnicodeUtils::EqualsNoCase(extension, "ogg")
@@ -972,7 +972,7 @@ bool CFileItem::IsDiscStub() const
 bool CFileItem::IsAudio() const
 {
   /* check preset mime type */
-  if(StringUtils::StartsWithNoCase(m_mimetype, "audio/"))
+  if(UnicodeUtils::StartsWithNoCase(m_mimetype, "audio/"))
     return true;
 
   if (HasMusicInfoTag())
@@ -990,7 +990,7 @@ bool CFileItem::IsAudio() const
   if (IsCDDA())
     return true;
 
-  if(StringUtils::StartsWithNoCase(m_mimetype, "application/"))
+  if(UnicodeUtils::StartsWithNoCase(m_mimetype, "application/"))
   { /* check for some standard types */
     std::string extension = m_mimetype.substr(12);
     if( UnicodeUtils::EqualsNoCase(extension, "ogg")
@@ -1043,7 +1043,7 @@ bool CFileItem::IsGame() const
 
 bool CFileItem::IsPicture() const
 {
-  if(StringUtils::StartsWithNoCase(m_mimetype, "image/"))
+  if(UnicodeUtils::StartsWithNoCase(m_mimetype, "image/"))
     return true;
 
   if (HasPictureInfoTag())
@@ -1194,14 +1194,14 @@ bool CFileItem::IsDVDFile(bool bVobs /*= true*/, bool bIfos /*= true*/) const
   {
     if (UnicodeUtils::EqualsNoCase(strFileName, "video_ts.ifo"))
       return true;
-    if (StringUtils::StartsWithNoCase(strFileName, "vts_") && StringUtils::EndsWithNoCase(strFileName, "_0.ifo") && strFileName.length() == 12)
+    if (UnicodeUtils::StartsWithNoCase(strFileName, "vts_") && UnicodeUtils::EndsWithNoCase(strFileName, "_0.ifo") && strFileName.length() == 12)
       return true;
   }
   if (bVobs)
   {
     if (UnicodeUtils::EqualsNoCase(strFileName, "video_ts.vob"))
       return true;
-    if (StringUtils::StartsWithNoCase(strFileName, "vts_") && StringUtils::EndsWithNoCase(strFileName, ".vob"))
+    if (UnicodeUtils::StartsWithNoCase(strFileName, "vts_") && UnicodeUtils::EndsWithNoCase(strFileName, ".vob"))
       return true;
   }
 
@@ -1242,8 +1242,8 @@ bool CFileItem::IsCBR() const
 
 bool CFileItem::IsRSS() const
 {
-  return StringUtils::StartsWithNoCase(m_strPath, "rss://") || URIUtils::HasExtension(m_strPath, ".rss")
-      || StringUtils::StartsWithNoCase(m_strPath, "rsss://")
+  return UnicodeUtils::StartsWithNoCase(m_strPath, "rss://") || URIUtils::HasExtension(m_strPath, ".rss")
+      || UnicodeUtils::StartsWithNoCase(m_strPath, "rsss://")
       || m_mimetype == "application/rss+xml";
 }
 
@@ -1574,9 +1574,9 @@ void CFileItem::FillInMimeType(bool lookup /*= true*/)
       m_mimetype = "x-directory/normal";
     else if (HasPVRChannelInfoTag())
       m_mimetype = GetPVRChannelInfoTag()->MimeType();
-    else if (StringUtils::StartsWithNoCase(GetDynPath(), "shout://") ||
-             StringUtils::StartsWithNoCase(GetDynPath(), "http://") ||
-             StringUtils::StartsWithNoCase(GetDynPath(), "https://"))
+    else if (UnicodeUtils::StartsWithNoCase(GetDynPath(), "shout://") ||
+             UnicodeUtils::StartsWithNoCase(GetDynPath(), "http://") ||
+             UnicodeUtils::StartsWithNoCase(GetDynPath(), "https://"))
     {
       // If lookup is false, bail out early to leave mime type empty
       if (!lookup)
@@ -1587,7 +1587,7 @@ void CFileItem::FillInMimeType(bool lookup /*= true*/)
       // try to get mime-type again but with an NSPlayer User-Agent
       // in order for server to provide correct mime-type.  Allows us
       // to properly detect an MMS stream
-      if (StringUtils::StartsWithNoCase(m_mimetype, "video/x-ms-"))
+      if (UnicodeUtils::StartsWithNoCase(m_mimetype, "video/x-ms-"))
         CCurlFile::GetMimeType(GetDynURL(), m_mimetype, "NSPlayer/11.00.6001.7000");
 
       // make sure there are no options set in mime-type
@@ -1606,8 +1606,8 @@ void CFileItem::FillInMimeType(bool lookup /*= true*/)
   }
 
   // change protocol to mms for the following mime-type.  Allows us to create proper FileMMS.
-  if(StringUtils::StartsWithNoCase(m_mimetype, "application/vnd.ms.wms-hdr.asfv1") ||
-     StringUtils::StartsWithNoCase(m_mimetype, "application/x-mms-framed"))
+  if(UnicodeUtils::StartsWithNoCase(m_mimetype, "application/vnd.ms.wms-hdr.asfv1") ||
+     UnicodeUtils::StartsWithNoCase(m_mimetype, "application/x-mms-framed"))
   {
     if (m_strDynPath.empty())
       m_strDynPath = m_strPath;
@@ -2750,7 +2750,7 @@ void CFileItemList::FilterCueItems()
               for (int j = 0; j < (int)m_items.size(); j++)
               {
                 CFileItemPtr pItem = m_items[j];
-                if (StringUtils::CompareNoCase(pItem->GetPath(), strMediaFile) == 0)
+                if (UnicodeUtils::CompareNoCase(pItem->GetPath(), strMediaFile) == 0)
                   pItem->SetCueDocument(cuesheet);
               }
             }
@@ -2766,7 +2766,7 @@ void CFileItemList::FilterCueItems()
     for (int j = 0; j < (int)m_items.size(); j++)
     {
       CFileItemPtr pItem = m_items[j];
-      if (StringUtils::CompareNoCase(pItem->GetPath(), itemstodelete[i]) == 0)
+      if (UnicodeUtils::CompareNoCase(pItem->GetPath(), itemstodelete[i]) == 0)
       { // delete this item
         m_items.erase(m_items.begin() + j);
         break;
@@ -3205,8 +3205,8 @@ bool CFileItemList::AlwaysCache() const
 std::string CFileItem::GetUserMusicThumb(bool alwaysCheckRemote /* = false */, bool fallbackToFolder /* = false */) const
 {
   if (m_strPath.empty()
-   || StringUtils::StartsWithNoCase(m_strPath, "newsmartplaylist://")
-   || StringUtils::StartsWithNoCase(m_strPath, "newplaylist://")
+   || UnicodeUtils::StartsWithNoCase(m_strPath, "newsmartplaylist://")
+   || UnicodeUtils::StartsWithNoCase(m_strPath, "newplaylist://")
    || m_bIsShareOrDrive
    || IsInternetStream()
    || URIUtils::IsUPnP(m_strPath)
@@ -3336,8 +3336,8 @@ std::string CFileItem::GetTBNFile() const
 bool CFileItem::SkipLocalArt() const
 {
   return (m_strPath.empty()
-       || StringUtils::StartsWithNoCase(m_strPath, "newsmartplaylist://")
-       || StringUtils::StartsWithNoCase(m_strPath, "newplaylist://")
+       || UnicodeUtils::StartsWithNoCase(m_strPath, "newsmartplaylist://")
+       || UnicodeUtils::StartsWithNoCase(m_strPath, "newplaylist://")
        || m_bIsShareOrDrive
        || IsInternetStream()
        || URIUtils::IsUPnP(m_strPath)

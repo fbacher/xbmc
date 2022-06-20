@@ -4106,7 +4106,7 @@ bool CMusicDatabase::CleanupSongsByIds(const std::string& strSongIds)
       //  Special case for streams inside an audio decoder package file.
       //  The last dir in the path is the audio file that
       //  contains the stream, so test if its there
-      if (StringUtils::EndsWith(URIUtils::GetExtension(strFileName),
+      if (UnicodeUtils::EndsWith(URIUtils::GetExtension(strFileName),
                                 KODI_ADDON_AUDIODECODER_TRACK_EXT))
       {
         strFileName = URIUtils::GetDirectory(strFileName);
@@ -5081,7 +5081,7 @@ bool CMusicDatabase::GetYearsNav(const std::string& strBaseDir,
         CSettings::SETTING_MUSICLIBRARY_USEORIGINALDATE);
 
     useOriginalYears =
-        useOriginalYears || StringUtils::StartsWith(strBaseDir, "musicdb://originalyears/");
+        useOriginalYears || UnicodeUtils::StartsWith(strBaseDir, "musicdb://originalyears/");
 
     if (!useOriginalYears)
     { // Get years from year part of release date
@@ -7757,7 +7757,7 @@ bool CMusicDatabase::GetSongsByWhereJSON(
       }
       else if (foundJSON)
       { // Field from join found in JSON request
-        if (!StringUtils::StartsWith(JSONtoDBSong[i].fieldDB, "Role_"))
+        if (!UnicodeUtils::StartsWith(JSONtoDBSong[i].fieldDB, "Role_"))
         {
           joinLayout.SetField(i - index_idAlbumArtist, JSONtoDBSong[i].SQL, true);
         }
@@ -7780,7 +7780,7 @@ bool CMusicDatabase::GetSongsByWhereJSON(
       for (const auto& name : rolefieldlist)
       {
         int idRole = -1;
-        if (StringUtils::StartsWith(name, "display"))
+        if (UnicodeUtils::StartsWith(name, "display"))
           idRole = GetRoleByName(name.substr(7));
         roleidlist.emplace_back(idRole);
       }
@@ -8020,7 +8020,7 @@ bool CMusicDatabase::GetSongsByWhereJSON(
           {
             for (const auto& displayXXX : rolefieldlist)
             {
-              if (!StringUtils::StartsWith(displayXXX, "display"))
+              if (!UnicodeUtils::StartsWith(displayXXX, "display"))
               {
                 // "contributors"
                 if (!songObj.isMember(displayXXX))
@@ -12199,10 +12199,10 @@ void CMusicDatabase::ImportFromXML(const std::string& xmlFile, CGUIDialogProgres
     // Count the number of artists, albums and songs
     while (entry)
     {
-      if (StringUtils::StartsWithNoCase(entry->Value(), "artist")||
-          StringUtils::StartsWithNoCase(entry->Value(), "album"))
+      if (UnicodeUtils::StartsWithNoCase(entry->Value(), "artist")||
+          UnicodeUtils::StartsWithNoCase(entry->Value(), "album"))
         total++;
-      else if (StringUtils::StartsWithNoCase(entry->Value(), "song"))
+      else if (UnicodeUtils::StartsWithNoCase(entry->Value(), "song"))
         songtotal++;
 
       entry = entry->NextSiblingElement();
@@ -12213,7 +12213,7 @@ void CMusicDatabase::ImportFromXML(const std::string& xmlFile, CGUIDialogProgres
     while (entry)
     {
       std::string strTitle;
-      if (StringUtils::StartsWithNoCase(entry->Value(), "artist"))
+      if (UnicodeUtils::StartsWithNoCase(entry->Value(), "artist"))
       {
         CArtist importedArtist;
         importedArtist.Load(entry);
@@ -12233,7 +12233,7 @@ void CMusicDatabase::ImportFromXML(const std::string& xmlFile, CGUIDialogProgres
                     __FUNCTION__, importedArtist.strArtist);
         current++;
       }
-      else if (StringUtils::StartsWithNoCase(entry->Value(), "album"))
+      else if (UnicodeUtils::StartsWithNoCase(entry->Value(), "album"))
       {
         CAlbum importedAlbum;
         importedAlbum.Load(entry);
@@ -12330,7 +12330,7 @@ bool CMusicDatabase::ImportSongHistory(const std::string& xmlFile,
       float fRating = 0.0;
       int iVotes;
       std::string strSQLSong;
-      if (StringUtils::StartsWithNoCase(entry->Value(), "song"))
+      if (UnicodeUtils::StartsWithNoCase(entry->Value(), "song"))
       {
         XMLUtils::GetString(entry, "artistdesc", strArtistDisp);
         XMLUtils::GetString(entry, "title", strTitle);
@@ -13100,9 +13100,9 @@ int CMusicDatabase::GetOrderFilter(const std::string& type,
   {
     //Add field for adjusted name sorting using sort name and ignoring articles
     std::string sortSQL;
-    if (StringUtils::EndsWith(name, "strArtists") || StringUtils::EndsWith(name, "strArtist"))
+    if (UnicodeUtils::EndsWith(name, "strArtists") || UnicodeUtils::EndsWith(name, "strArtist"))
     {
-      if (StringUtils::EndsWith(name, "strArtists"))
+      if (UnicodeUtils::EndsWith(name, "strArtists"))
         sortSQL = SortnameBuildSQL("artistsortname", sorting.sortAttributes, name, "strArtistSort");
       else
         sortSQL = SortnameBuildSQL("artistsortname", sorting.sortAttributes, name, "strSortName");
@@ -13115,7 +13115,7 @@ int CMusicDatabase::GetOrderFilter(const std::string& type,
       // Natural number case-insensitive sort
       filter.AppendOrder(AlphanumericSortSQL(name, sorting.sortOrder));
     }
-    else if (StringUtils::EndsWith(name, "strAlbum") || StringUtils::EndsWith(name, "strTitle"))
+    else if (UnicodeUtils::EndsWith(name, "strAlbum") || UnicodeUtils::EndsWith(name, "strTitle"))
     {
       sortSQL = SortnameBuildSQL("titlesortname", sorting.sortAttributes, name, "");
       if (!sortSQL.empty())
@@ -13127,7 +13127,7 @@ int CMusicDatabase::GetOrderFilter(const std::string& type,
       // Natural number case-insensitive sort
       filter.AppendOrder(AlphanumericSortSQL(name, sorting.sortOrder));
     }
-    else if (StringUtils::EndsWith(name, "strGenres"))
+    else if (UnicodeUtils::EndsWith(name, "strGenres"))
       // Natural number case-insensitive sort
       filter.AppendOrder(AlphanumericSortSQL(name, sorting.sortOrder));
     else

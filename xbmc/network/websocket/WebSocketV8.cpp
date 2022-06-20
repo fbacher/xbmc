@@ -51,7 +51,7 @@ bool CWebSocketV8::Handshake(const char* data, size_t length, std::string &respo
 
   // The request must be GET
   value = header.getMethod();
-  if (value == NULL || ! StringUtils::StartsWithNoCase(value, WS_HTTP_METHOD))
+  if (value == NULL || ! UnicodeUtils::StartsWithNoCase(value, WS_HTTP_METHOD))
   {
     CLog::Log(LOGINFO, "WebSocket [hybi-10]: invalid HTTP method received (GET expected)");
     return false;

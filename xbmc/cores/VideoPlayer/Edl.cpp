@@ -141,7 +141,7 @@ bool CEdl::ReadEdl(const std::string& strMovie, const float fFramesPerSecond)
       strFields[1] = strFields[0];
     }
 
-    if (StringUtils::StartsWith(strFields[0], "##"))
+    if (UnicodeUtils::StartsWith(strFields[0], "##"))
     {
       CLog::Log(LOGDEBUG, "Skipping comment line {} in EDL file: {}", iLine,
                 CURL::GetRedacted(edlFilename));
