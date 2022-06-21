@@ -10,6 +10,7 @@
 
 #include "utils/log.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 
 const CLocale CLocale::Empty;
 
@@ -69,10 +70,10 @@ bool CLocale::operator==(const CLocale& other) const
     return true;
 
   return m_valid == other.m_valid &&
-         StringUtils::EqualsNoCase(m_language, other.m_language) &&
-         StringUtils::EqualsNoCase(m_territory, other.m_territory) &&
-         StringUtils::EqualsNoCase(m_codeset, other.m_codeset) &&
-         StringUtils::EqualsNoCase(m_modifier, other.m_modifier);
+         UnicodeUtils::EqualsNoCase(m_language, other.m_language) &&
+         UnicodeUtils::EqualsNoCase(m_territory, other.m_territory) &&
+         UnicodeUtils::EqualsNoCase(m_codeset, other.m_codeset) &&
+         UnicodeUtils::EqualsNoCase(m_modifier, other.m_modifier);
 }
 
 std::string CLocale::ToString() const
@@ -103,7 +104,7 @@ std::string CLocale::ToStringLC() const
   if (StringUtils::containsNonAscii(locale)) {
        CLog::Log(LOGWARNING, "CLocale::ToStringLC locale contains non-ASCII: {}", locale);
      }
-  StringUtils::ToLower(locale, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
+  UnicodeUtils::ToLower(locale, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
 
   return locale;
 }
@@ -127,7 +128,7 @@ std::string CLocale::ToShortStringLC() const
     return "";
 
   std::string locale = ToShortString();
-  StringUtils::ToLower(locale);
+  UnicodeUtils::ToLower(locale);
 
   return locale;
 }
@@ -148,13 +149,13 @@ bool CLocale::Matches(const std::string& locale) const
   if (!m_valid || !other.m_valid)
     return false;
 
-  if (!StringUtils::EqualsNoCase(m_language, other.m_language))
+  if (!UnicodeUtils::EqualsNoCase(m_language, other.m_language))
     return false;
-  if (!m_territory.empty() && !other.m_territory.empty() && !StringUtils::EqualsNoCase(m_territory, other.m_territory))
+  if (!m_territory.empty() && !other.m_territory.empty() && !UnicodeUtils::EqualsNoCase(m_territory, other.m_territory))
     return false;
-  if (!m_codeset.empty() && !other.m_codeset.empty() && !StringUtils::EqualsNoCase(m_codeset, other.m_codeset))
+  if (!m_codeset.empty() && !other.m_codeset.empty() && !UnicodeUtils::EqualsNoCase(m_codeset, other.m_codeset))
     return false;
-  if (!m_modifier.empty() && !other.m_modifier.empty() && !StringUtils::EqualsNoCase(m_modifier, other.m_modifier))
+  if (!m_modifier.empty() && !other.m_modifier.empty() && !UnicodeUtils::EqualsNoCase(m_modifier, other.m_modifier))
     return false;
 
   return true;
@@ -253,7 +254,7 @@ bool CLocale::ParseLocale(const std::string &locale, std::string &language, std:
     if (StringUtils::containsNonAscii(territory)) {
       CLog::Log(LOGWARNING, "CLocale::ParseLocale territory contains non-ASCII: {}", territory);
     }
-    StringUtils::ToUpper(territory, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
+    UnicodeUtils::ToUpper(territory, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
     tmp = tmp.substr(0, pos);
   }
 
@@ -265,7 +266,7 @@ bool CLocale::ParseLocale(const std::string &locale, std::string &language, std:
   if (StringUtils::containsNonAscii(language)) {
        CLog::Log(LOGWARNING, "CLocale::ParseLocale language contains non-ASCII: {}", language);
      }
-  StringUtils::ToLower(language, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
+  UnicodeUtils::ToLower(language, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
 
   return CheckValidity(language, territory, codeset, modifier);
 }
@@ -284,8 +285,8 @@ void CLocale::Initialize()
     if (StringUtils::containsNonAscii(m_territory)) {
       CLog::Log(LOGWARNING, " CLocale::Initialize m_territory contains non-ASCII: {}", m_territory);
     }
-    StringUtils::ToLower(m_language, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
-    StringUtils::ToUpper(m_territory, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
+    UnicodeUtils::ToLower(m_language, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
+    UnicodeUtils::ToUpper(m_territory, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
   }
 }
 
@@ -295,17 +296,17 @@ int CLocale::GetMatchRank(const std::string& locale) const
 
   // both locales must be valid and match in language
   if (!m_valid || !other.m_valid ||
-      !StringUtils::EqualsNoCase(m_language, other.m_language))
+      !UnicodeUtils::EqualsNoCase(m_language, other.m_language))
     return -1;
 
   int rank = 0;
   // matching in territory is considered more important than matching in
   // codeset and/or modifier
-  if (!m_territory.empty() && !other.m_territory.empty() && StringUtils::EqualsNoCase(m_territory, other.m_territory))
+  if (!m_territory.empty() && !other.m_territory.empty() && UnicodeUtils::EqualsNoCase(m_territory, other.m_territory))
     rank += 3;
-  if (!m_codeset.empty() && !other.m_codeset.empty() && StringUtils::EqualsNoCase(m_codeset, other.m_codeset))
+  if (!m_codeset.empty() && !other.m_codeset.empty() && UnicodeUtils::EqualsNoCase(m_codeset, other.m_codeset))
     rank += 1;
-  if (!m_modifier.empty() && !other.m_modifier.empty() && StringUtils::EqualsNoCase(m_modifier, other.m_modifier))
+  if (!m_modifier.empty() && !other.m_modifier.empty() && UnicodeUtils::EqualsNoCase(m_modifier, other.m_modifier))
     rank += 1;
 
   return rank;

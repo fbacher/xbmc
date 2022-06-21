@@ -27,6 +27,8 @@
 // USE_ICU_COLLATOR chooses between ICU and legacy Kodi collation
 
 #define USE_ICU_COLLATOR 1
+#undef STRINGUTILS_UNICODE_ENABLE
+#define USE_STRINGUTILS_FORMAT 1
 
 /*
  *
@@ -190,7 +192,7 @@ public:
 	 *  flavor for the state of things.)
    */
 
-
+#if defined(USE_STRINGUTILS_FORMAT)
   /*!
    * \brief Get a formatted string similar to sprintf
    *
@@ -230,6 +232,9 @@ public:
 
   static std::string FormatV(PRINTF_FORMAT_STRING const char *fmt, va_list args);
   static std::wstring FormatV(PRINTF_FORMAT_STRING const wchar_t *fmt, va_list args);
+#endif
+
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
   /*!
    * \brief Converts a string to Upper case according to locale.
@@ -741,6 +746,9 @@ public:
    * \return <0 or 0 or >0 as usual for string comparisons
    */
   static int Compare(const std::string &str1, const std::string &str2);
+#endif
+
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
   /*!
    * \brief Initializes the Collator for this thread, such as before sorting a
@@ -810,6 +818,9 @@ public:
   {
     return StringUtils::Collate(std::wstring(left), std::wstring(right));
   }
+#endif
+#if defined(STRINGUTILS_UNICODE_ENABLE)
+
 
   /*!
    * \brief Performs a bit-wise comparison of two wstrings, after case folding each.
@@ -961,7 +972,7 @@ public:
   [[deprecated("StartsWith/EndsWith may be better choices. Multibyte characters, case folding and byte lengths don't mix.") ]] static int CompareNoCase(
       const char *s1, const char *s2, size_t n,
       StringOptions opt = StringOptions::FOLD_CASE_DEFAULT, const bool normalize = false);
-
+#endif
   // TODO: consider renaming to ParseInt
 
   /*!
@@ -973,6 +984,8 @@ public:
    * \return int value of found string
    */
   static int ReturnDigits(const std::string &str);
+
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
   /*!
    * \brief Get the leftmost side of a UTF-8 string, using character boundary
@@ -1154,6 +1167,7 @@ public:
    * This implementation allows for chars to be any utf-8 character(s). (Does NOT normalize).
    */
   static std::string& TrimRight(std::string &str, const char* const chars);
+#endif
 
   /*! \brief Remove leading and trailing ASCII space and TAB characters from str
    *
@@ -1238,6 +1252,8 @@ public:
   std::string RegexReplaceAll(std::string &str, const std::string pattern,
   		const std::string newStr, const int flags);
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
+
   /*! \brief Determines if a string begins with another string
    *
    * \param str1 string to be searched
@@ -1297,6 +1313,7 @@ public:
    */
   static bool StartsWithNoCase(const char *s1, const char *s2, StringOptions opt = StringOptions::FOLD_CASE_DEFAULT);
 
+
   /*! \brief Determines if a string ends with another string
    *
    * \param str1 string to be searched
@@ -1330,6 +1347,7 @@ public:
    * \return true if str1 starts with s2, otherwise false
    */
   static bool EndsWithNoCase(const std::string &str1, const char *s2, StringOptions opt = StringOptions::FOLD_CASE_DEFAULT);
+#endif
 
   /*! \brief Builds a string by appending every string from a container, separated by a delimiter
    *
@@ -1352,6 +1370,8 @@ public:
       result.erase(result.size() - delimiter.size());
     return result;
   }
+#if defined(STRINGUTILS_UNICODE_ENABLE)
+
 
   /*! \brief Splits the given input string into separate strings using the given delimiter.
 
@@ -1415,6 +1435,7 @@ public:
   static std::vector<std::string> SplitMulti(const std::vector<std::string>& input,
                                              const std::vector<std::string>& delimiters,
                                              size_t iMaxStrings = 0);
+#endif
 
   /*! \brief Counts the occurrences of strFind in strInput
    *
@@ -1423,6 +1444,10 @@ public:
    * \return count of the number of occurrences found
    */
   static int FindNumber(const std::string& strInput, const std::string &strFind);
+
+  static int64_t AlphaNumericCompareOrig(const wchar_t *left, const wchar_t *right);
+
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
   /*! \brief Compares two strings based on the rules of the given locale
    *
@@ -1453,8 +1478,11 @@ public:
    * \return < 0 if left < right based upon comparison based on comparison rules
    */
   static int64_t AlphaNumericCompare(const wchar_t *left, const wchar_t *right);
+#endif
 
   /*!
+   * TODO: Unicode is this in use? Should this be modified or moved to UnicodeUtils?
+   *
      * SQLite collating function, see sqlite3_create_collation
      * The equivalent of AlphaNumericCompare() but for comparing UTF8 encoded data using
      * LangInfo::GetSystemLocale
@@ -1476,6 +1504,8 @@ public:
      */
   static int AlphaNumericCollation(int nKey1, const void* pKey1, int nKey2, const void* pKey2);
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
+
   /*! \brief converts timeString (hh:mm:ss or nnn min) to seconds.
    *
    * timeString is expected to be of the form:
@@ -1489,17 +1519,6 @@ public:
    */
   static long TimeStringToSeconds(const std::string &timeString);
 
-  /*! \brief Strip any trailing \n or \r characters.
-   *
-   * \param strLine
-   */
-  static void RemoveCRLF(std::string& strLine);
-
-  /*! \brief utf8 version of strlen - skips any non-starting bytes in the count, thus returning the number of utf8 characters
-   \param s c-string to find the length of.
-   \return the number of utf8 characters in the string.
-   */
-  static size_t utf8_strlen(const char *s);
 
   /*! \brief convert a time in seconds to a string based on the given time format
    \param seconds time in seconds
@@ -1508,6 +1527,20 @@ public:
    \sa TIME_FORMAT
    */
   static std::string SecondsToTimeString(long seconds, TIME_FORMAT format = TIME_FORMAT_GUESS);
+
+  /*! \brief Strip any trailing \n or \r characters.
+   *
+   * \param strLine
+   */
+  static void RemoveCRLF(std::string& strLine);
+
+#endif
+
+  /*! \brief utf8 version of strlen - skips any non-starting bytes in the count, thus returning the number of utf8 characters
+   \param s c-string to find the length of.
+   \return the number of utf8 characters in the string.
+   */
+  static size_t utf8_strlen(const char *s);
 
   /*! \brief check whether a string is a natural number.
    Matches [ \t]*[0-9]+[ \t]*
@@ -1595,9 +1628,13 @@ public:
    */
   static int FindEndBracket(const std::string &str, char opener, char closer, int startPos = 0);
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
   static int DateStringToYYYYMMDD(const std::string &dateString);
+#endif
   static std::string ISODateToLocalizedDate (const std::string& strIsoDate);
+#if defined(STRINGUTILS_UNICODE_ENABLE)
   static void WordToDigits(std::string &word);
+#endif
   static std::string CreateUUID();
   static bool ValidateUUID(const std::string &uuid); // NB only validates syntax
   static double CompareFuzzy(const std::string &left, const std::string &right);
@@ -1641,6 +1678,7 @@ public:
     ss << std::fixed << num;
     return ss.str();
   }
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
   /*! \brief Escapes the given string to be able to be used as a parameter.
 
@@ -1651,6 +1689,7 @@ public:
    \return Escaped/Paramified string
    */
   static std::string Paramify(const std::string &param);
+#endif
 
   // TODO: Could rewrite to use Unicode delimiters using icu::UnicodeSet::spanUTF8(), and friends
   /*!
@@ -1728,10 +1767,10 @@ public:
   static std::string CreateFromCString(const char* cstr);
 
 private:
-  static int64_t AlphaNumericCompare_orig(const wchar_t *left, const wchar_t *right);
 
 };
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 struct sortstringbyname
 {
   bool operator()(const std::string& strItem1, const std::string& strItem2) const
@@ -1739,3 +1778,4 @@ struct sortstringbyname
     return StringUtils::CompareNoCase(strItem1, strItem2) < 0;
   }
 };
+#endif

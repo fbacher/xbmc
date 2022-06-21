@@ -9,6 +9,7 @@
 #include "DirectoryHistory.h"
 
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
@@ -127,7 +128,7 @@ void CDirectoryHistory::ClearPathHistory()
 
 bool CDirectoryHistory::IsMusicSearchUrl(CPathHistoryItem &i)
 {
-  return StringUtils::StartsWith(i.GetPath(), "musicsearch://");
+  return UnicodeUtils::StartsWith(i.GetPath(), "musicsearch://");
 }
 
 void CDirectoryHistory::ClearSearchHistory()
@@ -153,7 +154,7 @@ std::string CDirectoryHistory::preparePath(const std::string &strDirectory, bool
   
   std::string strDir = strDirectory;
   if (foldCase)
-    StringUtils::FoldCase(strDir);
+    UnicodeUtils::FoldCase(strDir);
 
   URIUtils::RemoveSlashAtEnd(strDir);
 

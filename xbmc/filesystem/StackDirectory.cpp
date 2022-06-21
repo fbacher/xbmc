@@ -107,12 +107,12 @@ namespace XFILE
                        Extension2 = itRegExp->GetMatch(4);
             if (offset)
               Title2 = File2.substr(0, itRegExp->GetSubStart(2));
-            if (StringUtils::EqualsNoCase(Title1, Title2))
+            if (UnicodeUtils::EqualsNoCase(Title1, Title2))
             {
-              if (!StringUtils::EqualsNoCase(Volume1, Volume2))
+              if (!UnicodeUtils::EqualsNoCase(Volume1, Volume2))
               {
-                if (StringUtils::EqualsNoCase(Ignore1, Ignore2) &&
-                    StringUtils::EqualsNoCase(Extension1, Extension2))
+                if (UnicodeUtils::EqualsNoCase(Ignore1, Ignore2) &&
+                    UnicodeUtils::EqualsNoCase(Extension1, Extension2))
                 {
                   // got it
                   strStackTitle = Title1 + Ignore1 + Extension1;
@@ -171,7 +171,7 @@ namespace XFILE
     // remove stack:// from the beginning
     path = path.substr(8);
 
-    vecPaths = StringUtils::Split(path, " , ");
+    vecPaths = UnicodeUtils::Split(path, " , ");
     if (vecPaths.empty())
       return false;
 

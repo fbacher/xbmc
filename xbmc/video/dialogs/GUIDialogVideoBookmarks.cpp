@@ -28,6 +28,7 @@
 #include "settings/SettingsComponent.h"
 #include "utils/Crc32.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
@@ -250,7 +251,7 @@ void CGUIDialogVideoBookmarks::OnRefreshList()
                                          m_bookmarks[i].seasonNumber, g_localizeStrings.Get(20359),
                                          m_bookmarks[i].episodeNumber);
     else
-      bookmarkTime = StringUtils::SecondsToTimeString((long)m_bookmarks[i].timeInSeconds, TIME_FORMAT_HH_MM_SS);
+      bookmarkTime = UnicodeUtils::SecondsToTimeString((long)m_bookmarks[i].timeInSeconds, TIME_FORMAT_HH_MM_SS);
 
     CFileItemPtr item(new CFileItem(StringUtils::Format(g_localizeStrings.Get(299), i + 1)));
     item->SetLabel2(bookmarkTime);
@@ -268,10 +269,10 @@ void CGUIDialogVideoBookmarks::OnRefreshList()
     g_application.GetAppPlayer().GetChapterName(chapterName, i);
 
     int64_t pos = g_application.GetAppPlayer().GetChapterPos(i);
-    std::string time = StringUtils::SecondsToTimeString((long) pos, TIME_FORMAT_HH_MM_SS);
+    std::string time = UnicodeUtils::SecondsToTimeString((long) pos, TIME_FORMAT_HH_MM_SS);
 
     if (chapterName.empty() ||
-        StringUtils::StartsWithNoCase(chapterName, time) ||
+        UnicodeUtils::StartsWithNoCase(chapterName, time) ||
         StringUtils::IsNaturalNumber(chapterName))
       chapterName = StringUtils::Format(g_localizeStrings.Get(25010), i);
 

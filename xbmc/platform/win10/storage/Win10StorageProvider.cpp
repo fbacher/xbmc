@@ -13,6 +13,7 @@
 #include "storage/MediaManager.h"
 #include "utils/JobManager.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 #include "platform/win10/AsyncHelpers.h"

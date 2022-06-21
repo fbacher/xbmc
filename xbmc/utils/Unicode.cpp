@@ -2695,7 +2695,7 @@ bool Unicode::InitializeCollator(icu::Locale icuLocale, bool normalize /* = fals
 }
 
 /**
- * Experimental Collation function aimed at being equivalent to StringUtils::AlphaNumericCompare
+ * Experimental Collation function aimed at being equivalent to UnicodeUtils::AlphaNumericCompare
  * but using ICU. The ICU should be superior. Need to do performance tests.
  *
  * Note that it would be faster to pass either UTF-16 (the native ICU format) or

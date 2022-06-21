@@ -9,7 +9,8 @@
 #include "EGLUtils.h"
 
 #include "ServiceBroker.h"
-#include "StringUtils.h"
+#include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "guilib/IDirtyRegionSolver.h"
 #include "log.h"
 #include "settings/AdvancedSettings.h"

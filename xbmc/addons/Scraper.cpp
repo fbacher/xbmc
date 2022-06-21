@@ -31,6 +31,7 @@
 #include "utils/ScraperParser.h"
 #include "utils/ScraperUrl.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/XMLUtils.h"
 #include "utils/log.h"
@@ -110,7 +111,7 @@ TYPE ScraperTypeFromContent(const CONTENT_TYPE &content)
 // if the XML root is <error>, throw CScraperError with enclosed <title>/<message> values
 static void CheckScraperError(const TiXmlElement *pxeRoot)
 {
-  if (!pxeRoot || StringUtils::CompareNoCase(pxeRoot->Value(), "error"))
+  if (!pxeRoot || UnicodeUtils::CompareNoCase(pxeRoot->Value(), "error"))
     return;
   std::string sTitle;
   std::string sMessage;
@@ -649,7 +650,7 @@ CMusicArtistInfo FromFileItem<CMusicArtistInfo>(const CFileItem &item)
 
   info = CMusicArtistInfo(sTitle, url);
   if (item.HasProperty("artist.genre"))
-    info.GetArtist().genre = StringUtils::Split(item.GetProperty("artist.genre").asString(),
+    info.GetArtist().genre = UnicodeUtils::Split(item.GetProperty("artist.genre").asString(),
                                                 CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_musicItemSeparator);
   if (item.HasProperty("artist.disambiguation"))
     info.GetArtist().strDisambiguation = item.GetProperty("artist.disambiguation").asString();
@@ -690,7 +691,7 @@ static std::string FromString(const CFileItem &item, const std::string &key)
 
 static std::vector<std::string> FromArray(const CFileItem &item, const std::string &key, int sep)
 {
-  return StringUtils::Split(item.GetProperty(key).asString(),
+  return UnicodeUtils::Split(item.GetProperty(key).asString(),
                             sep ? CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoItemSeparator
                                 : CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_musicItemSeparator);
 }
@@ -949,7 +950,7 @@ std::vector<CScraperUrl> CScraper::FindMovie(XFILE::CCurlFile &fcurl,
     {
       const char *sorted = xhResults.Element()->Attribute("sorted");
       if (sorted != NULL)
-        fSort = !StringUtils::EqualsNoCase(sorted, "yes");
+        fSort = !UnicodeUtils::EqualsNoCase(sorted, "yes");
     }
 
     for (TiXmlElement *pxeMovie = xhResults.FirstChild("entity").Element(); pxeMovie;
@@ -970,9 +971,9 @@ std::vector<CScraperUrl> CScraper::FindMovie(XFILE::CCurlFile &fcurl,
 
         // calculate the relevance of this hit
         std::string sCompareTitle = scurlMovie.GetTitle();
-        StringUtils::FoldCase(sCompareTitle);
+        UnicodeUtils::FoldCase(sCompareTitle);
         std::string sMatchTitle = sTitle;
-        StringUtils::FoldCase(sMatchTitle);
+        UnicodeUtils::FoldCase(sMatchTitle);
 
         /*
          * TODO: Need Unicode fuzzy compare
@@ -1199,7 +1200,7 @@ std::vector<CMusicArtistInfo> CScraper::FindArtist(CCurlFile &fcurl, const std::
         XMLUtils::GetString(pxeArtist, "genre", genre);
         if (!genre.empty())
           ari.GetArtist().genre =
-              StringUtils::Split(genre, CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_musicItemSeparator);
+              UnicodeUtils::Split(genre, CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_musicItemSeparator);
         XMLUtils::GetString(pxeArtist, "disambiguation", ari.GetArtist().strDisambiguation);
         XMLUtils::GetString(pxeArtist, "year", ari.GetArtist().strBorn);
 

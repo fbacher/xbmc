@@ -45,6 +45,7 @@
 #include "settings/SettingsComponent.h"
 #include "utils/CharsetConverter.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 #include <mutex>
@@ -1136,7 +1137,7 @@ unsigned int CDVDRadioRDSData::DecodeRT(uint8_t *msgElement, unsigned int len)
       std::string rdsline = m_RT_Text[m_RT_Index];
       rtrim_str(rdsline);
       g_charsetConverter.unknownToUTF8(rdsline);
-      m_RT.push_front(StringUtils::Trim(rdsline));
+      m_RT.push_front(UnicodeUtils::Trim(rdsline));
 
       if ((int)m_RT.size() > m_RT_MaxSize)
         m_RT.pop_back();

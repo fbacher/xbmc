@@ -17,6 +17,7 @@
 #include "DVDSubtitleStream.h"
 #include "SubtitleParserWebVTT.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 
 #include <cstring>
 #include <memory>
@@ -54,11 +55,11 @@ CDVDSubtitleParser* CDVDFactorySubtitle::CreateParser(std::string& strFile)
       {
         return new CDVDSubtitleParserVplayer(std::move(pStream), strFile);
       }
-      else if (StringUtils::StartsWithNoCase(line, "!: This is a Sub Station Alpha v") ||
-               StringUtils::StartsWithNoCase(line, "ScriptType: v4.00") ||
-               StringUtils::StartsWithNoCase(line, "Dialogue: Marked") ||
-               StringUtils::StartsWithNoCase(line, "Dialogue: ") ||
-               StringUtils::StartsWithNoCase(line, "[Events]"))
+      else if (UnicodeUtils::StartsWithNoCase(line, "!: This is a Sub Station Alpha v") ||
+               UnicodeUtils::StartsWithNoCase(line, "ScriptType: v4.00") ||
+               UnicodeUtils::StartsWithNoCase(line, "Dialogue: Marked") ||
+               UnicodeUtils::StartsWithNoCase(line, "Dialogue: ") ||
+               UnicodeUtils::StartsWithNoCase(line, "[Events]"))
       {
         return new CDVDSubtitleParserSSA(std::move(pStream), strFile);
       }
@@ -66,7 +67,7 @@ CDVDSubtitleParser* CDVDFactorySubtitle::CreateParser(std::string& strFile)
       {
         return new CDVDSubtitleParserSami(std::move(pStream), strFile);
       }
-      else if (StringUtils::StartsWithNoCase(line, "WEBVTT"))
+      else if (UnicodeUtils::StartsWithNoCase(line, "WEBVTT"))
       {
         return new CSubtitleParserWebVTT(std::move(pStream), strFile);
       }

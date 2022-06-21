@@ -13,6 +13,7 @@
 #include "FileItem.h"
 #include "ServiceBroker.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/SystemInfo.h"
 #include "utils/log.h"
 
@@ -83,7 +84,7 @@ void CAppParamParser::DisplayVersion()
 void CAppParamParser::DisplayHelp()
 {
   std::string lcAppName = CSysInfo::GetAppName();
-  StringUtils::ToLower(lcAppName);
+  UnicodeUtils::ToLower(lcAppName);
 
   std::cout << StringUtils::Format(helpText, lcAppName, CSysInfo::GetAppName());
 }

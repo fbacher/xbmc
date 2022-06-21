@@ -16,6 +16,7 @@
 #include "utils/Archive.h"
 #include "utils/CharsetConverter.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Variant.h"
 
 #include <algorithm>
@@ -643,8 +644,8 @@ bool CPVRRadioRDSInfoTag::IsPlayingRadiotextPlus() const
 std::string CPVRRadioRDSInfoTag::Trim(const std::string& value)
 {
   std::string trimmedValue(value);
-  StringUtils::TrimLeft(trimmedValue);
-  StringUtils::TrimRight(trimmedValue, " \n\r");
+  UnicodeUtils::TrimLeft(trimmedValue);
+  UnicodeUtils::TrimRight(trimmedValue, " \n\r");
   return trimmedValue;
 }
 

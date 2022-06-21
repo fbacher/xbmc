@@ -158,6 +158,7 @@ std::wstring StringUtils::FormatV(const wchar_t *fmt, va_list args) {
 	return L"";
 }
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 void StringUtils::ToUpper(std::string &str, const icu::Locale &locale) {
 	// std::cout << "ToUpper in: " << str << std::endl;
 
@@ -571,6 +572,7 @@ std::string& StringUtils::TrimRight(std::string &str, const char *const chars) {
   str.swap(result);
 	return str;
 }
+#endif
 
 int StringUtils::ReturnDigits(const std::string &str)
 {
@@ -732,6 +734,8 @@ int StringUtils::Replace(std::wstring &str, const std::wstring &oldStr,
 	return changes;
 }
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
+
 bool StringUtils::StartsWith(const std::string &str1, const std::string &str2) {
 	return Unicode::StartsWith(str1, str2);
 }
@@ -766,6 +770,7 @@ bool StringUtils::StartsWithNoCase(const char *s1, const char *s2, StringOptions
 	return StartsWithNoCase(std::string(s1), std::string(s2), opt);
 }
 
+
 bool StringUtils::EndsWith(const std::string &str1, const std::string &str2) {
 	const bool result = Unicode::EndsWith(str1, str2);
 	return result;
@@ -785,6 +790,9 @@ bool StringUtils::EndsWithNoCase(const std::string &str1, const char *s2, String
 	std::string str2 = std::string(s2);
 	return EndsWithNoCase(str1, str2, opt);
 }
+#endif
+#if defined(STRINGUTILS_UNICODE_ENABLE)
+
 
 std::vector<std::string> StringUtils::Split(const std::string &input,
 		const std::string &delimiter, const unsigned int iMaxStrings) {
@@ -931,6 +939,7 @@ std::vector<std::string> StringUtils::SplitMulti(
 	 return results;
 	 */
 }
+#endif
 
 // returns the number of occurrences of strFind in strInput.
 int StringUtils::FindNumber(const std::string &strInput,
@@ -1181,6 +1190,8 @@ static const uint16_t* const planemap[256] = {
 };
 // clang-format on
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
+
 bool StringUtils::InitializeCollator(bool normalize /* = false */)
 {
   return Unicode::InitializeCollator(Unicode::getDefaultICULocale(), normalize);
@@ -1200,6 +1211,7 @@ int32_t StringUtils::Collate(const std::wstring &left, const std::wstring &right
 {
 	return Unicode::Collate(left, right);
 }
+#endif
 
 static wchar_t GetCollationWeight(const wchar_t &r) {
 	// Lookup the "weight" of a UTF8 char, equivalent lowercase ascii letter, in the plane map,
@@ -1213,6 +1225,8 @@ static wchar_t GetCollationWeight(const wchar_t &r) {
 		return r;
 	return static_cast<wchar_t>(plane[r & 0xFF]);
 }
+
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
 // Not sure what the real goal is here. I think it is just to see if the
 // strings are the same after case folding. (Normalizing might be a good
@@ -1234,6 +1248,7 @@ int64_t StringUtils::AlphaNumericCompare(const wchar_t *left, const wchar_t *rig
 #endif
 	return result;
 }
+#endif
 
 // Not sure what the real goal is here. I think it is just to see if the
 // strings are the same after case folding. (Normalizing might be a good
@@ -1243,7 +1258,7 @@ int64_t StringUtils::AlphaNumericCompare(const wchar_t *left, const wchar_t *rig
 // returns negative if left < right, positive if left > right
 // and 0 if they are identical.
 // See also the equivalent StringUtils::AlphaNumericCollation() for UFT8 data
-int64_t StringUtils::AlphaNumericCompare_orig(const wchar_t *left,
+int64_t StringUtils::AlphaNumericCompareOrig(const wchar_t *left,
 		const wchar_t *right) {
 	const wchar_t *l = left;
 	const wchar_t *r = right;
@@ -1524,6 +1539,8 @@ int StringUtils::AlphaNumericCollation(int nKey1, const void* pKey1, int nKey2, 
   return (nKey1 - nKey2);
 }
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
+
 int StringUtils::DateStringToYYYYMMDD(const std::string &dateString) {
 	// TODO: I assume this is a fixed format for a database or something?
 	std::vector < std::string > days = StringUtils::Split(dateString, '-');
@@ -1537,6 +1554,7 @@ int StringUtils::DateStringToYYYYMMDD(const std::string &dateString) {
 	else
 		return -1;
 }
+#endif
 
 std::string StringUtils::ISODateToLocalizedDate(const std::string &strIsoDate) {
 	// Convert ISO8601 date strings YYYY, YYYY-MM, or YYYY-MM-DD to (partial) localized date strings
@@ -1569,6 +1587,8 @@ std::string StringUtils::ISODateToLocalizedDate(const std::string &strIsoDate) {
 	}
 	return formattedDate;
 }
+
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
 long StringUtils::TimeStringToSeconds(const std::string &timeString) {
 	std::string strCopy(timeString);
@@ -1628,6 +1648,7 @@ std::string StringUtils::SecondsToTimeString(long lSeconds, TIME_FORMAT format)
 
   return strHMS;
 }
+#endif
 
 bool StringUtils::IsNaturalNumber(const std::string& str)
 {
@@ -1703,9 +1724,12 @@ int StringUtils::asciixdigitvalue(char chr) {
 	return -1;
 }
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
+
 void StringUtils::RemoveCRLF(std::string &strLine) {
 	StringUtils::TrimRight(strLine, "\n\r");
 }
+#endif
 
 std::string StringUtils::SizeToString(int64_t size)
 {
@@ -1832,6 +1856,7 @@ size_t StringUtils::FindEndBracket(const std::string &str, char opener,
 }
 */
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 void StringUtils::WordToDigits(std::string &word)
 {
 
@@ -1857,6 +1882,7 @@ void StringUtils::WordToDigits(std::string &word)
     }
   }
 }
+#endif
 
 std::string StringUtils::CreateUUID()
 {
@@ -1939,6 +1965,8 @@ size_t StringUtils::utf8_strlen(const char *s) {
 	return length;
 }
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
+
 std::string StringUtils::Paramify(const std::string &param) {
 	std::string result = param;
    //std::cout << "StringUtils.Paramify param: " << param << std::endl;
@@ -1950,6 +1978,7 @@ std::string StringUtils::Paramify(const std::string &param) {
 	// add double quotes around the whole string
 	return "\"" + result + "\"";
 }
+#endif
 
 
 /**

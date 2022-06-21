@@ -65,6 +65,7 @@
 #endif
 #include "platform/Environment.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/XTimeUtils.h"
 
 #if defined(TARGET_WINDOWS)
@@ -1603,20 +1604,20 @@ extern "C"
   //SLOW CODE SHOULD BE REVISED
   int dll_stat(const char *path, struct stat *buffer)
   {
-    if (StringUtils::StartsWithNoCase(path, "shout://")) // don't stat shoutcast
+    if (UnicodeUtils::StartsWithNoCase(path, "shout://")) // don't stat shoutcast
       return -1;
-    if (StringUtils::StartsWithNoCase(path, "mms://")) // don't stat mms
+    if (UnicodeUtils::StartsWithNoCase(path, "mms://")) // don't stat mms
       return -1;
 
 #ifdef TARGET_POSIX
-    if (!StringUtils::CompareNoCase(path, "D:") || !StringUtils::CompareNoCase(path, "D:\\"))
+    if (!UnicodeUtils::CompareNoCase(path, "D:") || !UnicodeUtils::CompareNoCase(path, "D:\\"))
     {
       buffer->st_mode = S_IFDIR;
       return 0;
     }
 #endif
-    if (!StringUtils::CompareNoCase(path, "\\Device\\Cdrom0") ||
-        !StringUtils::CompareNoCase(path, "\\Device\\Cdrom0\\"))
+    if (!UnicodeUtils::CompareNoCase(path, "\\Device\\Cdrom0") ||
+        !UnicodeUtils::CompareNoCase(path, "\\Device\\Cdrom0\\"))
     {
       buffer->st_mode = _S_IFDIR;
       return 0;
@@ -1647,20 +1648,20 @@ extern "C"
 
   int dll_stat64(const char *path, struct __stat64 *buffer)
   {
-    if (StringUtils::StartsWithNoCase(path, "shout://")) // don't stat shoutcast
+    if (UnicodeUtils::StartsWithNoCase(path, "shout://")) // don't stat shoutcast
       return -1;
-    if (StringUtils::StartsWithNoCase(path, "mms://")) // don't stat mms
+    if (UnicodeUtils::StartsWithNoCase(path, "mms://")) // don't stat mms
       return -1;
 
 #ifdef TARGET_POSIX
-    if (!StringUtils::CompareNoCase(path, "D:") || !StringUtils::CompareNoCase(path, "D:\\"))
+    if (!UnicodeUtils::CompareNoCase(path, "D:") || !UnicodeUtils::CompareNoCase(path, "D:\\"))
     {
       buffer->st_mode = _S_IFDIR;
       return 0;
     }
 #endif
-    if (!StringUtils::CompareNoCase(path, "\\Device\\Cdrom0") ||
-        !StringUtils::CompareNoCase(path, "\\Device\\Cdrom0\\"))
+    if (!UnicodeUtils::CompareNoCase(path, "\\Device\\Cdrom0") ||
+        !UnicodeUtils::CompareNoCase(path, "\\Device\\Cdrom0\\"))
     {
       buffer->st_mode = _S_IFDIR;
       return 0;
@@ -1848,7 +1849,7 @@ extern "C"
             if (dll__environ[i] != NULL)
             {
               // we only support overwriting the old values
-              if (StringUtils::StartsWith(dll__environ[i], var))
+              if (UnicodeUtils::StartsWith(dll__environ[i], var))
               {
                 // free it first
                 free(dll__environ[i]);
@@ -1899,7 +1900,7 @@ extern "C"
       {
         if (dll__environ[i])
         {
-          if (StringUtils::StartsWithNoCase(dll__environ[i], szKey))
+          if (UnicodeUtils::StartsWithNoCase(dll__environ[i], szKey))
           {
             // found it
             value = dll__environ[i] + strlen(szKey) + 1;

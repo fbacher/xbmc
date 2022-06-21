@@ -13,6 +13,7 @@
 #include <map>
 #include <string>
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 
 class CWeatherJob : public CJob
 {
@@ -49,8 +50,8 @@ private:
     bool operator()(const std::string & s1, const std::string & s2) const {
 	  std::string t_s1 = std::string(s1);
 	  std::string t_s2 = std::string(s2);
-	  StringUtils::FoldCase(t_s1);
-	  StringUtils::FoldCase(t_s2);
+	  UnicodeUtils::FoldCase(t_s1);
+	  UnicodeUtils::FoldCase(t_s2);
 
       return std::lexicographical_compare
       (t_s1.begin(), t_s1.end(),

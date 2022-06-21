@@ -29,6 +29,7 @@
 #include "settings/SettingsComponent.h"
 #include "utils/LabelFormatter.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
@@ -464,7 +465,7 @@ void CGUIWindowMusicPlayList::OnItemLoaded(CFileItem* pItem)
     {
       int nDuration = pItem->GetMusicInfoTag()->GetDuration();
       if (nDuration > 0)
-        pItem->SetLabel2(StringUtils::SecondsToTimeString(nDuration));
+        pItem->SetLabel2(UnicodeUtils::SecondsToTimeString(nDuration));
     }
     else if (pItem->GetLabel() == "") // pls labels come in preformatted
     {

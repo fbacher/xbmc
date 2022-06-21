@@ -27,6 +27,7 @@
 #include "settings/SettingsComponent.h"
 #include "utils/CPUInfo.h"
 #include "utils/log.h"
+#include "utils/UnicodeUtils.h"
 
 #ifdef TARGET_WINDOWS
 #include <dwmapi.h>
@@ -1233,7 +1234,7 @@ std::string CSysInfo::GetUserAgent()
 std::string CSysInfo::GetDeviceName()
 {
   std::string friendlyName = CServiceBroker::GetSettingsComponent()->GetSettings()->GetString(CSettings::SETTING_SERVICES_DEVICENAME);
-  if (StringUtils::EqualsNoCase(friendlyName, CCompileInfo::GetAppName()))
+  if (UnicodeUtils::EqualsNoCase(friendlyName, CCompileInfo::GetAppName()))
   {
     std::string hostname("[unknown]");
     CServiceBroker::GetNetwork().GetHostName(hostname);

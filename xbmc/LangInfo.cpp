@@ -24,6 +24,7 @@
 #include "utils/CharsetConverter.h"
 #include "utils/LangCodeExpander.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/XBMCTinyXML.h"
 #include "utils/XMLUtils.h"
@@ -143,7 +144,7 @@ static std::string ToSettingTimeFormat(const CDateTime& time, const std::string&
 static CTemperature::Unit StringToTemperatureUnit(const std::string& temperatureUnit)
 {
   std::string unit(temperatureUnit);
-  StringUtils::FoldCase(unit);
+  UnicodeUtils::FoldCase(unit);
 
   for (const TemperatureInfo& info : temperatureInfo)
   {
@@ -157,7 +158,7 @@ static CTemperature::Unit StringToTemperatureUnit(const std::string& temperature
 static CSpeed::Unit StringToSpeedUnit(const std::string& speedUnit)
 {
   std::string unit(speedUnit);
-  StringUtils::FoldCase(unit);
+  UnicodeUtils::FoldCase(unit);
 
   for (const SpeedInfo& info : speedInfo)
   {
@@ -172,7 +173,7 @@ struct SortLanguage
 {
   bool operator()(const StringSettingOption &left, const StringSettingOption &right) const
   {
-    return StringUtils::CompareNoCase(left.label, right.label) < 0;
+    return UnicodeUtils::CompareNoCase(left.label, right.label) < 0;
   }
 };
 
@@ -558,10 +559,10 @@ bool CLangInfo::UseLocaleCollation()
     // Determine collation to use. When using MySQL/MariaDB or a platform that does not support
     // locale language collation then use accent folding internal equivalent of utf8_general_ci
     m_collationtype = 1;
-    if (!StringUtils::EqualsNoCase(
+    if (!UnicodeUtils::EqualsNoCase(
             CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_databaseMusic.type,
             "mysql") &&
-        !StringUtils::EqualsNoCase(
+        !UnicodeUtils::EqualsNoCase(
             CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_databaseVideo.type,
             "mysql") &&
         CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_useLocaleCollation)
@@ -753,9 +754,9 @@ const std::string& CLangInfo::GetAudioLanguage() const
 void CLangInfo::SetAudioLanguage(const std::string& language)
 {
   if (language.empty()
-    || StringUtils::EqualsNoCase(language, "default")
-    || StringUtils::EqualsNoCase(language, "original")
-    || StringUtils::EqualsNoCase(language, "mediadefault")
+    || UnicodeUtils::EqualsNoCase(language, "default")
+    || UnicodeUtils::EqualsNoCase(language, "original")
+    || UnicodeUtils::EqualsNoCase(language, "mediadefault")
     || !g_LangCodeExpander.ConvertToISO6392B(language, m_audioLanguage))
     m_audioLanguage.clear();
 }
@@ -772,8 +773,8 @@ const std::string& CLangInfo::GetSubtitleLanguage() const
 void CLangInfo::SetSubtitleLanguage(const std::string& language)
 {
   if (language.empty()
-    || StringUtils::EqualsNoCase(language, "default")
-    || StringUtils::EqualsNoCase(language, "original")
+    || UnicodeUtils::EqualsNoCase(language, "default")
+    || UnicodeUtils::EqualsNoCase(language, "original")
     || !g_LangCodeExpander.ConvertToISO6392B(language, m_subtitleLanguage))
     m_subtitleLanguage.clear();
 }
@@ -1136,7 +1137,7 @@ std::string CLangInfo::PrepareTimeFormat(const std::string& timeFormat, bool use
     // replace all "H" with "h"
     StringUtils::Replace(preparedTimeFormat, 'H', 'h');
 
-  StringUtils::Trim(preparedTimeFormat);
+  UnicodeUtils::Trim(preparedTimeFormat);
 
   return preparedTimeFormat;
 }

@@ -27,6 +27,7 @@
 #include "utils/ContentUtils.h"
 #include "utils/LangCodeExpander.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 #include "video/VideoInfoTag.h"
@@ -869,7 +870,7 @@ PopulateTagFromObject(CVideoInfoTag&         tag,
                     tag.m_artist.emplace_back(object.m_People.artists.GetItem(index)->name.GetChars());
             }
             else if (!object.m_Creator.IsEmpty() && object.m_Creator != "Unknown")
-                tag.m_artist = StringUtils::Split(object.m_Creator.GetChars(), CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoItemSeparator);
+                tag.m_artist = UnicodeUtils::Split(object.m_Creator.GetChars(), CServiceBroker::GetSettingsComponent()->GetAdvancedSettings()->m_videoItemSeparator);
             tag.m_strAlbum = object.m_Affiliation.album;
         }
         else

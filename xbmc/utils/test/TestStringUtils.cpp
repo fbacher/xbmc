@@ -154,6 +154,7 @@ TEST(TestStringUtils, FormatEnumWidth)
   EXPECT_STREQ(one, varstr.c_str());
 }
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 TEST(TestStringUtils, ToUpper)
 {
 
@@ -180,7 +181,7 @@ TEST(TestStringUtils, ToUpper_w)
   refstr = Unicode::utf8_to_wstring(std::string(UTF8_GERMAN_UPPER)); // ÓÓSSCHLOË
   varstr = Unicode::utf8_to_wstring(std::string(UTF8_GERMAN_SAMPLE)); // óóßChloë
   StringUtils::ToUpper(varstr);
-  int32_t result = StringUtils::Compare(refstr, varstr);
+  int32_t result = UnicodeUtils::Compare(refstr, varstr);
   EXPECT_EQ(result, 0);
 }
 
@@ -232,7 +233,7 @@ TEST(TestStringUtils, ToLower)
   varstr = UTF8_GERMAN_SAMPLE; // óóßChloë
   refstr = UTF8_GERMAN_LOWER; // óóßChloë
   StringUtils::ToLower(varstr);
-  int32_t result = StringUtils::Compare(refstr, varstr);
+  int32_t result = UnicodeUtils::Compare(refstr, varstr);
   EXPECT_EQ(result, 0);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
@@ -248,7 +249,7 @@ TEST(TestStringUtils, ToLower_w)
   varstr = Unicode::utf8_to_wstring(std::string(UTF8_GERMAN_UPPER)); // ÓÓSSCHLOË
   refstr = Unicode::utf8_to_wstring(std::string(UTF8_GERMAN_LOWER_SS)); // óóßChloë
   StringUtils::ToLower(varstr);
-  int32_t result = StringUtils::Compare(refstr, varstr);
+  int32_t result = UnicodeUtils::Compare(refstr, varstr);
   EXPECT_EQ(result, 0);
 
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
@@ -259,7 +260,7 @@ TEST(TestStringUtils, ToLower_w)
   varstr = Unicode::utf8_to_wstring(std::string(UTF8_GERMAN_SAMPLE)); // óóßChloë
   refstr = Unicode::utf8_to_wstring(std::string(UTF8_GERMAN_LOWER)); // óóßchloë
   StringUtils::ToLower(varstr);
-  result = StringUtils::Compare(refstr, varstr);
+  result = UnicodeUtils::Compare(refstr, varstr);
   EXPECT_EQ(result, 0);
 
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
@@ -780,6 +781,7 @@ TEST(TestStringUtils, TrimRight)
   StringUtils::TrimRight(varstr, "$? \t");
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
+#endif
 
 TEST(TestStringUtils, Replace)
 {
@@ -799,6 +801,7 @@ TEST(TestStringUtils, Replace)
   EXPECT_EQ(StringUtils::Replace(varstr, "s", "x"), 0);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
 TEST(TestStringUtils, StartsWith)
 {
@@ -832,7 +835,9 @@ TEST(TestStringUtils, EndsWithNoCase)
   EXPECT_TRUE(StringUtils::EndsWithNoCase(refstr, "sT"));
   EXPECT_TRUE(StringUtils::EndsWithNoCase(refstr, "TesT"));
 }
+#endif
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 TEST(TestStringUtils, FoldCase)
 {
   /*
@@ -852,7 +857,7 @@ TEST(TestStringUtils, FoldCase)
   std::string s2 = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
   StringUtils::FoldCase(s1);
   StringUtils::FoldCase(s2);
-  int32_t result = StringUtils::Compare(s1, s2);
+  int32_t result = UnicodeUtils::Compare(s1, s2);
   EXPECT_NE(result, 0);
 
   s1 = std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5);
@@ -861,7 +866,7 @@ TEST(TestStringUtils, FoldCase)
   StringUtils::FoldCase(s2, StringOptions::FOLD_CASE_DEFAULT);
   // td::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = StringUtils::Compare(s1, s2);
+  result = UnicodeUtils::Compare(s1, s2);
   EXPECT_NE(result, 0);
 
   s1 = "I İ İ i ı";
@@ -871,7 +876,7 @@ TEST(TestStringUtils, FoldCase)
   StringUtils::FoldCase(s2, StringOptions::FOLD_CASE_DEFAULT);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = StringUtils::Compare(s1, s2);
+  result = UnicodeUtils::Compare(s1, s2);
   EXPECT_EQ(result, 0);
 
   std::string I = "I";
@@ -890,7 +895,7 @@ TEST(TestStringUtils, FoldCase)
   StringUtils::FoldCase(s2, StringOptions::FOLD_CASE_DEFAULT);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = StringUtils::Compare(s1, s2);
+  result = UnicodeUtils::Compare(s1, s2);
   EXPECT_EQ(result, 0);
   /*
    FOLD_CASE_EXCLUDE_SPECIAL_I
@@ -907,7 +912,7 @@ TEST(TestStringUtils, FoldCase)
   StringUtils::FoldCase(s2, StringOptions::FOLD_CASE_EXCLUDE_SPECIAL_I);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = StringUtils::Compare(s1, s2);
+  result = UnicodeUtils::Compare(s1, s2);
   EXPECT_EQ(result, 0);
 
   /*
@@ -928,7 +933,7 @@ TEST(TestStringUtils, FoldCase)
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
 
-  result = StringUtils::Compare(s1, s2);
+  result = UnicodeUtils::Compare(s1, s2);
   EXPECT_EQ(result, 0);
 
 }
@@ -939,7 +944,7 @@ TEST(TestStringUtils, FoldCase_W)
   std::wstring w_s2 = Unicode::utf8_to_wstring(std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1));
   StringUtils::FoldCase(w_s1);
   StringUtils::FoldCase(w_s2);
-  int32_t result = StringUtils::Compare(w_s1, w_s2);
+  int32_t result = UnicodeUtils::Compare(w_s1, w_s2);
   EXPECT_NE(result, 0);
 
   w_s1 = Unicode::utf8_to_wstring(std::string(UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5));
@@ -948,7 +953,7 @@ TEST(TestStringUtils, FoldCase_W)
   StringUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_DEFAULT);
   // td::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = StringUtils::Compare(w_s1, w_s2);
+  result = UnicodeUtils::Compare(w_s1, w_s2);
   EXPECT_NE(result, 0);
 
   std::string s1 = "I İ İ i ı";
@@ -959,7 +964,7 @@ TEST(TestStringUtils, FoldCase_W)
   StringUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_DEFAULT);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = StringUtils::Compare(w_s1, w_s2);
+  result = UnicodeUtils::Compare(w_s1, w_s2);
   EXPECT_EQ(result, 0);
 
   std::string I = "I";
@@ -980,7 +985,7 @@ TEST(TestStringUtils, FoldCase_W)
   StringUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_DEFAULT);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = StringUtils::Compare(w_s1, w_s2);
+  result = UnicodeUtils::Compare(w_s1, w_s2);
 
   EXPECT_EQ(result, 0);
   /*
@@ -1000,7 +1005,7 @@ TEST(TestStringUtils, FoldCase_W)
   StringUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_EXCLUDE_SPECIAL_I);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = StringUtils::Compare(w_s1, w_s2);
+  result = UnicodeUtils::Compare(w_s1, w_s2);
   EXPECT_EQ(result, 0);
 
   /*
@@ -1022,9 +1027,10 @@ TEST(TestStringUtils, FoldCase_W)
   StringUtils::FoldCase(w_s2, StringOptions::FOLD_CASE_DEFAULT);
   // std::cout << "Turkic folded s1: " << s1 << std::endl;
   // std::cout << "Turkic folded s2: " << s2 << std::endl;
-  result = StringUtils::Compare(w_s1, w_s2);
+  result = UnicodeUtils::Compare(w_s1, w_s2);
   EXPECT_EQ(result, 0);
 }
+#endif
 
 TEST(TestStringUtils, Join)
 {
@@ -1044,6 +1050,7 @@ TEST(TestStringUtils, Join)
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 TEST(TestStringUtils, Normalize)
 {
   // TODO: These tests are all on essentially the same caseless string.
@@ -1052,29 +1059,31 @@ TEST(TestStringUtils, Normalize)
 
   std::string s1 = UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
   std::string result = StringUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFD);
-  int cmp = StringUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_2);
+  int cmp = UnicodeUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_2);
   EXPECT_EQ(cmp, 0);
 
   s1 = UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
   result = StringUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFC);
-  cmp = StringUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5);
+  cmp = UnicodeUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5);
   EXPECT_EQ(cmp, 0);
 
   s1 = UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
   result = StringUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFKC);
-  cmp = StringUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5);
+  cmp = UnicodeUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5);
   EXPECT_EQ(cmp, 0);
 
   s1 = UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
   result = StringUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFD);
-  cmp = StringUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_2);
+  cmp = UnicodeUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_2);
   EXPECT_EQ(cmp, 0);
 
   s1 = UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1;
   result = StringUtils::Normalize(s1, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFKD);
-  cmp = StringUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_2);
+  cmp = UnicodeUtils::Compare(result, UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_2);
   EXPECT_EQ(cmp, 0);
 }
+#endif
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
 TEST(TestStringUtils, Split)
 {
@@ -1126,12 +1135,15 @@ TEST(TestStringUtils, Split)
   EXPECT_EQ(1U, StringUtils::Split("a bc  d ef ghi ", "").size());
   EXPECT_STREQ("a bc  d ef ghi ", StringUtils::Split("a bc  d ef ghi ", 'z').at(0).c_str());
 }
+#endif
 
 TEST(TestStringUtils, FindNumber)
 {
   EXPECT_EQ(3, StringUtils::FindNumber("aabcaadeaa", "aa"));
   EXPECT_EQ(1, StringUtils::FindNumber("aabcaadeaa", "b"));
 }
+
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
 TEST(TestStringUtils, Collate)
 {
@@ -1156,15 +1168,19 @@ TEST(TestStringUtils, Collate)
   var = StringUtils::Collate(s3, s4); // No (extra) Normalization
   EXPECT_NE(var, 0);
 }
+#endif
+
 TEST(TestStringUtils, AlphaNumericCompare)
 {
   int64_t ref;
   int64_t var;
 
   ref = 0;
-  var = StringUtils::AlphaNumericCompare(L"123abc", L"abc123");
+  var = StringUtils::AlphaNumericCompareOrig(L"123abc", L"abc123");
   EXPECT_LT(var, ref);
 }
+
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
 TEST(TestStringUtils, TimeStringToSeconds)
 {
@@ -1192,6 +1208,7 @@ TEST(TestStringUtils, RemoveCRLF)
   StringUtils::RemoveCRLF(varstr);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
+#endif
 
 TEST(TestStringUtils, utf8_strlen)
 {
@@ -1203,6 +1220,7 @@ TEST(TestStringUtils, utf8_strlen)
   EXPECT_EQ(ref, var);
 }
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 TEST(TestStringUtils, SecondsToTimeString)
 {
   std::string refstr;
@@ -1212,6 +1230,7 @@ TEST(TestStringUtils, SecondsToTimeString)
   varstr = StringUtils::SecondsToTimeString(77455);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
+#endif
 
 TEST(TestStringUtils, IsNaturalNumber)
 {
@@ -1320,7 +1339,7 @@ TEST(TestStringUtils, FindEndBracket)
   var = StringUtils::FindEndBracket("atest testbb test", 'a', 'b');
   EXPECT_EQ(ref, var);
 }
-
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 TEST(TestStringUtils, DateStringToYYYYMMDD)
 {
   int ref;
@@ -1330,7 +1349,9 @@ TEST(TestStringUtils, DateStringToYYYYMMDD)
   var = StringUtils::DateStringToYYYYMMDD("2012-07-06");
   EXPECT_EQ(ref, var);
 }
+#endif
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 TEST(TestStringUtils, WordToDigits)
 {
   std::string ref;
@@ -1341,6 +1362,7 @@ TEST(TestStringUtils, WordToDigits)
   StringUtils::WordToDigits(var);
   EXPECT_STREQ(ref.c_str(), var.c_str());
 }
+#endif
 
 TEST(TestStringUtils, CreateUUID)
 {
@@ -1352,13 +1374,14 @@ TEST(TestStringUtils, ValidateUUID)
   EXPECT_TRUE(StringUtils::ValidateUUID(StringUtils::CreateUUID()));
 }
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 TEST(TestStringUtils, CompareFuzzy)
 {
   double ref;
   double var;
 
   ref = 6.25;
-  var = StringUtils::CompareFuzzy("test string", "string test");
+  var = UnicodeUtils::CompareFuzzy("test string", "string test");
   EXPECT_EQ(ref, var);
 }
 
@@ -1381,6 +1404,8 @@ TEST(TestStringUtils, FindBestMatch)
   EXPECT_EQ(refint, varint);
   EXPECT_EQ(refdouble, vardouble);
 }
+#endif
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
 TEST(TestStringUtils, Paramify)
 {
@@ -1390,6 +1415,8 @@ TEST(TestStringUtils, Paramify)
   std::string result = StringUtils::Paramify(input);
   EXPECT_STREQ(ref, result.c_str());
 }
+#endif
+
 TEST(TestStringUtils, Tokenize)
 {
   // \brief Split a string by the specified delimiters.
@@ -1431,6 +1458,7 @@ TEST(TestStringUtils, Tokenize)
   EXPECT_STREQ("die", result[5].data());
 }
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 TEST(TestStringUtils, sortstringbyname)
 {
   std::vector<std::string> strarray;
@@ -1443,6 +1471,7 @@ TEST(TestStringUtils, sortstringbyname)
   EXPECT_STREQ("B", strarray[1].c_str());
   EXPECT_STREQ("c", strarray[2].c_str());
 }
+#endif
 
 TEST(TestStringUtils, FileSizeFormat)
 {

@@ -40,6 +40,7 @@
 #include "settings/AdvancedSettings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 #include <algorithm>
@@ -2081,7 +2082,7 @@ public:
     if (StringUtils::containsNonAscii(strUpperCodecName)) {
       CLog::Log(LOGWARNING, "CCodecIds::GetCodecByName strCodecName contains non-ASCII: {}", strCodecName);
     }
-    StringUtils::ToUpper(strUpperCodecName, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues);
+    UnicodeUtils::ToUpper(strUpperCodecName, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues);
 
     std::map<std::string, PVR_CODEC>::const_iterator it = m_lookup.find(strUpperCodecName);
     if (it != m_lookup.end())
@@ -2108,7 +2109,7 @@ private:
         if (StringUtils::containsNonAscii(strUpperCodecName)) {
           CLog::Log(LOGWARNING, "CCodecIds::CCodecIds strCodecName contains non-ASCII: {}", strUpperCodecName);
         }
-        StringUtils::ToUpper(strUpperCodecName, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues);
+        UnicodeUtils::ToUpper(strUpperCodecName, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues);
 
         m_lookup.insert(std::make_pair(strUpperCodecName, tmp));
       }

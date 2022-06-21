@@ -63,6 +63,7 @@
 #include "threads/IRunnable.h"
 #include "utils/StringUtils.h"
 #include "utils/SystemInfo.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/Variant.h"
 #include "utils/log.h"
@@ -1185,7 +1186,7 @@ namespace PVR
       if (positionInSeconds > 0)
         resumeString = StringUtils::Format(
             g_localizeStrings.Get(12022),
-            StringUtils::SecondsToTimeString(positionInSeconds, TIME_FORMAT_HH_MM_SS));
+            UnicodeUtils::SecondsToTimeString(positionInSeconds, TIME_FORMAT_HH_MM_SS));
     }
     return resumeString;
   }

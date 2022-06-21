@@ -17,6 +17,7 @@
 #include "settings/AdvancedSettings.h"
 #include "settings/SettingsComponent.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/URIUtils.h"
 #include "utils/log.h"
 
@@ -209,7 +210,7 @@ int CNfsConnection::getContextForExport(const std::string &exportname)
 bool CNfsConnection::splitUrlIntoExportAndPath(const CURL& url, std::string &exportPath, std::string &relativePath)
 {
   //refresh exportlist if empty or hostname change
-  if(m_exportList.empty() || !StringUtils::EqualsNoCase(url.GetHostName(), m_hostName))
+  if(m_exportList.empty() || !UnicodeUtils::EqualsNoCase(url.GetHostName(), m_hostName))
   {
     m_exportList = GetExportList(url);
   }
@@ -882,8 +883,8 @@ bool CNFSFile::OpenForWrite(const CURL& url, bool bOverWrite)
 bool CNFSFile::IsValidFile(const std::string& strFileName)
 {
   if (strFileName.find('/') == std::string::npos || /* doesn't have sharename */
-      StringUtils::EndsWith(strFileName, "/.") || /* not current folder */
-      StringUtils::EndsWith(strFileName, "/.."))  /* not parent folder */
+      UnicodeUtils::EndsWith(strFileName, "/.") || /* not current folder */
+      UnicodeUtils::EndsWith(strFileName, "/.."))  /* not parent folder */
     return false;
   return true;
 }

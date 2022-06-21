@@ -13,6 +13,7 @@
 #include "Util.h"
 #include "utils/CharsetConverter.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/Variant.h"
 
 #include <algorithm>
@@ -567,7 +568,7 @@ bool SorterAscending(const SortItem &left, const SortItem &right)
   if (preliminarySort(left, right, true, result, labelLeft, labelRight))
     return result;
 
-  return StringUtils::AlphaNumericCompare(labelLeft.c_str(), labelRight.c_str()) < 0;
+  return UnicodeUtils::AlphaNumericCompare(labelLeft.c_str(), labelRight.c_str()) < 0;
 }
 
 bool SorterDescending(const SortItem &left, const SortItem &right)
@@ -577,7 +578,7 @@ bool SorterDescending(const SortItem &left, const SortItem &right)
   if (preliminarySort(left, right, true, result, labelLeft, labelRight))
     return result;
 
-  return StringUtils::AlphaNumericCompare(labelLeft.c_str(), labelRight.c_str()) > 0;
+  return UnicodeUtils::AlphaNumericCompare(labelLeft.c_str(), labelRight.c_str()) > 0;
 }
 
 bool SorterIgnoreFoldersAscending(const SortItem &left, const SortItem &right)
@@ -587,7 +588,7 @@ bool SorterIgnoreFoldersAscending(const SortItem &left, const SortItem &right)
   if (preliminarySort(left, right, false, result, labelLeft, labelRight))
     return result;
 
-  return StringUtils::AlphaNumericCompare(labelLeft.c_str(), labelRight.c_str()) < 0;
+  return UnicodeUtils::AlphaNumericCompare(labelLeft.c_str(), labelRight.c_str()) < 0;
 }
 
 bool SorterIgnoreFoldersDescending(const SortItem &left, const SortItem &right)
@@ -597,7 +598,7 @@ bool SorterIgnoreFoldersDescending(const SortItem &left, const SortItem &right)
   if (preliminarySort(left, right, false, result, labelLeft, labelRight))
     return result;
 
-  return StringUtils::AlphaNumericCompare(labelLeft.c_str(), labelRight.c_str()) > 0;
+  return UnicodeUtils::AlphaNumericCompare(labelLeft.c_str(), labelRight.c_str()) > 0;
 }
 
 bool SorterIndirectAscending(const SortItemPtr &left, const SortItemPtr &right)
@@ -995,7 +996,7 @@ void SortUtils::Sort(SortBy sortBy, SortOrder sortOrder, SortAttribute attribute
         item->insert(std::pair<Field, CVariant>(FieldSort, CVariant(sortLabel)));
       }
 
-      if (StringUtils::InitializeCollator(false)) // Used by ICU Collator
+      if (UnicodeUtils::InitializeCollator(false)) // Used by ICU Collator
       {
         // Do the sorting
         std::stable_sort(items.begin(), items.end(), getSorter(sortOrder, attributes));
@@ -1037,7 +1038,7 @@ void SortUtils::Sort(SortBy sortBy, SortOrder sortOrder, SortAttribute attribute
         (*item)->insert(std::pair<Field, CVariant>(FieldSort, CVariant(sortLabel)));
       }
 
-      if  (StringUtils::InitializeCollator(false)) // Used by ICU Collator
+      if  (UnicodeUtils::InitializeCollator(false)) // Used by ICU Collator
       {
         // Do the sorting
         std::stable_sort(items.begin(), items.end(), getSorterIndirect(sortOrder, attributes));
@@ -1124,7 +1125,7 @@ std::string SortUtils::RemoveArticles(const std::string &label)
   std::set<std::string> sortTokens = g_langInfo.GetSortTokens();
   for (std::set<std::string>::const_iterator token = sortTokens.begin(); token != sortTokens.end(); ++token)
   {
-    if (token->size() < label.size() && StringUtils::StartsWithNoCase(label, *token))
+    if (token->size() < label.size() && UnicodeUtils::StartsWithNoCase(label, *token))
       return label.substr(token->size());
   }
 

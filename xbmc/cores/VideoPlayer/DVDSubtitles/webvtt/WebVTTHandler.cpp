@@ -18,6 +18,7 @@
 #include "utils/CharsetConverter.h"
 #include "utils/HTMLUtil.h"
 #include "utils/StringUtils.h"
+#include "utils/UnicodeUtils.h"
 #include "utils/log.h"
 
 #include <algorithm>
@@ -254,7 +255,7 @@ void CWebVTTHandler::DecodeLine(std::string line, std::vector<subtitleData>* sub
     {
       m_currentSection = WebvttSection::NOTE;
     }
-    else if (StringUtils::StartsWith(line, "X-TIMESTAMP-MAP")) // HLS streaming spec
+    else if (UnicodeUtils::StartsWith(line, "X-TIMESTAMP-MAP")) // HLS streaming spec
     {
       // Get the HLS timestamp values to sync the subtitles with video
       CRegExp regLocal;
@@ -461,7 +462,7 @@ void CWebVTTHandler::DecodeLine(std::string line, std::vector<subtitleData>* sub
         auto colorInfo =
             std::find_if(m_CSSColors.begin(), m_CSSColors.end(),
                          [&](const std::pair<std::string, UTILS::COLOR::ColorInfo>& item) {
-                           return StringUtils::EqualsNoCase(item.first, colorName);
+                           return UnicodeUtils::EqualsNoCase(item.first, colorName);
                          });
         if (colorInfo != m_CSSColors.end())
         {
@@ -472,7 +473,7 @@ void CWebVTTHandler::DecodeLine(std::string line, std::vector<subtitleData>* sub
       std::string colorRGB = GetCueCssValue("colorRGB", line);
       if (!colorRGB.empty()) // From CSS Color numeric R,G,B values
       {
-        auto intValues = StringUtils::Split(colorRGB, ",");
+        auto intValues = UnicodeUtils::Split(colorRGB, ",");
         uint32_t color = UTILS::COLOR::ConvertIntToRGB(
             std::stoi(intValues[2]), std::stoi(intValues[1]), std::stoi(intValues[0]));
         m_feedCssStyle.color = StringUtils::Format("{:6x}", color);
@@ -563,7 +564,7 @@ void CWebVTTHandler::GetCueData(std::string& cueText)
         m_hlsTimestampMpegTsUs - m_hlsTimestampLocalUs;
     cueSettings =
         cueText.substr(m_cueTimeRegex.GetFindLen(), cueText.length() - m_cueTimeRegex.GetFindLen());
-    StringUtils::Trim(cueSettings);
+    UnicodeUtils::Trim(cueSettings);
   }
   else // This should never happen
   {
@@ -902,7 +903,7 @@ void CWebVTTHandler::ConvertSubtitle(std::string& text)
     if (StringUtils::containsNonAscii(fullTag)) {
       CLog::Log(LOGWARNING, "CWebVTTHandler::ConvertSubtitle fullTag is non-ASCII: {}\n", fullTag);
     }
-    StringUtils::ToLower(fullTag, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues.
+    UnicodeUtils::ToLower(fullTag, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues.
 
     // Get tag name only (e.g. full tag is "</c>", tagName will be "c")
     std::string tagName = m_tagsRegex.GetMatch(1);
@@ -912,7 +913,7 @@ void CWebVTTHandler::ConvertSubtitle(std::string& text)
     if (fullTag.substr(1, 1) == "/")
       InsertCssStyleCloseTag(tagName, text, pos, flagTags, cssTagsOpened, baseStyle);
 
-    if (fullTag == "<b>" || StringUtils::StartsWith(fullTag, "<b."))
+    if (fullTag == "<b>" || UnicodeUtils::StartsWith(fullTag, "<b."))
     {
       if (flagTags[FLAG_TAG_BOLD] == 0)
         InsertTextPos(text, "{\\b1}", pos);
@@ -924,7 +925,7 @@ void CWebVTTHandler::ConvertSubtitle(std::string& text)
       if (flagTags[FLAG_TAG_BOLD] == 0)
         InsertTextPos(text, "{\\b0}", pos);
     }
-    else if (fullTag == "<i>" || StringUtils::StartsWith(fullTag, "<i."))
+    else if (fullTag == "<i>" || UnicodeUtils::StartsWith(fullTag, "<i."))
     {
       if (flagTags[FLAG_TAG_ITALIC] == 0)
         InsertTextPos(text, "{\\i1}", pos);
@@ -937,7 +938,7 @@ void CWebVTTHandler::ConvertSubtitle(std::string& text)
       if (flagTags[FLAG_TAG_ITALIC] == 0)
         InsertTextPos(text, "{\\i0}", pos);
     }
-    else if (fullTag == "<u>" || StringUtils::StartsWith(fullTag, "<u."))
+    else if (fullTag == "<u>" || UnicodeUtils::StartsWith(fullTag, "<u."))
     {
       if (flagTags[FLAG_TAG_UNDERLINE] == 0)
         InsertTextPos(text, "{\\u1}", pos);

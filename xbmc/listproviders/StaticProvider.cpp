@@ -33,7 +33,7 @@ CStaticListProvider::CStaticListProvider(const TiXmlElement *element, int parent
   if (XMLUtils::GetInt(element, "default", m_defaultItem))
   {
     const char *always = element->FirstChildElement("default")->Attribute("always");
-    if (always && StringUtils::StartsWithNoCase(always, "true"))
+    if (always && UnicodeUtils::StartsWithNoCase(always, "true"))
       m_defaultAlways = true;
   }
 }

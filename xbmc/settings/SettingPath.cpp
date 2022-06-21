@@ -93,8 +93,8 @@ bool CSettingPath::Deserialize(const TiXmlNode *node, bool update /* = false */)
 bool CSettingPath::SetValue(const std::string &value)
 {
   // for backwards compatibility to Frodo
-  if (StringUtils::EqualsNoCase(value, "select folder") ||
-      StringUtils::EqualsNoCase(value, "select writable folder"))
+  if (UnicodeUtils::EqualsNoCase(value, "select folder") ||
+      UnicodeUtils::EqualsNoCase(value, "select writable folder"))
     return CSettingString::SetValue("");
 
   return CSettingString::SetValue(value);
