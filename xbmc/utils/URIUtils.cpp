@@ -144,7 +144,7 @@ void URIUtils::RemoveExtension(std::string& strFileName)
 	
 	// TODO: Unicode, verify
 	
-    if (StringUtils::containsNonAscii(strExtension)) {
+    if (UnicodeUtils::ContainsNonAscii(strExtension)) {
       CLog::Log(LOGWARNING, "URIUtils::RemoveExtension strExtension contains non-ASCII: {}", strExtension);
     }
     UnicodeUtils::ToLower(strExtension, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
@@ -487,7 +487,7 @@ std::string URIUtils::ChangeBasePath(const std::string &fromPath, const std::str
 
   // Convert back slashes to forward slashes, if required
   if (IsDOSPath(fromPath) && !IsDOSPath(toPath))
-    StringUtils::Replace(toFile, "\\", "/");
+    UnicodeUtils::Replace(toFile, "\\", "/");
 
   // Handle difference in URL encoded vs. not encoded
   if ( HasEncodedFilename(CURL(fromPath))
@@ -503,7 +503,7 @@ std::string URIUtils::ChangeBasePath(const std::string &fromPath, const std::str
 
   // Convert forward slashes to back slashes, if required
   if (!IsDOSPath(fromPath) && IsDOSPath(toPath))
-    StringUtils::Replace(toFile, "/", "\\");
+    UnicodeUtils::Replace(toFile, "/", "\\");
 
   if (bAddPath)
     return AddFileToFolder(toPath, toFile);
@@ -1361,9 +1361,9 @@ std::string URIUtils::AddFileToFolder(const std::string& strFolder,
 
   // correct any slash directions
   if (!IsDOSPath(strFolder))
-    StringUtils::Replace(strResult, '\\', '/');
+    UnicodeUtils::Replace(strResult, '\\', '/');
   else
-    StringUtils::Replace(strResult, '/', '\\');
+    UnicodeUtils::Replace(strResult, '/', '\\');
 
   return strResult;
 }
@@ -1400,7 +1400,7 @@ CURL URIUtils::CreateArchivePath(const std::string& type,
      code (and elsewhere) doesn't pass in non-posix paths.
    */
   std::string strBuffer(pathInArchive);
-  StringUtils::Replace(strBuffer, '\\', '/');
+  UnicodeUtils::Replace(strBuffer, '\\', '/');
   UnicodeUtils::TrimLeft(strBuffer, "/");
   url.SetFileName(strBuffer);
 

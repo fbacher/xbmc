@@ -418,7 +418,7 @@ void CGUIDialogNumeric::SetMode(INPUT_MODE mode, const std::string &initial)
     else if (m_mode == INPUT_DATE)
     {
       std::string tmp = initial;
-      StringUtils::Replace(tmp, '/', '.');
+      UnicodeUtils::Replace(tmp, '/', '.');
       dateTime.SetFromDBDate(tmp);
     }
 

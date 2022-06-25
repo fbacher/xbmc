@@ -299,12 +299,12 @@ void CScraperParser::ParseExpression(const std::string& input, std::string& dest
 
       int iLen = reg.GetFindLen();
       // nasty hack #1 - & means \0 in a replace string
-      StringUtils::Replace(strCurOutput, "&","!!!AMPAMP!!!");
+      UnicodeUtils::Replace(strCurOutput, "&","!!!AMPAMP!!!");
       std::string result = reg.GetReplaceString(strCurOutput);
       if (!result.empty())
       {
         std::string strResult(result);
-        StringUtils::Replace(strResult, "!!!AMPAMP!!!","&");
+        UnicodeUtils::Replace(strResult, "!!!AMPAMP!!!","&");
         Clean(strResult);
         ReplaceBuffers(strResult);
         if (iCompare > -1)
@@ -565,7 +565,7 @@ void CScraperParser::ConvertJSON(std::string &string)
     string.replace(string.begin()+pos1-2, string.begin()+pos2+reg2.GetSubLength(2), replace);
   }
 
-  StringUtils::Replace(string, "\\\"","\"");
+  UnicodeUtils::Replace(string, "\\\"","\"");
 }
 
 void CScraperParser::ClearBuffers()

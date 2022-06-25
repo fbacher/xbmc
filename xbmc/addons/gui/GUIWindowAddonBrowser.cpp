@@ -636,7 +636,7 @@ std::string CGUIWindowAddonBrowser::GetStartFolder(const std::string& dir)
     {
       const bool all = CServiceBroker::GetPlatform().SupportsUserInstalledBinaryAddons();
       std::string startDir = dir;
-      StringUtils::Replace(startDir, "/default_binary_addons_source/", all ? "/all/" : "/user/");
+      UnicodeUtils::Replace(startDir, "/default_binary_addons_source/", all ? "/all/" : "/user/");
       return startDir;
     }
     else

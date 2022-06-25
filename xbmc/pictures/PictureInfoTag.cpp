@@ -136,7 +136,7 @@ bool CPictureInfoTag::Load(const std::string &path)
 
   // TODO: Unicode, looks like trouble
 
-  if (StringUtils::containsNonAscii(strExtension)) {
+  if (UnicodeUtils::ContainsNonAscii(strExtension)) {
        CLog::Log(LOGWARNING, "CPictureInfoTag::Load strExtension contains non-ASCII: {}", strExtension);
      }
   UnicodeUtils::ToLower(strExtension, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues

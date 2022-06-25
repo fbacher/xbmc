@@ -324,7 +324,7 @@ std::string CMediaManager::TranslateDevicePath(const std::string& devicePath, bo
     return "";
 
   if(bReturnAsDevice == false)
-    StringUtils::Replace(strDevice, "\\\\.\\","");
+    UnicodeUtils::Replace(strDevice, "\\\\.\\","");
   else if(!strDevice.empty() && strDevice[1]==':')
     strDevice = StringUtils::Format("\\\\.\\{}:", strDevice[0]);
 

@@ -476,8 +476,8 @@ void CUtil::GetQualifiedFilename(const std::string &strBasePath, std::string &st
   strFilename = URIUtils::AddFileToFolder(strBasePath, strFilename);
 
   // get rid of any /./ or \.\ that happen to be there
-  StringUtils::Replace(strFilename, "\\.\\", "\\");
-  StringUtils::Replace(strFilename, "/./", "/");
+  UnicodeUtils::Replace(strFilename, "\\.\\", "\\");
+  UnicodeUtils::Replace(strFilename, "/./", "/");
 
   // now find any "\\..\\" and remove them via GetParentPath
   size_t pos;
@@ -904,20 +904,20 @@ std::string CUtil::MakeLegalFileName(const std::string &strFile, int LegalType)
 {
   std::string result = strFile;
 
-  StringUtils::Replace(result, '/', '_');
-  StringUtils::Replace(result, '\\', '_');
-  StringUtils::Replace(result, '?', '_');
+  UnicodeUtils::Replace(result, '/', '_');
+  UnicodeUtils::Replace(result, '\\', '_');
+  UnicodeUtils::Replace(result, '?', '_');
 
   if (LegalType == LEGAL_WIN32_COMPAT)
   {
     // just filter out some illegal characters on windows
-    StringUtils::Replace(result, ':', '_');
-    StringUtils::Replace(result, '*', '_');
-    StringUtils::Replace(result, '?', '_');
-    StringUtils::Replace(result, '\"', '_');
-    StringUtils::Replace(result, '<', '_');
-    StringUtils::Replace(result, '>', '_');
-    StringUtils::Replace(result, '|', '_');
+    UnicodeUtils::Replace(result, ':', '_');
+    UnicodeUtils::Replace(result, '*', '_');
+    UnicodeUtils::Replace(result, '?', '_');
+    UnicodeUtils::Replace(result, '\"', '_');
+    UnicodeUtils::Replace(result, '<', '_');
+    UnicodeUtils::Replace(result, '>', '_');
+    UnicodeUtils::Replace(result, '|', '_');
     UnicodeUtils::TrimRight(result, ". ");
   }
   return result;
@@ -969,7 +969,7 @@ std::string CUtil::ValidatePath(const std::string &path, bool bFixDoubleSlashes 
 #ifdef TARGET_WINDOWS
   if (URIUtils::IsDOSPath(path))
   {
-    StringUtils::Replace(result, '/', '\\');
+    UnicodeUtils::Replace(result, '/', '\\');
     /* The double slash correction should only be used when *absolutely*
        necessary! This applies to certain DLLs or use from Python DLLs/scripts
        that incorrectly generate double (back) slashes.
@@ -987,7 +987,7 @@ std::string CUtil::ValidatePath(const std::string &path, bool bFixDoubleSlashes 
   else if (path.find("://") != std::string::npos || path.find(":\\\\") != std::string::npos)
 #endif
   {
-    StringUtils::Replace(result, '\\', '/');
+    UnicodeUtils::Replace(result, '\\', '/');
     /* The double slash correction should only be used when *absolutely*
        necessary! This applies to certain DLLs or use from Python DLLs/scripts
        that incorrectly generate double (back) slashes.
@@ -1455,7 +1455,7 @@ bool CUtil::MakeShortenPath(std::string StrInput, std::string& StrOutput, size_t
   // replace any additional /../../ with just /../ if necessary
   std::string replaceDots = StringUtils::Format("..{}..", cDelim);
   while (StrInput.size() > (unsigned int)iTextMaxLength)
-    if (!StringUtils::Replace(StrInput, replaceDots, ".."))
+    if (!UnicodeUtils::Replace(StrInput, replaceDots, ".."))
       break;
   // finally, truncate our string to force inside our max text length,
   // replacing the last 2 characters with ".."

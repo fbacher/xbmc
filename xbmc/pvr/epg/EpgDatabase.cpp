@@ -593,7 +593,7 @@ private:
           strFragment.clear();
 
           strFragment += ") LIKE UPPER('%";
-          StringUtils::Replace(strTerm, "'", "''"); // escape '
+          UnicodeUtils::Replace(strTerm, "'", "''"); // escape '
           strFragment += strTerm;
           strFragment += "%')) ";
 

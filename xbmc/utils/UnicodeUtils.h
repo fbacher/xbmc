@@ -127,14 +127,14 @@ public:
 	 *
 	 *  TO_LOWER:
 	 *
-	 *  std::string.toLower is frequently used to 'normalize' strings for use
+	 *  std::string.toLower is frequently used to 'Normalize' strings for use
 	 *  as map keys. This WON'T WORK for most languages/character sets.
 	 *  	ToLower is locale sensitive. A German sharp-s (looks a bit like an
 	 *  	italic B) is equivalent to "ss". There is no upper-case equivalent.
 	 *
 	 *  	Accent marks frequently change. In particular, Turkic has 4 versions of
 	 *  	the letter "I" (English has two). To further complicate matters,
-	 *  	in Turkic locale, toUpper of the dotted "i" translates to an upper
+	 *  	in Turkic locale, ToUpper of the dotted "i" translates to an upper
 	 *  	case dotted i; toLower converts an upper case dottless "I" to a lower
 	 *  	case dotless "I".
 	 *
@@ -168,7 +168,7 @@ public:
 	 *  Implications:
 	 *  * You can't compare two strings one byte or even codepoint at a time
 	 *  * Two strings of different, non-zero lengths does not tell you if
-	 *    strings are not-equal! (Not without knowing that the strings are normalized
+	 *    strings are not-equal! (Not without knowing that the strings are Normalized
 	 *    for the same locale).
 	 *  * When iterating the characters of a string, you frequently have
 	 *    to know where the character boundaries are.
@@ -177,7 +177,7 @@ public:
 	 *  Don't give up hope yet:
 	 *  * The ICU library, while complicated and pretty heavy, can reliably
 	 *    handle many localization and Unicode issues.
-	 *  * Frequently strings are normalized. Normalizing isn't that expensive.
+	 *  * Frequently strings are Normalized. Normalizing isn't that expensive.
 	 *  * While it is simpler/faster to keep everything in Unicode (32-bit),
 	 *    it is not overly expensive to use utf-8, utf-16.
 	 *  * ICU tries to be as efficient as possible, assumes the most common,
@@ -382,7 +382,7 @@ public:
    *
    * Note: This function serves a similar purpose that "ToLower/ToUpper" is
    *       frequently used for ASCII maps indexed by keyword. ToLower/ToUpper does
-   *       NOT work to 'normalize' Unicode to a consistent value regardless of
+   *       NOT work to 'Normalize' Unicode to a consistent value regardless of
    *       the case variations of the input string. A particular problem is the behavior
    *       of "The Turkic I". FOLD_CASE_DEFAULT is effective at
    *       eliminating this problem. Below are the four "I" characters in
@@ -545,8 +545,9 @@ public:
    *
    *  \param str string to TitleCase
    *  \param locale
+   *  \return str in TitleCase
    */
-  static void TitleCase(std::wstring &str, const std::locale &locale);
+  static std::wstring TitleCase(const std::wstring &str, const std::locale &locale);
 
   /*!
    *  \brief TitleCase a string using LangInfo::GetSystemLocale.
@@ -560,8 +561,9 @@ public:
    *
    *  \param str string to TitleCase
    *  \param locale
+   *  \return str in TitleCase
    */
-  static void TitleCase(std::wstring &str);
+  static std::wstring TitleCase(const std::wstring &str);
 
   /*!
    *  \brief TitleCase a wstring using locale.
@@ -575,8 +577,9 @@ public:
    *
    *  \param str string to TitleCase
    *  \param locale
+   *  \return str in TitleCase
    */
-  static void TitleCase(std::string &str, const std::locale &locale);
+  static std::string TitleCase(const std::string &str, const std::locale &locale);
 
   /*!
    *  \brief TitleCase a wstring using LangInfo::GetSystemLocale.
@@ -590,8 +593,9 @@ public:
    *
    *  \param str string to TitleCase
    *  \param locale
+   *  \return str in TitleCase
    */
-  static void TitleCase(std::string &str);
+  static std::string TitleCase(const std::string &str);
 
   /*!
    *  \brief Normalizes a wstring. Not expected to be used outside of UnicodeUtils.
@@ -602,15 +606,15 @@ public:
    *  normalization is not needed in many situations. An introduction can be found
    *  at: https://unicode-org.github.io/icu/userguide/transforms/normalization/
    *
-   *  \param str string to normalize.
+   *  \param str string to Normalize.
    *  \param options fine tunes behavior. See StringOptions. Frequently can leave
    *         at default value.
-   *  \param normalizerType select the appropriate normalizer for the job
-   *  \return normalized string
+   *  \param NormalizerType select the appropriate Normalizer for the job
+   *  \return Normalized string
    */
 
   static const std::wstring Normalize(const std::wstring &src, const StringOptions opt =
-      StringOptions::FOLD_CASE_DEFAULT, const NormalizerType normalizerType = NormalizerType::NFKC);
+      StringOptions::FOLD_CASE_DEFAULT, const NormalizerType NormalizerType = NormalizerType::NFKC);
 
   /*!
    *  \brief Normalizes a string. Not expected to be used outside of UnicodeUtils.
@@ -621,15 +625,15 @@ public:
    * normalization is not needed in many situations. An introduction can be found
    * at: https://unicode-org.github.io/icu/userguide/transforms/normalization/
    *
-   * \param str string to normalize.
+   * \param str string to Normalize.
    * \param options fine tunes behavior. See StringOptions. Frequently can leave
    *        at default value.
-   * \param normalizerType select the appropriate normalizer for the job
-   * \return normalized string
+   * \param NormalizerType select the appropriate Normalizer for the job
+   * \return Normalized string
    */
 
   static const std::string Normalize(const std::string &src, const StringOptions opt =
-      StringOptions::FOLD_CASE_DEFAULT, const NormalizerType normalizerType = NormalizerType::NFKC);
+      StringOptions::FOLD_CASE_DEFAULT, const NormalizerType NormalizerType = NormalizerType::NFKC);
 
   /*!
    *  \brief Determines if two strings are identical in content.
@@ -662,73 +666,73 @@ public:
    * \brief Determines if two strings are the same, after case folding each.
    *
    * Logically equivalent to Equals(FoldCase(str1, opt)), FoldCase(str2, opt))
-   * or, if normalize == true: Equals(NFD(FoldCase(NFD(str1))), NFD(FoldCase(NFD(str2))))
+   * or, if Normalize == true: Equals(NFD(FoldCase(NFD(str1))), NFD(FoldCase(NFD(str2))))
    * (NFD is a type of normalization)
    *
    * Note: When normalization = true, the string comparison is done incrementally
-   * as the strings are normalized and folded. Otherwise, case folding is applied
+   * as the strings are Normalized and folded. Otherwise, case folding is applied
    * to the entire string first.
    *
-   * Note In most cases normalization should not be required, using normalize
+   * Note In most cases normalization should not be required, using Normalize
    * should yield better results for those cases.
    *
    * \param str1 one of the strings to compare
    * \param str2 one of the strings to compare
    * \param opt StringOptions to apply. Generally leave at default value.
-   * \param normalize Controls whether normalization is performed before and after
+   * \param Normalize Controls whether normalization is performed before and after
    *        case folding
    * \return true if both strings compare after case folding, otherwise false
    */
   static bool EqualsNoCase(const std::string &str1, const std::string &str2,
-      const StringOptions opt = StringOptions::FOLD_CASE_DEFAULT, const bool normalize = false);
+      const StringOptions opt = StringOptions::FOLD_CASE_DEFAULT, const bool Normalize = false);
 
   /*!
    * \brief Determines if two strings are the same, after case folding each.
    *
    * Logically equivalent to Equals(FoldCase(str1, opt)), FoldCase(s2, opt))
-   * or, if normalize == true: Equals(NFD(FoldCase(NFD(str1))), NFD(FoldCase(NFD(s2))))
+   * or, if Normalize == true: Equals(NFD(FoldCase(NFD(str1))), NFD(FoldCase(NFD(s2))))
    * (NFD is a type of normalization)
    *
    * Note: When normalization = true, the string comparison is done incrementally
-   * as the strings are normalized and folded. Otherwise, case folding is applied
+   * as the strings are Normalized and folded. Otherwise, case folding is applied
    * to the entire string first.
    *
-   * Note In most cases normalization should not be required, using normalize
+   * Note In most cases normalization should not be required, using Normalize
    * should yield better results for those cases.
    *
    * \param str1 one of the strings to compare
    * \param s2 one of the (c-style) strings to compare
    * \param opt StringOptions to apply. Generally leave at default value.
-   * \param normalize Controls whether normalization is performed before and after
+   * \param Normalize Controls whether normalization is performed before and after
    *        case folding
    * \return true if both strings compare after case folding, otherwise false
    */
   static bool EqualsNoCase(const std::string &str1, const char *s2, const StringOptions opt =
-      StringOptions::FOLD_CASE_DEFAULT, const bool normalize = false);
+      StringOptions::FOLD_CASE_DEFAULT, const bool Normalize = false);
 
   /*!
    * \brief Determines if two strings are the same, after case folding each.
    *
    * Logically equivalent to Equals(FoldCase(s1, opt)), FoldCase(s2, opt))
-   * or, if normalize == true: Equals(NFD(FoldCase(NFD(s1))), NFD(FoldCase(NFD(s2))))
+   * or, if Normalize == true: Equals(NFD(FoldCase(NFD(s1))), NFD(FoldCase(NFD(s2))))
    * (NFD is a type of normalization)
    *
    * Note: When normalization = true, the string comparison is done incrementally
-   * as the strings are normalized and folded. Otherwise, case folding is applied
+   * as the strings are Normalized and folded. Otherwise, case folding is applied
    * to the entire string first.
    *
-   * Note In most cases normalization should not be required, using normalize
+   * Note In most cases normalization should not be required, using Normalize
    * should yield better results for those cases.
    *
    * \param s1 one of the (c-style) strings to compare
    * \param s2 one of the (c-style) strings to compare
    * \param opt StringOptions to apply. Generally leave at default value.
-   * \param normalize Controls whether normalization is performed before and after
+   * \param Normalize Controls whether normalization is performed before and after
    *        case folding
    * \return true if both strings compare after case folding, otherwise false
    */
   static bool EqualsNoCase(const char *s1, const char *s2, StringOptions opt =
-      StringOptions::FOLD_CASE_DEFAULT, const bool normalize = false);
+      StringOptions::FOLD_CASE_DEFAULT, const bool Normalize = false);
 
   /*!
    * \brief Compares two wstrings using codepoint order. Locale does not matter.
@@ -755,11 +759,11 @@ public:
    * Assumes that all collation will occur in this thread.
    *
    * \param icuLocale Collation order will be based on the given locale.
-   * \param normalize Controls whether normalization is performed prior to collation.
+   * \param Normalize Controls whether normalization is performed prior to collation.
    *                  Frequently not required. Some free normalization always occurs.
    * \return true of initialization was successful, otherwise false.
    */
-  static bool InitializeCollator(const icu::Locale &icuLocale, bool normalize /* = false */);
+  static bool InitializeCollator(const icu::Locale &icuLocale, bool Normalize /* = false */);
 
   /*!
    * \brief Initializes the Collator for this thread, such as before sorting a
@@ -768,11 +772,11 @@ public:
    * Assumes that all collation will occur in this thread.
    *
    * \param locale Collation order will be based on the given locale.
-   * \param normalize Controls whether normalization is performed prior to collation.
+   * \param Normalize Controls whether normalization is performed prior to collation.
    *                  Frequently not required. Some free normalization always occurs.
    * \return true of initialization was successful, otherwise false.
    */
-  static bool InitializeCollator(const std::locale &locale, bool normalize /* = false */);
+  static bool InitializeCollator(const std::locale &locale, bool Normalize /* = false */);
 
   /*!
    * \brief Initializes the Collator for this thread using LangInfo::GetSystemLocale,
@@ -780,11 +784,11 @@ public:
    *
    * Assumes that all collation will occur in this thread.
    *
-   * \param normalize Controls whether normalization is performed prior to collation.
+   * \param Normalize Controls whether normalization is performed prior to collation.
    *                  Frequently not required. Some free normalization always occurs.
    * \return true of initialization was successful, otherwise false.
    */
-  static bool InitializeCollator(bool normalize = false);
+  static bool InitializeCollator(bool Normalize = false);
 
   /*!
    * \brief Performs locale sensitive string comparison.
@@ -821,20 +825,20 @@ public:
    * \brief Performs a bit-wise comparison of two wstrings, after case folding each.
    *
    * Logically equivalent to Compare(FoldCase(str1, opt)), FoldCase(str2, opt))
-   * or, if normalize == true: Compare(NFD(FoldCase(NFD(str1))), NFD(FoldCase(NFD(str2))))
+   * or, if Normalize == true: Compare(NFD(FoldCase(NFD(str1))), NFD(FoldCase(NFD(str2))))
    * (NFD is a type of normalization)
    *
    * Note: When normalization = true, the string comparison is done incrementally
-   * as the strings are normalized and folded. Otherwise, case folding is applied
+   * as the strings are Normalized and folded. Otherwise, case folding is applied
    * to the entire string first.
    *
-   * Note In most cases normalization should not be required, using normalize
+   * Note In most cases normalization should not be required, using Normalize
    * should yield better results for those cases.
    *
    * \param str1 one of the wstrings to compare
    * \param str2 one of the wstrings to compare
    * \param opt StringOptions to apply. Generally leave at the default value
-   * \param normalize Controls whether normalization is performed before and after
+   * \param Normalize Controls whether normalization is performed before and after
    *        case folding
    * \return The result of bitwise character comparison:
    * < 0 if the characters str1 are bitwise less than the characters in str2,
@@ -842,26 +846,26 @@ public:
    * > 0 if the characters in str1 are bitwise greater than the characters in str2.
    */
   static int CompareNoCase(const std::wstring &str1, const std::wstring &str2, StringOptions opt =
-      StringOptions::FOLD_CASE_DEFAULT, const bool normalize = false);
+      StringOptions::FOLD_CASE_DEFAULT, const bool Normalize = false);
 
   /*!
    * \brief Performs a bit-wise comparison of two strings, after case folding each.
    *
    * Logically equivalent to Compare(FoldCase(str1, opt)), FoldCase(str2, opt))
-   * or, if normalize == true: Compare(NFD(FoldCase(NFD(str1))), NFD(FoldCase(NFD(str2))))
+   * or, if Normalize == true: Compare(NFD(FoldCase(NFD(str1))), NFD(FoldCase(NFD(str2))))
    * (NFD is a type of normalization)
    *
    * Note: When normalization = true, the string comparison is done incrementally
-   * as the strings are normalized and folded. Otherwise, case folding is applied
+   * as the strings are Normalized and folded. Otherwise, case folding is applied
    * to the entire string first.
    *
-   * Note In most cases normalization should not be required, using normalize
+   * Note In most cases normalization should not be required, using Normalize
    * should yield better results for those cases.
    *
    * \param str1 one of the strings to compare
    * \param str2 one of the strings to compare
    * \param opt StringOptions to apply. Generally leave at the default value
-   * \param normalize Controls whether normalization is performed before and after
+   * \param Normalize Controls whether normalization is performed before and after
    *        case folding
    * \return The result of bitwise character comparison:
    * < 0 if the characters str1 are bitwise less than the characters in str2,
@@ -869,31 +873,26 @@ public:
    * > 0 if the characters in str1 are bitwise greater than the characters in str2.
    */
   static int CompareNoCase(const std::string &str1, const std::string &str2, StringOptions opt =
-      StringOptions::FOLD_CASE_DEFAULT, const bool normalize = false);
-
-  // TODO: Review issues with truncating length of multi-byte strings.
+      StringOptions::FOLD_CASE_DEFAULT, const bool Normalize = false);
 
   /*!
    * \brief Performs a bit-wise comparison of two strings, after case folding each.
    *
    * Logically equivalent to Compare(FoldCase(s1, opt)), FoldCase(s2, opt))
-   * or, if normalize == true: Compare(NFD(FoldCase(NFD(s1))), NFD(FoldCase(NFD(s2))))
+   * or, if Normalize == true: Compare(NFD(FoldCase(NFD(s1))), NFD(FoldCase(NFD(s2))))
    * (NFD is a type of normalization)
    *
-   * NOTE: Limiting the number of bytes to compare via the option n may produce
-   *       unexpected results for multi-byte characters.
-   *
    * Note: When normalization = true, the string comparison is done incrementally
-   * as the strings are normalized and folded. Otherwise, case folding is applied
+   * as the strings are Normalized and folded. Otherwise, case folding is applied
    * to the entire string first.
    *
-   * Note In most cases normalization should not be required, using normalize
+   * Note In most cases normalization should not be required, using Normalize
    * should yield better results for those cases.
    *
    * \param s1 one of the strings to compare
    * \param s2 one of the strings to compare
    * \param opt StringOptions to apply. Generally leave at the default value
-   * \param normalize Controls whether normalization is performed before and after
+   * \param Normalize Controls whether normalization is performed before and after
    *        case folding
    * \return The result of bitwise character comparison:
    * < 0 if the characters s1 are bitwise less than the characters in s2,
@@ -901,30 +900,31 @@ public:
    * > 0 if the characters in s1 are bitwise greater than the characters in s2.
    */
   static int CompareNoCase(const char *s1, const char *s2, StringOptions opt =
-      StringOptions::FOLD_CASE_DEFAULT, const bool normalize = false);
+      StringOptions::FOLD_CASE_DEFAULT, const bool Normalize = false);
 
   /*!
    * \brief Performs a bit-wise comparison of two strings, after case folding each.
    *
    * Logically equivalent to Compare(FoldCase(str1, opt)), FoldCase(str2, opt))
-   * or, if normalize == true: Compare(NFD(FoldCase(NFD(str1))), NFD(FoldCase(NFD(str2))))
+   * or, if Normalize == true: Compare(NFD(FoldCase(NFD(str1))), NFD(FoldCase(NFD(str2))))
    * (NFD is a type of normalization)
    *
    * Note: Use of the byte-length argument n is STRONGLY discouraged since
-   * it can easily result in malformed Unicode.
+   * it can easily result in malformed Unicode. Further, byte-length does not
+   * correlate to character length in multi-byte languages.
    *
    * Note: When normalization = true, the string comparison is done incrementally
-   * as the strings are normalized and folded. Otherwise, case folding is applied
+   * as the strings are Normalized and folded. Otherwise, case folding is applied
    * to the entire string first.
    *
-   * Note In most cases normalization should not be required, using normalize
+   * Note In most cases normalization should not be required, using Normalize
    * should yield better results for those cases.
    *
    * \param str1 one of the strings to compare
    * \param str2 one of the strings to compare
    * \param n maximum number of bytes to compare
    * \param opt StringOptions to apply. Generally leave at the default value
-   * \param normalize Controls whether normalization is performed before and after
+   * \param Normalize Controls whether normalization is performed before and after
    *        case folding
    * \return The result of bitwise character comparison:
    * < 0 if the characters str1 are bitwise less than the characters in str2,
@@ -933,30 +933,30 @@ public:
    */
   [[deprecated("StartsWith/EndsWith may be better choices. Multibyte characters, case folding and byte lengths don't mix.") ]] static int CompareNoCase(
       const std::string &str1, const std::string &str2, size_t n, StringOptions opt =
-          StringOptions::FOLD_CASE_DEFAULT, const bool normalize = false);
+          StringOptions::FOLD_CASE_DEFAULT, const bool Normalize = false);
 
   /*!
    * \brief Performs a bit-wise comparison of two strings, after case folding each.
    *
    * Logically equivalent to Compare(FoldCase(s1, opt)), FoldCase(s2, opt))
-   * or, if normalize == true: Compare(NFD(FoldCase(NFD(s1))), NFD(FoldCase(NFD(s2))))
+   * or, if Normalize == true: Compare(NFD(FoldCase(NFD(s1))), NFD(FoldCase(NFD(s2))))
    * (NFD is a type of normalization)
    *
    * NOTE: Limiting the number of bytes to compare via the option n may produce
    *       unexpected results for multi-byte characters.
    *
    * Note: When normalization = true, the string comparison is done incrementally
-   * as the strings are normalized and folded. Otherwise, case folding is applied
+   * as the strings are Normalized and folded. Otherwise, case folding is applied
    * to the entire string first.
    *
-   * Note In most cases normalization should not be required, using normalize
+   * Note In most cases normalization should not be required, using Normalize
    * should yield better results for those cases.
    *
    * \param s1 one of the strings to compare
    * \param s2 one of the strings to compare
    * \param n maximum number of bytes to compare
    * \param opt StringOptions to apply. Generally leave at the default value
-   * \param normalize Controls whether normalization is performed before and after
+   * \param Normalize Controls whether normalization is performed before and after
    *        case folding
    * \return The result of bitwise character comparison:
    * < 0 if the characters s1 are bitwise less than the characters in s2,
@@ -966,9 +966,9 @@ public:
 
   [[deprecated("StartsWith/EndsWith may be better choices. Multibyte characters, case folding and byte lengths don't mix.") ]] static int CompareNoCase(
       const char *s1, const char *s2, size_t n,
-      StringOptions opt = StringOptions::FOLD_CASE_DEFAULT, const bool normalize = false);
+      StringOptions opt = StringOptions::FOLD_CASE_DEFAULT, const bool Normalize = false);
 
-  // TODO: consider renaming to ParseInt
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
   /*!
    * \brief Returns the int value of the first series of digits found in the string
@@ -979,6 +979,7 @@ public:
    * \return int value of found string
    */
   static int ReturnDigits(const std::string &str);
+#endif
 
   /*!
    * \brief Get the leftmost side of a UTF-8 string, using character boundary
@@ -1019,7 +1020,7 @@ public:
    *
    * Ex: Copy all but the rightmost two characters from str:
    *
-   * std::string x = Left(str, 2, false, Unicode::getDefaultICULocale());
+   * std::string x = Left(str, 2, false, Unicode::GetDefaultICULocale());
    */
 
   static std::string Left(const std::string &str, const size_t charCount, const bool leftReference,
@@ -1062,9 +1063,102 @@ public:
      *
      * Ex: Copy all but the leftmost two characters from str:
      *
-     * std::string x = Right(str, 2, false, Unicode::getDefaultICULocale());
+     * std::string x = Right(str, 2, false, Unicode::GetDefaultICULocale());
      */
-    static std::string Right(const std::string &str, const size_t charCount, bool rightReference = true);
+    static std::string Right(const std::string &str, const size_t charCount, bool getEndIndex = true);
+
+    /*!
+      * \brief Gets the byte-offset of a Unicode character relative to a reference
+      *
+      * This function is primarily used by Left, Right and Mid. See comment at end for details on use.
+      *
+      * \param str UTF-8 string to get index from
+      * \param charCount character offset to find index for
+      * \param left + getBeginIndex define how character index is measured. See comment below
+      * \param getBeginIndex + left define how character index is measured. See comment below
+      * \param icuLocale fine-tunes character boundary rules
+      * \return code-unit index, relative to str (not the substr) for the given offset
+      *                   and character count
+      *                   std::string::npos is returned if charCount is outside of the string
+      *
+      * left=true  getBeginIndex=true   Returns offset of last byte of nth character (0-n). Used by Left.
+      * left=true  getBeginIndex=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
+      * left=false getBeginIndex=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
+      * left=false getBeginIndex=false  Returns offset of first byte of nth char from right end (0-n). Used by Right(x)
+      */
+    static size_t GetByteIndexForCharacter(const std::string &str, size_t charCount,
+        const bool left, const bool getBeginIndex, icu::Locale icuLocale);
+    /*!
+      * \brief Gets the byte-offset of a Unicode character relative to a reference
+      *
+      * This function is primarily used by Left, Right and Mid. See comment at end for details on use.
+      *
+      * \param str UTF-8 string to get index from
+      * \param charCount character offset to find index for
+      * \param left + getBeginIndex define how character index is measured. See comment below
+      * \param getBeginIndex + left define how character index is measured. See comment below
+      * \param locale fine-tunes character boundary rules
+      * \return code-unit index, relative to str (not the substr) for the given offset
+      *                   and character count
+      *                   std::string::npos is returned if charCount is outside of the string
+      *
+      * left=true  getBeginIndex=true   Returns offset of last byte of nth character (0-n). Used by Left.
+      * left=true  getBeginIndex=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
+      * left=false getBeginIndex=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
+      * left=false getBeginIndex=false  Returns offset of first byte of nth char from right end (0-n). Used by Right(x)
+      */
+    static size_t GetByteIndexForCharacter(const std::string &str, size_t charCount,
+        const bool left, const bool getBeginIndex, std::locale locale);
+
+    /*!
+      * \brief Gets the byte-offset of a Unicode character relative to a reference
+      *
+      * This function is primarily used by Left, Right and Mid. See comment at end for details on use.
+      * The currently configured locale is used to tweak character boundaries
+      *
+      * \param str UTF-8 string to get index from
+      * \param charCount character offset to find index for
+      * \param left + getBeginIndex define how character index is measured. See comment below
+      * \param getBeginIndex + left define how character index is measured. See comment below
+      * \return code-unit index, relative to str (not the substr) for the given offset
+      *                   and character count
+      *                   std::string::npos is returned if charCount is outside of the string
+      *
+      * left=true  getBeginIndex=true   Returns offset of last byte of nth character (0-n). Used by Left.
+      * left=true  getBeginIndex=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
+      * left=false getBeginIndex=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
+      * left=false getBeginIndex=false  Returns offset of first byte of nth char from right end (0-n). Used by Right(x)
+      */
+    /*!
+     * \brief Gets the byte-index of a Unicode character specified by character position.
+     *
+     * Unicode characters may consist of multiple codepoints. This function's parameters
+     * are based on characters NOT bytes.
+     *
+     * This signature uses the currently configured locale to tweak character boundaries
+     *
+     * \param str String to get index from
+     * \param charCount zero-based character index identifying the character of interest
+     * \param getBeginIndex  if true, then measure from the left end of the string
+     * \param left      if true, then start counting characters from the left end
+     *                  of str
+     *                  if false, then start counting characters from right end of str
+     *
+     * Examples:
+     *    str = "Where have all the flowers gone?" (32 chars)
+     *
+     *    GetByteIndexForCharacter(str, 0, true, getUSEnglishLocale()) => 0
+     *    GetByteIndexForCharacter(str, 0, false, getUSEnglishLocale()) => 31
+     *    GetByteIndexForCharacter(str, 5, true, getUSEnglishLocale()) => 5
+     *    GetByteIndexForCharacter(str, 5, false, getUSEnglishLocale()) => 26
+     *    GetByteIndexForCharacter(str, str.length()-1, false, getUSEnglishLocale()) => 0
+     *    GetByteIndexForCharacter(str, 0, false, getUSEnglishLocale()) => 31
+     *    GetByteIndexForCharacter(str, str.length(), true, getUSEnglishLocale()) => std::string::npos
+     *    GetByteIndexForCharacter(str, str.length(), false, getUSEnglishLocale()) => std::string::npos
+     *
+     */
+    static size_t GetByteIndexForCharacter(const std::string &str, size_t charCount,
+        const bool left, const bool getBeginIndex);
 
     /*!
      * \brief Get the rightmost side of a UTF-8 string, using character boundary
@@ -1085,7 +1179,7 @@ public:
      *
      * Ex: Copy all but the leftmost two characters from str:
      *
-     * std::string x = Right(str, 2, false, Unicode::getDefaultICULocale());
+     * std::string x = Right(str, 2, false, Unicode::GetDefaultICULocale());
      */
     static std::string Right(const std::string &str, const size_t charCount, bool rightReference,
         const icu::Locale &icuLocale);
@@ -1110,7 +1204,7 @@ public:
    *
    * Note: Prior algorithm which will only work if chars is ASCII is probably sufficient
    * for current needs.
-   * This implementation allows for chars to be any utf-8 characters. (Does NOT normalize).
+   * This implementation allows for chars to be any utf-8 characters. (Does NOT Normalize).
    */
   static std::string& Trim(std::string &str, const char* const chars);
 
@@ -1134,7 +1228,7 @@ public:
    *
    * Note: Prior algorithm which will only work if chars is ASCII is probably sufficient
    * for current needs.
-   * This implementation allows for chars to be any utf-8 characters. (Does NOT normalize).
+   * This implementation allows for chars to be any utf-8 characters. (Does NOT Normalize).
    */
   static std::string& TrimLeft(std::string &str, const char* const chars);
 
@@ -1157,7 +1251,7 @@ public:
    *
    * Note: Prior algorithm which will only work if chars is ASCII is probably sufficient
    * for current needs.
-   * This implementation allows for chars to be any utf-8 character(s). (Does NOT normalize).
+   * This implementation allows for chars to be any utf-8 character(s). (Does NOT Normalize).
    */
   static std::string& TrimRight(std::string &str, const char* const chars);
 
@@ -1504,12 +1598,15 @@ public:
    */
   static void RemoveCRLF(std::string& strLine);
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
+
   // TODO: Unicode BROKEN! Expose Unicode method to get character counts.
   /*! \brief utf8 version of strlen - skips any non-starting bytes in the count, thus returning the number of utf8 characters
    \param s c-string to find the length of.
    \return the number of utf8 characters in the string.
    */
   static size_t utf8_strlen(const char *s);
+#endif
 
   /*! \brief convert a time in seconds to a string based on the given time format
    \param seconds time in seconds
@@ -1518,6 +1615,8 @@ public:
    \sa TIME_FORMAT
    */
   static std::string SecondsToTimeString(long seconds, TIME_FORMAT format = TIME_FORMAT_GUESS);
+
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
   /*! \brief check whether a string is a natural number.
    Matches [ \t]*[0-9]+[ \t]*
@@ -1532,8 +1631,9 @@ public:
    \return true if the string is an integer, false otherwise.
    */
   static bool IsInteger(const std::string& str);
+#endif
 
-  inline static bool containsNonAscii(std::string str)
+  inline static bool ContainsNonAscii(std::string str)
   {
   	for (size_t i = 0; i < str.length(); i++) {
   		if (not isascii(str[i])) {
@@ -1543,7 +1643,7 @@ public:
   	return false;
   }
 
-  inline static bool containsNonAscii(std::wstring str)
+  inline static bool ContainsNonAscii(std::wstring str)
   {
     for (size_t i = 0; i < str.length(); i++) {
       if (not isascii(str[i])) {
@@ -1552,6 +1652,9 @@ public:
     }
     return false;
   }
+
+#if defined(STRINGUTILS_UNICODE_ENABLE)
+
   /* The next several isasciiXX and asciiXXvalue functions are locale independent (US-ASCII only),
    * as opposed to standard ::isXX (::isalpha, ::isdigit...) which are locale dependent.
    * Next functions get parameter as char and don't need double cast ((int)(unsigned char) is required for standard functions). */
@@ -1579,7 +1682,7 @@ public:
   }
   static std::string SizeToString(int64_t size);
   static const std::string Empty;
-
+#endif
   /**
    * Scans the str for the occurrence of word.
    *
@@ -1587,6 +1690,8 @@ public:
    * separated by spaces.
    */
   static size_t FindWord(const std::string &str, const std::string &word);
+
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
   /*!
    * \brief Starting at a point after an opening bracket, scans a string for it's matching
@@ -1597,13 +1702,14 @@ public:
    * \param str A utf-8 string to scan for 'brackets'
    * \param opener The 'open-bracket' ASCII character used in the string
    * \param closer The 'close-bracket' ASCII character used in the string
-   * \param startPos Offset in str, past the open-bracket that the function is to find
+   * \param startPos byte offset in str, past the open-bracket that the function is to find
    * the closing bracket for.
    *
    * \return the index of the matching close-bracket, or std::string::npos if not found.
    *
    */
   static int FindEndBracket(const std::string &str, char opener, char closer, int startPos = 0);
+#endif
 
   static int DateStringToYYYYMMDD(const std::string &dateString);
 #if defined(STRINGUTILS_UNICODE_ENABLE)

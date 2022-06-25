@@ -504,7 +504,7 @@ void CMusicInfoTag::AddReleaseDate(const std::string& strDateYear, bool isMonth 
   {
     // Have 0000-MM-DD where ID3 v2.3 TDAT tag read first, fill YYYY part from TYER
     if (GetReleaseYear() == "0000")
-      StringUtils::Replace(m_strReleaseDate, "0000", strDateYear);
+      UnicodeUtils::Replace(m_strReleaseDate, "0000", strDateYear);
   }
   else
     m_strReleaseDate = strDateYear;  // Could be YYYY, YYYY-MM or YYYY-MM-DD

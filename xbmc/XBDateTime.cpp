@@ -1204,7 +1204,7 @@ std::string CDateTime::GetAsLocalizedTime(const std::string &format, bool withSe
         i=length;
       }
 
-      StringUtils::Replace(strPart, "''", "'");
+      UnicodeUtils::Replace(strPart, "''", "'");
 
       strOut+=strPart;
     }
@@ -1363,7 +1363,7 @@ std::string CDateTime::GetAsLocalizedDate(const std::string &strFormat) const
         strPart = strFormat.substr(i + 1, length - i - 1);
         i = length;
       }
-      StringUtils::Replace(strPart, "''", "'");
+      UnicodeUtils::Replace(strPart, "''", "'");
       strOut+=strPart;
     }
     else if (c=='D' || c=='d') // parse days

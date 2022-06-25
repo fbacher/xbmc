@@ -34,18 +34,17 @@
 #include "log.h"
 #include "Locale.h"
 
-
 #undef DISABLE_OPTIMIZATION  // Used for testing. Code should behave the same way
 
 // convert UTF-8 string to wstring
-std::wstring Unicode::utf8_to_wstring(const std::string &str)
+std::wstring Unicode::UTF8ToWString(const std::string &str)
 {
   std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
   return myconv.from_bytes(str);
 }
 
 // convert wstring to UTF-8 string
-std::string Unicode::wstring_to_utf8(const std::wstring &str)
+std::string Unicode::WStringToUTF8(const std::wstring &str)
 {
   std::wstring_convert<std::codecvt_utf8<wchar_t>> myconv;
   return myconv.to_bytes(str);
@@ -425,36 +424,37 @@ bool Unicode::isLatinChar(UChar32 codepoint)
   return false;
 }
 
-icu::Locale Unicode::getICULocale(const std::locale &locale)
+icu::Locale Unicode::GetICULocale(const std::locale &locale)
 {
 
   UErrorCode status = U_ZERO_ERROR;
-  icu::Locale icu_locale = Unicode::getICULocale(locale.name().data());
+  icu::Locale icu_locale = Unicode::GetICULocale(locale.name().data());
   if (U_FAILURE(status))
   {
-    CLog::Log(LOGERROR, "Error in Unicode::getICULocale: {}", status);
+    CLog::Log(LOGERROR, "Error in Unicode::GetICULocale: {}", status);
   }
   return icu_locale;
 }
 
-const std::string Unicode::getICULocaleId(icu::Locale locale)
+const std::string Unicode::GetICULocaleId(icu::Locale locale)
 {
   std::string localeId = std::string();
   if (locale != nullptr)
   {
-    localeId.append("_");
-    localeId.append(locale.getCountry());
-    return localeId;
-  }
-  localeId.append(locale.getLanguage());
-  if (locale.getCountry() != nullptr)
-  {
-    localeId.append("_");
-    localeId.append(locale.getCountry());
+    if (locale.getLanguage() != nullptr)
+    {
+      localeId.append(locale.getLanguage());
+      if (locale.getCountry() != nullptr)
+      {
+        localeId.append("_");
+        localeId.append(locale.getCountry());
+      }
+    }
   }
   return localeId;
 }
-icu::Locale Unicode::getDefaultICULocale()
+
+icu::Locale Unicode::GetDefaultICULocale()
 {
   std::string language = g_langInfo.GetLocale().GetLanguageCode();
   if (language.length() < 2)
@@ -466,11 +466,11 @@ icu::Locale Unicode::getDefaultICULocale()
   {
     country = "";
   }
-  icu::Locale icu_locale = Unicode::getICULocale(language.data(), country.data());
+  icu::Locale icu_locale = Unicode::GetICULocale(language.data(), country.data());
   return icu_locale;
 }
 
-icu::Locale Unicode::getICULocale(const char *language, const char *country, const char *variant,
+icu::Locale Unicode::GetICULocale(const char *language, const char *country, const char *variant,
     const char *keywordsAndValues)
 {
 
@@ -479,21 +479,25 @@ icu::Locale Unicode::getICULocale(const char *language, const char *country, con
   icu::Locale icu_locale = icu::Locale(language, country, variant, keywordsAndValues = 0);
   if (U_FAILURE(status))
   {
-    CLog::Log(LOGERROR, "Error in Unicode::getICULocale: {}", status);
+    CLog::Log(LOGERROR, "Error in Unicode::GetICULocale: {}", status);
   }
   return icu_locale;
 }
 
-const std::string Unicode::toUpper(const std::string &src, const icu::Locale &locale)
+const std::string Unicode::ToUpper(const std::string &src, const icu::Locale &locale)
 {
   // TODO: Change to icu::CaseMap::utf8ToUpper or ucasemap_utf8ToUpper
 
   std::string localeId = "none";
-  if (locale != nullptr)
+  icu::Locale currentLocale = locale;
+  if (currentLocale == nullptr)
+    currentLocale = Unicode::GetDefaultICULocale();
+
+  if (currentLocale != nullptr)
   {
-    localeId = Unicode::getICULocaleId(locale);
+    localeId = Unicode::GetICULocaleId(currentLocale);
   }
-  // CLog::Log(LOGINFO, "toUpper locale: %s", localeId);
+  // CLog::Log(LOGINFO, "ToUpper locale: %s", localeId);
 
   if (src.length() == 0)
     return std::string(src);
@@ -511,12 +515,12 @@ const std::string Unicode::toUpper(const std::string &src, const icu::Locale &lo
   UChar* p_u_toupper_buffer = u_toupper_buffer;
   int32_t toupper_length = 0;
 
-  Unicode::toUpper(p_u_src, u_src_actual_length, locale, p_u_toupper_buffer, u_toupper_size,
+  Unicode::ToUpper(p_u_src, u_src_actual_length, currentLocale, p_u_toupper_buffer, u_toupper_size,
       toupper_length, status);
 
   if (U_FAILURE(status))
   {
-    CLog::Log(LOGERROR, "Error in Unicode::toUpper: {}", status);
+    CLog::Log(LOGERROR, "Error in Unicode::ToUpper: {}", status);
 
     return std::string();
   }
@@ -557,7 +561,7 @@ const std::string Unicode::toUpper(const std::string &src, const icu::Locale &lo
 
  } */
 
-void Unicode::toUpper(UChar *p_u_src_buffer, int32_t u_src_length, const icu::Locale locale,
+void Unicode::ToUpper(UChar *p_u_src_buffer, int32_t u_src_length, const icu::Locale locale,
     UChar *p_u_toupper_buffer, const int32_t u_toupper_buffer_size, int32_t &to_upper_length,
     UErrorCode &status)
 {
@@ -568,8 +572,8 @@ void Unicode::toUpper(UChar *p_u_src_buffer, int32_t u_src_length, const icu::Lo
   }
 
   status = U_ZERO_ERROR;
-  std::string localeId = Unicode::getICULocaleId(locale);
-  // CLog::Log(LOGINFO, "toUpper locale: %s", localeId);
+  std::string localeId = Unicode::GetICULocaleId(locale);
+  // CLog::Log(LOGINFO, "ToUpper locale: %s", localeId);
   to_upper_length = u_strToUpper(p_u_toupper_buffer, u_toupper_buffer_size, p_u_src_buffer,
       u_src_length, localeId.data(), &status);
 
@@ -577,20 +581,20 @@ void Unicode::toUpper(UChar *p_u_src_buffer, int32_t u_src_length, const icu::Lo
   {
     // Caller supposed to examine status
 
-    CLog::Log(LOGERROR, "Error in Unicode::toUpper: {}", status);
+    CLog::Log(LOGERROR, "Error in Unicode::ToUpper: {}", status);
   }
 }
 
-const std::string Unicode::toLower(const std::string &src, const icu::Locale &locale)
+const std::string Unicode::ToLower(const std::string &src, const icu::Locale &locale)
 {
   // TODO: Replace with icu::CaseMap::utf8ToLower or ucasemap_utf8ToLower
 
   std::string localeId = "none";
   if (locale != nullptr)
   {
-    localeId = Unicode::getICULocaleId(locale);
+    localeId = Unicode::GetICULocaleId(locale);
   }
-  // CLog::Log(LOGINFO, "toLower locale: %s", localeId);
+  // CLog::Log(LOGINFO, "ToLower locale: %s", localeId);
   icu::UnicodeString uString = Unicode::toUnicodeString(src);
   uString.toLower(locale);
   std::string result = std::string(); // Empty string
@@ -598,12 +602,12 @@ const std::string Unicode::toLower(const std::string &src, const icu::Locale &lo
   return result;
 }
 
-const std::wstring Unicode::toCapitalize(const std::wstring &src, const icu::Locale &locale)
+const std::wstring Unicode::ToCapitalize(const std::wstring &src, const icu::Locale &locale)
 {
   std::string localeId = "none";
   if (locale != nullptr)
   {
-    localeId = Unicode::getICULocaleId(locale);
+    localeId = Unicode::GetICULocaleId(locale);
   }
   icu::UnicodeString uString = Unicode::toUnicodeString(src);
   icu::StringCharacterIterator iter = icu::StringCharacterIterator(uString);
@@ -642,15 +646,15 @@ const std::wstring Unicode::toCapitalize(const std::wstring &src, const icu::Loc
   return wresult;
 }
 
-const std::string Unicode::toCapitalize(const std::string &src, const icu::Locale &locale)
+const std::string Unicode::ToCapitalize(const std::string &src, const icu::Locale &locale)
 {
 
   std::string localeId = "none";
   if (locale != nullptr)
   {
-    localeId = Unicode::getICULocaleId(locale);
+    localeId = Unicode::GetICULocaleId(locale);
   }
-  CLog::Log(LOGINFO, "toCapitalize locale: {}", localeId);
+  CLog::Log(LOGINFO, "ToCapitalize locale: {}", localeId);
   icu::UnicodeString uString = Unicode::toUnicodeString(src);
   icu::StringCharacterIterator iter = icu::StringCharacterIterator(uString);
 
@@ -692,7 +696,7 @@ const std::string Unicode::toCapitalize(const std::string &src, const icu::Local
  *
  */
 
-const std::wstring Unicode::toTitle(const std::wstring &src, const icu::Locale &locale)
+const std::wstring Unicode::ToTitle(const std::wstring &src, const icu::Locale &locale)
 {
   UErrorCode status = U_ZERO_ERROR;
 
@@ -700,7 +704,7 @@ const std::wstring Unicode::toTitle(const std::wstring &src, const icu::Locale &
 
   if (U_FAILURE(status))
   {
-    CLog::Log(LOGERROR, "Error in Unicode::toTitle: {}", status);
+    CLog::Log(LOGERROR, "Error in Unicode::ToTitle: {}", status);
     return std::wstring(src);
   }
 
@@ -712,13 +716,13 @@ const std::wstring Unicode::toTitle(const std::wstring &src, const icu::Locale &
 
   std::string utf8Result = std::string();
   utf8Result = result.toUTF8String(utf8Result);
-  std::wstring wResult = Unicode::utf8_to_wstring(utf8Result);
+  std::wstring wResult = Unicode::UTF8ToWString(utf8Result);
 
   delete wordIterator;
   return wResult;
 }
 
-const std::string Unicode::toTitle(const std::string &src, const icu::Locale &locale)
+const std::string Unicode::ToTitle(const std::string &src, const icu::Locale &locale)
 {
   // TODO: change to use icu::CaseMap::utf8toTitle or ucasemap_utf8ToTitle
 
@@ -728,7 +732,7 @@ const std::string Unicode::toTitle(const std::string &src, const icu::Locale &lo
 
   if (U_FAILURE(status))
   {
-    CLog::Log(LOGERROR, "Error in Unicode::toTitle: {}", status);
+    CLog::Log(LOGERROR, "Error in Unicode::ToTitle: {}", status);
     return std::string(src);
   }
 
@@ -741,7 +745,7 @@ const std::string Unicode::toTitle(const std::string &src, const icu::Locale &lo
   return utf8Result;
 }
 
-const std::wstring Unicode::toFold(std::wstring &src, const StringOptions options)
+const std::wstring Unicode::ToFold(std::wstring &src, const StringOptions options)
 {
   // ICU wchar_t support is spotty. Convert to native UChars (UTF-16).
 
@@ -776,7 +780,7 @@ const std::wstring Unicode::toFold(std::wstring &src, const StringOptions option
 
 /*! \brief Folds the case of a string.
 
- Similar to toLower except in addition, all accents are stripped
+ Similar to ToLower except in addition, all accents are stripped
  and other transformations are made (such as German sharp-S is converted to ss).
  The transformation is independent of locale.
 
@@ -785,7 +789,7 @@ const std::wstring Unicode::toFold(std::wstring &src, const StringOptions option
  \return folded string
  */
 // Called by Python code: ModuleXbmc.cpp Unicode::utf8Fold(src, options);
-const std::string Unicode::utf8Fold(const std::string &src, const int32_t options)
+const std::string Unicode::UTF8Fold(const std::string &src, const int32_t options)
 {
   // Note: very similar to using ucasemap_utf8FoldCase
 
@@ -798,7 +802,7 @@ const std::string Unicode::utf8Fold(const std::string &src, const int32_t option
   char buffer[bufferSize];
   icu::CheckedArrayByteSink sink = icu::CheckedArrayByteSink(buffer, bufferSize);
 
-  Unicode::toFold(icu::StringPiece(src), sink, status, options);
+  Unicode::ToFold(icu::StringPiece(src), sink, status, options);
   std::string result;
 
   if (U_FAILURE(status))
@@ -826,7 +830,7 @@ const std::string Unicode::utf8Fold(const std::string &src, const int32_t option
 
 /*! \brief Folds the case of a string.
 
- Similar to toLower except in addition, insignificant accents are stripped
+ Similar to ToLower except in addition, insignificant accents are stripped
  and other transformations are made (such as German sharp-S is converted to ss).
  The transformation is independent of locale.
 
@@ -835,7 +839,7 @@ const std::string Unicode::utf8Fold(const std::string &src, const int32_t option
  \return folded string
  */
 
-const std::string Unicode::toFold(std::string &src, const StringOptions options)
+const std::string Unicode::ToFold(std::string &src, const StringOptions options)
 {
 
   if (src.length() == 0)
@@ -847,20 +851,20 @@ const std::string Unicode::toFold(std::string &src, const StringOptions options)
   char buffer[bufferSize];
   icu::CheckedArrayByteSink sink = icu::CheckedArrayByteSink(buffer, bufferSize);
 
-  Unicode::toFold(icu::StringPiece(src), sink, status, to_underlying(options));
+  Unicode::ToFold(icu::StringPiece(src), sink, status, to_underlying(options));
 
   if (U_FAILURE(status))
   {
     // Buffer should be big enough
     if (sink.NumberOfBytesAppended() > bufferSize)
     {
-      CLog::Log(LOGERROR, "Error in Unicode::toFold: buffer not large enough need: {}",
+      CLog::Log(LOGERROR, "Error in Unicode::ToFold: buffer not large enough need: {}",
           sink.NumberOfBytesAppended());
       return src;
     }
     else
     {
-      CLog::Log(LOGERROR, "Error in Unicode::toFold: {}", status);
+      CLog::Log(LOGERROR, "Error in Unicode::ToFold: {}", status);
       return src;
     }
   }
@@ -874,8 +878,8 @@ const std::string Unicode::toFold(std::string &src, const StringOptions options)
 
 /*! \brief PRIVATE Folds the case of a string.
 
- Case Folding is used in non-ASCII environments in a manner similar to toLower for ASCII.
- In particular, it is heavily used to 'normalize' strings used in maps where a caseless,
+ Case Folding is used in non-ASCII environments in a manner similar to ToLower for ASCII.
+ In particular, it is heavily used to 'Normalize' strings used in maps where a caseless,
  accentless is required. ToLower can not be used in these circumstances.
 
  \param strPiece string to fold.
@@ -886,7 +890,7 @@ const std::string Unicode::toFold(std::string &src, const StringOptions options)
  Notes: length and number of bytes in strPiece may change during folding/normalization
  */
 
-void Unicode::toFold(const icu::StringPiece strPiece, icu::CheckedArrayByteSink &sink,
+void Unicode::ToFold(const icu::StringPiece strPiece, icu::CheckedArrayByteSink &sink,
     UErrorCode &status, const int32_t options)
 {
   icu::CaseMap::utf8Fold(options, strPiece, sink, nullptr, status);
@@ -900,15 +904,15 @@ void Unicode::toFold(const icu::StringPiece strPiece, icu::CheckedArrayByteSink 
  at: https://unicode-org.github.io/icu/userguide/transforms/normalization/
  Examples and very good summary at: https://www.unicode.org/reports/tr15/tr15-51.html#Examples
 
- \param str string to normalize
+ \param str string to Normalize
  \param options fine tunes behavior. See StringOptions. Frequently can leave
- at default value. NOT ALL OPTIONS recognized by all normalizers.
- \param normalizerType select the appropriate normalizer for the job
+ at default value. NOT ALL OPTIONS recognized by all Normalizers.
+ \param NormalizerType select the appropriate Normalizer for the job
  \return src
  */
 
-const std::wstring Unicode::normalize(const std::wstring &src, const StringOptions option,
-    const NormalizerType normalizerType)
+const std::wstring Unicode::Normalize(const std::wstring &src, const StringOptions option,
+    const NormalizerType NormalizerType)
 {
   // ICU wchar_t support is spotty. Convert to native UChars (UTF-16).
 
@@ -928,40 +932,40 @@ const std::wstring Unicode::normalize(const std::wstring &src, const StringOptio
 
   UErrorCode status = U_ZERO_ERROR;
   int32_t folded_length = 0;  // In UChars
-  // Folds and normalizes at same time.
+  // Folds and Normalizes at same time.
 
-  const UNormalizer2* normalizer;
+  const UNormalizer2* Normalizer;
 
-  switch (normalizerType)
+  switch (NormalizerType)
   {
     case NormalizerType::NFC:
     {
-      normalizer = unorm2_getNFCInstance(&status);
+      Normalizer = unorm2_getNFCInstance(&status);
       break;
     }
     case NormalizerType::NFD:
     {
-      normalizer = unorm2_getNFDInstance(&status);
+      Normalizer = unorm2_getNFDInstance(&status);
       break;
     }
     case NormalizerType::NFKC:
     {
-      normalizer = unorm2_getNFKCInstance(&status);
+      Normalizer = unorm2_getNFKCInstance(&status);
       break;
     }
     case NormalizerType::NFKD:
     {
-      normalizer = unorm2_getNFKDInstance(&status);
+      Normalizer = unorm2_getNFKDInstance(&status);
       break;
     }
     case NormalizerType::NFCKCASEFOLD:
     {
-      normalizer = unorm2_getNFKCCasefoldInstance(&status);
+      Normalizer = unorm2_getNFKCCasefoldInstance(&status);
       break;
     }
   }
 
-  folded_length = unorm2_normalize(normalizer, u_src, (int) src.length(), u_dest, (int) u_dest_size,
+  folded_length = unorm2_normalize(Normalizer, u_src, (int) src.length(), u_dest, (int) u_dest_size,
       &status);
 
   std::wstring result;
@@ -985,15 +989,15 @@ const std::wstring Unicode::normalize(const std::wstring &src, const StringOptio
  normalization is not needed in many situations. An introduction can be found
  at: https://unicode-org.github.io/icu/userguide/transforms/normalization/
 
- \param str string to normalize
+ \param str string to Normalize
  \param options fine tunes behavior. See StringOptions. Frequently can leave
- at default value. NOT ALL OPTIONS recognized by all normalizers
- \param normalizerType select the appropriate normalizer for the job
+ at default value. NOT ALL OPTIONS recognized by all Normalizers
+ \param NormalizerType select the appropriate Normalizer for the job
  \return src
  */
 
-const std::string Unicode::normalize(const std::string &src, const StringOptions options,
-    const NormalizerType normalizerType)
+const std::string Unicode::Normalize(const std::string &src, const StringOptions options,
+    const NormalizerType NormalizerType)
 {
   if (src.length() == 0)
     return "";
@@ -1004,7 +1008,7 @@ const std::string Unicode::normalize(const std::string &src, const StringOptions
   char buffer[bufferSize];
   icu::CheckedArrayByteSink sink = icu::CheckedArrayByteSink(buffer, bufferSize);
 
-  Unicode::normalize(icu::StringPiece(src), sink, status, to_underlying(options), normalizerType);
+  Unicode::Normalize(icu::StringPiece(src), sink, status, to_underlying(options), NormalizerType);
 
   std::string result;
   if (U_FAILURE(status))
@@ -1012,12 +1016,12 @@ const std::string Unicode::normalize(const std::string &src, const StringOptions
     result = std::string(src);
     if (sink.NumberOfBytesAppended() > bufferSize)
     {
-      CLog::Log(LOGERROR, "Error in Unicode::normalize buffer not large enough need: {}",
+      CLog::Log(LOGERROR, "Error in Unicode::Normalize buffer not large enough need: {}",
           sink.NumberOfBytesAppended());
     }
     else
     {
-      CLog::Log(LOGERROR, "Error in Unicode::normalize: {}", status);
+      CLog::Log(LOGERROR, "Error in Unicode::Normalize: {}", status);
     }
   }
   else
@@ -1034,12 +1038,12 @@ const std::string Unicode::normalize(const std::string &src, const StringOptions
  normalization is not needed in many situations. An introduction can be found
  at: https://unicode-org.github.io/icu/userguide/transforms/normalization/
 
- \param strPiece UTF-8 string to normalize.
+ \param strPiece UTF-8 string to Normalize.
  \param sink stack-based buffer to hold result
  \param status relays status of operation
  \param options fine tunes case folding behavior. For most situations, leave at default.
- NOT ALL OPTIONS recognized by all normalizers.
- \param normalizerType select the appropriate normalizer for the job
+ NOT ALL OPTIONS recognized by all Normalizers.
+ \param NormalizerType select the appropriate Normalizer for the job
 
  Notes: length and number of bytes in strPiece may change during normalization
 
@@ -1048,13 +1052,13 @@ const std::string Unicode::normalize(const std::string &src, const StringOptions
  this up. The type of normalization to use depends upon the goal.
  */
 
-void Unicode::normalize(const icu::StringPiece strPiece, icu::CheckedArrayByteSink &sink,
-    UErrorCode &status, const int32_t options, const NormalizerType normalizerType)
+void Unicode::Normalize(const icu::StringPiece strPiece, icu::CheckedArrayByteSink &sink,
+    UErrorCode &status, const int32_t options, const NormalizerType NormalizerType)
 {
   const icu::Normalizer2* normalizer;
   bool composeMode;
 
-  switch (normalizerType)
+  switch (NormalizerType)
   {
     case NormalizerType::NFC:
     {
@@ -1089,7 +1093,7 @@ void Unicode::normalize(const icu::StringPiece strPiece, icu::CheckedArrayByteSi
   }
   if (U_FAILURE(status))
   {
-    CLog::Log(LOGINFO, "Error in normalize create:");
+    CLog::Log(LOGINFO, "Error in Normalize create:");
   }
   else
   {
@@ -1105,7 +1109,7 @@ void Unicode::normalize(const icu::StringPiece strPiece, icu::CheckedArrayByteSi
     }
     if (U_FAILURE(status))
     {
-      CLog::Log(LOGINFO, "Error in normalize call: ");
+      CLog::Log(LOGINFO, "Error in Normalize call: ");
     }
   }
   if (U_FAILURE(status))
@@ -1117,8 +1121,8 @@ void Unicode::normalize(const icu::StringPiece strPiece, icu::CheckedArrayByteSi
   }
 }
 
-int Unicode::w_strcasecmp(const std::wstring &s1, const std::wstring &s2,
-    const StringOptions options, const bool normalize /* = false */)
+int Unicode::StrCaseCmp(const std::wstring &s1, const std::wstring &s2,
+    const StringOptions options, const bool Normalize /* = false */)
 {
   // TODO: Add normalization
 
@@ -1146,7 +1150,7 @@ int Unicode::w_strcasecmp(const std::wstring &s1, const std::wstring &s2,
   Unicode::wchar_to_UChar(s2.data(), u_s2, u_s2_size, destLength2);
 
   int result;
-  if (not normalize)
+  if (not Normalize)
   {
     result = u_strcasecmp(u_s1, u_s2, to_underlying(options));
   }
@@ -1167,8 +1171,8 @@ int Unicode::w_strcasecmp(const std::wstring &s1, const std::wstring &s2,
   return result;
 }
 
-int Unicode::utf8_strcasecmp(const std::string &s1, const std::string &s2,
-    const StringOptions options, const bool normalize /* = false */)
+int Unicode::StrCaseCmp(const std::string &s1, const std::string &s2,
+    const StringOptions options, const bool Normalize /* = false */)
 {
 
   if (s1.empty() and s2.empty())
@@ -1194,7 +1198,7 @@ int Unicode::utf8_strcasecmp(const std::string &s1, const std::string &s2,
   Unicode::StringToUChar(s1, u_s1, u_s1_size, destLength1);
   Unicode::StringToUChar(s2, u_s2, u_s2_size, destLength2);
   int result;
-  if (not normalize)
+  if (not Normalize)
   {
     result = u_strcasecmp(u_s1, u_s2, to_underlying(options));
   }
@@ -1208,16 +1212,16 @@ int Unicode::utf8_strcasecmp(const std::string &s1, const std::string &s2,
     result = unorm_compare(p_s1, destLength1, p_s2, destLength2, to_underlying(opts), &status);
     if (U_FAILURE(status))
     {
-      CLog::Log(LOGERROR, "Error in Unicode::utf8_strcasecmp {}", status);
+      CLog::Log(LOGERROR, "Error in Unicode::StrCaseCmp {}", status);
       result = 1234;
     }
   }
   return result;
 }
 
-int Unicode::utf8_strcasecmp(const std::string &s1, size_t s1_start, size_t s1_length,
+int Unicode::StrCaseCmp(const std::string &s1, size_t s1_start, size_t s1_length,
     const std::string &s2, size_t s2_start, size_t s2_length, const StringOptions options,
-    const bool normalize /* = false */)
+    const bool Normalize /* = false */)
 {
 
   // Lengths are relative to UTF8 encoding. Only send the bytes
@@ -1249,7 +1253,7 @@ int Unicode::utf8_strcasecmp(const std::string &s1, size_t s1_start, size_t s1_l
   Unicode::StringToUChar(s1, u_s1, u_s1_size, destLength1, s1_start, s1_length);
   Unicode::StringToUChar(s2, u_s2, u_s2_size, destLength2, s2_start, s2_length);
   int result;
-  if (not normalize)
+  if (not Normalize)
   {
     result = u_strcasecmp(u_s1, u_s2, to_underlying(options));
   }
@@ -1269,18 +1273,18 @@ int Unicode::utf8_strcasecmp(const std::string &s1, size_t s1_start, size_t s1_l
   return result;
 }
 
-int Unicode::utf8_strcasecmp(const std::string &s1, const std::string &s2, size_t n,
-    const StringOptions options, const bool normalize /* = false */)
+int Unicode::StrCaseCmp(const std::string &s1, const std::string &s2, size_t n,
+    const StringOptions options, const bool Normalize /* = false */)
 {
 
   size_t n1 = std::min(n, s1.length());
   size_t n2 = std::min(n, s2.length());
 
-  return Unicode::utf8_strcasecmp(s1, 0, n1, s2, 0, n2, options, normalize);
+  return Unicode::StrCaseCmp(s1, 0, n1, s2, 0, n2, options, Normalize);
 }
 
-int8_t Unicode::strcmp(const std::wstring &s1, size_t s1_start, size_t s1_length,
-    const std::wstring &s2, size_t s2_start, size_t s2_length, const bool normalize /* = false */)
+int8_t Unicode::StrCmp(const std::wstring &s1, size_t s1_start, size_t s1_length,
+    const std::wstring &s2, size_t s2_start, size_t s2_length, const bool Normalize /* = false */)
 {
 
   // TODO: Use faster icu::Collator::compareUTF8()
@@ -1309,12 +1313,12 @@ int8_t Unicode::strcmp(const std::wstring &s1, size_t s1_start, size_t s1_length
   return result;
 }
 
-int8_t Unicode::strcmp(const std::string &s1, size_t s1_start, size_t s1_length,
-    const std::string &s2, size_t s2_start, size_t s2_length, const bool normalize /* = false */)
+int8_t Unicode::StrCmp(const std::string &s1, size_t s1_start, size_t s1_length,
+    const std::string &s2, size_t s2_start, size_t s2_length, const bool Normalize /* = false */)
 {
 
   // TODO: Use faster icu::Collator::compareUTF8()
-  // TODO: Implement normalize
+  // TODO: Implement Normalize
 
   // Lengths are relative to UTF8 encoding. Only send the bytes
   // specified to the Unicode lib, otherwise there would be
@@ -1341,7 +1345,6 @@ int8_t Unicode::strcmp(const std::string &s1, size_t s1_start, size_t s1_length,
   int8_t result = u_strCompare(u_s1, destLength1, u_s2, destLength2, true);
   return result;
 }
-
 
 bool Unicode::StartsWith(const std::string &s1, const std::string &s2)
 {
@@ -1387,21 +1390,33 @@ bool Unicode::EndsWithNoCase(const std::string &s1, const std::string &s2,
  * parameters are based on characters and NOT bytes.
  *
  * \param str to get a substring of
- * \param charCount if > 0 maximum number of characters to keep from left end
- *                  if < 0 number of characters to remove from right end
+ * \param charIndex if leftReference, maximum number of characters to keep from left end
+ *                  else number of characters to remove from right end
+ * \param leftReference controls how charCount is interpreted
  * \return leftmost characters of string, length determined by charCount
  *
  */
-std::string Unicode::Left(const std::string &str, const size_t charCount, const bool leftReference, const icu::Locale icuLocale)
+std::string Unicode::Left(const std::string &str, const size_t charCount,
+                          const bool leftReference, const icu::Locale icuLocale)
 {
+  if (charCount == 0)
+  {
+    if (leftReference)
+      return std::string();
+    else
+      return std::string(str);
+  }
   size_t utf8Index;
   std::string result;
-  result = Unicode::normalize(str, StringOptions::FOLD_CASE_DEFAULT,
-      NormalizerType::NFC);
+  result = Unicode::Normalize(str, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFC);
   if (result.compare(str) != 0)
-    CLog::Log(LOGINFO, "Unicode::getCodeUnitIndex Normalized string different from original");
+    CLog::Log(LOGINFO, "Unicode::GetCodeUnitIndex Normalized string different from original");
 
-  utf8Index = Unicode::getCodeUnitIndex(result, 0, charCount, leftReference, true, icuLocale);
+  utf8Index = Unicode::GetCodeUnitIndex(result, charCount, true, leftReference, icuLocale);
+  if (utf8Index == std::string::npos)
+  {
+    return result;
+  }
 
   return result.substr(0, utf8Index);
 }
@@ -1424,34 +1439,40 @@ std::string Unicode::Mid(const std::string &str, const size_t startCharIndex,
   size_t startUTF8Index;
   size_t endUTF8Index;
   std::string result;
-  result = Unicode::normalize(str, StringOptions::FOLD_CASE_DEFAULT,
-      NormalizerType::NFC);
+  result = Unicode::Normalize(str, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFC);
   if (result.compare(str) != 0)
-    CLog::Log(LOGINFO, "Unicode::getCodeUnitIndex Normalized string different from original");
+    CLog::Log(LOGINFO, "Unicode::GetCodeUnitIndex Normalized string different from original");
 
-  startUTF8Index = Unicode::getCodeUnitIndex(result, 0, startCharIndex, true, true,
-      Unicode::getDefaultICULocale());
+  startUTF8Index = Unicode::GetCodeUnitIndex(result, startCharIndex, true, true,
+      Unicode::GetDefaultICULocale());
   if (startUTF8Index == std::string::npos)
   {
     result = std::string();
     return result;
   }
-  endUTF8Index = Unicode::getCodeUnitIndex(result, startUTF8Index, charCount, true, true,
-      Unicode::getDefaultICULocale());
-  return result.substr(startUTF8Index, (endUTF8Index - startUTF8Index));
+  result =  result.substr(startUTF8Index);
+
+  endUTF8Index = Unicode::GetCodeUnitIndex(result, charCount, true, true,
+      Unicode::GetDefaultICULocale());
+  return result.substr(0, endUTF8Index);
 }
 
-std::string Unicode::Right(const std::string &str, const size_t charCount, bool rightReference,
+std::string Unicode::Right(const std::string &str, const size_t charCount, bool getEndIndex,
     const icu::Locale &icuLocale)
 {
+  if (charCount == 0)
+  {
+    if (getEndIndex)
+      return std::string();
+    return std::string(str);
+  }
   size_t utf8Index;
   std::string result;
-  result = Unicode::normalize(str, StringOptions::FOLD_CASE_DEFAULT,
-      NormalizerType::NFC);
+  result = Unicode::Normalize(str, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFC);
   if (result.compare(str) != 0)
-    CLog::Log(LOGINFO, "Unicode::getCodeUnitIndex Normalized string different from original");
+    CLog::Log(LOGINFO, "Unicode::GetCodeUnitIndex Normalized string different from original");
 
-  utf8Index = Unicode::getCodeUnitIndex(result, 0, charCount, ! rightReference, false, icuLocale);
+  utf8Index = Unicode::GetCodeUnitIndex(result, charCount, false, ! getEndIndex, icuLocale);
 
   if (utf8Index == std::string::npos)
     utf8Index = result.length();
@@ -1469,12 +1490,25 @@ thread_local icu::BreakIterator* m_cbi = nullptr;
  * \brief Gets the code-unit index for the given Character Index
  *
  *
+ *Unicode characters are of variable byte length. This function's
+ * parameters are based on characters and NOT bytes.
+ *
+ * \param str string to extract substring from
+ * \param charCount maximum number of characters to include in substring
+ * \return substring of str, beginning with character 'firstCharIndex',
+ *         length determined by charCount
+ *
  * \return code-unit index for the given offset and character count.
  *                   std::string::npos is returned if charCount is outside of the string
  */
-size_t Unicode::getCodeUnitIndex(const std::string &str, size_t startOffset, size_t charCount,
-    const bool forward, const bool left, icu::Locale icuLocale)
+size_t Unicode::GetCodeUnitIndex(const std::string &str, size_t charCount,
+    const bool left, const bool getBeginIndex, icu::Locale icuLocale)
 {
+  // TODO: Unicode: Note that this code is not yet able to reliably deal with
+  // malformed Unicode. Related to this, it is not yet ready to work on a substring.
+  // The most expeditious way to achieve these is to use UnicodeStrings.
+
+  size_t startOffset = 0;
 #ifndef DISABLE_OPTIMIZATION
   // Disable when we want to confirm that code behaves the same without
   // this shortcut.
@@ -1488,16 +1522,17 @@ size_t Unicode::getCodeUnitIndex(const std::string &str, size_t startOffset, siz
   {
     if (left) // Return n code-units to copy starting from left end
     {
-      if (forward)
+      if (getBeginIndex)
         return startOffset;
       else
         return str.length(); // Omit charCount chars from right end
     }
     else // right- Return starting code-unit to begin copying
     {
-      if (forward) // User wants to omit charCount (0) chars from left end
+      if (getBeginIndex) // User wants to omit charCount (0) chars from left end
         return startOffset;
-      else // User wants charCount (0) chars from right end
+      else
+        // User wants charCount (0) chars from right end
         return str.length();
     }
   }
@@ -1505,16 +1540,17 @@ size_t Unicode::getCodeUnitIndex(const std::string &str, size_t startOffset, siz
   {
     if (left) // Return n code-units to copy starting from left end
     {
-      if (forward)
+      if (getBeginIndex)
         return str.length();
       else
         return startOffset; // Omit charCount chars from right end
     }
     else // right- Return starting code-unit to begin copying
     {
-      if (forward) // User wants to omit charCount (0) chars from left end
+      if (getBeginIndex) // User wants to omit charCount (0) chars from left end
         return str.length();
-      else // User wants charCount (0) chars from right end
+      else
+        // User wants charCount (0) chars from right end
         return startOffset;
     }
   }
@@ -1523,37 +1559,36 @@ size_t Unicode::getCodeUnitIndex(const std::string &str, size_t startOffset, siz
   UErrorCode status = U_ZERO_ERROR;
   if (m_cbi != nullptr)
   {
-    icu::Locale previousLocale = m_cbi->getLocale(
-        ULocDataLocaleType::ULOC_ACTUAL_LOCALE, status);
-    if (Unicode::getICULocaleId(previousLocale) != Unicode::getICULocaleId(icuLocale))
+    icu::Locale previousLocale = m_cbi->getLocale(ULocDataLocaleType::ULOC_ACTUAL_LOCALE, status);
+    if (Unicode::GetICULocaleId(previousLocale) != Unicode::GetICULocaleId(icuLocale))
     {
       delete m_cbi;
       m_cbi = nullptr;
     }
   }
   if (m_cbi == nullptr)
-   {
-     m_cbi = icu::BreakIterator::createCharacterInstance(icuLocale, status);
-     if (U_FAILURE(status))
-     {
-       CLog::Log(LOGERROR, "Error in Unicode::getCodeUnitIndex: {}", status);
-       m_cbi = nullptr;
-       return startOffset;
-     }
-   }
+  {
+    m_cbi = icu::BreakIterator::createCharacterInstance(icuLocale, status);
+    if (U_FAILURE(status))
+    {
+      CLog::Log(LOGERROR, "Error in Unicode::GetCodeUnitIndex: {}", status);
+      m_cbi = nullptr;
+      return startOffset;
+    }
+  }
 
   UText* ut = nullptr;
   ut = utext_openUTF8(ut, str.data(), str.length(), &status);
   if (U_FAILURE(status))
   {
-    CLog::Log(LOGERROR, "Error in Unicode::getCodeUnitIndex: {}", status);
+    CLog::Log(LOGERROR, "Error in Unicode::GetCodeUnitIndex: {}", status);
     return 0;
   }
   m_cbi->setText(ut, status);
 
   if (U_FAILURE(status))
   {
-    CLog::Log(LOGERROR, "Error in Unicode::getCodeUnitIndex: {}", status);
+    CLog::Log(LOGERROR, "Error in Unicode::GetCodeUnitIndex: {}", status);
     utext_close(ut);
     return 0;
   }
@@ -1564,7 +1599,8 @@ size_t Unicode::getCodeUnitIndex(const std::string &str, size_t startOffset, siz
 
     if (startOffset == 0)
     {
-      CLog::Log(LOGWARNING, "Unicode::getCodeUnitIndex string is malformed, does not start with valid character.");
+      CLog::Log(LOGWARNING,
+          "Unicode::GetCodeUnitIndex string is malformed, does not start with valid character.");
       utext_close(ut);
       return str.length() - 1;
     }
@@ -1572,7 +1608,7 @@ size_t Unicode::getCodeUnitIndex(const std::string &str, size_t startOffset, siz
 
     if (startOffset == std::string::npos)
     {
-      CLog::Log(LOGWARNING, "Unicode::getCodeUnitIndex startOffset NOT on character boundary."
+      CLog::Log(LOGWARNING, "Unicode::GetCodeUnitIndex startOffset NOT on character boundary."
           " No valid boundary found after startOffset.");
       utext_close(ut);
       return str.length() - 1;
@@ -1580,29 +1616,151 @@ size_t Unicode::getCodeUnitIndex(const std::string &str, size_t startOffset, siz
   }
 
   int byteIndex = -1;
-  if (forward)
+  if (getBeginIndex)
   {
     m_cbi->preceding(startOffset + 1);
     byteIndex = m_cbi->next(charCount);
   }
   else
   {
-   size_t charsToDelete = charCount;
-   byteIndex = m_cbi->last();
-   while (charsToDelete > 0) {
-     size_t charIndex = m_cbi->next(-1);
-     if (charIndex == std::string::npos)
-       break;
-     if (charIndex < startOffset)
-       break;
-     byteIndex = charIndex;
-     charsToDelete--;
-   }
+    size_t charsToDelete = charCount;
+    byteIndex = m_cbi->last();
+    while (charsToDelete > 0)
+    {
+      size_t charIndex = m_cbi->next(-1);
+      if (charIndex == std::string::npos)
+        break;
+      byteIndex = charIndex;
+      charsToDelete--;
+    }
   }
+
+  utext_close(ut);
+  return byteIndex + startOffset;
+}
+
+/*!
+ * \brief Gets the code-unit index for the given Character Index
+ *
+ * \param str UTF-8 string to get index from
+ * \param startOffset byte-offset of substring to work on
+ * \param charIndex zero-based index of character to get code-unit (byte) index for
+ * \param left controls interpretation of charIndex
+ *             if left, then get byte-offset of the first byte of charIndex measured
+ *             from left end of substring
+ *             if right, then get get byte-offset of the last byte of the charIndex
+ *             measured from right end of substring
+ * \param icuLocale fine-tunes character boundary rules
+ * \return code-unit index for the given offset and character count
+ *                   std::string::npos is returned if charCount is outside of the string
+ * /
+size_t Unicode::GetCodeUnitIndex(const std::string &str, size_t startOffset, size_t charIndex,
+    const bool left, icu::Locale icuLocale)
+{
+#ifndef DISABLE_OPTIMIZATION
+  // Disable when we want to confirm that code behaves the same without
+  // this shortcut.
+  //
+  // If Requested # characters is 0 or > available code units (here bytes)
+  // then quick calculation can give result. Humans wouldn't use this
+  // codepath, but a loop or some such might.
+
+  if (startOffset > str.length())
+  {
+    CLog::Log(LOGERROR, "Error in Unicode::GetCodeUnitIndex: startOffset > str.length");
+
+    return std::string::npos;
+  }
+  size_t effectiveStrLength = str.length() - startOffset;
+  if (charIndex == 0)
+  {
+    if (left)
+      return startOffset;
+  }
+  if (charIndex >= effectiveStrLength) // Entire string, don't need to calculate char boundaries
+  {
+    if (left)
+      return str.length() - 1;
+    else
+      return startOffset;
+  }
+#endif
+
+  UErrorCode status = U_ZERO_ERROR;
+  if (m_cbi != nullptr)
+  {
+    icu::Locale previousLocale = m_cbi->getLocale(ULocDataLocaleType::ULOC_VALID_LOCALE, status);
+    if (Unicode::GetICULocaleId(previousLocale) != Unicode::GetICULocaleId(icuLocale))
+    {
+      delete m_cbi;
+      m_cbi = nullptr;
+    }
+  }
+  if (m_cbi == nullptr)
+  {
+    m_cbi = icu::BreakIterator::createCharacterInstance(icuLocale, status);
+    if (U_FAILURE(status))
+    {
+      CLog::Log(LOGERROR, "Error in Unicode::GetCodeUnitIndex: {}", status);
+      m_cbi = nullptr;
+      return startOffset;  // TODO: Unicode Need better handling
+    }
+  }
+
+  UText* ut = nullptr;
+  ut = utext_openUTF8(ut, str.data() + startOffset, str.length() - startOffset, &status);
+  if (U_FAILURE(status))
+  {
+    CLog::Log(LOGERROR, "Error in Unicode::GetCodeUnitIndex: {}", status);
+    return std::string::npos;  // TODO: Unicode Need better handling
+  }
+  m_cbi->setText(ut, status);
+
+  if (U_FAILURE(status))
+  {
+    CLog::Log(LOGERROR, "Error in Unicode::GetCodeUnitIndex: {}", status);
+    utext_close(ut);
+    return std::string::npos; // TODO: Unicode Need better handling
+  }
+  if (not m_cbi->isBoundary(0)) // If not on boundary, advances to next boundary
+  {
+    CLog::Log(LOGWARNING,
+        "Unicode::GetCodeUnitIndex malformed string, does not start with valid character. Advancing to valid char.");
+    startOffset = m_cbi->current();
+    if (startOffset == std::string::npos)
+    {
+      CLog::Log(LOGWARNING, "Unicode::GetCodeUnitIndex No valid character found.");
+      utext_close(ut);
+      return std::string::npos; // TODO: Unicode need better handling
+    }
+  }
+
+  size_t byteIndex = std::string::npos; // byteIndex is relative to startOffset
+  if (left)
+  {
+    // Byte index at start of charIndex
+    m_cbi->first();
+    byteIndex = m_cbi->next(charIndex);
+  }
+  else
+  {
+    // Omit last n chars. Set position just BEFORE START of charIndex
+
+    byteIndex = m_cbi->last(); // current position AFTER last char
+    byteIndex = m_cbi->next(- charIndex); // Backup to BEGINNING of charIndex
+    if (byteIndex == std::string::npos)  // caller specified too many chars
+      byteIndex = 0;
+    else
+      byteIndex--; // Now we are just BEFORE charIndex
+  }
+
+  // if (byteIndex >= effectiveStrLength)  // Past last character
+  //   byteIndex = std::string::npos;
 
   utext_close(ut);
   return byteIndex;
 }
+*/
 /*
  const std::string Unicode::substr(const std::string &str, size_t startCharIndex,
  size_t numChars)
@@ -1619,7 +1777,7 @@ size_t Unicode::getCodeUnitIndex(const std::string &str, size_t startOffset, siz
  // Don't like having to use locale with character BreakIterator.
  // Perhaps should use "root" locale, or some other constant locale.
 
- icu::Locale locale = Unicode::getDefaultICULocale();
+ icu::Locale locale = Unicode::GetDefaultICULocale();
 
  icu::BreakIterator* charIter = icu::BreakIterator::createCharacterInstance(locale, status);
  if (U_FAILURE(status))
@@ -1755,8 +1913,8 @@ std::string Unicode::TrimRight(const std::string &str, const std::string deleteC
 // TODO: What if deleteChars has a non-Character in it (i.e. an accent without a
 // character that it is attached to?
 
-icu::UnicodeString Unicode::Trim(const icu::UnicodeString &uStr, const icu::UnicodeString &deleteChars,
-    const bool trimStart, const bool trimEnd)
+icu::UnicodeString Unicode::Trim(const icu::UnicodeString &uStr,
+    const icu::UnicodeString &deleteChars, const bool trimStart, const bool trimEnd)
 {
 
   // TODO: Revisit use of size_t with int32_t
@@ -1882,8 +2040,8 @@ icu::UnicodeString Unicode::Trim(const icu::UnicodeString &uStr, const bool trim
 
 }
 
-std::string Unicode::Trim(const std::string &str, const std::string &deleteChars, const bool trimStart,
-    const bool trimEnd)
+std::string Unicode::Trim(const std::string &str, const std::string &deleteChars,
+    const bool trimStart, const bool trimEnd)
 {
   // TODO: change to use uniset.h spanUTF8 & spanBackUTF8
 
@@ -1918,20 +2076,22 @@ std::string Unicode::Trim(const std::string &str, const std::string &deleteChars
  * @stable ICU 2.0
  */
 
-std::tuple<std::string, int> Unicode::FindCountAndReplace(const std::string &src, const std::string &oldText,
-    const std::string &newText)
+std::tuple<std::string, int> Unicode::FindCountAndReplace(const std::string &src,
+    const std::string &oldText, const std::string &newText)
 {
   // TODO: Try to change API to just return if something was changed
 
   icu::UnicodeString kSrc = Unicode::toUnicodeString(src);
   icu::UnicodeString kOldText = Unicode::toUnicodeString(oldText);
   icu::UnicodeString kNewText = Unicode::toUnicodeString(newText);
-  std::tuple<icu::UnicodeString, int> result = Unicode::FindCountAndReplace(kSrc, kOldText, kNewText);
+  std::tuple<icu::UnicodeString, int> result = Unicode::FindCountAndReplace(kSrc, kOldText,
+      kNewText);
   icu::UnicodeString kResultStr = std::get<0>(result);
   int changes = std::get<1>(result);
   std::string resultStr = std::string();
   kResultStr.toUTF8String(resultStr);
-  return {resultStr, changes};
+  return
+  { resultStr, changes};
 }
 
 std::tuple<icu::UnicodeString, int> Unicode::FindCountAndReplace(const icu::UnicodeString &kSrc,
@@ -1941,21 +2101,22 @@ std::tuple<icu::UnicodeString, int> Unicode::FindCountAndReplace(const icu::Unic
       kNewText, 0, kNewText.length());
 }
 
-std::tuple<icu::UnicodeString, int>
-Unicode::FindCountAndReplace(const icu::UnicodeString &srcText, const int32_t srcStart,
-    const int32_t srcLength, const icu::UnicodeString &oldText, const int32_t oldStart,
-    const int32_t oldLength, const icu::UnicodeString &newText, const int32_t newStart,
-    const int32_t newLength)
+std::tuple<icu::UnicodeString, int> Unicode::FindCountAndReplace(const icu::UnicodeString &srcText,
+    const int32_t srcStart, const int32_t srcLength, const icu::UnicodeString &oldText,
+    const int32_t oldStart, const int32_t oldLength, const icu::UnicodeString &newText,
+    const int32_t newStart, const int32_t newLength)
 {
   int changes = 0;
   icu::UnicodeString resultStr = icu::UnicodeString(srcText);
   if (srcText.isBogus() || oldText.isBogus() || newText.isBogus())
   {
-    return {resultStr, changes};
+    return
+    { resultStr, changes};
   }
   if (oldLength == 0)
   {
-    return {resultStr, changes};
+    return
+    { resultStr, changes};
   }
 
   int32_t length = srcLength;
@@ -1978,7 +2139,8 @@ Unicode::FindCountAndReplace(const icu::UnicodeString &srcText, const int32_t sr
       changes++;
     }
   }
-  return {resultStr, changes};
+  return
+  { resultStr, changes};
 }
 /*
  * Original
@@ -1992,7 +2154,7 @@ Unicode::FindCountAndReplace(const icu::UnicodeString &srcText, const int32_t sr
  * index. Further SINCE CASE FOLDING is used, the length of both wordLowerCase
  * AND the searched string can change.  Need to compensate for this!!
  *
- size_t StringUtils::FindWords(const char *str, const char *wordLowerCase)
+ size_t UnicodeUtils::FindWords(const char *str, const char *wordLowerCase)
  {
  // NOTE: This assumes word is lowercase!
  const unsigned char *s = (const unsigned char *)str;
@@ -2225,7 +2387,7 @@ size_t Unicode::FindWord(const std::string &str, const std::string &word)
  *
  */
 
-std::string& Unicode::findAndReplace(std::string &str, const std::string oldText,
+std::string& Unicode::FindAndReplace(std::string &str, const std::string oldText,
     const std::string newText)
 {
   icu::UnicodeString uString = Unicode::toUnicodeString(str);
@@ -2236,8 +2398,6 @@ std::string& Unicode::findAndReplace(std::string &str, const std::string oldText
 
   std::string resultStr = std::string();
   resultStr = uString.toUTF8String(resultStr);
-  // std::cout << "findAndReplace in: " << str << " oldText: " << oldText
-  //	<< " newText: " << newText << " out: " << resultStr << std::endl;
   str.swap(resultStr);
   return str;
 }
@@ -2248,11 +2408,11 @@ std::string& Unicode::findAndReplace(std::string &str, const std::string oldText
  * https://unicode-org.github.io/icu/userguide/strings/regexp.html
  *
  */
-size_t Unicode::regexFind(const std::string &str, const std::string pattern, const int flags)
+size_t Unicode::RegexFind(const std::string &str, const std::string pattern, const int flags)
 {
   // TODO: incomplete. Poorly defined
 
-  //std::cout << "regexFind str: " << str << " pat: " << pattern << std::endl;
+  //std::cout << "RegexFind str: " << str << " pat: " << pattern << std::endl;
 
   icu::UnicodeString uString = Unicode::toUnicodeString(str);
   icu::UnicodeString uPattern = Unicode::toUnicodeString(pattern);
@@ -2263,7 +2423,7 @@ size_t Unicode::regexFind(const std::string &str, const std::string pattern, con
 
   if (U_FAILURE(status))
   {
-    CLog::Log(LOGERROR, "Error in Unicode::regexFind a {}", status);
+    CLog::Log(LOGERROR, "Error in Unicode::RegexFind a {}", status);
     delete (matcher);
     return index;
   }
@@ -2273,7 +2433,7 @@ size_t Unicode::regexFind(const std::string &str, const std::string pattern, con
     index = matcher->start(status);
     if (U_FAILURE(status))
     {
-      CLog::Log(LOGERROR, "Error in Unicode::regexFind 2 {}", status);
+      CLog::Log(LOGERROR, "Error in Unicode::RegexFind 2 {}", status);
       delete (matcher);
       return index;
     }
@@ -2284,7 +2444,7 @@ size_t Unicode::regexFind(const std::string &str, const std::string pattern, con
       icu::UnicodeString match = matcher->group(i, status);
       if (U_FAILURE(status))
       {
-        CLog::Log(LOGERROR, "Error in Unicode::regexFind c {}", status);
+        CLog::Log(LOGERROR, "Error in Unicode::RegexFind c {}", status);
         delete (matcher);
         return index;
       }
@@ -2293,7 +2453,7 @@ size_t Unicode::regexFind(const std::string &str, const std::string pattern, con
         index = matcher->start(i, status);
         if (U_FAILURE(status))
         {
-          CLog::Log(LOGERROR, "Error in Unicode::wstrcasecmp d {}", status);
+          CLog::Log(LOGERROR, "Error in Unicode::RegexFind d {}", status);
           delete (matcher);
           return index;
         }
@@ -2641,13 +2801,13 @@ bool Unicode::Contains(const std::string &str, const std::vector<std::string> &k
 
 thread_local icu::Collator* myCollator = nullptr;
 
-bool Unicode::InitializeCollator(std::locale locale, bool normalize /* = false */)
+bool Unicode::InitializeCollator(std::locale locale, bool Normalize /* = false */)
 {
-  icu::Locale icuLocale = Unicode::getICULocale(locale);
-  return Unicode::InitializeCollator(icuLocale, normalize);
+  icu::Locale icuLocale = Unicode::GetICULocale(locale);
+  return Unicode::InitializeCollator(icuLocale, Normalize);
 }
 
-bool Unicode::InitializeCollator(icu::Locale icuLocale, bool normalize /* = false */)
+bool Unicode::InitializeCollator(icu::Locale icuLocale, bool Normalize /* = false */)
 {
   UErrorCode status = U_ZERO_ERROR;
   icu::UnicodeString dispName;
@@ -2655,7 +2815,7 @@ bool Unicode::InitializeCollator(icu::Locale icuLocale, bool normalize /* = fals
   {
     delete myCollator;
   }
-  std::string localeId = Unicode::getICULocaleId(icuLocale);
+  std::string localeId = Unicode::GetICULocaleId(icuLocale);
   CLog::Log(LOGINFO, "Collate locale: {}", localeId);
 
   myCollator = icu::Collator::createInstance(icuLocale, status);
@@ -2673,7 +2833,7 @@ bool Unicode::InitializeCollator(icu::Locale icuLocale, bool normalize /* = fals
 
   status = U_ZERO_ERROR;
 
-  if (normalize)
+  if (Normalize)
     myCollator->setAttribute(UCOL_NORMALIZATION_MODE, UCOL_ON, status);
   else
     myCollator->setAttribute(UCOL_NORMALIZATION_MODE, UCOL_OFF, status);

@@ -133,7 +133,7 @@ std::wstring StringUtils::FormatV(const wchar_t *fmt, va_list args) {
 				{
 			std::wstring str(cstr, nActual);
 			free(cstr);
-		 	// CLog::Log(LOGINFO, "StringUtils::wFormatV: {}\n", Unicode::wstring_to_utf8(str));
+		 	// CLog::Log(LOGINFO, "StringUtils::wFormatV: {}\n", Unicode::WStringToUTF8(str));
 			return str;
 		}
 		free(cstr);
@@ -165,13 +165,13 @@ void StringUtils::ToUpper(std::string &str, const icu::Locale &locale) {
 	if (str.length() == 0)
 		return;
 
-	std::string upper = Unicode::toUpper(str, locale);
+	std::string upper = Unicode::ToUpper(str, locale);
    //std::cout << "ToUpper in: " << str << " out: " << upper << std::endl;
 	str.swap(upper);
 }
 
 void StringUtils::ToUpper(std::string &str, const std::locale &locale) {
-  icu::Locale icuLocale = Unicode::getICULocale(locale);
+  icu::Locale icuLocale = Unicode::GetICULocale(locale);
   return StringUtils::ToUpper(str, icuLocale);
 }
 
@@ -179,7 +179,7 @@ void StringUtils::ToUpper(std::string &str) {
 	if (str.length() == 0)
 		return;
 
-	icu::Locale icuLocale = Unicode::getDefaultICULocale();
+	icu::Locale icuLocale = Unicode::GetDefaultICULocale();
   StringUtils::ToUpper(str, icuLocale);
 }
 
@@ -187,7 +187,7 @@ void StringUtils::ToUpper(std::wstring &str, const std::locale &locale) {
 	if (str.length() == 0)
 		return;
 
-  icu::Locale icuLocale = Unicode::getICULocale(locale);
+  icu::Locale icuLocale = Unicode::GetICULocale(locale);
   StringUtils::ToUpper(str, icuLocale);
 }
 
@@ -196,17 +196,17 @@ void StringUtils::ToUpper(std::wstring &str, const icu::Locale &locale) {
 	if (str.length() == 0)
 		return;
 
-	std::string str_utf8 = Unicode::wstring_to_utf8(str);
-	const std::string upper = Unicode::toUpper(str_utf8, locale);
+	std::string str_utf8 = Unicode::WStringToUTF8(str);
+	const std::string upper = Unicode::ToUpper(str_utf8, locale);
    //std::cout << "ToUpper 1 (wide) in: " << str_utf8 << " out: " << upper << std::endl;
-	std::wstring wUpper = Unicode::utf8_to_wstring(upper);
+	std::wstring wUpper = Unicode::UTF8ToWString(upper);
 	str.swap(wUpper);
 }
 void StringUtils::ToUpper(std::wstring &str) {
 	if (str.length() == 0)
 		return;
 
-  icu::Locale icuLocale = Unicode::getDefaultICULocale();
+  icu::Locale icuLocale = Unicode::GetDefaultICULocale();
 	StringUtils::ToUpper(str, icuLocale);
 }
 
@@ -215,7 +215,7 @@ void StringUtils::ToUpper(std::wstring &str) {
  * TODO: fix this
  */
 void StringUtils::ToLower(std::string &str, const std::locale &locale) {
-  icu::Locale icuLocale = Unicode::getICULocale(locale);
+  icu::Locale icuLocale = Unicode::GetICULocale(locale);
 	return StringUtils::ToLower(str, icuLocale);
 }
 
@@ -233,7 +233,7 @@ void StringUtils::ToLower(std::string &str, const icu::Locale &locale) {
 }
 
 void StringUtils::ToLower(std::wstring &str, const std::locale &locale) {
-  icu::Locale icuLocale = Unicode::getICULocale(locale);
+  icu::Locale icuLocale = Unicode::GetICULocale(locale);
   return StringUtils::ToLower(str, icuLocale);
 }
 
@@ -241,42 +241,42 @@ void StringUtils::ToLower(std::wstring &str, const icu::Locale &locale) {
 	if (str.length() == 0)
 		return;
 
-	std::string str_utf8 = Unicode::wstring_to_utf8(str);
+	std::string str_utf8 = Unicode::WStringToUTF8(str);
 	const std::string lower_utf8 = Unicode::toLower(str_utf8, locale);
    //std::cout << "ToLower 1 (wide) in: " << str_utf8 << " out: " << lower_utf8 << std::endl;
-	std::wstring wLower = Unicode::utf8_to_wstring(lower_utf8);
+	std::wstring wLower = Unicode::UTF8ToWString(lower_utf8);
 	str.swap(wLower);
 }
 
 void StringUtils::ToLower(std::string &str) {
-  icu::Locale icuLocale = Unicode::getDefaultICULocale();
+  icu::Locale icuLocale = Unicode::GetDefaultICULocale();
 	return StringUtils::ToLower(str, icuLocale);
 }
 
 void StringUtils::ToLower(std::wstring &str) {
-  icu::Locale icuLocale = Unicode::getDefaultICULocale();
+  icu::Locale icuLocale = Unicode::GetDefaultICULocale();
   return StringUtils::ToLower(str, icuLocale);}
 
 void StringUtils::FoldCase(std::string &str, const StringOptions opt /*  = StringOptions::FOLD_CASE_DEFAULT */) {
 	if (str.length() == 0)
 		return;
 
-	std::string result = Unicode::toFold(str, opt);
+	std::string result = Unicode::ToFold(str, opt);
 }
 
 void StringUtils::FoldCase(std::wstring &str, const StringOptions opt /*  = StringOptions::FOLD_CASE_DEFAULT */) {
 	if (str.length() == 0)
 		return;
 
-	Unicode::toFold(str, opt);
+	Unicode::ToFold(str, opt);
 	return;
 }
 
 void StringUtils::ToCapitalize(std::wstring &str, const icu::Locale &icuLocale) {
 #ifdef USE_TO_TITLE_FOR_CAPITALIZE
-  Unicode::toTitle(str, icuLocale);
+  Unicode::ToTitle(str, icuLocale);
 #else
-  std::wstring result = Unicode::toCapitalize(str, icuLocale);
+  std::wstring result = Unicode::ToCapitalize(str, icuLocale);
   // TODO: Eliminate swap
   str.swap(result);
 #endif
@@ -284,9 +284,9 @@ void StringUtils::ToCapitalize(std::wstring &str, const icu::Locale &icuLocale) 
 }
 
 void StringUtils::ToCapitalize(std::wstring &str, const std::locale &locale) {
-	icu::Locale icuLocale = Unicode::getICULocale(locale);
+	icu::Locale icuLocale = Unicode::GetICULocale(locale);
 #ifdef USE_TO_TITLE_FOR_CAPITALIZE
-  Unicode::toTitle(str, icuLocale);
+  Unicode::ToTitle(str, icuLocale);
 #else
  return StringUtils::ToCapitalize(str, icuLocale);
 #endif
@@ -294,18 +294,18 @@ void StringUtils::ToCapitalize(std::wstring &str, const std::locale &locale) {
 
 void StringUtils::ToCapitalize(std::string &str, const icu::Locale &locale) {
 #ifdef USE_TO_TITLE_FOR_CAPITALIZE
-  Unicode::toTitle(str, locale);
+  Unicode::ToTitle(str, locale);
 #else
-  std::string result = Unicode::toCapitalize(str, locale);
+  std::string result = Unicode::ToCapitalize(str, locale);
 	str.swap(result);
 #endif
 		return;
 }
 
 void StringUtils::ToCapitalize(std::string &str, const std::locale &locale) {
-  icu::Locale icuLocale = Unicode::getICULocale(locale);
+  icu::Locale icuLocale = Unicode::GetICULocale(locale);
 #ifdef USE_TO_TITLE_FOR_CAPITALIZE
-  Unicode::toTitle(str, icuLocale);
+  Unicode::ToTitle(str, icuLocale);
 #else
   StringUtils::ToCapitalize(str, icuLocale);
 #endif
@@ -313,9 +313,9 @@ void StringUtils::ToCapitalize(std::string &str, const std::locale &locale) {
 }
 
 void StringUtils::ToCapitalize(std::wstring &str) {
-  icu::Locale icuLocale = Unicode::getDefaultICULocale();
+  icu::Locale icuLocale = Unicode::GetDefaultICULocale();
 #ifdef USE_TO_TITLE_FOR_CAPITALIZE
-  Unicode::toTitle(str, icuLocale);
+  Unicode::ToTitle(str, icuLocale);
 #else
 	StringUtils::ToCapitalize(str, icuLocale);
 #endif
@@ -323,9 +323,9 @@ void StringUtils::ToCapitalize(std::wstring &str) {
 }
 
 void StringUtils::ToCapitalize(std::string &str) {
-  icu::Locale icuLocale = Unicode::getDefaultICULocale();
+  icu::Locale icuLocale = Unicode::GetDefaultICULocale();
 #ifdef USE_TO_TITLE_FOR_CAPITALIZE
-  Unicode::toTitle(str, icuLocale);
+  Unicode::ToTitle(str, icuLocale);
 #else
   StringUtils::ToCapitalize(str, icuLocale);
 #endif
@@ -334,57 +334,57 @@ void StringUtils::ToCapitalize(std::string &str) {
 
 void StringUtils::TitleCase(std::wstring &str, const std::locale &locale)
 {
-  icu::Locale icuLocale = Unicode::getICULocale(locale);
-  std::wstring result = Unicode::toTitle(str, icuLocale);
+  icu::Locale icuLocale = Unicode::GetICULocale(locale);
+  std::wstring result = Unicode::ToTitle(str, icuLocale);
   str.swap(result);
   return;
 }
 
 void StringUtils::TitleCase(std::wstring &str) {
-  icu::Locale icuLocale = Unicode::getDefaultICULocale();
-  std::wstring result = Unicode::toTitle(str, icuLocale);
+  icu::Locale icuLocale = Unicode::GetDefaultICULocale();
+  std::wstring result = Unicode::ToTitle(str, icuLocale);
   str.swap(result);
   return;
 }
 
 void StringUtils::TitleCase(std::string &str, const std::locale &locale) {
-  icu::Locale icuLocale = Unicode::getICULocale(locale);
-  std::string result = Unicode::toTitle(str, icuLocale);
+  icu::Locale icuLocale = Unicode::GetICULocale(locale);
+  std::string result = Unicode::ToTitle(str, icuLocale);
   str.swap(result);
   return;
 }
 
 void StringUtils::TitleCase(std::string &str) {
-  icu::Locale icuLocale = Unicode::getDefaultICULocale();
-  std::string result = Unicode::toTitle(str, icuLocale);
+  icu::Locale icuLocale = Unicode::GetDefaultICULocale();
+  std::string result = Unicode::ToTitle(str, icuLocale);
   str.swap(result);
   return;
 }
 
 const std::wstring StringUtils::Normalize(const std::wstring &src,
 		const StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */,
-		const NormalizerType normalizerType) {
-	return Unicode::normalize(src, opt, normalizerType);
+		const NormalizerType NormalizerType) {
+	return Unicode::Normalize(src, opt, NormalizerType);
 }
 
 const std::string StringUtils::Normalize(const std::string &src,
 		const StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */,
-		const NormalizerType normalizerType) {
-	return Unicode::normalize(src, opt, normalizerType);
+		const NormalizerType NormalizerType) {
+	return Unicode::Normalize(src, opt, NormalizerType);
 }
 
 bool StringUtils::Equals(const std::string &str1, const std::string &str2) {
-	int8_t rc = Unicode::strcmp(str1, 0, str1.length(), str2, 0, str2.length());
+	int8_t rc = Unicode::StrCmp(str1, 0, str1.length(), str2, 0, str2.length());
 	return rc == (int8_t) 0;
 }
 
 bool StringUtils::Equals(const std::wstring &str1, const std::wstring &str2) {
-	int8_t rc = Unicode::strcmp(str1, 0, str1.length(), str2, 0, str2.length());
+	int8_t rc = Unicode::StrCmp(str1, 0, str1.length(), str2, 0, str2.length());
 	return rc == 0;
 }
 
 bool StringUtils::EqualsNoCase(const std::string &str1, const std::string &str2,
-		StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */, const bool normalize /* = false */) {
+		StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */, const bool Normalize /* = false */) {
 	// before we do the char-by-char comparison, first compare sizes of both strings.
 	// This led to a 33% improvement in benchmarking on average. (size() just returns a member of std::string)
 	if (str1.size() == 0 and str2.size() == 0)
@@ -393,7 +393,7 @@ bool StringUtils::EqualsNoCase(const std::string &str1, const std::string &str2,
 	if (str1.size() == 0 or str2.size() == 0)
 		return false;
 
-	int8_t rc = Unicode::utf8_strcasecmp(str1, str2, opt, normalize);
+	int8_t rc = Unicode::StrCaseCmp(str1, str2, opt, Normalize);
 
 	rc = rc == 0;
    //std::cout << "EqualsNoCase 1 str1: " << str1 << " str2: " << str2 << " rc: "
@@ -402,16 +402,16 @@ bool StringUtils::EqualsNoCase(const std::string &str1, const std::string &str2,
 }
 
 bool StringUtils::EqualsNoCase(const std::string &str1, const char *s2, StringOptions opt /* StringOptions::FOLD_CASE_DEFAULT */,
-		const bool normalize /* = false */) {
+		const bool Normalize /* = false */) {
 	std::string str2 = std::string(s2);
-	return EqualsNoCase(str1, str2, opt, normalize);
+	return EqualsNoCase(str1, str2, opt, Normalize);
 }
 
 bool StringUtils::EqualsNoCase(const char *s1, const char *s2, StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */,
-		const bool normalize /* = false */) {
+		const bool Normalize /* = false */) {
 	std::string str1 = std::string(s1);
 	std::string str2 = std::string(s2);
-	return EqualsNoCase(str1, str2, opt, normalize);
+	return EqualsNoCase(str1, str2, opt, Normalize);
 }
 
 
@@ -421,7 +421,7 @@ int StringUtils::Compare(const std::wstring &str1, const std::wstring &str2) {
 	int32_t str2_length = str2.length();
 	int32_t str1_start = 0;
 	int32_t str2_start = 0;
-	int rc = Unicode::strcmp(str1, str1_start, str1_length,
+	int rc = Unicode::StrCmp(str1, str1_start, str1_length,
 			                     str2, str2_start, str2_length);
 	// std::cout << "Compare 1 str1: " << str1 << " str2: " << str2 << " n: " << n
 	// 		<< " rc: " << (int) rc << std::endl;
@@ -435,7 +435,7 @@ int StringUtils::Compare(const std::string &str1, const std::string &str2) {
 	int32_t str2_length = str2.length();
 	int32_t str1_start = 0;
 	int32_t str2_start = 0;
-	int rc = Unicode::strcmp(str1, str1_start, str1_length,
+	int rc = Unicode::StrCmp(str1, str1_start, str1_length,
 			                     str2, str2_start, str2_length);
 	// std::cout << "Compare 1 str1: " << str1 << " str2: " << str2 << " n: " << n
 	// 		<< " rc: " << (int) rc << std::endl;
@@ -444,25 +444,25 @@ int StringUtils::Compare(const std::string &str1, const std::string &str2) {
 }
 
 int StringUtils::CompareNoCase(const std::wstring &str1, const std::wstring &str2,
-		StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */, const bool normalize /* = false */) {
+		StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */, const bool Normalize /* = false */) {
 
-	int rc = Unicode::w_strcasecmp(str1, str2, opt, normalize);
+	int rc = Unicode::StrCaseCmp(str1, str2, opt, Normalize);
 	return rc;
 }
 int StringUtils::CompareNoCase(const std::string &str1, const std::string &str2,
-    StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */, const bool normalize /* = false */) {
-  int rc = Unicode::utf8_strcasecmp(str1, str2, opt, normalize);
+    StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */, const bool Normalize /* = false */) {
+  int rc = Unicode::StrCaseCmp(str1, str2, opt, Normalize);
   return rc;
 }
 
-int StringUtils::CompareNoCase(const char *s1, const char *s2, StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */, const bool normalize /* = false */) {
+int StringUtils::CompareNoCase(const char *s1, const char *s2, StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */, const bool Normalize /* = false */) {
   std::string str1 = std::string(s1);
   std::string str2 = std::string(s2);
-  return StringUtils::CompareNoCase(str1, str2, opt, normalize);
+  return StringUtils::CompareNoCase(str1, str2, opt, Normalize);
 }
 
 int StringUtils::CompareNoCase(const std::string &str1, const std::string &str2,
-		size_t n, StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */ , const bool normalize /* = false */) {
+		size_t n, StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */ , const bool Normalize /* = false */) {
 
 	// TODO: value of 'n' is questionable in Unicode environment.
 	if (n == 0)
@@ -481,7 +481,7 @@ int StringUtils::CompareNoCase(const std::string &str1, const std::string &str2,
     }
 	}
 
-	int rc = Unicode::utf8_strcasecmp(str1, str2, n, opt, normalize);
+	int rc = Unicode::StrCaseCmp(str1, str2, n, opt, Normalize);
 	// std::cout << "CompareNoCase 1 str1: " << str1 << " str2: " << str2 << " n: " << n
 	// 		<< " rc: " << (int) rc << std::endl;
 
@@ -489,17 +489,17 @@ int StringUtils::CompareNoCase(const std::string &str1, const std::string &str2,
 }
 
 int StringUtils::CompareNoCase(const char *s1, const char *s2,
-		size_t n /* = 0 */, StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */, const bool normalize /* = false */) {
+		size_t n /* = 0 */, StringOptions opt /* = StringOptions::FOLD_CASE_DEFAULT */, const bool Normalize /* = false */) {
 
 
 	std::string str1 = std::string(s1);
 	std::string str2 = std::string(s2);
-	return StringUtils::CompareNoCase(str1, str2, n, opt, normalize);
+	return StringUtils::CompareNoCase(str1, str2, n, opt, Normalize);
 }
 
 std::string StringUtils::Left(const std::string &str, const size_t charCount, const bool leftReference)
 {
-	std::string result = Unicode::Left(str, charCount, leftReference, Unicode::getDefaultICULocale());
+	std::string result = Unicode::Left(str, charCount, leftReference, Unicode::GetDefaultICULocale());
 
 	return result;
 }
@@ -518,7 +518,7 @@ std::string StringUtils::Mid(const std::string &str, const size_t firstCharIndex
 
 std::string StringUtils::Right(const std::string &str, const size_t charCount, bool rightReference /* = true */)
 {
-	std::string result = Unicode::Right(str, charCount, rightReference, Unicode::getDefaultICULocale());
+	std::string result = Unicode::Right(str, charCount, rightReference, Unicode::GetDefaultICULocale());
 	return result;
 }
 
@@ -579,9 +579,6 @@ int StringUtils::ReturnDigits(const std::string &str)
   std::stringstream ss;
   bool digitFound = false;
 
-  //TODO: DELETE ME
-  CLog::Log(LOGINFO, "StringUtils::ReturnDigits str: {}\n", str);
-
   for (const auto& character : str)
   {
     if (isdigit(character))
@@ -597,6 +594,7 @@ int StringUtils::ReturnDigits(const std::string &str)
   return atoi(ss.str().c_str());
 }
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
 /*
  * Replaces every occurrence of oldText with newText within the string.
@@ -611,7 +609,7 @@ int StringUtils::ReturnDigits(const std::string &str)
 std::string& StringUtils::FindAndReplace(std::string &str, const std::string oldText,
 		const std::string newText) {
 	std::string orig = str;
-	 Unicode::findAndReplace(str, oldText, newText);
+	 Unicode::FindAndReplace(str, oldText, newText);
 		//CLog::Log(LOGINFO, "StringUtils::FindAndReplace\n");
 
 	 //+CLog::Log(LOGINFO, "StringUtils::FindAndReplace str: {} newText: {} result: {}\n",
@@ -640,12 +638,15 @@ std::string StringUtils::RegexReplaceAll(std::string &str, const std::string pat
 	 //+		 str, pattern, newStr, result);
 	 return result;
 }
-
+#endif
 
 std::string& StringUtils::RemoveDuplicatedSpacesAndTabs(std::string& str)
 {
 	// Since removing only ASCII spaces and tabs there is no need to convert to/from
 	// Unicode.
+
+  // TODO: Multiple erases slower than replacing chars as you go and then erase trailing
+  // at end
 
   std::string::iterator it = str.begin();
   bool onSpace = false;
@@ -671,6 +672,8 @@ std::string& StringUtils::RemoveDuplicatedSpacesAndTabs(std::string& str)
   }
   return str;
 }
+
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
 /**
  * Replaces every occurrence of oldchar with newChar in str.
@@ -713,16 +716,16 @@ int StringUtils::Replace(std::wstring &str, const std::wstring &oldStr,
 	if (oldStr.empty() or str.empty())
 		return 0;
 
-	std::string str_utf8 = Unicode::wstring_to_utf8(str);
+	std::string str_utf8 = Unicode::WStringToUTF8(str);
 	std::string str_utf8_save = std::string(str_utf8);
-	std::string oldStr_utf8 = Unicode::wstring_to_utf8(oldStr);
-	std::string newStr_utf8 = Unicode::wstring_to_utf8(newStr);
+	std::string oldStr_utf8 = Unicode::WStringToUTF8(oldStr);
+	std::string newStr_utf8 = Unicode::WStringToUTF8(newStr);
    //std::cout << "Replace (wide) str: " << str_utf8_save << "oldStr: "
 		//	<< oldStr_utf8 << " newStr: " << newStr_utf8 << std::endl;
 
 	int changes = StringUtils::Replace(str_utf8, oldStr_utf8, newStr_utf8);
 
-	std::wstring result_w = Unicode::utf8_to_wstring(str_utf8);
+	std::wstring result_w = Unicode::UTF8ToWString(str_utf8);
 
 	//CLog::Log(LOGINFO, "StringUtils::Replace_w\n");
 
@@ -733,6 +736,7 @@ int StringUtils::Replace(std::wstring &str, const std::wstring &oldStr,
 	str.swap(result_w);
 	return changes;
 }
+#endif
 
 #if defined(STRINGUTILS_UNICODE_ENABLE)
 
@@ -941,6 +945,8 @@ std::vector<std::string> StringUtils::SplitMulti(
 }
 #endif
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
+
 // returns the number of occurrences of strFind in strInput.
 int StringUtils::FindNumber(const std::string &strInput,
 		const std::string &strFind) {
@@ -948,6 +954,7 @@ int StringUtils::FindNumber(const std::string &strInput,
 	    to_underlying(RegexpFlag::UREGEX_LITERAL));
 	return numFound;
 }
+#endif
 
 // Plane maps for MySQL utf8_general_ci (now known as utf8mb3_general_ci) collation
 // Derived from https://github.com/MariaDB/server/blob/10.5/strings/ctype-utf8.c
@@ -1192,18 +1199,18 @@ static const uint16_t* const planemap[256] = {
 
 #if defined(STRINGUTILS_UNICODE_ENABLE)
 
-bool StringUtils::InitializeCollator(bool normalize /* = false */)
+bool StringUtils::InitializeCollator(bool Normalize /* = false */)
 {
-  return Unicode::InitializeCollator(Unicode::getDefaultICULocale(), normalize);
+  return Unicode::InitializeCollator(Unicode::GetDefaultICULocale(), Normalize);
 }
-bool StringUtils::InitializeCollator(const std::locale &locale, bool normalize /* = false */)
+bool StringUtils::InitializeCollator(const std::locale &locale, bool Normalize /* = false */)
 {
-  return Unicode::InitializeCollator(Unicode::getICULocale(locale), normalize);
+  return Unicode::InitializeCollator(Unicode::GetICULocale(locale), Normalize);
 }
 
-bool StringUtils::InitializeCollator(const icu::Locale &icuLocale, bool normalize /* = false */)
+bool StringUtils::InitializeCollator(const icu::Locale &icuLocale, bool Normalize /* = false */)
 {
-  return Unicode::InitializeCollator(icuLocale, normalize);
+  return Unicode::InitializeCollator(icuLocale, Normalize);
 }
 
 
@@ -1240,11 +1247,11 @@ int64_t StringUtils::AlphaNumericCompare(const wchar_t *left, const wchar_t *rig
 #ifdef USE_ICU_COLLATOR
 	int64_t result = StringUtils::Collate(left, right);
   // CLog::Log(LOGINFO, "StringUtils::AlphaNumericCompare Collate left: {} right: {} result: {}\n",
-	//		 Unicode::wstring_to_utf8(left), Unicode::wstring_to_utf8(right), result);
+	//		 Unicode::WStringToUTF8(left), Unicode::WStringToUTF8(right), result);
 #else
-	int64_t result = StringUtils::AlphaNumericCompare_orig(left, right);
+	int64_t result = StringUtils::AlphaNumericCompare(left, right);
   // CLog::Log(LOGINFO, "StringUtils::AlphaNumericCompare_orig left: {} right: {} result: {}\n",
-	//		 Unicode::wstring_to_utf8(left), Unicode::wstring_to_utf8(right), result);
+	//		 Unicode::WStringToUTF8(left), Unicode::WStringToUTF8(right), result);
 #endif
 	return result;
 }
@@ -1258,7 +1265,7 @@ int64_t StringUtils::AlphaNumericCompare(const wchar_t *left, const wchar_t *rig
 // returns negative if left < right, positive if left > right
 // and 0 if they are identical.
 // See also the equivalent StringUtils::AlphaNumericCollation() for UFT8 data
-int64_t StringUtils::AlphaNumericCompareOrig(const wchar_t *left,
+int64_t StringUtils::AlphaNumericCompare(const wchar_t *left,
 		const wchar_t *right) {
 	const wchar_t *l = left;
 	const wchar_t *r = right;
@@ -1793,6 +1800,8 @@ std::string StringUtils::ToHexadecimal(const std::string& in)
   return ss.str();
 }
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
+
 size_t StringUtils::FindWord(const std::string &str, const std::string &word)
 {
   size_t index;
@@ -1802,12 +1811,13 @@ size_t StringUtils::FindWord(const std::string &str, const std::string &word)
 #ifdef USE_FINDWORD_REGEX
   std::string pattern = "((\\Q" + word + "\\E)|(((?:(?:\\d++(?=[^\\d]))|(?:[a-z]++(?=[^a-z]))|(?:[^\\d\\sa-z]))\\s*+(?=[^\\s]))(\\Q" + word + "\\E)))";
   int flags = to_underlying(RegexpFlag::UREGEX_CASE_INSENSITIVE);
-  index = Unicode::regexFind(str, pattern, flags);
+  index = Unicode::RegexFind(str, pattern, flags);
 #else
   index = Unicode::FindWord(str, word);
 #endif
 	return index;
 }
+#endif
 
 /*
  * Guaranteed to work ONLY with ASCII 'brackets'. String may be utf-8.
@@ -1911,7 +1921,7 @@ bool StringUtils::ValidateUUID(const std::string &uuid) {
 double StringUtils::CompareFuzzy(const std::string &left,
 		const std::string &right) {
 	/*  TODO: Unicode. Examine if this works with Unicode. Does it need locale?
-	 *        Should strings be case folded and normalized first?
+	 *        Should strings be case folded and Normalized first?
 	 *        Other packages exist (mostly python) that take locale
 	 *        most are vague about Unicode.
 	 *        Google's BERT and TensorFlow are interesting (mostly python).
@@ -1945,15 +1955,17 @@ int StringUtils::FindBestMatch(const std::string &str,
 	return best;
 }
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 // Looks for EXACT match (no case folding)
 
-bool StringUtils::ContainsKeyword(const std::string &str,
+bool UnicodeUtils::ContainsKeyword(const std::string &str,
 		const std::vector<std::string> &keywords) {
 
 	// TODO: Needs test
 
 	return Unicode::Contains(str, keywords);
 }
+#endif
 
 size_t StringUtils::utf8_strlen(const char *s) {
 	size_t length = 0;
@@ -1988,6 +2000,7 @@ std::string StringUtils::Paramify(const std::string &param) {
 std::vector<std::string> StringUtils::Tokenize(const std::string &input,
 		const std::string &delimiters) {
 	// TODO:  Need Tests!!
+  // TODO: Convert to Unicode
 
 	std::vector < std::string > tokens = std::vector<std::string>();
 	Tokenize(input, tokens, delimiters);
@@ -1996,12 +2009,12 @@ std::vector<std::string> StringUtils::Tokenize(const std::string &input,
 
 /**
  * Note: delimiters is a string of one or more ASCII single-character delimiters.
- *       input may be utf-8.
+ *       Should work with non-ASCII input
  */
 
 void StringUtils::Tokenize(const std::string& input, std::vector<std::string>& tokens, const std::string& delimiters)
 {
-	if (containsNonAscii(delimiters)) {
+	if (UnicodeUtils::ContainsNonAscii(delimiters)) {
 	 	CLog::Log(LOGWARNING, "StringUtils::Tokenize contains non-ASCII delimiter: {}\n", delimiters);
 	}
   tokens.clear();

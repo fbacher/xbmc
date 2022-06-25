@@ -275,8 +275,8 @@ void CWin32StorageProvider::GetDrivesByType(VECSOURCES &localDrives, Drive_Types
             break;
           }
         }
-        StringUtils::Replace(share.strName, ":\\", ":");
-        StringUtils::Replace(share.strPath, ":\\", ":");
+        UnicodeUtils::Replace(share.strName, ":\\", ":");
+        UnicodeUtils::Replace(share.strPath, ":\\", ":");
         share.m_ignore= true;
         if( !bUseDCD )
         {

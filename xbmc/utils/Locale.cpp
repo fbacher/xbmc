@@ -101,7 +101,7 @@ std::string CLocale::ToStringLC() const
   
   // TODO: Unicode Verify
   
-  if (StringUtils::containsNonAscii(locale)) {
+  if (UnicodeUtils::ContainsNonAscii(locale)) {
        CLog::Log(LOGWARNING, "CLocale::ToStringLC locale contains non-ASCII: {}", locale);
      }
   UnicodeUtils::ToLower(locale, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
@@ -251,7 +251,7 @@ bool CLocale::ParseLocale(const std::string &locale, std::string &language, std:
   
      // TODO: Unicode Verify
   
-    if (StringUtils::containsNonAscii(territory)) {
+    if (UnicodeUtils::ContainsNonAscii(territory)) {
       CLog::Log(LOGWARNING, "CLocale::ParseLocale territory contains non-ASCII: {}", territory);
     }
     UnicodeUtils::ToUpper(territory, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
@@ -263,7 +263,7 @@ bool CLocale::ParseLocale(const std::string &locale, std::string &language, std:
     
   // TODO: Unicode Verify
   
-  if (StringUtils::containsNonAscii(language)) {
+  if (UnicodeUtils::ContainsNonAscii(language)) {
        CLog::Log(LOGWARNING, "CLocale::ParseLocale language contains non-ASCII: {}", language);
      }
   UnicodeUtils::ToLower(language, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
@@ -279,10 +279,10 @@ void CLocale::Initialize()
     
     // TODO: Unicode Verify
   
-    if (StringUtils::containsNonAscii(m_language)) {
+    if (UnicodeUtils::ContainsNonAscii(m_language)) {
       CLog::Log(LOGWARNING, " CLocale::Initialize m_language contains non-ASCII: {}", m_language);
     }
-    if (StringUtils::containsNonAscii(m_territory)) {
+    if (UnicodeUtils::ContainsNonAscii(m_territory)) {
       CLog::Log(LOGWARNING, " CLocale::Initialize m_territory contains non-ASCII: {}", m_territory);
     }
     UnicodeUtils::ToLower(m_language, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues

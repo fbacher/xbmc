@@ -226,24 +226,24 @@ char* Interface_General::get_region(void* kodiBase, const char* id)
   if (UnicodeUtils::CompareNoCase(id, "datelong") == 0)
   {
     result = g_langInfo.GetDateFormat(true);
-    StringUtils::Replace(result, "DDDD", "%A");
-    StringUtils::Replace(result, "MMMM", "%B");
-    StringUtils::Replace(result, "D", "%d");
-    StringUtils::Replace(result, "YYYY", "%Y");
+    UnicodeUtils::Replace(result, "DDDD", "%A");
+    UnicodeUtils::Replace(result, "MMMM", "%B");
+    UnicodeUtils::Replace(result, "D", "%d");
+    UnicodeUtils::Replace(result, "YYYY", "%Y");
   }
   else if (UnicodeUtils::CompareNoCase(id, "dateshort") == 0)
   {
     result = g_langInfo.GetDateFormat(false);
-    StringUtils::Replace(result, "MM", "%m");
-    StringUtils::Replace(result, "DD", "%d");
+    UnicodeUtils::Replace(result, "MM", "%m");
+    UnicodeUtils::Replace(result, "DD", "%d");
 #ifdef TARGET_WINDOWS
-    StringUtils::Replace(result, "M", "%#m");
-    StringUtils::Replace(result, "D", "%#d");
+    UnicodeUtils::Replace(result, "M", "%#m");
+    UnicodeUtils::Replace(result, "D", "%#d");
 #else
-    StringUtils::Replace(result, "M", "%-m");
-    StringUtils::Replace(result, "D", "%-d");
+    UnicodeUtils::Replace(result, "M", "%-m");
+    UnicodeUtils::Replace(result, "D", "%-d");
 #endif
-    StringUtils::Replace(result, "YYYY", "%Y");
+    UnicodeUtils::Replace(result, "YYYY", "%Y");
   }
   else if (UnicodeUtils::CompareNoCase(id, "tempunit") == 0)
     result = g_langInfo.GetTemperatureUnitString();
@@ -252,11 +252,11 @@ char* Interface_General::get_region(void* kodiBase, const char* id)
   else if (UnicodeUtils::CompareNoCase(id, "time") == 0)
   {
     result = g_langInfo.GetTimeFormat();
-    StringUtils::Replace(result, "H", "%H");
-    StringUtils::Replace(result, "h", "%I");
-    StringUtils::Replace(result, "mm", "%M");
-    StringUtils::Replace(result, "ss", "%S");
-    StringUtils::Replace(result, "xx", "%p");
+    UnicodeUtils::Replace(result, "H", "%H");
+    UnicodeUtils::Replace(result, "h", "%I");
+    UnicodeUtils::Replace(result, "mm", "%M");
+    UnicodeUtils::Replace(result, "ss", "%S");
+    UnicodeUtils::Replace(result, "xx", "%p");
   }
   else if (UnicodeUtils::CompareNoCase(id, "meridiem") == 0)
     result = StringUtils::Format("{}/{}", g_langInfo.GetMeridiemSymbol(MeridiemSymbolAM),

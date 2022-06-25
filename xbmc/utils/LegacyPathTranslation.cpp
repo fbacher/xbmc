@@ -97,7 +97,7 @@ std::string CLegacyPathTranslation::TranslatePath(const std::string &legacyPath,
   {
     if (UnicodeUtils::StartsWithNoCase(newPath, translationMap[index].legacyPath))
     {
-      StringUtils::Replace(newPath, translationMap[index].legacyPath, translationMap[index].newPath);
+      UnicodeUtils::Replace(newPath, translationMap[index].legacyPath, translationMap[index].newPath);
       break;
     }
   }

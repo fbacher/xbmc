@@ -125,10 +125,10 @@ std::string CSettingPath::GetMasking(const CFileExtensionProvider& fileExtension
     return execMask;
 
   // convert mask qualifiers
-  StringUtils::Replace(masking, "$AUDIO", audioMask);
-  StringUtils::Replace(masking, "$VIDEO", videoMask);
-  StringUtils::Replace(masking, "$IMAGE", imageMask);
-  StringUtils::Replace(masking, "$EXECUTABLE", execMask);
+  UnicodeUtils::Replace(masking, "$AUDIO", audioMask);
+  UnicodeUtils::Replace(masking, "$VIDEO", videoMask);
+  UnicodeUtils::Replace(masking, "$IMAGE", imageMask);
+  UnicodeUtils::Replace(masking, "$EXECUTABLE", execMask);
 
   return masking;
 }

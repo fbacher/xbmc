@@ -1246,7 +1246,7 @@ void MysqlDatabase::mysqlVXPrintf(
         char q = ((xtype==etSQLESCAPE3)?'"':'\'');   /* Quote character */
         std::string arg = va_arg(ap, char*);
         if (isLike)
-          StringUtils::Replace(arg, "\\", "\\\\");
+          UnicodeUtils::Replace(arg, "\\", "\\\\");
         const char *escarg = arg.c_str();
 
         isnull = escarg==0;

@@ -41,7 +41,7 @@ CXBMCTinyXML::CXBMCTinyXML(const std::string& documentName, const std::string& d
 {
   // TODO: Unicode, verify
   
-  if (StringUtils::containsNonAscii(documentCharset)) {
+  if (UnicodeUtils::ContainsNonAscii(documentCharset)) {
     CLog::Log(LOGWARNING, "CXBMCTinyXML::CXBMCTinyXML documentCharset contains non-ASCII: {}", documentCharset);
   }
   UnicodeUtils::ToUpper(m_SuggestedCharset, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
@@ -93,7 +93,7 @@ bool CXBMCTinyXML::LoadFile(const std::string& _filename, const std::string& doc
   
   // TODO: Unicode, verify
   
-  if (StringUtils::containsNonAscii(documentCharset)) {
+  if (UnicodeUtils::ContainsNonAscii(documentCharset)) {
     CLog::Log(LOGWARNING, "CXBMCTinyXML::LoadFile documentCharset contains non-ASCII: {}", documentCharset);
   }
   UnicodeUtils::ToUpper(m_SuggestedCharset, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
@@ -137,7 +137,7 @@ bool CXBMCTinyXML::Parse(const std::string& data, const std::string& dataCharset
   
   // TODO: Unicode, verify
   
-  if (StringUtils::containsNonAscii(dataCharset)) {
+  if (UnicodeUtils::ContainsNonAscii(dataCharset)) {
     CLog::Log(LOGWARNING, "CXBMCTinyXML::Parse dataCharset contains non-ASCII: {}", dataCharset);
   }
   UnicodeUtils::ToUpper(m_SuggestedCharset, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues

@@ -809,7 +809,7 @@ extern "C"
     if (url.GetFileName().find("*.*") != std::string::npos)
     {
       std::string strReplaced = url.GetFileName();
-      StringUtils::Replace(strReplaced, "*.*","");
+      UnicodeUtils::Replace(strReplaced, "*.*","");
       url.SetFileName(strReplaced);
     }
     else if (url.GetFileName().find("*.") != std::string::npos)
@@ -820,7 +820,7 @@ extern "C"
     else if (url.GetFileName().find("*") != std::string::npos)
     {
       std::string strReplaced = url.GetFileName();
-      StringUtils::Replace(strReplaced, "*","");
+      UnicodeUtils::Replace(strReplaced, "*","");
       url.SetFileName(strReplaced);
     }
     int iDirSlot=0; // locate next free directory

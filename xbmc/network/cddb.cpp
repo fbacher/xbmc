@@ -496,9 +496,9 @@ void Xcddb::parseData(const char *buffer)
         UnicodeUtils::TrimRight(strKeyword);
 
         std::string strValue(s+1);
-        StringUtils::Replace(strValue, "\\n", "\n");
-        StringUtils::Replace(strValue, "\\t", "\t");
-        StringUtils::Replace(strValue, "\\\\", "\\");
+        UnicodeUtils::Replace(strValue, "\\n", "\n");
+        UnicodeUtils::Replace(strValue, "\\t", "\t");
+        UnicodeUtils::Replace(strValue, "\\\\", "\\");
 
         std::map<std::string, std::string>::const_iterator it = keywords.find(strKeyword);
         if (it != keywords.end())

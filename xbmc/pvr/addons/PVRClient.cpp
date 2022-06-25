@@ -2079,7 +2079,7 @@ public:
       return retVal;
 
     std::string strUpperCodecName = strCodecName;
-    if (StringUtils::containsNonAscii(strUpperCodecName)) {
+    if (UnicodeUtils::ContainsNonAscii(strUpperCodecName)) {
       CLog::Log(LOGWARNING, "CCodecIds::GetCodecByName strCodecName contains non-ASCII: {}", strCodecName);
     }
     UnicodeUtils::ToUpper(strUpperCodecName, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues);
@@ -2106,7 +2106,7 @@ private:
         tmp.codec_id = codec->id;
 
         std::string strUpperCodecName = codec->name;
-        if (StringUtils::containsNonAscii(strUpperCodecName)) {
+        if (UnicodeUtils::ContainsNonAscii(strUpperCodecName)) {
           CLog::Log(LOGWARNING, "CCodecIds::CCodecIds strCodecName contains non-ASCII: {}", strUpperCodecName);
         }
         UnicodeUtils::ToUpper(strUpperCodecName, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues);

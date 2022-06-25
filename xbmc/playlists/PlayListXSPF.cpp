@@ -109,7 +109,7 @@ bool CPlayListXSPF::Load(const std::string& strFileName)
         // We don't use URIUtils::CanonicalizePath because m_strBasePath may be a
         // protocol e.g. smb
 #ifdef TARGET_WINDOWS
-        StringUtils::Replace(localpath, "/", "\\");
+        UnicodeUtils::Replace(localpath, "/", "\\");
 #endif
         localpath = URIUtils::GetRealPath(localpath);
 

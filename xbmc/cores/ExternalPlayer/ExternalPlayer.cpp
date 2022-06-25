@@ -165,7 +165,7 @@ void CExternalPlayer::Process()
         continue;
 
       std::string strMatch = vecSplit[0];
-      StringUtils::Replace(strMatch, ",,",",");
+      UnicodeUtils::Replace(strMatch, ",,",",");
       bool bCaseless = vecSplit[3].find('i') != std::string::npos;
       CRegExp regExp(bCaseless, CRegExp::autoUtf8);
 
@@ -178,7 +178,7 @@ void CExternalPlayer::Process()
       if (regExp.RegFind(mainFile) > -1)
       {
         std::string strPat = vecSplit[1];
-        StringUtils::Replace(strPat, ",,",",");
+        UnicodeUtils::Replace(strPat, ",,",",");
 
         if (!regExp.RegComp(strPat.c_str()))
         { // invalid regexp - complain in logs
@@ -187,7 +187,7 @@ void CExternalPlayer::Process()
         }
 
         std::string strRep = vecSplit[2];
-        StringUtils::Replace(strRep, ",,",",");
+        UnicodeUtils::Replace(strRep, ",,",",");
         bool bGlobal = vecSplit[3].find('g') != std::string::npos;
         bool bStop = vecSplit[3].find('s') != std::string::npos;
         int iStart = 0;
@@ -233,10 +233,10 @@ void CExternalPlayer::Process()
   strFArgs.append("\" ");
   strFArgs.append(m_args);
 
-  int nReplaced = StringUtils::Replace(strFArgs, "{0}", mainFile);
+  int nReplaced = UnicodeUtils::Replace(strFArgs, "{0}", mainFile);
 
   if (!nReplaced)
-    nReplaced = StringUtils::Replace(strFArgs, "{1}", mainFile) + StringUtils::Replace(strFArgs, "{2}", archiveContent);
+    nReplaced = UnicodeUtils::Replace(strFArgs, "{1}", mainFile) + UnicodeUtils::Replace(strFArgs, "{2}", archiveContent);
 
   if (!nReplaced)
   {
@@ -665,9 +665,9 @@ void CExternalPlayer::GetCustomRegexpReplacers(TiXmlElement *pRootElement,
         CLog::Log(LOGDEBUG, "    Global:[{}] Stop:[{}]", bGlobal ? "true" : "false",
                   bStop ? "true" : "false");
         // keep literal commas since we use comma as a separator
-        StringUtils::Replace(strMatch, ",",",,");
-        StringUtils::Replace(strPat, ",",",,");
-        StringUtils::Replace(strRep, ",",",,");
+        UnicodeUtils::Replace(strMatch, ",",",,");
+        UnicodeUtils::Replace(strPat, ",",",,");
+        UnicodeUtils::Replace(strRep, ",",",,");
 
         std::string strReplacer = strMatch + " , " + strPat + " , " + strRep + " , " + (bGlobal ? "g" : "") + (bStop ? "s" : "");
         if (iAction == 2)

@@ -173,9 +173,9 @@ void CAddonSettings::OnSettingAction(const std::shared_ptr<const CSetting>& sett
     {
       actionData = settingAction->GetData();
       // replace $CWD with the url of the add-on
-      StringUtils::Replace(actionData, "$CWD", m_addonPath);
+      UnicodeUtils::Replace(actionData, "$CWD", m_addonPath);
       // replace $ID with the id of the add-on
-      StringUtils::Replace(actionData, "$ID", m_addonId);
+      UnicodeUtils::Replace(actionData, "$ID", m_addonId);
     }
   }
 
@@ -738,9 +738,9 @@ SettingPtr CAddonSettings::InitializeFromOldSettingAction(const std::string& set
   // parse the action attribute
   std::string action = XMLUtils::GetAttribute(settingElement, "action");
   // replace $CWD with the url of the add-on
-  StringUtils::Replace(action, "$CWD", m_addonPath);
+  UnicodeUtils::Replace(action, "$CWD", m_addonPath);
   // replace $ID with the id of the add-on
-  StringUtils::Replace(action, "$ID", m_addonId);
+  UnicodeUtils::Replace(action, "$ID", m_addonId);
 
   // prepare the setting's control
   auto control = std::make_shared<CSettingControlButton>();
@@ -880,10 +880,10 @@ SettingPtr CAddonSettings::InitializeFromOldSettingPath(const std::string& setti
   if (!mask.empty())
   {
     // convert mask qualifiers
-    StringUtils::Replace(mask, "$AUDIO", audioMask);
-    StringUtils::Replace(mask, "$VIDEO", videoMask);
-    StringUtils::Replace(mask, "$IMAGE", imageMask);
-    StringUtils::Replace(mask, "$EXECUTABLE", execMask);
+    UnicodeUtils::Replace(mask, "$AUDIO", audioMask);
+    UnicodeUtils::Replace(mask, "$VIDEO", videoMask);
+    UnicodeUtils::Replace(mask, "$IMAGE", imageMask);
+    UnicodeUtils::Replace(mask, "$EXECUTABLE", execMask);
   }
   else
   {
@@ -1305,7 +1305,7 @@ SettingPtr CAddonSettings::InitializeFromOldSettingFileWithSource(const std::str
   setting->SetDefault(defaultValue);
 
   if (source.find("$PROFILE") != std::string::npos)
-    StringUtils::Replace(source, "$PROFILE", m_addonProfile);
+    UnicodeUtils::Replace(source, "$PROFILE", m_addonProfile);
   else
     source = URIUtils::AddFileToFolder(m_addonPath, source);
 

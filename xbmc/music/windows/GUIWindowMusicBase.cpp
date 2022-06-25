@@ -998,7 +998,7 @@ bool CGUIWindowMusicBase::GetDirectory(const std::string &strDirectory, CFileIte
         else
         {
           if (dirType == MediaTypeAlbum)
-            StringUtils::Replace(artitem.prefix, "albumartist", "artist");
+            UnicodeUtils::Replace(artitem.prefix, "albumartist", "artist");
           artname = artitem.prefix + "." + artitem.artType;
         }
       artmap.insert(std::make_pair(artname, artitem.url));

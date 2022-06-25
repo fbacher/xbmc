@@ -259,7 +259,7 @@ std::string CTextureBundleXBT::Normalize(std::string name)
 {
   UnicodeUtils::Trim(name);
   UnicodeUtils::FoldCase(name);
-  StringUtils::Replace(name, '\\', '/');
+  UnicodeUtils::Replace(name, '\\', '/');
 
   return name;
 }

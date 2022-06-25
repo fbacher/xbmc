@@ -657,7 +657,7 @@ std::string getFieldFromString(const std::string &str, const char* field)
       std::vector<std::string> tmpAr2 = UnicodeUtils::Split(i, "=");
       if (tmpAr2.size() == 2)
       {
-        StringUtils::Replace(tmpAr2[1], "\"", "");//remove quotes
+        UnicodeUtils::Replace(tmpAr2[1], "\"", "");//remove quotes
         return tmpAr2[1];
       }
     }

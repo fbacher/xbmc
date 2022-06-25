@@ -2168,7 +2168,7 @@ namespace VIDEO
       if (i->thumb.empty())
       {
         std::string thumbFile = i->strName;
-        StringUtils::Replace(thumbFile, ' ', '_');
+        UnicodeUtils::Replace(thumbFile, ' ', '_');
         for (int j = 0; j < items.Size(); j++)
         {
           std::string compare = URIUtils::GetFileName(items[j]->GetPath());

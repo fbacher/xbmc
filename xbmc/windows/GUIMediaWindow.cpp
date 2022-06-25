@@ -2053,7 +2053,7 @@ bool CGUIMediaWindow::GetFilteredItems(const std::string &filter, CFileItemList 
     if (numericMatch)
       UnicodeUtils::WordToDigits(match);
 
-    if (StringUtils::FindWord(match, trimmedFilter) != std::string::npos)
+    if (UnicodeUtils::FindWord(match, trimmedFilter) != std::string::npos)
       filteredItems.Add(item);
   }
 

@@ -157,7 +157,7 @@ namespace XFILE
 
     // remove "stack://" from the folder
     folder = folder.substr(8);
-    StringUtils::Replace(file, ",,", ",");
+    UnicodeUtils::Replace(file, ",,", ",");
 
     return URIUtils::AddFileToFolder(folder, file);
   }
@@ -177,7 +177,7 @@ namespace XFILE
 
     // because " , " is used as a separator any "," in the real paths are double escaped
     for (std::string& itPath : vecPaths)
-      StringUtils::Replace(itPath, ",,", ",");
+      UnicodeUtils::Replace(itPath, ",,", ",");
 
     return true;
   }
@@ -192,7 +192,7 @@ namespace XFILE
     URIUtils::Split(items[stack[0]]->GetPath(), folder, file);
     stackedPath += folder;
     // double escape any occurrence of commas
-    StringUtils::Replace(file, ",", ",,");
+    UnicodeUtils::Replace(file, ",", ",,");
     stackedPath += file;
     for (unsigned int i = 1; i < stack.size(); ++i)
     {
@@ -200,7 +200,7 @@ namespace XFILE
       file = items[stack[i]]->GetPath();
 
       // double escape any occurrence of commas
-      StringUtils::Replace(file, ",", ",,");
+      UnicodeUtils::Replace(file, ",", ",,");
       stackedPath += file;
     }
     return stackedPath;
@@ -215,7 +215,7 @@ namespace XFILE
     URIUtils::Split(paths[0], folder, file);
     stackedPath += folder;
     // double escape any occurrence of commas
-    StringUtils::Replace(file, ",", ",,");
+    UnicodeUtils::Replace(file, ",", ",,");
     stackedPath += file;
     for (unsigned int i = 1; i < paths.size(); ++i)
     {
@@ -223,7 +223,7 @@ namespace XFILE
       file = paths[i];
 
       // double escape any occurrence of commas
-      StringUtils::Replace(file, ",", ",,");
+      UnicodeUtils::Replace(file, ",", ",,");
       stackedPath += file;
     }
     return true;

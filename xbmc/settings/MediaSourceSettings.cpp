@@ -265,7 +265,7 @@ bool CMediaSourceSettings::AddShare(const std::string &type, const CMediaSource 
   }
   // TODO: fpf Unicode Looks like trouble
 
-  if (StringUtils::containsNonAscii(strPath1)) {
+  if (UnicodeUtils::ContainsNonAscii(strPath1)) {
     CLog::Log(LOGWARNING, "CMediaSourceSettings::AddShare strPath1 contains non-ASCII: {}", strPath1);
   }
   UnicodeUtils::ToUpper(strPath1, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues

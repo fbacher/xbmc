@@ -290,7 +290,7 @@ static const String LOCALE_ENGLISH_NAME = "english_name";
 #ifdef DOXYGEN_SHOULD_USE_THIS
     ///
     /// \ingroup python_xbmc
-    /// @brief \python_func{ xbmc.utf8_fold(str, options) }
+    /// @brief \python_func{ xbmc.UTF8Fold(str, options) }
     /// Fold the case of the given string using unicode rules
     ///
     /// @param src   String to have folded
@@ -320,13 +320,13 @@ static const String LOCALE_ENGLISH_NAME = "english_name";
     /// **Example:**
     /// ~~~~~~~~~~~~~{.py}
     /// ..
-    /// msg = xbmc.utf8_fold('Hi mom!', 0)
+    /// msg = xbmc.UTF8Fold('Hi mom!', 0)
     /// ..
     /// ~~~~~~~~~~~~~
     ///
-    utf8_fold(...);
+    UTF8Fold(...);
 #else
-    std::string utf8_fold(const std::string& src, const int options);
+    std::string UTF8Fold(const std::string& src, const int options);
 #endif
 
 #ifdef DOXYGEN_SHOULD_USE_THIS

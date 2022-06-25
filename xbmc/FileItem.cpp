@@ -1612,7 +1612,7 @@ void CFileItem::FillInMimeType(bool lookup /*= true*/)
     if (m_strDynPath.empty())
       m_strDynPath = m_strPath;
 
-    StringUtils::Replace(m_strDynPath, "http:", "mms:");
+    UnicodeUtils::Replace(m_strDynPath, "http:", "mms:");
   }
 }
 
@@ -3127,8 +3127,8 @@ bool CFileItemList::Save(int windowID)
     // Before caching save simplified cache file name in every item so the cache file can be
     // identifed and removed if the item is updated. List path and options (used for file
     // name when list cached) can not be accurately derived from item path.
-    StringUtils::Replace(cachefile, "special://temp/archive_cache/", "");
-    StringUtils::Replace(cachefile, ".fi", "");
+    UnicodeUtils::Replace(cachefile, "special://temp/archive_cache/", "");
+    UnicodeUtils::Replace(cachefile, ".fi", "");
     for (const auto& item : m_items)
       item->SetProperty("cachefilename", cachefile);
 
@@ -3252,11 +3252,11 @@ std::string CFileItem::GetUserMusicThumb(bool alwaysCheckRemote /* = false */, b
 		
 		// TODO: Unicode, verify. Is this really needed?
 		
-        if (StringUtils::containsNonAscii(ext)) {
+        if (UnicodeUtils::ContainsNonAscii(ext)) {
           CLog::Log(LOGWARNING, "CFileItem::GetUserMusicThumb ext contains non-ASCII: {}", ext);
         }
         UnicodeUtils::ToUpper(ext, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
-        StringUtils::Replace(folderThumb1, strFileName, name + ext);
+        UnicodeUtils::Replace(folderThumb1, strFileName, name + ext);
         if (CFile::Exists(folderThumb1)) // folder.JPG
           return folderThumb1;
 
@@ -3265,18 +3265,18 @@ std::string CFileItem::GetUserMusicThumb(bool alwaysCheckRemote /* = false */, b
 		
 		// TODO: Unicode, verify. Is this really needed?
 		
-        if (StringUtils::containsNonAscii(firstletter)) {
+        if (UnicodeUtils::ContainsNonAscii(firstletter)) {
           CLog::Log(LOGWARNING, "CFileItem::GetUserMusicThumb firstletter contains non-ASCII: {}", firstletter);
         }
         UnicodeUtils::ToUpper(firstletter, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
         name.replace(0, 1, firstletter);
-        StringUtils::Replace(folderThumb1, strFileName, name + ext);
+        UnicodeUtils::Replace(folderThumb1, strFileName, name + ext);
         if (CFile::Exists(folderThumb1)) // Folder.JPG
           return folderThumb1;
         
         folderThumb1 = folderThumb;
         UnicodeUtils::FoldCase(ext);
-        StringUtils::Replace(folderThumb1, strFileName, name + ext);
+        UnicodeUtils::Replace(folderThumb1, strFileName, name + ext);
         if (CFile::Exists(folderThumb1)) // Folder.jpg
           return folderThumb1;
       }

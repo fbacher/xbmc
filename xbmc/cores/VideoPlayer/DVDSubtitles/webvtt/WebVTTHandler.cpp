@@ -167,14 +167,14 @@ void TranslateEscapeChars(std::string& text)
 {
   if (text.find('&') != std::string::npos)
   {
-    StringUtils::Replace(text, "&lrm;", u8"\u200e");
-    StringUtils::Replace(text, "&rlm;", u8"\u200f");
-    StringUtils::Replace(text, "&#x2068;", u8"\u2068");
-    StringUtils::Replace(text, "&#x2069;", u8"\u2069");
-    StringUtils::Replace(text, "&amp;", "&");
-    StringUtils::Replace(text, "&lt;", "<");
-    StringUtils::Replace(text, "&gt;", ">");
-    StringUtils::Replace(text, "&nbsp;", " ");
+    UnicodeUtils::Replace(text, "&lrm;", u8"\u200e");
+    UnicodeUtils::Replace(text, "&rlm;", u8"\u200f");
+    UnicodeUtils::Replace(text, "&#x2068;", u8"\u2068");
+    UnicodeUtils::Replace(text, "&#x2069;", u8"\u2069");
+    UnicodeUtils::Replace(text, "&amp;", "&");
+    UnicodeUtils::Replace(text, "&lt;", "<");
+    UnicodeUtils::Replace(text, "&gt;", ">");
+    UnicodeUtils::Replace(text, "&nbsp;", " ");
   }
 }
 
@@ -900,7 +900,7 @@ void CWebVTTHandler::ConvertSubtitle(std::string& text)
     // that current language does not mess with characters, like Turkic
     // (and others) can do.
 
-    if (StringUtils::containsNonAscii(fullTag)) {
+    if (UnicodeUtils::ContainsNonAscii(fullTag)) {
       CLog::Log(LOGWARNING, "CWebVTTHandler::ConvertSubtitle fullTag is non-ASCII: {}\n", fullTag);
     }
     UnicodeUtils::ToLower(fullTag, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues.

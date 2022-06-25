@@ -188,7 +188,7 @@ std::string CHttpHeader::GetCharset(void) const
 
   // TODO: Unicode Verify
   
-  if (StringUtils::containsNonAscii(strValue)) {
+  if (UnicodeUtils::ContainsNonAscii(strValue)) {
     CLog::Log(LOGWARNING, "CHttpHeader::GetCharset strValue contains non-ASCII: {}", strValue);
   }
   UnicodeUtils::ToUpper(strValue, icu::Locale::getEnglish());
@@ -221,7 +221,7 @@ std::string CHttpHeader::GetCharset(void) const
             return charset;
           else
           { // charset contains quoted string (allowed according to RFC 2616)
-            StringUtils::Replace(charset, "\\", ""); // unescape chars, ignoring possible '\"' and '\\'
+            UnicodeUtils::Replace(charset, "\\", ""); // unescape chars, ignoring possible '\"' and '\\'
             const size_t closingQ = charset.find('"', 1);
             if (closingQ == std::string::npos)
               return ""; // no closing quote

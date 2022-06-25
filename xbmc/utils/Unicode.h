@@ -308,10 +308,10 @@ class Unicode
 {
 public:
 
-  static std::wstring utf8_to_wstring(const std::string &str);
-  static std::string wstring_to_utf8(const std::wstring &str);
-  static icu::Locale getDefaultICULocale();
-  static icu::Locale getICULocale(const std::locale &locale);
+  static std::wstring UTF8ToWString(const std::string &str);
+  static std::string WStringToUTF8(const std::wstring &str);
+  static icu::Locale GetDefaultICULocale();
+  static icu::Locale GetICULocale(const std::locale &locale);
 
   /*
    * A simple wrapper around icu::Locale
@@ -336,10 +336,10 @@ public:
    * Note: More information can be found in unicode/locid.h (part of ICU library).
    */
 
-  static icu::Locale getICULocale(const char *language, const char *country = 0,
+  static icu::Locale GetICULocale(const char *language, const char *country = 0,
       const char *variant = 0, const char *keywordsAndValues = 0);
 
-  static const std::string getICULocaleId(icu::Locale locale);
+  static const std::string GetICULocaleId(icu::Locale locale);
 
   /*!
    *  \brief Folds the case of a string, independent of Locale.
@@ -368,7 +368,7 @@ public:
    * StringOptions is not used directly so that this API can be by used by Python.
    */
 
-  static const std::string utf8Fold(const std::string &src, const int32_t options);
+  static const std::string UTF8Fold(const std::string &src, const int32_t options);
 
   /*!
     *  \brief Folds the case of a string, independent of Locale.
@@ -396,7 +396,7 @@ public:
     * See StringOptions for the more details.
     */
 
-  static const std::wstring toFold(std::wstring &src, const StringOptions options);
+  static const std::wstring ToFold(std::wstring &src, const StringOptions options);
 
   /*!
    *  \brief Folds the case of a wstring, independent of Locale.
@@ -424,26 +424,26 @@ public:
    * See StringOptions for the more details.
    */
 
-  static const std::string toFold(std::string &src, const StringOptions options);
+  static const std::string ToFold(std::string &src, const StringOptions options);
 
-  static const std::wstring normalize(const std::wstring &src, const StringOptions option,
-      const NormalizerType normalizerType = NormalizerType::NFKC);
+  static const std::wstring Normalize(const std::wstring &src, const StringOptions option,
+      const NormalizerType NormalizerType = NormalizerType::NFKC);
 
-  static const std::string normalize(const std::string &src, const StringOptions options,
-      const NormalizerType normalizerType = NormalizerType::NFKC);
+  static const std::string Normalize(const std::string &src, const StringOptions options,
+      const NormalizerType NormalizerType = NormalizerType::NFKC);
 
-  static const std::string toUpper(const std::string &src, const icu::Locale &locale);
-  static const std::string toLower(const std::string &src, const icu::Locale &locale);
-  static const std::string toCapitalize(const std::string &src, const icu::Locale &locale);
-  static const std::wstring toCapitalize(const std::wstring &src, const icu::Locale &locale);
-  static const std::wstring toTitle(const std::wstring &src, const icu::Locale &locale);
-  static const std::string toTitle(const std::string &src, const icu::Locale &locale);
+  static const std::string ToUpper(const std::string &src, const icu::Locale &locale);
+  static const std::string ToLower(const std::string &src, const icu::Locale &locale);
+  static const std::string ToCapitalize(const std::string &src, const icu::Locale &locale);
+  static const std::wstring ToCapitalize(const std::wstring &src, const icu::Locale &locale);
+  static const std::wstring ToTitle(const std::wstring &src, const icu::Locale &locale);
+  static const std::string ToTitle(const std::string &src, const icu::Locale &locale);
 
-  static int8_t strcmp(const std::wstring &s1, size_t s1_start, size_t s1_length,
-      const std::wstring &s2, size_t s2_start, size_t s2_length, const bool normalize = false);
+  static int8_t StrCmp(const std::wstring &s1, size_t s1_start, size_t s1_length,
+      const std::wstring &s2, size_t s2_start, size_t s2_length, const bool Normalize = false);
 
-  static int8_t strcmp(const std::string &s1, size_t s1_start, size_t s1_length,
-      const std::string &s2, size_t s2_start, size_t s2_length, const bool normalize = false);
+  static int8_t StrCmp(const std::string &s1, size_t s1_start, size_t s1_length,
+      const std::string &s2, size_t s2_start, size_t s2_length, const bool Normalize = false);
 
   // Go with default Normalization (off). Some free normalization
   // is still performed. Even with it on, you should do some
@@ -451,28 +451,28 @@ public:
   // locales/codepoints. See the documentation for UCOL_NORMALIZATION_MODE
   // for a hint.
 
-  static bool InitializeCollator(std::locale locale, bool normalize = false);
+  static bool InitializeCollator(std::locale locale, bool Normalize = false);
 
-  static bool InitializeCollator(icu::Locale icuLocale, bool normalize = false);
+  static bool InitializeCollator(icu::Locale icuLocale, bool Normalize = false);
 
   static int32_t Collate(const std::wstring &left, const std::wstring &right);
 
-  static int w_strcasecmp(const std::wstring &s1, const std::wstring &s2,
-      const StringOptions options, const bool normalize = false);
+  static int StrCaseCmp(const std::wstring &s1, const std::wstring &s2,
+      const StringOptions options, const bool Normalize = false);
 
-  static int utf8_strcasecmp(const std::string &s1, const std::string &s2,
-      const StringOptions options, const bool normalize = false);
+  static int StrCaseCmp(const std::string &s1, const std::string &s2,
+      const StringOptions options, const bool Normalize = false);
 
   /*!
    * \param n Limits number of bytes to compare. A value of string:npos
    * causes the entire strings to be compared.
    */
-  static int utf8_strcasecmp(const std::string &s1, const std::string &s2, size_t n,
-      const StringOptions options, const bool normalize = false);
+  static int StrCaseCmp(const std::string &s1, const std::string &s2, size_t n,
+      const StringOptions options, const bool Normalize = false);
 
-  static int utf8_strcasecmp(const std::string &s1, size_t s1_start, size_t s1_length,
+  static int StrCaseCmp(const std::string &s1, size_t s1_start, size_t s1_length,
       const std::string &s2, size_t s2_start, size_t s2_length, const StringOptions options,
-      const bool normalize = false);
+      const bool Normalize = false);
 
   static bool StartsWith(const std::string &s1, const std::string &s2);
    static bool StartsWithNoCase(const std::string &s1, const std::string &s2,
@@ -527,19 +527,40 @@ public:
    * \param charCount if rightReference: charCount is number of characters to
    *                  copy from right end (limited by str length)
    *                  if ! rightReference: number of characters to omit from left end
-   * \param rightReference controls how charCount is interpreted
+   * \param getEndIndex controls how charCount is interpreted
    * \param icuLocale determines how character breaks are made
    * \return rightmost characters of string, length determined by charCount
    *
    * Ex: Copy all but the leftmost two characters from str:
    *
-   * std::string x = Right(str, 2, false, Unicode::getDefaultICULocale());
+   * std::string x = Right(str, 2, false, Unicode::GetDefaultICULocale());
    */
-  static std::string Right(const std::string &str, const size_t charCount, bool rightReference,
+  static std::string Right(const std::string &str, const size_t charCount, bool getEndIndex,
       const icu::Locale &icuLocale);
 
-  static size_t getCodeUnitIndex(const std::string &str, size_t startOffset, size_t charCount,
-      const bool forward, const bool left, icu::Locale icuLocale = nullptr);
+  /*!
+   * \brief Gets the byte-offset of a Unicode character relative to a reference
+   *
+   * This function is primarily used by Left, Right and Mid. See comment at end for details on use.
+   *
+   * \param str UTF-8 string to get index from
+   * \param charCount character offset to find index for
+   * \param left + getBeginIndex define how character index is measured. See comment below
+   * \param getBeginIndex + left define how character index is measured. See comment below
+   * \param icuLocale fine-tunes character boundary rules
+   * \return code-unit index, relative to str (not the substr) for the given offset
+   *                   and character count
+   *                   std::string::npos is returned if charCount is outside of the string
+   *
+   * left=true  getBeginIndex=true   Returns offset of last byte of nth character (0-n). Used by Left.
+   * left=true  getBeginIndex=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
+   * left=false getBeginIndex=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
+   * left=false getBeginIndex=false  Returns offset of first byte of nth char from right end (0-n). Used by Right(x)
+   */
+
+  static size_t GetCodeUnitIndex(const std::string &str, size_t charCount,
+                                 const bool left, const bool getBeginIndex, icu::Locale icuLocale);
+
   /*!
    * \brief return a substring of a string
    *
@@ -582,7 +603,7 @@ public:
    *
    */
 
-  static std::string& findAndReplace(std::string &str, const std::string oldText,
+  static std::string& FindAndReplace(std::string &str, const std::string oldText,
       const std::string newText);
 
   /**
@@ -615,7 +636,7 @@ public:
    *
    */
 
-  static size_t regexFind(const std::string &str, const std::string pattern, const int flags);
+  static size_t RegexFind(const std::string &str, const std::string pattern, const int flags);
 
   /*
    * Regular expression patterns for this lib can be found at:
@@ -883,15 +904,15 @@ private:
     return icu::UnicodeString::fromUTF8(src);
   }
 
-  static void toUpper(UChar *p_u_src_buffer, int32_t u_src_length, icu::Locale locale,
+  static void ToUpper(UChar *p_u_src_buffer, int32_t u_src_length, icu::Locale locale,
       UChar *p_u_toupper_buffer, const int32_t u_toupper_buffer_size, int32_t &to_upper_length,
       UErrorCode &status);
 
-  static void toFold(const icu::StringPiece strPiece, icu::CheckedArrayByteSink &sink,
+  static void ToFold(const icu::StringPiece strPiece, icu::CheckedArrayByteSink &sink,
       UErrorCode &status, const int32_t options);
 
-  static void normalize(const icu::StringPiece strPiece, icu::CheckedArrayByteSink &sink,
-      UErrorCode &status, const int32_t options, const NormalizerType normalizerType);
+  static void Normalize(const icu::StringPiece strPiece, icu::CheckedArrayByteSink &sink,
+      UErrorCode &status, const int32_t options, const NormalizerType NormalizerType);
 
   static icu::UnicodeString Trim(const icu::UnicodeString &str, const icu::UnicodeString &deleteChars,
       const bool trimStart, const bool trimEnd);

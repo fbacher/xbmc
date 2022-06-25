@@ -125,15 +125,15 @@ public:
 	 *
 	 *  TO_LOWER:
 	 *
-	 *  std::string.toLower is frequently used to 'normalize' strings for use
+	 *  std::string.ToLower is frequently used to 'normalize' strings for use
 	 *  as map keys. This WON'T WORK for most languages/character sets.
 	 *  	ToLower is locale sensitive. A German sharp-s (looks a bit like an
 	 *  	italic B) is equivalent to "ss". There is no upper-case equivalent.
 	 *
 	 *  	Accent marks frequently change. In particular, Turkic has 4 versions of
 	 *  	the letter "I" (English has two). To further complicate matters,
-	 *  	in Turkic locale, toUpper of the dotted "i" translates to an upper
-	 *  	case dotted i; toLower converts an upper case dottless "I" to a lower
+	 *  	in Turkic locale, ToUpper of the dotted "i" translates to an upper
+	 *  	case dotted i; ToLower converts an upper case dottless "I" to a lower
 	 *  	case dotless "I".
 	 *
 	 *  For almost all purposes, you want to use FoldCase instead of ToLower.
@@ -1169,12 +1169,14 @@ public:
   static std::string& TrimRight(std::string &str, const char* const chars);
 #endif
 
-  /*! \brief Remove leading and trailing ASCII space and TAB characters from str
+  /*! \brief Converts all tabs to spaces. Removes duplicate spaces
    *
-   * \param str to trim
+   * \param str to cleanup
    * \return trimmed string, same as str argument.
    */
   static std::string& RemoveDuplicatedSpacesAndTabs(std::string& str);
+
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
   /*! \brief Replaces every occurrence of a char in string.
 
@@ -1211,6 +1213,9 @@ public:
      \return Count of the number of changes
      */
   static int Replace(std::wstring &str, const std::wstring &oldStr, const std::wstring &newStr);
+#endif
+
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
   /*! \brief Replaces every occurrence of a string within another string.
 
@@ -1252,6 +1257,7 @@ public:
   std::string RegexReplaceAll(std::string &str, const std::string pattern,
   		const std::string newStr, const int flags);
 
+#endif
 #if defined(STRINGUTILS_UNICODE_ENABLE)
 
   /*! \brief Determines if a string begins with another string
@@ -1355,7 +1361,7 @@ public:
    * \param delimiter will separate each member of strings
    * \return the concatenation of every string in the container, separated by the delimiter
    *
-   * Note: This looks like it is Unicode safe, but more research required to be sure.
+   * TODO: This looks like it is Unicode safe, but more research required to be sure.
    *       Most likely this is okay if the delimiter is a simple separator (space, comma,
    *       etc.).
    */
@@ -1437,6 +1443,8 @@ public:
                                              size_t iMaxStrings = 0);
 #endif
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
+
   /*! \brief Counts the occurrences of strFind in strInput
    *
    * \param strInput string to be searched
@@ -1444,8 +1452,9 @@ public:
    * \return count of the number of occurrences found
    */
   static int FindNumber(const std::string& strInput, const std::string &strFind);
+#endif
 
-  static int64_t AlphaNumericCompareOrig(const wchar_t *left, const wchar_t *right);
+  static int64_t AlphaNumericCompare(const wchar_t *left, const wchar_t *right);
 
 #if defined(STRINGUTILS_UNICODE_ENABLE)
 
@@ -1536,25 +1545,42 @@ public:
 
 #endif
 
-  /*! \brief utf8 version of strlen - skips any non-starting bytes in the count, thus returning the number of utf8 characters
-   \param s c-string to find the length of.
-   \return the number of utf8 characters in the string.
+  /*!
+   * \brief utf8 version of strlen - skips any non-starting bytes in the count,
+   * thus returning the number of unicode codepoints. Note that a codepoint is NOT
+   * a character, although it frequently is. It is, however, Unicode is based on
+   * 32-bit (well, 21-bits, but contained in 4 bytes) codepoints. It is likely that
+   * in the usecase for SQL, that this is what is needed.
+   *
+   * TODO: WARNING: Does NOT return # of Unicode "characters" More study is needed
+   * to determine what is needed. Only used by SQL query with substring.
+   *
+   * \param s c-string to find the length of.
+   * \return the number of utf8 characters in the string.
    */
   static size_t utf8_strlen(const char *s);
 
-  /*! \brief check whether a string is a natural number.
-   Matches [ \t]*[0-9]+[ \t]*
-   \param str the string to check
-   \return true if the string is a natural number, false otherwise.
+  /*!
+   * \brief check whether a string is a natural number.
+   *
+   * Matches [ \t]*[0-9]+[ \t]*
+   *
+   * \param str the string to check
+   * \return true if the string is a natural number, false otherwise.
    */
   static bool IsNaturalNumber(const std::string& str);
 
-  /*! \brief check whether a string is an integer.
-   Matches [ \t]*[\-]*[0-9]+[ \t]*
-   \param str the string to check
-   \return true if the string is an integer, false otherwise.
+  /*!
+   * \brief check whether a string is an integer.
+   *
+   * Matches [ \t]*[\-]*[0-9]+[ \t]*
+   *
+   * \param str the string to check
+   * \return true if the string is an integer, false otherwise.
    */
   static bool IsInteger(const std::string& str);
+
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
   inline static bool containsNonAscii(std::string str)
   {
@@ -1575,33 +1601,113 @@ public:
     }
     return false;
   }
-  /* The next several isasciiXX and asciiXXvalue functions are locale independent (US-ASCII only),
-   * as opposed to standard ::isXX (::isalpha, ::isdigit...) which are locale dependent.
-   * Next functions get parameter as char and don't need double cast ((int)(unsigned char) is required for standard functions). */
-  inline static bool isasciidigit(char chr) // locale independent
+#endif
+
+  /*!
+   * \brief Determines whether the given character is an ASCII digit or not
+   *
+   * Locale independent, safe to use with UTF-8
+   *
+   * \param chr C-char (byte) to examine
+   * \return true if char matches regex [0-9], else false
+   */
+  inline static bool isasciidigit(char chr)
   {
     return chr >= '0' && chr <= '9';
   }
-  inline static bool isasciixdigit(char chr) // locale independent
+
+  /*!
+   * \brief Determines whether the given character is an ASCII hexadecimal digit or not
+   *
+   * Locale independent, safe to use with UTF-8
+   *
+   * \param chr C-char (byte) to examine
+   * \return true if char matches regex [0-9a-fA-F], otherwise false
+   *
+   */
+  inline static bool isasciixdigit(char chr)
   {
     return (chr >= '0' && chr <= '9') || (chr >= 'a' && chr <= 'f') || (chr >= 'A' && chr <= 'F');
   }
+
+  /*!
+   * \brief Converts the given ASCII digit to its numeric value.
+   *
+   * Locale independent, safe to use with UTF-8
+   *
+   * \param chr a C-char (byte)
+   * \return -1 if ! isasciidigit(chr), otherwise the integer value represented by chr
+   */
   static int asciidigitvalue(char chr); // locale independent
-  static int asciixdigitvalue(char chr); // locale independent
+
+  /*!
+   * \brief Converts the given ASCII hexadecimal digit to its numeric value.
+   *
+   * Locale independent, safe to use with UTF-8
+   *
+   * \param chr a C-char (byte)
+   * \return -1 if ! isasciixdigit(chr), otherwise the integer value represented by
+   *         hexadecimal digit chr (character case does not matter)
+   */
+  static int asciixdigitvalue(char chr);
+
+  /*!
+   * \brief Determines whether the given character is an ASCII uppercase letter or not
+   *
+   * Locale independent, safe to use with UTF-8
+   *
+   * \param chr C-char (byte) to examine
+   * \return true if char matches regex [A-Z], otherwise false
+   */
   inline static bool isasciiuppercaseletter(char chr) // locale independent
   {
     return (chr >= 'A' && chr <= 'Z');
   }
+
+  /*!
+    * \brief Determines whether the given character is an ASCII lowercase letter or not
+    *
+    * Locale independent, safe to use with UTF-8
+    *
+    * \param chr C-char (byte) to examine
+    * \return true if char matches regex [a-z], otherwise false
+    */
   inline static bool isasciilowercaseletter(char chr) // locale independent
   {
     return (chr >= 'a' && chr <= 'z');
   }
+
+  /*!
+    * \brief Determines whether the given character is an ASCII alphanumeric character or not
+    *
+    * Locale independent, safe to use with UTF-8
+    *
+    * \param chr C-char (byte) to examine
+    * \return true if char matches regex [0-9a-zA-Z], otherwise false
+    */
   inline static bool isasciialphanum(char chr) // locale independent
   {
     return isasciiuppercaseletter(chr) || isasciilowercaseletter(chr) || isasciidigit(chr);
   }
+
+ /*!
+  * \brief converts the given number into a human-friendly string representing a size in bytes.
+  *
+  * The returned string is a power of two:
+  *   2147483647 => "2.00 GB"
+  *
+  * \param size
+  * \return human friendly value for size
+  */
   static std::string SizeToString(int64_t size);
+
+  /*!
+   * \brief A constant value for an empty string. Can be used when a constant return
+   *        value is allowed
+   */
   static const std::string Empty;
+
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
   /**
    * Scans the str for the occurrence of word.
@@ -1610,6 +1716,7 @@ public:
    * separated by spaces.
    */
   static size_t FindWord(const std::string &str, const std::string &word);
+#endif
 
   /*!
    * \brief Starting at a point after an opening bracket, scans a string for it's matching

@@ -450,7 +450,7 @@ bool CPVRGUIInfo::GetListItemAndPlayerLabel(const CFileItem* item, const CGUIInf
       case LISTITEM_EPISODENAME:
         strValue = recording->EpisodeName();
         // fixup multiline episode name strings (which do not fit in any way in our GUI)
-        StringUtils::Replace(strValue, "\n", ", ");
+        UnicodeUtils::Replace(strValue, "\n", ", ");
         return true;
       case VIDEOPLAYER_CHANNEL_NAME:
       case LISTITEM_CHANNEL_NAME:
@@ -688,7 +688,7 @@ bool CPVRGUIInfo::GetListItemAndPlayerLabel(const CFileItem* item, const CGUIInf
         {
           strValue = epgTag->EpisodeName();
           // fixup multiline episode name strings (which do not fit in any way in our GUI)
-          StringUtils::Replace(strValue, "\n", ", ");
+          UnicodeUtils::Replace(strValue, "\n", ", ");
         }
         return true;
       case VIDEOPLAYER_CAST:
