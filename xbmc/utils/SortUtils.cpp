@@ -1000,6 +1000,7 @@ void SortUtils::Sort(SortBy sortBy, SortOrder sortOrder, SortAttribute attribute
       {
         // Do the sorting
         std::stable_sort(items.begin(), items.end(), getSorter(sortOrder, attributes));
+        UnicodeUtils::SortCompleted(items.size());
       }
     }
   }

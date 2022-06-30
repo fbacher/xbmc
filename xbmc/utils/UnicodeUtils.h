@@ -12,47 +12,45 @@
 //
 //  File:      UnicodeUtils.h
 //
-//  Purpose:   ATL split string utility
-//  Author:    Paul J. Weiss
+//  Purpose:   Unicode oriented string functions
+//  Author:    Frank Feuerbacher
 //
-//  Major modifications by Frank Feuerbacher to utilize icu4c Unicode library
-//  to resolve issues discovered in Kodi 19 Matrix (Unicode and Python 3 support)
+//  Derived from StringUtils.h, but put in separate class to emphasize
+//  both the Unicode orientation as well as to point out that the
+//  functions are as close to the original StringUtils functions, but NOT
+//  identical. Function name, parameter and behavioral differences exist.
 //
-//  Modified to use J O'Leary's std::string class by kraqh3d
+//  This class relies heavily on icu4c Unicode library. The Unicode class
+//  handles the low level interaction with ICU while this provides the
+//  functions which Kodi code should normally use.
 //
 //------------------------------------------------------------------------
 
-#define USE_STRINGUTILS_FORMAT 1
-#undef STRINGUTILS_UNICODE_ENABLE
-
 // TODO: Move to make/cmake file
-// USE_ICU_COLLATOR chooses between ICU and legacy Kodi collation
+// #define USE_ICU_COLLATOR chooses between ICU and legacy Kodi collation
 
 #define USE_ICU_COLLATOR 1
 
 /*
- *
- * USE_TO_TITLE_FOR_CAPITALIZE controls whether to use legacy Kodi ToCapitalize
- * algorithm:
+ * #define USE_TO_TITLE_FOR_CAPITALIZE controls whether to use legacy Kodi ToCapitalize
+ * or to use ICU's TitleCase.
+ * ToCapitalize algorithm:
  *   Upper case first letter of every "word"; Punctuation as well as spaces
  *   separates words. "n.y-c you pig" results in "N.Y-C You Pig". No characters
  *   lower cased. Only uppercases first codepoint of word, potentially producing
- *   bad Unicode when multiple codepoints are used to represent a letter. Probably
- *   not a severe error. May be difficult to correct with exposed APIs.
- * New Algorithm is to use ICU toTitle. This is locale dependent.
+ *   bad Unicode when multiple codepoints are used to represent a letter.
+ *   May be difficult to correct with exposed APIs.
+ *
+ * TitleCase algorithm:
  *   Imperfect, but uses Locale rules to Title Case. Takes context into account.
  *   Does NOT generally use a dictionary of words to NOT uppercases (i.e. to, the...)
  *   Would titlecase "n.y.c you pig" as "N.y.c You Pig", but "n-y-c" becomes "N-Y-C"
- *   (the same as Capitalize).
+ *   (the same as Capitalize). Behavior can be modified, including adding code to
+ *   perform dictionary lookups.
  *
- *   Properly handles any change of string lengths.
+ *   Properly handles any change of string (byte) lengths during the capitalization.
  */
 #undef USE_TO_TITLE_FOR_CAPITALIZE
-
-/*
- * TODO: Fix, or remove code for USE_FINDWORD_REGEX
- */
-#undef USE_FINDWORD_REGEX
 
 #include <stdarg.h>   // others depend on this
 #include <climits>
@@ -76,105 +74,67 @@
 #include "Unicode.h"
 #include "XBDateTime.h"
 
-/*!
- * \brief  C-processor Token string-ification
- *
- * The following macros can be used to stringify definitions to
- * C style strings.
- *
- * Example:
- *
- * #define foo 4
- * DEF_TO_STR_NAME(foo)  // outputs "foo"
- * DEF_TO_STR_VALUE(foo) // outputs "4"
- *
- */
-
-#define DEF_TO_STR_NAME(x) #x
-#define DEF_TO_STR_VALUE(x) DEF_TO_STR_NAME(x)
-
-#if not defined(USE_STRINGUTILS_FORMAT)
-template<typename T, std::enable_if_t<!std::is_enum<T>::value, int> = 0>
-constexpr auto&& EnumToInt(T&& arg) noexcept
-{
-  return arg;
-}
-template<typename T, std::enable_if_t<std::is_enum<T>::value, int> = 0>
-constexpr auto EnumToInt(T&& arg) noexcept
-{
-  return static_cast<int>(arg);
-}
-#endif
-
 class UnicodeUtils
 {
 public:
 
 	/**
-	 *  A Brief description of some of the Unicode issues: (Work in Progress)
-	 *  DO NOT take this as definitive! It is from my current understanding.
+	 *  A Brief description of some of the Unicode issues:
 	 *
 	 *  Working with Unicode and multiple languages greatly complicates
-	 *  string operations.
+	 *  string operations. ToLower prompted the creation of this class. Turkic
+	 *  has 4 versions of the letter I (two of which are the Roman ones "I"
+	 *  and "i". A number of languages do something like this and it is not normally
+	 *  a huge deal. However, in Turkic, changing the case of the Roman "I" (same
+	 *  as English I) results in the Turkic, lower case dotless I, "ı". This
+	 *  broke tons of code and prevented Kodi from woking at all in Turkic and
+	 *  a similar language. Other problems were discovered that were more subtle.
 	 *
-	 *  Several things to keep in mind: (this is NOT a comprehensive list)
+	 *  Changing the case of strings can change their byte AND character lengths,
+	 *  depending upon locale. Example, German sharp-s 'ß' is equivalent to two
+	 *  lower-case 's' characters. UpperCasing a sharp-s becomes 'SS' because
+	 *  there is no upper-case sharp-S.
 	 *
-	 *  In Kodi, all char * and std::string contain UTF-8. For some situations,
-	 *  such as the delimiter for "split", only ASCII is used. wchar_t and
-	 *  wstrings contain 32-bit unicode codepoints (UChar32). However,
-	 *  wchar_t is not guaranteed to be 32-bits. There may be some platforms
-	 *  where wchar_t contains UTF-16.
+	 *  FoldCase is normally what you want to use instead of ToLower (when you
+	 *  want to 'normalize' a string for use as an index, etc.). (This resolved
+	 *  the Turkic-I problem mentioned above.)
 	 *
-	 *  TO_LOWER:
+	 *  UTF-8, UTF-16, etc. are all encodings for 4-byte Unicode codepoints.
+	 *  A codepoint is frequently a 'character' but not necessarily. Codepoints
+	 *  can represent character variations, such as accent marks. Emojiis are
+	 *  also included in the Unicode standard. (The flag of Scotland (🏴󠁧󠁢󠁳󠁣󠁴󠁿) requires
+	 *  seven-codepoint sequence)). Unicode frequently uses the terms "character"
+	 *  and "Grapheme" interchangeably, if not a bit loosely.
 	 *
-	 *  std::string.toLower is frequently used to 'Normalize' strings for use
-	 *  as map keys. This WON'T WORK for most languages/character sets.
-	 *  	ToLower is locale sensitive. A German sharp-s (looks a bit like an
-	 *  	italic B) is equivalent to "ss". There is no upper-case equivalent.
+	 *  In addition to some characters being composed of multiple codepoints, the
+	 *  order of all but the first codepoint can get scrambled a bit during
+	 *  processing. They visually look the same (who cares if the left upper dot
+	 *  is specified before the right upper dot), they can wreak havoc with the
+	 *  code. To solve this are various Normalizations that can be applied. Fortunately
+	 *  Normalization is not required in many cases. The only problem is, I haven't
+	 *  figured out the rules yet. Normalization may be required before & after a
+	 *  FoldCase operation, for example. When possible, this function does this
+	 *  for you.
 	 *
-	 *  	Accent marks frequently change. In particular, Turkic has 4 versions of
-	 *  	the letter "I" (English has two). To further complicate matters,
-	 *  	in Turkic locale, ToUpper of the dotted "i" translates to an upper
-	 *  	case dotted i; toLower converts an upper case dottless "I" to a lower
-	 *  	case dotless "I".
+	 *  C++ has some rudimentary Unicode support but has gaping holes:
+	 *  Many g++ systems define wchar_t as unsigned 32 bits, which maps
+	 *  nicely to a Unicode codepoint. However, the standard does NOT specify
+	 *  a length for wchar_t. Newer C++ versions adds several new character
+	 *  types that move in the right direction, but there is no support for
+	 *  Normalizing, working with multi-codepoint "characters" and many other
+	 *  capabilities.
 	 *
-	 *  For almost all purposes, you want to use FoldCase instead of ToLower.
-	 *
-	 *  Character UTF-8, wchar_t, Size, Length, Grapheme, Codepoints:
-	 *
-	 *  * A Unicode codepoint is unsigned 32 bits. This is specified in the
-	 *    standard. Unicode frequently uses the term Grapheme to mean Character.
-	 *    A Grapheme can be composed of one or more codepoints. The first
-	 *    codepoint contains the basic character information, additional
-	 *    codepoints add accents, etc.
-	 *
-	 *    Frequently an accented character can be represented in multiple
-	 *    combinations of codepoints. One such case has five different
-	 *    representations of the same character varying in length from 1
-	 *    to five codepoints. Normalization (which is locale specific)
-	 *    reorders and possibly combines a character's codepoints into
-	 *    a canological order so that they can be compared with one another.
-	 *
-	 *  * UTF-8 is a compressed encoding of Unicode (32-bit).
-	 *    UTF-16 is a compressed 16-bit encoding of Unicode
-	 *    wchar_t does NOT specify a length, nor any knowledge of Unicode
-	 *    although on many g++ systems, it is 32-bits. There are other
-	 *    encodings.
-	 *
-	 *  * C++ support of Unicode is very sparse. Mostly it is only encode/decode
-	 *    to/from UTF-8, UTF-16, wchar_t and Unicode. Otherwise there is
-	 *    next to no knowledge of Unicode.
-	 *
-	 *  Implications:
+	 *  Implications of C++ limitations:
 	 *  * You can't compare two strings one byte or even codepoint at a time
 	 *  * Two strings of different, non-zero lengths does not tell you if
 	 *    strings are not-equal! (Not without knowing that the strings are Normalized
 	 *    for the same locale).
 	 *  * When iterating the characters of a string, you frequently have
-	 *    to know where the character boundaries are.
+	 *    to know where the character boundaries are, which there is no support
+	 *    for
 	 *  * You may have to copy or alter strings simply to compare them
 	 *
-	 *  Don't give up hope yet:
+   * ICU library
 	 *  * The ICU library, while complicated and pretty heavy, can reliably
 	 *    handle many localization and Unicode issues.
 	 *  * Frequently strings are Normalized. Normalizing isn't that expensive.
@@ -183,59 +143,22 @@ public:
 	 *  * ICU tries to be as efficient as possible, assumes the most common,
 	 *    cheaper case first, resorting to more expensive solutions only when
 	 *    needed.
-	 *
-	 *  Still, the ICU library is incomplete and aging. It is based on several
-	 *  implementations donated from multiple sources and held together with
-	 *  hot glue and horse hair. (well, it's not that bad). Still, it is
-	 *  widely respected. I would much rather they reimplement using 32-bit
-	 *  codepoint characters. It seems supporting utf-8, utf-16, Char32...
-	 *  GREATLY complicates the API and implementation, resulting in numerous
-	 *  inconsistencies. (Ok, I'll stop preaching. I just want to give you a
-	 *  flavor for the state of things.)
-   */
-
-
-#if not defined (USE_STRINGUTILS_FORMAT)
-  /*!
-   * \brief Get a formatted string similar to sprintf
    *
-   * \param fmt Format of the resulting string
-   * \param ... variable number of value type arguments
-   * \return Formatted string
+   * The string methods here are definitely more expensive than those in StringUtils.
+   * There is a lot of opportunity for improvement:
+   *  * This initial release focused more on correct function than speed.
+   *    Numerous improvements can be made
+   *  * Database Sorting is a good opportunity for improvement. There are
+   *    multiple character conversions performed for EACH comparison
+   *    (UTF-8? -> wchar (Unicode) -> UTF-16 (ICU native encoding)).
+   *    Database encodings are configurable. I don't know how Kodi configures
+   *    the databases.
+   *  * Many operations use heap memory for temp objects. Can change to
+   *    stack allocated memory (requires a bit more boilerplate code)
+   *  * For future release, convert everything to one of ICUs preferred
+   *    representations and avoid all of the temp conversions.
    */
-  template<typename... Args>
-  static std::string Format(const std::string& fmt, Args&&... args)
-  {
-  	// Note that there is an ICU version of Format
 
-    // coverity[fun_call_w_exception : FALSE]
-
-    return ::fmt::format(fmt, EnumToInt(std::forward<Args>(args))...);
-     // Can NOT call CLog::Log from here due to recursion
-
-  }
-
-  /*!
-   *  \brief Get a formatted wstring similar to sprintf
-   *
-   * \param fmt Format of the resulting string
-   * \param ... variable number of value type arguments
-   * \return Formatted string
-   */
-  template<typename... Args>
-  static std::wstring Format(const std::wstring& fmt, Args&&... args)
-  {
-    // coverity[fun_call_w_exception : FALSE]
-
-  	// TODO: Unicode- Which Locale is used? Unicode safe?
-
-    return ::fmt::format(fmt, EnumToInt(std::forward<Args>(args))...);
-    // Can NOT call CLog::Log due to recursion!
-  }
-
-  static std::string FormatV(PRINTF_FORMAT_STRING const char *fmt, va_list args);
-  static std::wstring FormatV(PRINTF_FORMAT_STRING const wchar_t *fmt, va_list args);
-#endif
 
   /*!
    * \brief Converts a string to Upper case according to locale.
@@ -444,44 +367,8 @@ public:
   /*!
    *  \brief Capitalizes a wstring using locale.
    *
-   * If USE_TO_TITLE_FOR_CAPITALIZE is set, then uses ICU:toTitle to
-   * convert string to "Title Case" following Locale specific rules.
-   *
-   * Otherwise, uses a simplistic approach familiar to English speakers.
-   * See comments for USE_TO_TITLE_FOR_CAPITALIZE for more information.
-   *
-   * \param str string to capitalize in place
-   * \param locale Use capitalization rules of Locale (ignored when
-   *        USE_TO_TITLE_FOR_CAPITALIZE not set)
-   * \return str converted to "Title Case"
-   */
-  static void ToCapitalize(std::wstring &str, const icu::Locale &locale);
-
-  /*!
-   *  \brief Capitalizes a wstring using locale.
-   *
-   * If USE_TO_TITLE_FOR_CAPITALIZE is set, then uses ICU:toTitle to
-   * convert string to "Title Case" following Locale specific rules.
-   *
-   * Otherwise, uses a simplistic approach familiar to English speakers.
-   * See comments for USE_TO_TITLE_FOR_CAPITALIZE for more information.
-   *
-   * \param str string to capitalize in place
-   * \param locale Use capitalization rules of Locale (ignored when
-   *        USE_TO_TITLE_FOR_CAPITALIZE not set)
-   * \return str converted to "Title Case"
-   */
-  static void ToCapitalize(std::wstring &str, const std::locale &locale);
-
-  /*!
-   *  \brief Capitalizes a wstring using locale.
-   *
-   * If USE_TO_TITLE_FOR_CAPITALIZE is set, then uses ICU:toTitle to
-   * convert string to "Title Case" following Locale specific rules, using
-   * LangInfo::GetSystemLocale.
-   *
-   * Otherwise, uses a simplistic approach familiar to English speakers.
-   * See comments for USE_TO_TITLE_FOR_CAPITALIZE for more information.
+   * Uses a simplistic approach familiar to English speakers.
+   * See TitleCase for a more locale aware solution.
    *
    * \param str string to capitalize in place
    * \return str converted to "Title Case"
@@ -489,45 +376,10 @@ public:
   static void ToCapitalize(std::wstring &str);
 
   /*!
-   *  \brief Capitalizes a string using locale.
-   *
-   * If USE_TO_TITLE_FOR_CAPITALIZE is set, then uses ICU:toTitle to
-   * convert string to "Title Case" following Locale specific rules.
-   *
-   * Otherwise, uses a simplistic approach familiar to English speakers.
-   * See comments for USE_TO_TITLE_FOR_CAPITALIZE for more information.
-   *
-   * \param str string to capitalize in place
-   * \param locale Use capitalization rules of Locale (ignored when
-   *        USE_TO_TITLE_FOR_CAPITALIZE not set)
-   * \return str converted to "Title Case"
-   */
-  static void ToCapitalize(std::string &str, const icu::Locale &locale);
-
-  /*!
-   *  \brief Capitalizes a string using locale.
-   *
-   * If USE_TO_TITLE_FOR_CAPITALIZE is set, then uses ICU:toTitle to
-   * convert string to "Title Case" following Locale specific rules.
-   *
-   * Otherwise, uses a simplistic approach familiar to English speakers.
-   * See comments for USE_TO_TITLE_FOR_CAPITALIZE for more information.
-   *
-   * \param str string to capitalize in place
-   * \param locale Use capitalization rules of Locale (ignored when
-   *        USE_TO_TITLE_FOR_CAPITALIZE not set)
-   * \return str converted to "Title Case"
-   */
-  static void ToCapitalize(std::string &str, const std::locale &locale);
-
-  /*!
    *  \brief Capitalizes a string using LangInfo::GetSystemLocale.
    *
-   * If USE_TO_TITLE_FOR_CAPITALIZE is set, then uses ICU:toTitle to
-   * convert string to "Title Case" following Locale specific rules.
-   *
-   * Otherwise, uses a simplistic approach familiar to English speakers.
-   * See comments for USE_TO_TITLE_FOR_CAPITALIZE for more information.
+   * Uses a simplistic approach familiar to English speakers.
+   * See TitleCase for a more locale aware solution.
    *
    * \param str string to capitalize in place
    * \return str converted to "Title Case"
@@ -537,7 +389,6 @@ public:
   /*!
    *  \brief TitleCase a wstring using locale.
    *
-   *  TitleCases the given wstring according to the rules of the given locale.
    *  Similar too, but more language friendly version of ToCapitalize. Uses ICU library.
    *
    *  Best results are when a complete sentence/paragraph is TitleCased rather than
@@ -550,11 +401,10 @@ public:
   static std::wstring TitleCase(const std::wstring &str, const std::locale &locale);
 
   /*!
-   *  \brief TitleCase a string using LangInfo::GetSystemLocale.
+   *  \brief TitleCase a wstring using LangInfo::GetSystemLocale.
    *
-   *  TitleCases the given wstring according to the locale.
-   *  Similar too, but more language friendly version of ToCapitalize with
-   *  USE_TO_TITLE_FOR_CAPITALIZE not defined. Uses ICU library.
+   *  Similar too, but more language friendly version of ToCapitalize.
+   *  Uses ICU library.
    *
    *  Best results are when a complete sentence/paragraph is TitleCased rather than
    *  individual words.
@@ -568,9 +418,8 @@ public:
   /*!
    *  \brief TitleCase a wstring using locale.
    *
-   *  TitleCases the given wstring according to the rules of the given locale.
-   *  Similar too, but more language friendly version of ToCapitalize when
-   *  USE_TO_TITLE_FOR_CAPITALIZE is not defined. Uses ICU library.
+   *  Similar too, but more language friendly version of ToCapitalize.
+   *  Uses ICU library.
    *
    *  Best results are when a complete sentence/paragraph is TitleCased rather than
    *  individual words.
@@ -582,11 +431,10 @@ public:
   static std::string TitleCase(const std::string &str, const std::locale &locale);
 
   /*!
-   *  \brief TitleCase a wstring using LangInfo::GetSystemLocale.
+   *  \brief TitleCase a string using LangInfo::GetSystemLocale.
    *
-   *  TitleCases the given wstring according to the rules of the locale.
-   *  Similar too, but more language friendly version of ToCapitalize when
-   *  USE_TO_TITLE_FOR_CAPITALIZE is not defined. Uses ICU library.
+   *  Similar too, but more language friendly version of ToCapitalize.
+   *  Uses ICU library.
    *
    *  Best results are when a complete sentence/paragraph is TitleCased rather than
    *  individual words.
@@ -661,6 +509,7 @@ public:
   static bool Equals(const std::wstring &str1, const std::wstring &str2);
 
   // TODO: Add wstring version of EqualsNoCase
+  // TODO: Give guidance on when and what type of Normalization to use.
 
   /*!
    * \brief Determines if two strings are the same, after case folding each.
@@ -674,7 +523,7 @@ public:
    * to the entire string first.
    *
    * Note In most cases normalization should not be required, using Normalize
-   * should yield better results for those cases.
+   * should yield better results for those cases where it is required.
    *
    * \param str1 one of the strings to compare
    * \param str2 one of the strings to compare
@@ -698,7 +547,7 @@ public:
    * to the entire string first.
    *
    * Note In most cases normalization should not be required, using Normalize
-   * should yield better results for those cases.
+   * should yield better results for those cases where it is required.
    *
    * \param str1 one of the strings to compare
    * \param s2 one of the (c-style) strings to compare
@@ -722,7 +571,7 @@ public:
    * to the entire string first.
    *
    * Note In most cases normalization should not be required, using Normalize
-   * should yield better results for those cases.
+   * should yield better results for those cases where it is required.
    *
    * \param s1 one of the (c-style) strings to compare
    * \param s2 one of the (c-style) strings to compare
@@ -758,12 +607,17 @@ public:
    *
    * Assumes that all collation will occur in this thread.
    *
+   * Note: Only has an impact if icu collation is configured instead of legacy
+   *       AlphaNumericCompare.
+   *
+   *       Also starts the elapsed-time timer for the sort. See SortCompleted.
+   *
    * \param icuLocale Collation order will be based on the given locale.
    * \param Normalize Controls whether normalization is performed prior to collation.
    *                  Frequently not required. Some free normalization always occurs.
-   * \return true of initialization was successful, otherwise false.
+   * \return true if initialization was successful, otherwise false.
    */
-  static bool InitializeCollator(const icu::Locale &icuLocale, bool Normalize /* = false */);
+  static bool InitializeCollator(const icu::Locale &icuLocale, bool Normalize = false );
 
   /*!
    * \brief Initializes the Collator for this thread, such as before sorting a
@@ -771,18 +625,29 @@ public:
    *
    * Assumes that all collation will occur in this thread.
    *
+   * Note: Only has an impact if icu collation is configured instead of legacy
+   *       AlphaNumericCompare.
+   *
+   *       Also starts the elapsed-time timer for the sort. See SortCompleted.
+   *
    * \param locale Collation order will be based on the given locale.
    * \param Normalize Controls whether normalization is performed prior to collation.
    *                  Frequently not required. Some free normalization always occurs.
-   * \return true of initialization was successful, otherwise false.
+   * \return true if initialization was successful, otherwise false.
    */
-  static bool InitializeCollator(const std::locale &locale, bool Normalize /* = false */);
+  static bool InitializeCollator(const std::locale &locale, bool Normalize = false );
 
   /*!
    * \brief Initializes the Collator for this thread using LangInfo::GetSystemLocale,
    * such as before sorting a table.
    *
    * Assumes that all collation will occur in this thread.
+   *
+   *
+   * Note: Only has an impact if icu collation is configured instead of legacy
+   *       AlphaNumericCompare.
+   *
+   *       Also starts the elapsed-time timer for the sort. See SortCompleted.
    *
    * \param Normalize Controls whether normalization is performed prior to collation.
    *                  Frequently not required. Some free normalization always occurs.
@@ -802,6 +667,17 @@ public:
    *         == 0 if left collates the same as right
    *          > 0 if left collates > right
    */
+
+  /*!
+   * \brief Provides the ability to collect basic performance info for the previous sort
+   *
+   * Must be run in the same thread that InitializeCollator was run. May require some setting
+   * or #define to be set to enable recording of data in log.
+   *
+   * \param sortItems simple count of how many items sorted.
+   */
+  static void SortCompleted(int sortItems);
+
   static int32_t Collate(const std::wstring &left, const std::wstring &right);
 
   /*!
@@ -833,7 +709,7 @@ public:
    * to the entire string first.
    *
    * Note In most cases normalization should not be required, using Normalize
-   * should yield better results for those cases.
+   * may yield better results.
    *
    * \param str1 one of the wstrings to compare
    * \param str2 one of the wstrings to compare
@@ -860,7 +736,7 @@ public:
    * to the entire string first.
    *
    * Note In most cases normalization should not be required, using Normalize
-   * should yield better results for those cases.
+   * may yield better results.
    *
    * \param str1 one of the strings to compare
    * \param str2 one of the strings to compare
@@ -887,7 +763,7 @@ public:
    * to the entire string first.
    *
    * Note In most cases normalization should not be required, using Normalize
-   * should yield better results for those cases.
+   * may yield better results.
    *
    * \param s1 one of the strings to compare
    * \param s2 one of the strings to compare
@@ -918,7 +794,7 @@ public:
    * to the entire string first.
    *
    * Note In most cases normalization should not be required, using Normalize
-   * should yield better results for those cases.
+   * may yield better results.
    *
    * \param str1 one of the strings to compare
    * \param str2 one of the strings to compare
@@ -950,7 +826,7 @@ public:
    * to the entire string first.
    *
    * Note In most cases normalization should not be required, using Normalize
-   * should yield better results for those cases.
+   * may yield better results.
    *
    * \param s1 one of the strings to compare
    * \param s2 one of the strings to compare
@@ -968,54 +844,41 @@ public:
       const char *s1, const char *s2, size_t n,
       StringOptions opt = StringOptions::FOLD_CASE_DEFAULT, const bool Normalize = false);
 
-#if defined(STRINGUTILS_UNICODE_ENABLE)
-
   /*!
-   * \brief Returns the int value of the first series of digits found in the string
+   * \brief Get the leftmost side of a UTF-8 string, using the character
+   *        boundary rules from the current icu Locale.
    *
-   *  Ignores any non-digits in string
-   *
-   * \param str to extract number from
-   * \return int value of found string
-   */
-  static int ReturnDigits(const std::string &str);
-#endif
-
-  /*!
-   * \brief Get the leftmost side of a UTF-8 string, using character boundary
-   * rules defined by LangInfo::GetSystemLocale.
-   *
-   * Unicode characters may consist of multiple codepoints. This function's
-   * parameters are based on characters and NOT bytes.
+   * Unicode characters are of variable length. This function's
+   * parameters are based on characters and NOT bytes. Byte-length can change during
+   * processing (from normalization).
    *
    * \param str to get a substring of
-   * \param charCount if leftReference: charCount is number of characters to
+   * \param charCount if keepLeft: charCount is number of characters to
    *                  copy from left end (limited by str length)
-   *                  if ! leftReference: number of characters to omit from right end
-   * \param leftReference controls how charCount is interpreted
+   *                  if ! keepLeft: number of characters to omit from right end
+   * \param keepLeft controls how charCount is interpreted
    * \return leftmost characters of string, length determined by charCount
    *
    * Ex: Copy all but the rightmost two characters from str:
    *
    * std::string x = Left(str, 2, false);
    */
-  static std::string Left(const std::string &str, const size_t charCount, const bool leftReference = true);
+  static std::string Left(const std::string &str, const size_t charCount, const bool keepLeft = true);
 
   /*!
    * \brief Get the leftmost side of a UTF-8 string, using character boundary
    * rules defined by the given locale.
    *
-   * Unicode characters may consist of multiple codepoints. This function's
-   * parameters are based on characters and NOT bytes. Due to normalization,
-   * the byte-length of the strings may change, although the character counts
-   * will not.
+   * Unicode characters are of variable length. This function's
+   * parameters are based on characters and NOT bytes. Byte-length can change during
+   * processing (from normalization).
    *
    * \param str to get a substring of
-   * \param charCount if leftReference: charCount is number of characters to
+   * \param charCount if keepLeft: charCount is number of characters to
    *                  copy from left end (limited by str length)
-   *                  if ! leftReference: number of characters to omit from right end
-   * \param leftReference controls how charCount is interpreted
-   * \param icuLocale determines how character breaks are made
+   *                  if ! keepLeft: number of characters to omit from right end
+   * \param icuLocale determines where the character breaks are
+   * \param keepLeft controls how charCount is interpreted
    * \return leftmost characters of string, length determined by charCount
    *
    * Ex: Copy all but the rightmost two characters from str:
@@ -1023,12 +886,12 @@ public:
    * std::string x = Left(str, 2, false, Unicode::GetDefaultICULocale());
    */
 
-  static std::string Left(const std::string &str, const size_t charCount, const bool leftReference,
-      const icu::Locale &icuLocale);
+  static std::string Left(const std::string &str, const size_t charCount,
+      const icu::Locale &icuLocale, const bool keepLeft=true);
 
   /*!
    * \brief Get a substring of a UTF-8 string using character boundary rules
-   * defined by LangInfo::GetSystemLocale.
+   * defined by the current icu::Locale.
    *
    * Unicode characters may consist of multiple codepoints. This function's
    * parameters are based on characters and NOT bytes. Due to normalization,
@@ -1046,8 +909,8 @@ public:
         const size_t charCount = std::string::npos);
 
     /*!
-     * \brief Get the rightmost side of a UTF-8 string, using character boundary
-     * rules defined by the given locale.
+     * \brief Get the rightmost end of a UTF-8 string, using character boundary
+     * rules defined by the current icu Locale.
      *
      * Unicode characters may consist of multiple codepoints. This function's
      * parameters are based on characters and NOT bytes. Due to normalization,
@@ -1055,17 +918,41 @@ public:
      * will not.
      *
      * \param str to get a substring of
-     * \param charCount if rightReference: charCount is number of characters to
+     * \param charCount if keepRight: charCount is number of characters to
      *                  copy from right end (limited by str length)
-     *                  if ! rightReference: number of characters to omit from left end
-     * \param rightReference controls how charCount is interpreted
+     *                  if ! keepRight: charCount number of characters to omit from right end
+     * \param keepRight controls how charCount is interpreted
      * \return rightmost characters of string, length determined by charCount
      *
      * Ex: Copy all but the leftmost two characters from str:
      *
-     * std::string x = Right(str, 2, false, Unicode::GetDefaultICULocale());
+     * std::string x = Right(str, 2, false);
      */
-    static std::string Right(const std::string &str, const size_t charCount, bool getEndIndex = true);
+    static std::string Right(const std::string &str, const size_t charCount, bool keepRight = true);
+
+    /*!
+       * \brief Get the rightmost end of a UTF-8 string, using character boundary
+       * rules defined by the given locale.
+       *
+       * Unicode characters may consist of multiple codepoints. This function's
+       * parameters are based on characters and NOT bytes. Due to normalization,
+       * the byte-length of the strings may change, although the character counts
+       * will not.
+       *
+       * \param str to get a substring of
+       * \param charCount if keepRight: charCount is number of characters to
+       *                  copy from right end (limited by str length)
+       *                  if ! keepRight: charCount number of characters to omit from right end
+       * \param icuLocale determines character boundaries
+       * \param keepRight controls how charCount is interpreted
+       * \return rightmost characters of string, length determined by charCount
+       *
+       * Ex: Copy all but the leftmost two characters from str:
+       *
+       * std::string x = Right(str, 2, false, Unicode::GetDefaultICULocale());
+       */
+      static std::string Right(const std::string &str, const size_t charCount,
+          const icu::Locale &icuLocale, bool keepRight = true);
 
     /*!
       * \brief Gets the byte-offset of a Unicode character relative to a reference
@@ -1185,39 +1072,52 @@ public:
         const icu::Locale &icuLocale);
 
 
-  /*! \brief Remove all whitespace from beginning and end of str
+  /*!
+   * \brief Remove all whitespace from beginning and end of str in-place
    *
    * \param str to trim
+   *
+   * Whitespace is defined for Unicode as:  [\t\n\f\r\p{Z}] where \p{Z} means marked as white space
+   * which includes ASCII space, plus a number of Unicode space characters. See Unicode::Trim for
+   * a complete list.
+   *
    * \return trimmed string, same as str argument.
+   *
+   * Note: Prior to Kodi 20 Trim defined whitespace as: isspace() which is [ \t\n\v\f\r] and
+   *       as well as other characters, depending upon locale.
    */
   static std::string& Trim(std::string &str);
 
-  /*! \brief Remove a set of characters from beginning and end of str
+  /*!
+   * \brief Remove a set of characters from beginning and end of str in-place
    *
-   *  Remove any leading or trailing characters from a set of chars from str.
+   *  Remove any leading or trailing characters from the set chars from str.
    *
    *  Ex: Trim("abc1234bxa", "acb") ==> "1234bx"
    *
    * \param str to trim
-   * \param chars (characters) to remove from str
+   * \param chars characters to remove from str
    * \return trimmed string, same as str argument.
    *
-   * Note: Prior algorithm which will only work if chars is ASCII is probably sufficient
-   * for current needs.
+   * Note: Prior algorithm only supported chars containing ASCII characters.
    * This implementation allows for chars to be any utf-8 characters. (Does NOT Normalize).
    */
   static std::string& Trim(std::string &str, const char* const chars);
 
-  /*! \brief Remove all whitespace from beginning of str
+  /*!
+   *  \brief Remove all whitespace from beginning of str in-place
+   *
+   *  See UnicodeUtils::Trim(str) for a description of whitespace characters
    *
    * \param str to trim
    * \return trimmed string, same as str argument.
    */
   static std::string& TrimLeft(std::string &str);
 
-  /*! \brief Remove a set of characters from beginning of str
+  /*!
+   * \brief Remove a set of characters from beginning of str in-place
    *
-   *  Remove any leading characters in chars from str.
+   *  Remove any leading characters from the set chars from str.
    *
    *  Ex: TrimLeft("abc1234bxa", "acb") ==> "1234bxa"
    *
@@ -1225,23 +1125,23 @@ public:
    * \param chars (characters) to remove from str
    * \return trimmed string, same as str argument.
    *
-   *
-   * Note: Prior algorithm which will only work if chars is ASCII is probably sufficient
-   * for current needs.
+   * Note: Prior algorithm only supported chars containing ASCII characters.
    * This implementation allows for chars to be any utf-8 characters. (Does NOT Normalize).
    */
   static std::string& TrimLeft(std::string &str, const char* const chars);
 
-  /*! \brief Remove all whitespace from end of str
+  /*!
+   * \brief Remove all whitespace from end of str in-place
+   *
+   * See Trim(str) for information about what characters are considered whitespace
    *
    * \param str to trim
    * \return trimmed string, same as str argument.
    */
   static std::string& TrimRight(std::string &str);
 
-  /*! \brief Remove a set of characters from end of str
-   *
-   *  Remove any trailing characters in chars from str.
+  /*!
+   *  \brief Remove trailing characters from the set of chars from str in-place
    *
    *  Ex: TrimRight("abc1234bxa", "acb") ==> "abc1234bx"
    *
@@ -1249,82 +1149,89 @@ public:
    * \param chars (characters) to remove from str
    * \return trimmed string, same as str argument.
    *
-   * Note: Prior algorithm which will only work if chars is ASCII is probably sufficient
-   * for current needs.
-   * This implementation allows for chars to be any utf-8 character(s). (Does NOT Normalize).
+   * Note: Prior algorithm only supported chars containing ASCII characters.
+   * This implementation allows for chars to be any utf-8 characters. (Does NOT Normalize).
    */
   static std::string& TrimRight(std::string &str, const char* const chars);
 
-  /*! \brief Remove leading and trailing ASCII space and TAB characters from str
+  /*!
+   * \brief Converts tabs to spaces and then removes duplicate space characters
+   * from str in-place
    *
-   * \param str to trim
+   * \param str to modify
    * \return trimmed string, same as str argument.
    */
   static std::string& RemoveDuplicatedSpacesAndTabs(std::string& str);
 
-  /*! \brief Replaces every occurrence of a char in string.
-
-  Somewhat less efficient than FindAndReplace because this one returns a count
-  of the number of changes.
-
-  \param str String to make changes to
-  \param oldChar character to be replaced
-  \parm newChar character to replace with
-  \return Count of the number of changes
-  */
+  /*!
+   * \brief Replaces every occurrence of a char in string.
+   *
+   * Somewhat less efficient than FindAndReplace because this one returns a count
+   * of the number of changes.
+   *
+   * \param str String to make changes to in-place
+   * \param oldChar character to be replaced
+   * \param newChar character to replace with
+   * \return Count of the number of changes
+   */
   static int Replace(std::string &str, char oldChar, char newChar);
 
-  /*! \brief Replaces every occurrence of a string within another string.
-
-    Somewhat less efficient than FindAndReplace because this one returns a count
-    of the number of changes.
-
-    \param str String to make changes to
-    \param oldStr string to be replaced
-    \parm newStr string to replace with
-    \return Count of the number of changes
-    */
+  /*!
+   * \brief Replaces every occurrence of a string within another string.
+   *
+   * Somewhat less efficient than FindAndReplace because this one returns a count
+   * of the number of changes.
+   *
+   * \param str String to make changes to in-place
+   * \param oldStr string to be replaced
+   * \param newStr string to replace with
+   * \return Count of the number of changes
+   */
   static int Replace(std::string &str, const std::string &oldStr, const std::string &newStr);
 
-  /*! \brief Replaces every occurrence of a wstring within another wstring.
-
-     Somewhat less efficient than FindAndReplace because this one returns a count
-     of the number of changes.
-
-     \param str String to make changes to
-     \param oldStr string to be replaced
-     \parm newStr string to replace with
-     \return Count of the number of changes
-     */
+  /*!
+   * \brief Replaces every occurrence of a wstring within another wstring in-place
+   *
+   *  Somewhat less efficient than FindAndReplace because this one returns a count
+   *  of the number of changes.
+   *
+   * \param str String to make changes to
+   * \param oldStr string to be replaced
+   * \parm newStr string to replace with
+   * \return Count of the number of changes
+   */
   static int Replace(std::wstring &str, const std::wstring &oldStr, const std::wstring &newStr);
 
-  /*! \brief Replaces every occurrence of a string within another string.
-
-     Should be more efficient than Replace since it directly uses an icu library
-     routine and does not have to count changes.
-
-     \param str String to make changes to
-     \param oldStr string to be replaced
-     \parm newStr string to replace with
-     \return the modified string (same as str).
-     */
-  static std::string& FindAndReplace(std::string &str, const std::string oldText,
+  /*!
+   * \brief Replaces every occurrence of a string within another string
+   *
+   * Should be more efficient than Replace since it directly uses an icu library
+   * routine and does not have to count changes.
+   *
+   * \param str String to make changes to
+   * \param oldStr string to be replaced
+   * \parm newStr string to replace with
+   * \return the modified string.
+   */
+  static std::string FindAndReplace(const std::string &str, const std::string oldText,
   		const std::string newText);
 
-  /*! \brief Replaces every occurrence of a string within another string.
-
-       Should be more efficient than Replace since it directly uses an icu library
-       routine and does not have to count changes.
-
-       \param str String to make changes to
-       \param oldStr string to be replaced
-       \parm newStr string to replace with
-       \return the modified string (same as str).
-       */
-  static std::string& FindAndReplace(std::string &str, const char * oldText,
+  /*!
+   * \brief Replaces every occurrence of a string within another string.
+   *
+   * Should be more efficient than Replace since it directly uses an icu library
+   * routine and does not have to count changes.
+   *
+   * \param str String to make changes to
+   * \param oldStr string to be replaced
+   * \parm newStr string to replace with
+   * \return the modified string
+   */
+  static std::string FindAndReplace(const std::string &str, const char * oldText,
   		const char * newText);
 
-  /*! \brief Replaces every occurrence of a regex pattern with a string in another string.
+  /*!
+   * \brief Replaces every occurrence of a regex pattern with a string in another string.
    *
    * Regex based version of Replace. See:
    * https://unicode-org.github.io/icu/userguide/strings/regexp.html
@@ -1335,10 +1242,11 @@ public:
    * \param flags controls behavior of regular expression engine
    * \return result of regular expression
    */
-  std::string RegexReplaceAll(std::string &str, const std::string pattern,
+  std::string RegexReplaceAll(const std::string &str, const std::string pattern,
   		const std::string newStr, const int flags);
 
-  /*! \brief Determines if a string begins with another string
+  /*!
+   * \brief Determines if a string begins with another string
    *
    * \param str1 string to be searched
    * \param str2 string to find at beginning of str1
@@ -1346,7 +1254,8 @@ public:
    */
   static bool StartsWith(const std::string &str1, const std::string &str2);
 
-  /*! \brief Determines if a string begins with another string
+  /*!
+   * \brief Determines if a string begins with another string
    *
    * \param str1 string to be searched
    * \param s2 string to find at beginning of str1
@@ -1354,7 +1263,8 @@ public:
    */
   static bool StartsWith(const std::string &str1, const char *s2);
 
-  /*! \brief Determines if a string begins with another string
+  /*!
+   * \brief Determines if a string begins with another string
    *
    * \param s1 string to be searched
    * \param s2 string to find at beginning of str1
@@ -1362,42 +1272,46 @@ public:
    */
   static bool StartsWith(const char *s1, const char *s2);
 
-  /*! \brief Determines if a string begins with another string, ignoring their case
+  /*!
+   * \brief Determines if a string begins with another string, ignoring their case
    *
    * Equivalent to StartsWith(FoldCase(str1), FoldCase(str2))
    *
    * \param str1 string to be searched
    * \param str2 string to find at beginning of str1
-   * \param opt controls behavior of case folding
+   * \param opt controls behavior of case folding, normally leave at default
    * \return true if str1 starts with str2, otherwise false
    */
   static bool StartsWithNoCase(const std::string &str1, const std::string &str2,
   		StringOptions opt = StringOptions::FOLD_CASE_DEFAULT);
 
-  /*! \brief Determines if a string begins with another string, ignoring their case
+  /*!
+   * \brief Determines if a string begins with another string, ignoring their case
    *
    * Equivalent to StartsWith(FoldCase(str1), FoldCase(s2))
    *
    * \param str1 string to be searched
    * \param s2 string to find at beginning of str1
-   * \param opt controls behavior of case folding
+   * \param opt controls behavior of case folding, normally leave at default
    * \return true if str1 starts with s2, otherwise false
    */
   static bool StartsWithNoCase(const std::string &str1, const char *s2,
   		StringOptions opt = StringOptions::FOLD_CASE_DEFAULT);
 
-  /*! \brief Determines if a string begins with another string, ignoring their case
+  /*!
+   * \brief Determines if a string begins with another string, ignoring their case
    *
    * Equivalent to StartsWith(FoldCase(s1), FoldCase(s2))
    *
    * \param s1 string to be searched
    * \param s2 string to find at beginning of s1
-   * \param opt controls behavior of case folding
+   * \param opt controls behavior of case folding, normally leave at default
    * \return true if s1 starts with s2, otherwise false
    */
   static bool StartsWithNoCase(const char *s1, const char *s2, StringOptions opt = StringOptions::FOLD_CASE_DEFAULT);
 
-  /*! \brief Determines if a string ends with another string
+  /*!
+   * \brief Determines if a string ends with another string
    *
    * \param str1 string to be searched
    * \param str2 string to find at end of str1
@@ -1405,7 +1319,8 @@ public:
    */
   static bool EndsWith(const std::string &str1, const std::string &str2);
 
-  /*! \brief Determines if a string ends with another string
+  /*!
+   * \brief Determines if a string ends with another string
    *
    * \param str1 string to be searched
    * \param s2 string to find at end of str1
@@ -1422,103 +1337,96 @@ public:
    */
   static bool EndsWithNoCase(const std::string &str1, const std::string &str2, StringOptions opt = StringOptions::FOLD_CASE_DEFAULT);
 
-  /*! \brief Determines if a string begins with another string while ignoring case
+  /*!
+   * \brief Determines if a string begins with another string while ignoring case
    *
    * \param str1 string to be searched
    * \param s2 string to find at beginning of str1
-   * \param opt controls behavior of case folding
+   * \param opt controls behavior of case folding, normally leave at default
    * \return true if str1 starts with s2, otherwise false
    */
   static bool EndsWithNoCase(const std::string &str1, const char *s2, StringOptions opt = StringOptions::FOLD_CASE_DEFAULT);
 
-#if defined(STRINGUTILS_UNICODE_ENABLE)
-
-  /*! \brief Builds a string by appending every string from a container, separated by a delimiter
+  /*!
+   * \brief Splits the given input string into separate strings using the given delimiter.
    *
-   * \param strings a container of a number of strings
-   * \param delimiter will separate each member of strings
-   * \return the concatenation of every string in the container, separated by the delimiter
+   * If the given input string is empty the result will be an empty vector (not
+   * a vector containing an empty string).
    *
-   * TODO: Unicode This looks like it is Unicode safe, but more research required to be sure.
-   *       Most likely this is okay if the delimiter is a simple separator (space, comma,
-   *       etc.).
+   * \param input string to be split
+   * \param delimiter used to split the input string
+   * \param iMaxStrings (optional) Maximum number of generated split strings
    */
-  template<typename CONTAINER>
-  static std::string Join(const CONTAINER &strings, const std::string& delimiter)
-  {
-    std::string result;
-    for (const auto& str : strings)
-      result += str + delimiter;
+  static std::vector<std::string> Split(const std::string& input, const std::string& delimiter, size_t iMaxStrings = 0);
 
-    if (!result.empty())
-      result.erase(result.size() - delimiter.size());
-    return result;
-  }
-#endif
-
-  /*! \brief Splits the given input string into separate strings using the given delimiter.
-
-   If the given input string is empty the result will be an empty array (not
-   an array containing an empty string).
-
-   \param input Input string to be split
-   \param delimiter Delimiter to be used to split the input string
-   \param iMaxStrings (optional) Maximum number of split strings
-   */
-  static std::vector<std::string> Split(const std::string& input, const std::string& delimiter, unsigned int iMaxStrings = 0);
-
-  /*! \brief Splits the given input string into separate strings using the given delimiter.
-
-   If the given input string is empty the result will be an empty array (not
-   an array containing an empty string).
-
-   \param input Input string to be split
-   \param delimiter Delimiter to be used to split the input string
-   \param iMaxStrings (optional) Maximum number of split strings
+  /*!
+   *  \brief Splits the given input string into separate strings using the given delimiter.
+   *
+   * If the given input string is empty the result will be an empty vector (not
+   * an vector containing an empty string).
+   *
+   * If iMaxStrings limit is reached, the unprocessed input is returned along with the
+   * incomplete split strings.
+   *
+   *  Ex: input = "a/b#c/d/e/f/g/h"
+   *     delimiter = "/"
+   *     iMaxStrings = 5
+   *     returned = {"a", "b#c", "d", "e", "f", "/g/h"}
+   *
+   * \param input string to be split
+   * \param delimiter used to split the input string
+   * \param iMaxStrings Maximum number of generated split strings. The default value
+   *        of 0 places no limit on the generated strings.
    */
   static std::vector<std::string> Split(const std::string& input, const char delimiter, size_t iMaxStrings = 0);
 
-  /*! \brief Splits the given input string into separate strings using the given delimiters.
-
-   First, for all but the first delimiter, each occurrence of the delimiter in input will be
-   replaced by the first delimiter.
-
-   example: input = "abcdefg" delimiters = "a", "de", "e"
-            input => "abcag"  // Substitute "de" with "a"
-            input => "abcag" // No occurrence of "e"
-            output => "", "bc", "g"
-
-   Finally, the first delimiter will be used to split input, as split using a single delimiter
-
-   \param input Input string to be split
-   \param delimiter Delimiter to be used to split the input string
-   \param iMaxStrings (optional) Maximum number of split strings
-
-   TODO: Need test case for this, including example
+  /*!
+   * \brief Splits the given input string into separate strings using the given delimiters.
+   *
+   * \param input string to be split
+   * \param delimiters used to split the input string as described above
+   * \return a Vector of substrings
    */
   static std::vector<std::string> Split(const std::string& input, const std::vector<std::string>& delimiters);
 
 
-  /*! \brief Splits the given input strings using the given delimiters into further separate strings.
-
-  If an input vector element is empty the result will be an empty vector element (not
-  an empty string).
-
-  Delimiter strings are applied in order, so once the (optional) maximum number of
-  items is produced no other delimiters are applied. This produces different results
-  to applying all delimiters at once e.g. "a/b#c/d" becomes "a", "b#c", "d" rather
-  than "a", "b", "c/d"
-
-  \param input Input vector of strings each to be split
-  \param delimiters Delimiter strings to be used to split the input strings
-  \param iMaxStrings (optional) Maximum number of resulting split strings
-
-  TODO: Need Testcase!
-  */
+  /*!
+   * \brief Splits multiple input strings using the the same set of delimiters.
+   *
+   * If an input vector element is empty the result will be an empty vector element (not
+   * an empty string).
+   *
+   * Delimiter strings are applied in order, so once iMaxStrings
+   * items is produced no other delimiters are applied. This produces different results
+   * than applying all delimiters at once:
+   *
+   * Ex: input = {"a/b#c/d/e/foo/g::h/", "#p/q/r:s/x&extraNarfy"}
+   *     delimiters = {"/", "#", ":", "Narf"}
+   *     if iMaxStrings=7
+   *        return value = {"a", "b#c", "d" "e", "foo", "/g::h/", "p", "q", "/r:s/x&extraNarfy}"
+   *
+   *     if iMaxStrings=0
+   *        return value = {"a", "b", "c", "d", "e", "f", "g", "", "h", "", "", "p", "q", "r", "s",
+   *                        "x&extra", "y"}
+   *
+   * e.g. "a/b#c/d" becomes "a", "b#c", "d" rather
+   * than "a", "b", "c/d"
+   *
+   * \param input vector of strings each to be split
+   * \param delimiters strings to be used to split the input strings
+   * \param iMaxStrings limits number of resulting split strings. A value of 0
+   *        means no limit.
+   * \return vector of split strings
+   *
+   * TODO: Need Testcase!
+   */
   static std::vector<std::string> SplitMulti(const std::vector<std::string>& input,
                                              const std::vector<std::string>& delimiters,
-                                             size_t iMaxStrings = 0);
+                                             size_t iMaxStrings = 0, bool omitEmptyStrings = false);
 
+  static std::vector<std::string> SplitMultiOrig(const std::vector<std::string>& input,
+                                             const std::vector<std::string>& delimiters,
+                                             size_t iMaxStrings = 0);
   /*! \brief Counts the occurrences of strFind in strInput
    *
    * \param strInput string to be searched
@@ -1598,16 +1506,6 @@ public:
    */
   static void RemoveCRLF(std::string& strLine);
 
-#if defined(STRINGUTILS_UNICODE_ENABLE)
-
-  // TODO: Unicode BROKEN! Expose Unicode method to get character counts.
-  /*! \brief utf8 version of strlen - skips any non-starting bytes in the count, thus returning the number of utf8 characters
-   \param s c-string to find the length of.
-   \return the number of utf8 characters in the string.
-   */
-  static size_t utf8_strlen(const char *s);
-#endif
-
   /*! \brief convert a time in seconds to a string based on the given time format
    \param seconds time in seconds
    \param format the format we want the time in.
@@ -1615,23 +1513,6 @@ public:
    \sa TIME_FORMAT
    */
   static std::string SecondsToTimeString(long seconds, TIME_FORMAT format = TIME_FORMAT_GUESS);
-
-#if defined(STRINGUTILS_UNICODE_ENABLE)
-
-  /*! \brief check whether a string is a natural number.
-   Matches [ \t]*[0-9]+[ \t]*
-   \param str the string to check
-   \return true if the string is a natural number, false otherwise.
-   */
-  static bool IsNaturalNumber(const std::string& str);
-
-  /*! \brief check whether a string is an integer.
-   Matches [ \t]*[\-]*[0-9]+[ \t]*
-   \param str the string to check
-   \return true if the string is an integer, false otherwise.
-   */
-  static bool IsInteger(const std::string& str);
-#endif
 
   inline static bool ContainsNonAscii(std::string str)
   {
@@ -1653,36 +1534,6 @@ public:
     return false;
   }
 
-#if defined(STRINGUTILS_UNICODE_ENABLE)
-
-  /* The next several isasciiXX and asciiXXvalue functions are locale independent (US-ASCII only),
-   * as opposed to standard ::isXX (::isalpha, ::isdigit...) which are locale dependent.
-   * Next functions get parameter as char and don't need double cast ((int)(unsigned char) is required for standard functions). */
-  inline static bool isasciidigit(char chr) // locale independent
-  {
-    return chr >= '0' && chr <= '9';
-  }
-  inline static bool isasciixdigit(char chr) // locale independent
-  {
-    return (chr >= '0' && chr <= '9') || (chr >= 'a' && chr <= 'f') || (chr >= 'A' && chr <= 'F');
-  }
-  static int asciidigitvalue(char chr); // locale independent
-  static int asciixdigitvalue(char chr); // locale independent
-  inline static bool isasciiuppercaseletter(char chr) // locale independent
-  {
-    return (chr >= 'A' && chr <= 'Z');
-  }
-  inline static bool isasciilowercaseletter(char chr) // locale independent
-  {
-    return (chr >= 'a' && chr <= 'z');
-  }
-  inline static bool isasciialphanum(char chr) // locale independent
-  {
-    return isasciiuppercaseletter(chr) || isasciilowercaseletter(chr) || isasciidigit(chr);
-  }
-  static std::string SizeToString(int64_t size);
-  static const std::string Empty;
-#endif
   /**
    * Scans the str for the occurrence of word.
    *
@@ -1691,79 +1542,9 @@ public:
    */
   static size_t FindWord(const std::string &str, const std::string &word);
 
-#if defined(STRINGUTILS_UNICODE_ENABLE)
-
-  /*!
-   * \brief Starting at a point after an opening bracket, scans a string for it's matching
-   * close bracket.
-   *
-   * Note: While the string can be utf-8, the open & close brackets must be ASCII.
-   *
-   * \param str A utf-8 string to scan for 'brackets'
-   * \param opener The 'open-bracket' ASCII character used in the string
-   * \param closer The 'close-bracket' ASCII character used in the string
-   * \param startPos byte offset in str, past the open-bracket that the function is to find
-   * the closing bracket for.
-   *
-   * \return the index of the matching close-bracket, or std::string::npos if not found.
-   *
-   */
-  static int FindEndBracket(const std::string &str, char opener, char closer, int startPos = 0);
-#endif
-
   static int DateStringToYYYYMMDD(const std::string &dateString);
-#if defined(STRINGUTILS_UNICODE_ENABLE)
-
-  static std::string ISODateToLocalizedDate (const std::string& strIsoDate);
-#endif
 
   static void WordToDigits(std::string &word);
-
-#if defined(STRINGUTILS_UNICODE_ENABLE)
-  static std::string CreateUUID();
-  static bool ValidateUUID(const std::string &uuid); // NB only validates syntax
-  static double CompareFuzzy(const std::string &left, const std::string &right);
-  static int FindBestMatch(const std::string &str, const std::vector<std::string> &strings, double &matchscore);
-  static bool ContainsKeyword(const std::string &str, const std::vector<std::string> &keywords);
-
-  /*! \brief Convert the string of binary chars to the actual string.
-
-  Convert the string representation of binary chars to the actual string.
-  For example \1\2\3 is converted to a string with binary char \1, \2 and \3
-
-  \param param String to convert
-  \return Converted string
-  */
-  static std::string BinaryStringToString(const std::string& in);
-  /**
-   * Convert each character in the string to its hexadecimal
-   * representation and return the concatenated result
-   *
-   * example: "abc\n" -> "6162630a"
-   */
-  static std::string ToHexadecimal(const std::string& in);
-  /*! \brief Format the string with locale separators.
-
-  Format the string with locale separators.
-  For example 10000.57 in en-us is '10,000.57' but in italian is '10.000,57'
-
-  \param param String to format
-  \return Formatted string
-  */
-  template<typename T>
-  static std::string FormatNumber(T num)
-  {
-    std::stringstream ss;
-// ifdef is needed because when you set _ITERATOR_DEBUG_LEVEL=0 and you use custom numpunct you will get runtime error in debug mode
-// for more info https://connect.microsoft.com/VisualStudio/feedback/details/2655363
-#if !(defined(_DEBUG) && defined(TARGET_WINDOWS))
-    ss.imbue(g_langInfo.GetSystemLocale());
-#endif
-    ss.precision(1);
-    ss << std::fixed << num;
-    return ss.str();
-  }
-#endif
 
   /*! \brief Escapes the given string to be able to be used as a parameter.
 
@@ -1775,86 +1556,6 @@ public:
    */
   static std::string Paramify(const std::string &param);
 
-#if defined(STRINGUTILS_UNICODE_ENABLE)
-
-  // TODO: Could rewrite to use Unicode delimiters using icu::UnicodeSet::spanUTF8(), and friends
-  /*!
-   *  \brief Splits a string using one or more delimiting ASCII characters,
-   *  ignoring empty tokens.
-   *
-   *  Missing delimiters results in a match of entire string.
-   *
-   *  Differs from Split() in two ways:
-   *    1. The delimiters are treated as individual ASCII characters, rather than a single
-   *       delimiting string.
-   *    2. Empty tokens are ignored.
-   *
-   * \param input string to split into tokens
-   * \param delimiters one or more ASCII characters to use as token separators
-   * \return a vector of non-empty tokens.
-   *
-   */
-  static std::vector<std::string> Tokenize(const std::string& input, const std::string& delimiters);
-
-  /*!
-   *  \brief Splits a string using one or more delimiting ASCII characters,
-   *  ignoring empty tokens.
-   *
-   *  Instead of returning the tokens as a return value, they are returned via the first
-   *  argument, 'tokens'.
-   *
-   * \param tokens Vector that found, non-empty tokens are returned by
-   * \param input string to split into tokens
-   * \param delimiters one or more ASCII characters to use as token separators
-   *
-   */
-  static void Tokenize(const std::string& input, std::vector<std::string>& tokens, const std::string& delimiters);
-
-  /*!
-   * \brief Splits a string into tokens delimited by a single ASCII character.
-   *
-   * \param input string to split into tokens
-   * \param delimiter an ASCII character to use as a token separator
-   * \return a vector of non-empty tokens.
-   *
-   */
-  static std::vector<std::string> Tokenize(const std::string& input, const char delimiter);
-
-  /*!
-   * \brief Splits a string into tokens delimited by a single ASCII character.
-   *
-   * \param tokens Vector that found, non-empty tokens are returned by
-   * \param input string to split into tokens
-   * \param delimiter an ASCII character to use as a token separator
-   *
-   */
-  static void Tokenize(const std::string& input, std::vector<std::string>& tokens, const char delimiter);
-
-
-  static uint64_t ToUint64(const std::string& str, uint64_t fallback) noexcept;
-
-  /*!
-   * \brief Formats a file-size into human a human-friendly form
-   * Returns bytes in a human readable format using the smallest unit that will fit `bytes` in at
-   * most three digits. The number of decimals are adjusted with significance such that 'small'
-   * numbers will have more decimals than larger ones.
-   *
-   * For example: 1024 bytes will be formatted as "1.00kB", 10240 bytes as "10.0kB" and
-   * 102400 bytes as "100kB". See TestUnicodeUtils for more examples.
-   */
-  static std::string FormatFileSize(uint64_t bytes);
-
-  /*!
-   * \brief Creates a std::string from a char*. A null pointer results in an empty string.
-   *
-   * \param cstr pointer to C null-terminated byte array
-   * \return the resulting std::string or ""
-   */
-  static std::string CreateFromCString(const char* cstr);
-
-private:
-  static int64_t AlphaNumericCompare_orig(const wchar_t *left, const wchar_t *right);
-#endif
 };
 
 struct sortstringbyname

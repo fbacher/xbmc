@@ -761,7 +761,7 @@ TEST(TestUnicodeUtils, Left_Advanced)
 
   origstr = std::string(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1); // 3 codepoints, 1 char
   refstr = "";
-  varstr = UnicodeUtils::Left(origstr, 0, true, getUSEnglishLocale());
+  varstr = UnicodeUtils::Left(origstr, 0, getUSEnglishLocale(), true);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   // Interesting case. All five VARIENTs can be normalized
@@ -769,19 +769,19 @@ TEST(TestUnicodeUtils, Left_Advanced)
 
   origstr = std::string(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
   refstr = std::string(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_5); // 2 codepoints, 1 char
-  varstr = UnicodeUtils::Left(origstr, 2, true, getUSEnglishLocale());
+  varstr = UnicodeUtils::Left(origstr, 2, getUSEnglishLocale());
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   origstr = std::string(TestUnicodeUtils::UTF8_GERMAN_SAMPLE); // u"óóßChloë"
   refstr = "óó";
-  varstr = UnicodeUtils::Left(origstr, 2, true, getUSEnglishLocale());
+  varstr = UnicodeUtils::Left(origstr, 2, getUSEnglishLocale(), true);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   // Get leftmost substring removing n characters from end of string
 
   origstr = std::string(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
   refstr = std::string("");
-  varstr = UnicodeUtils::Left(origstr, 1, false, getUSEnglishLocale());
+  varstr = UnicodeUtils::Left(origstr, 1, getUSEnglishLocale(), false);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   // Interesting case. All five VARIENTs can be normalized
@@ -789,17 +789,17 @@ TEST(TestUnicodeUtils, Left_Advanced)
 
   origstr = std::string(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
   refstr = std::string("");
-  varstr = UnicodeUtils::Left(origstr, 2, false, getUSEnglishLocale());
+  varstr = UnicodeUtils::Left(origstr, 2, getUSEnglishLocale(), false);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   origstr = std::string(TestUnicodeUtils::UTF8_MULTI_CODEPOINT_CHAR1_VARIENT_1);
   refstr = "";
-  varstr = UnicodeUtils::Left(origstr, 5, false, getUSEnglishLocale());
+  varstr = UnicodeUtils::Left(origstr, 5, getUSEnglishLocale(), false);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   origstr = std::string(TestUnicodeUtils::UTF8_GERMAN_SAMPLE); // u"óóßChloë"
   refstr = "óóßChl";
-  varstr = UnicodeUtils::Left(origstr, 2, false, getUSEnglishLocale());
+  varstr = UnicodeUtils::Left(origstr, 2, getUSEnglishLocale(), false);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   // TODO: Add test to ensure count works properly for multi-codepoint characters
@@ -855,6 +855,7 @@ TEST(TestUnicodeUtils, Mid)
 
 TEST(TestUnicodeUtils, Right)
 {
+  // TODO: Create Right_Advanced test
   std::string refstr;
   std::string varstr;
   std::string origstr = "Test";
@@ -1282,6 +1283,116 @@ TEST(TestUnicodeUtils, Split)
   EXPECT_STREQ("", varresults.at(5).c_str());
   EXPECT_STREQ("n", varresults.at(6).c_str());
 
+  varresults = UnicodeUtils::Split(",a,b,cd,", ",");
+  EXPECT_STREQ("", varresults.at(0).c_str());
+  EXPECT_STREQ("a", varresults.at(1).c_str());
+  EXPECT_STREQ("b", varresults.at(2).c_str());
+  EXPECT_STREQ("cd", varresults.at(3).c_str());
+  EXPECT_STREQ("", varresults.at(4).c_str());
+
+  std::vector<std::string> expectedResult;
+  varresults = UnicodeUtils::Split(",a,,aa,,", ",");
+  expectedResult =
+  { "", "a", "", "aa", "", "" };
+  size_t idx = 0;
+  EXPECT_EQ(expectedResult.size(), varresults.size());
+
+  for (auto i : expectedResult)
+  {
+    if (idx >= 0)
+    {
+      EXPECT_STREQ(i.c_str(), varresults.at(idx).c_str());
+      idx++;
+    }
+  }
+
+  varresults = UnicodeUtils::Split(",a,,,aa,,,", ",");
+  expectedResult =
+  { "", "a", "", "", "aa", "", "", "" };
+  EXPECT_EQ(expectedResult.size(), varresults.size());
+  idx = 0;
+  for (auto i : expectedResult)
+  {
+    if (idx >= 0)
+    {
+      EXPECT_STREQ(i.c_str(), varresults.at(idx).c_str());
+      idx++;
+    }
+  }
+
+  varresults = UnicodeUtils::Split(",-+a,,--++aa,,-+",
+  { ",", "-", "+" });
+  expectedResult =
+  { "", "", "", "a", "", "", "", "", "", "aa", "", "", "", "" };
+  EXPECT_EQ(expectedResult.size(), varresults.size());
+  idx = 0;
+  for (auto i : expectedResult)
+  {
+    if (idx >= 0)
+    {
+      EXPECT_STREQ(i.c_str(), varresults.at(idx).c_str());
+      idx++;
+    }
+  }
+  varresults = UnicodeUtils::Split(",-+a,,--++aa,,-+",
+  { "-", "+", "," });
+  expectedResult =
+  { "", "", "", "a", "", "", "", "", "", "aa", "", "", "", "" };
+  EXPECT_EQ(expectedResult.size(), varresults.size());
+  idx = 0;
+  for (auto i : expectedResult)
+  {
+    if (idx >= 0)
+    {
+      EXPECT_STREQ(i.c_str(), varresults.at(idx).c_str());
+      idx++;
+    }
+  }
+  varresults = UnicodeUtils::Split(",-+a,,--++aa,,-+",
+  { "+", ",", "-" });
+  expectedResult =
+  { "", "", "", "a", "", "", "", "", "", "aa", "", "", "", "" };
+  EXPECT_EQ(expectedResult.size(), varresults.size());
+  idx = 0;
+  for (auto i : expectedResult)
+  {
+    if (idx >= 0)
+    {
+      EXPECT_STREQ(i.c_str(), varresults.at(idx).c_str());
+      idx++;
+    }
+  }
+  // This result looks incorrect, but verified against Matrix 19.4 behavior
+  varresults = UnicodeUtils::Split("a,,,a,,,,,,aa,,,a",
+    { ",", "-", "+" });
+    expectedResult =
+    { "a", "", "", "a", "", "", "", "", "", "aa", "", "", "a" };
+    EXPECT_EQ(expectedResult.size(), varresults.size());
+    idx = 0;
+    for (auto i : expectedResult)
+    {
+      if (idx >= 0)
+      {
+        EXPECT_STREQ(i.c_str(), varresults.at(idx).c_str());
+        idx++;
+      }
+    }
+
+  varresults = UnicodeUtils::Split("a,-+a,,--++aa,-+a",
+  { ",", "-", "+" });
+  expectedResult =
+    { "a", "", "", "a", "", "", "", "", "", "aa", "", "", "a" };
+  EXPECT_EQ(expectedResult.size(), varresults.size());
+  idx = 0;
+  for (auto i : expectedResult)
+  {
+    if (idx >= 0)
+    {
+      EXPECT_STREQ(i.c_str(), varresults.at(idx).c_str());
+      idx++;
+    }
+  }
+
   EXPECT_TRUE(UnicodeUtils::Split("", "|").empty());
 
   EXPECT_EQ(4U, UnicodeUtils::Split("a bc  d ef ghi ", " ", 4).size());
@@ -1317,6 +1428,211 @@ TEST(TestUnicodeUtils, Split)
 
   EXPECT_EQ(1U, UnicodeUtils::Split("a bc  d ef ghi ", "").size());
   EXPECT_STREQ("a bc  d ef ghi ", UnicodeUtils::Split("a bc  d ef ghi ", 'z').at(0).c_str());
+
+  std::string input;
+  std::vector<std::string> delimiters;
+  std::vector<std::string> result;
+  input = "a/b#c/d/e/foo/g::h/"; // "#p/q/r:s/x&extraNarfy"};
+  delimiters = {"/", "#", ":", "Narf"};
+  expectedResult = {"a", "b", "c", "d", "e", "foo", "g", "", "h", ""}; // , "", "p", "q", "r", "s",
+                    // "x&extra", "y"};
+  result.clear();
+  Unicode::SplitTo(std::back_inserter(result), input, delimiters, 0);
+
+  EXPECT_EQ(expectedResult.size(), result.size());
+   idx = 0;
+   for (auto i : expectedResult)
+   {
+     if (idx < result.size())
+     {
+       EXPECT_STREQ(i.c_str(), result.at(idx).c_str());
+       idx++;
+     }
+   }
+
+  input = {"a/b#c/d/e/foo/g::h/", "#p/q/r:s/x&extraNarfy"};
+  delimiters = {"/", "#", ":", "Narf"};
+  expectedResult = {"a", "b#c", "d", "e", "foo", "/g::h/", "p", "q", "/r:s/x&extraNarfy"};
+
+}
+
+TEST(TestUnicodeUtils, SplitMulti)
+{
+  /*
+  * Delimiter strings are applied in order, so once the iMaxStrings
+  * items is produced no other delimiters are applied. This produces different results
+  * than applying all delimiters at once e.g. "a/b#c/d" becomes "a", "b#c", "d" rather
+  * than "a", "b", "c/d"
+  *
+  * \param input vector of strings each to be split
+  * \param delimiters strings to be used to split the input strings
+  * \param iMaxStrings (optional) Maximum number of resulting split strings
+  *
+  * TODO: Need Testcase!
+  *
+  * static std::vector<std::string> SplitMulti(const std::vector<std::string>& input,
+  *                                           const std::vector<std::string>& delimiters,
+  *                                           size_t iMaxStrings = 0);
+  */
+  size_t idx;
+  std::vector<std::string> expectedResult;
+  std::vector<std::string> input;
+  std::vector<std::string> delimiters;
+  std::vector<std::string> result;
+
+  input.push_back(",h,ij,k,lm,,n,");
+  delimiters.push_back(",");
+  result = UnicodeUtils::SplitMulti(input, delimiters);
+  EXPECT_STREQ("", result.at(0).c_str());
+  EXPECT_STREQ("h", result.at(1).c_str());
+  EXPECT_STREQ("ij", result.at(2).c_str());
+  EXPECT_STREQ("k", result.at(3).c_str());
+  EXPECT_STREQ("lm", result.at(4).c_str());
+  EXPECT_STREQ("", result.at(5).c_str());
+  EXPECT_STREQ("n", result.at(6).c_str());
+  EXPECT_STREQ("", result.at(7).c_str());
+
+  input.clear();
+  delimiters.clear();
+  input.push_back("abcde");
+  input.push_back("Where is the beef?");
+  input.push_back("cbcefa");
+  delimiters.push_back("a");
+  delimiters.push_back("bc");
+  delimiters.push_back("ef");
+  delimiters.push_back("c");
+  result = UnicodeUtils::Split("abcde", delimiters);
+  result = UnicodeUtils::Split("Where is the beef?", delimiters);
+  result = UnicodeUtils::Split("cbcefa", delimiters);
+   result = UnicodeUtils::Split("aaaa", "a");
+  result = UnicodeUtils::SplitMulti(input, delimiters);
+  // Matrix 4 result = {"de", "Where is the be", "?", "", ""}
+  // Convert "bc" to "a"
+  // "abcde" => "aade"
+  // "Where is the beef?" => "Where is the beef?"
+  // "cbcefa" => "caefa"
+  //
+  // Convert "ef" to "a"
+  // "aade" => "aade"
+  // "Where is the beef?" => "Where is the bea?"
+  // "caefa" => "caaa"
+  //
+  // Convert "c" to "a"
+  // "aade" => "aade"
+  // "Where is the bea?" => "Where is the bea?"
+  // "caaa" => "aaaa"
+
+  // Finally, Split on a
+  // "aade" => {"", "", "de"} // 1 null because delim at beginning of line, 2nd null because no non-delim before it
+  // "Where is the bea?" => {"Where is the be", "?"}
+  // "aaaa" => {"", "", "", ""}
+
+  std::vector<std::string> expectedResult1;
+  std::vector<std::string> expectedResult2;
+  std::vector<std::string> expectedResult3;
+
+  expectedResult1 = {"", "", "de"};
+  expectedResult2 = {"Where is the be", "?"};
+  expectedResult3 = {"", "", "", "", "", ""};  // Matrix 4
+  expectedResult = std::vector<std::string>(expectedResult1);
+  expectedResult.insert(expectedResult.end(), expectedResult2.begin(), expectedResult2.end());
+  expectedResult.insert(expectedResult.end(), expectedResult3.begin(), expectedResult3.end());
+
+  expectedResult = {"de", "Where is the be", "?"};
+
+  result = UnicodeUtils::SplitMulti(input, delimiters);
+
+    EXPECT_EQ(expectedResult.size(), result.size());
+    idx = 0;
+    for (auto i : expectedResult)
+    {
+      if (idx < result.size())
+      {
+        EXPECT_STREQ(i.c_str(), result.at(idx).c_str());
+        idx++;
+      }
+    }
+
+    // These two tests verify the example in UnicodeUtils documentation for
+    // SplitMulti.
+
+    input = {"a/b#c/d/e/foo/g::h/", "#p/q/r:s/x&extraNarfy"};
+    delimiters = {"/", "#", ":", "Narf"};
+    expectedResult = {"a", "b", "c", "d", "e", "foo", "g", "", "h", "", "", "p", "q", "r", "s",
+                      "x&extra", "y"};
+    expectedResult = {"a", "b", "c", "d", "e", "foo", "g", "h", "p", "q", "r", "s",
+                      "x&extra", "y"};
+    result = UnicodeUtils::SplitMultiOrig(input, delimiters, 0);
+    EXPECT_EQ(expectedResult.size(), result.size());
+     idx = 0;
+     for (auto i : expectedResult)
+     {
+       if (idx < result.size())
+       {
+         EXPECT_STREQ(i.c_str(), result.at(idx).c_str());
+         idx++;
+       }
+     }
+
+     result = UnicodeUtils::SplitMulti(input, delimiters, 0);
+        EXPECT_EQ(expectedResult.size(), result.size());
+         idx = 0;
+         for (auto i : expectedResult)
+         {
+           if (idx < result.size())
+           {
+             EXPECT_STREQ(i.c_str(), result.at(idx).c_str());
+             idx++;
+           }
+         }
+
+    input = {"a/b#c/d/e/foo/g::h/", "#p/q/r:s/x&extraNarfy"};
+    delimiters = {"/", "#", ":", "Narf"};
+    expectedResult = {"a", "b#c", "d", "e", "foo", "g::h/", "#p/q/r:s/x&extraNarfy"};
+    result = UnicodeUtils::SplitMultiOrig(input, delimiters, 7);
+    EXPECT_EQ(expectedResult.size(), result.size());
+     idx = 0;
+     for (auto i : expectedResult)
+     {
+       if (idx < result.size())
+       {
+         EXPECT_STREQ(i.c_str(), result.at(idx).c_str());
+         idx++;
+       }
+     }
+
+     // expectedResult = {"a", "b", "c", "d", "e", "foo/g//h/", "#p/q/r:s/x&extraNarfy"};
+     result = UnicodeUtils::SplitMulti(input, delimiters, 7);
+        EXPECT_EQ(expectedResult.size(), result.size());
+         idx = 0;
+         for (auto i : expectedResult)
+         {
+           if (idx < result.size())
+           {
+             EXPECT_STREQ(i.c_str(), result.at(idx).c_str());
+             idx++;
+           }
+         }
+
+  input = {" a,b-e e-f,c d-", "-sworn enemy, is not here"};
+   delimiters = {",", " ", "-"};
+   // The following has a minor bug and is present in Matrix 19.4. Should not return null strings
+
+   // expectedResult =  {"a", "b", "e", "e", "f", "c", "d", "", "", "sworn", "enemy", "is", "not", "here"};
+   expectedResult =  {"a", "b", "e", "e", "f", "c", "d", "sworn", "enemy", "is", "not", "here"};
+
+   result = UnicodeUtils::SplitMulti(input, delimiters);
+
+   EXPECT_EQ(expectedResult.size(), result.size());
+   idx = 0;
+   for (auto i : expectedResult)
+   {
+     if (idx < result.size())
+     {
+       EXPECT_STREQ(i.c_str(), result.at(idx).c_str());
+       idx++;
+     }
+   }
 }
 
 TEST(TestUnicodeUtils, FindNumber)
@@ -1384,19 +1700,6 @@ TEST(TestUnicodeUtils, RemoveCRLF)
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
 
-#if defined(STRINGUTILS_UNICODE_ENABLE)
-
-TEST(TestUnicodeUtils, utf8_strlen)
-{
-  size_t ref;
-  size_t var;
-
-  ref = 9;
-  var = UnicodeUtils::utf8_strlen("ｔｅｓｔ＿ＵＴＦ８");
-  EXPECT_EQ(ref, var);
-}
-#endif
-
 TEST(TestUnicodeUtils, SecondsToTimeString)
 {
   std::string refstr;
@@ -1406,61 +1709,6 @@ TEST(TestUnicodeUtils, SecondsToTimeString)
   varstr = UnicodeUtils::SecondsToTimeString(77455);
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
-#ifdef UNICODE_STRING_DISABLE
-
-TEST(TestUnicodeUtils, IsNaturalNumber)
-{
-  EXPECT_TRUE(UnicodeUtils::IsNaturalNumber("10"));
-  EXPECT_TRUE(UnicodeUtils::IsNaturalNumber(" 10"));
-  EXPECT_TRUE(UnicodeUtils::IsNaturalNumber("0"));
-  EXPECT_FALSE(UnicodeUtils::IsNaturalNumber(" 1 0"));
-  EXPECT_FALSE(UnicodeUtils::IsNaturalNumber("1.0"));
-  EXPECT_FALSE(UnicodeUtils::IsNaturalNumber("1.1"));
-  EXPECT_FALSE(UnicodeUtils::IsNaturalNumber("0x1"));
-  EXPECT_FALSE(UnicodeUtils::IsNaturalNumber("blah"));
-  EXPECT_FALSE(UnicodeUtils::IsNaturalNumber("120 h"));
-  EXPECT_FALSE(UnicodeUtils::IsNaturalNumber(" "));
-  EXPECT_FALSE(UnicodeUtils::IsNaturalNumber(""));
-}
-
-TEST(TestUnicodeUtils, IsInteger)
-{
-  EXPECT_TRUE(UnicodeUtils::IsInteger("10"));
-  EXPECT_TRUE(UnicodeUtils::IsInteger(" -10"));
-  EXPECT_TRUE(UnicodeUtils::IsInteger("0"));
-  EXPECT_FALSE(UnicodeUtils::IsInteger(" 1 0"));
-  EXPECT_FALSE(UnicodeUtils::IsInteger("1.0"));
-  EXPECT_FALSE(UnicodeUtils::IsInteger("1.1"));
-  EXPECT_FALSE(UnicodeUtils::IsInteger("0x1"));
-  EXPECT_FALSE(UnicodeUtils::IsInteger("blah"));
-  EXPECT_FALSE(UnicodeUtils::IsInteger("120 h"));
-  EXPECT_FALSE(UnicodeUtils::IsInteger(" "));
-  EXPECT_FALSE(UnicodeUtils::IsInteger(""));
-}
-#endif
-
-#ifdef UNICODE_STRING_DISABLE
-TEST(TestUnicodeUtils, SizeToString)
-{
-  std::string ref;
-  std::string var;
-
-  ref = "2.00 GB";
-  var = UnicodeUtils::SizeToString(2147483647);
-  EXPECT_STREQ(ref.c_str(), var.c_str());
-
-  ref = "0.00 B";
-  var = UnicodeUtils::SizeToString(0);
-  EXPECT_STREQ(ref.c_str(), var.c_str());
-}
-#endif
-
-#ifdef UNICODE_STRING_DISABLE
-TEST(TestUnicodeUtils, EmptyString)
-{
-  EXPECT_STREQ("", UnicodeUtils::Empty.c_str());
-}
-#endif
 
 TEST(TestUnicodeUtils, FindWord)
 {
@@ -1511,19 +1759,6 @@ TEST(TestUnicodeUtils, FindWord_NonAscii)
   var = UnicodeUtils::FindWord("abcçdefgğh ıİi jklmnoöprsştuüvyz", "ıiİ jklmnoöprsştuüvyz");
 }
 
-#ifdef UNICODE_STRING_DISABLE
-
-TEST(TestUnicodeUtils, FindEndBracket)
-{
-  int ref;
-  int var;
-
-  ref = 11;
-  var = UnicodeUtils::FindEndBracket("atest testbb test", 'a', 'b');
-  EXPECT_EQ(ref, var);
-}
-#endif
-
 TEST(TestUnicodeUtils, DateStringToYYYYMMDD)
 {
   int ref;
@@ -1545,102 +1780,6 @@ TEST(TestUnicodeUtils, WordToDigits)
   EXPECT_STREQ(ref.c_str(), var.c_str());
 }
 
-#if defined(STRINGUTILS_UNICODE_ENABLE)
-
-TEST(TestUnicodeUtils, CreateUUID)
-{
-  std::cout << "CreateUUID(): " << UnicodeUtils::CreateUUID() << std::endl;
-}
-
-TEST(TestUnicodeUtils, ValidateUUID)
-{
-  EXPECT_TRUE(UnicodeUtils::ValidateUUID(UnicodeUtils::CreateUUID()));
-}
-
-TEST(TestUnicodeUtils, CompareFuzzy)
-{
-  double ref;
-  double var;
-
-  ref = 6.25;
-  var = UnicodeUtils::CompareFuzzy("test string", "string test");
-  EXPECT_EQ(ref, var);
-}
-
-TEST(TestUnicodeUtils, FindBestMatch)
-{
-  double refdouble;
-  double vardouble;
-  int refint;
-  int varint;
-  std::vector<std::string> strarray;
-
-  refint = 3;
-  refdouble = 0.5625;
-  strarray.emplace_back("");
-  strarray.emplace_back("a");
-  strarray.emplace_back("e");
-  strarray.emplace_back("es");
-  strarray.emplace_back("t");
-  varint = UnicodeUtils::FindBestMatch("test", strarray, vardouble);
-  EXPECT_EQ(refint, varint);
-  EXPECT_EQ(refdouble, vardouble);
-}
-
-TEST(TestUnicodeUtils, Paramify)
-{
-  const char* input = "some, very \\ odd \"string\"";
-  const char* ref = "\"some, very \\\\ odd \\\"string\\\"\"";
-
-  std::string result = UnicodeUtils::Paramify(input);
-  EXPECT_STREQ(ref, result.c_str());
-}
-#endif
-
-#if defined(STRINGUTILS_UNICODE_ENABLE)
-
-TEST(TestUnicodeUtils, Tokenize)
-{
-  // \brief Split a string by the specified delimiters.
-
-  //Splits a string using one or more delimiting characters, ignoring empty tokens.
-  //Differs from Split() in two ways:
-  //  1. The delimiters are treated as individual characters, rather than a single delimiting string.
-  //  2. Empty tokens are ignored.
-  // \return a vector of tokens
-
-  std::vector<std::string> result;
-
-  std::string input = "All good men:should not die!";
-  std::string delimiters = "";
-  result = UnicodeUtils::Tokenize(input, delimiters);
-  EXPECT_EQ(1, result.size());
-  EXPECT_STREQ("All good men:should not die!", result[0].c_str());
-
-  delimiters = " :!";
-  result = UnicodeUtils::Tokenize(input, delimiters);
-  EXPECT_EQ(result.size(), 6);
-
-  EXPECT_STREQ("All", result[0].c_str());
-  EXPECT_STREQ("good", result[1].data());
-  EXPECT_STREQ("men", result[2].data());
-  EXPECT_STREQ("should", result[3].data());
-  EXPECT_STREQ("not", result[4].data());
-  EXPECT_STREQ("die", result[5].data());
-
-  input = ":! All good men:should not die! :";
-  result = UnicodeUtils::Tokenize(input, delimiters);
-  EXPECT_EQ(result.size(), 6);
-
-  EXPECT_STREQ("All", result[0].c_str());
-  EXPECT_STREQ("good", result[1].data());
-  EXPECT_STREQ("men", result[2].data());
-  EXPECT_STREQ("should", result[3].data());
-  EXPECT_STREQ("not", result[4].data());
-  EXPECT_STREQ("die", result[5].data());
-}
-#endif
-
 TEST(TestUnicodeUtils, sortstringbyname)
 {
   std::vector<std::string> strarray;
@@ -1653,21 +1792,3 @@ TEST(TestUnicodeUtils, sortstringbyname)
   EXPECT_STREQ("B", strarray[1].c_str());
   EXPECT_STREQ("c", strarray[2].c_str());
 }
-
-#if defined(STRINGUTILS_UNICODE_ENABLE)
-
-TEST(TestUnicodeUtils, ToHexadecimal)
-{
-  EXPECT_STREQ("", UnicodeUtils::ToHexadecimal("").c_str());
-  EXPECT_STREQ("616263", UnicodeUtils::ToHexadecimal("abc").c_str());
-  std::string a
-  { "a\0b\n", 4 };
-  EXPECT_STREQ("6100620a", UnicodeUtils::ToHexadecimal(a).c_str());
-  std::string nul
-  { "\0", 1 };
-  EXPECT_STREQ("00", UnicodeUtils::ToHexadecimal(nul).c_str());
-  std::string ff
-  { "\xFF", 1 };
-  EXPECT_STREQ("ff", UnicodeUtils::ToHexadecimal(ff).c_str());
-}
-#endif

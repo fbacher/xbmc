@@ -455,6 +455,8 @@ public:
 
   static bool InitializeCollator(icu::Locale icuLocale, bool Normalize = false);
 
+  static void SortCompleted(int sortItems);
+
   static int32_t Collate(const std::wstring &left, const std::wstring &right);
 
   static int StrCaseCmp(const std::wstring &s1, const std::wstring &s2,
@@ -489,15 +491,15 @@ public:
    * parameters are based on characters and NOT bytes.
    *
    * \param str to get a substring of
-   * \param charCount if leftReference: charCount is number of characters to
+   * \param charCount if keepLeft: charCount is number of characters to
    *                  copy from left end (limited by str length)
-   *                  if ! leftReference: number of characters to omit from right end
-   * \param leftReference controls how charCount is interpreted
+   *                  if ! keepLeft: number of characters to omit from right end
+   * \param keepLeft controls how charCount is interpreted
    * \return leftmost characters of string, length determined by charCount
    *
    */
-  static std::string Left(const std::string &str, const size_t charCount, const bool leftReference,
-      const icu::Locale icuLocale);
+  static std::string Left(const std::string &str, const size_t charCount,
+      const icu::Locale icuLocale, const bool keepLeft = true);
 
   /*!
    *  \brief Get a substring of a UTF-8 string
@@ -524,10 +526,10 @@ public:
    * will not.
    *
    * \param str to get a substring of
-   * \param charCount if rightReference: charCount is number of characters to
+   * \param charCount if keepRight: charCount is number of characters to
    *                  copy from right end (limited by str length)
-   *                  if ! rightReference: number of characters to omit from left end
-   * \param getEndIndex controls how charCount is interpreted
+   *                  if ! keepRight: number of characters to omit from left end
+   * \param keepRight controls how charCount is interpreted
    * \param icuLocale determines how character breaks are made
    * \return rightmost characters of string, length determined by charCount
    *
@@ -535,8 +537,8 @@ public:
    *
    * std::string x = Right(str, 2, false, Unicode::GetDefaultICULocale());
    */
-  static std::string Right(const std::string &str, const size_t charCount, bool getEndIndex,
-      const icu::Locale &icuLocale);
+  static std::string Right(const std::string &str, const size_t charCount,
+      const icu::Locale &icuLocale, bool keepRight = true);
 
   /*!
    * \brief Gets the byte-offset of a Unicode character relative to a reference
@@ -562,18 +564,20 @@ public:
                                  const bool left, const bool getBeginIndex, icu::Locale icuLocale);
 
   /*!
-   * \brief return a substring of a string
    *
-   * \param str string to extract substring from
-   * \param firstCharIndex character of substring [0 based]
-   *                  if > 0 then index measured from beginning of string
-   *                  if < 0 then index measured from end of string
-   * \param charCount if > 0 maximum number of characters to keep left end
-   *                  if < 0 number of characters to remove from right end
-   * \return substring of str, beginning with character 'first', length determined by charCount
-   * /
-   static const std::string substr(const std::string &str, int32_t startCharIndex,
-   int32_t numChars);
+   * Removes leading and trailing whitespace: [\t\n\f\r\p{Z}] where \p{Z} means characters with the
+   * property Z. Full list is:
+   * 0009..000D    ; White_Space # Cc   [5] <control-0009>..<control-000D>
+   * 0020          ; White_Space # Zs       SPACE
+   * 0085          ; White_Space # Cc       <control-0085>
+   * 00A0          ; White_Space # Zs       NO-BREAK SPACE
+   * 1680          ; White_Space # Zs       OGHAM SPACE MARK
+   * 2000..200A    ; White_Space # Zs  [11] EN QUAD..HAIR SPACE
+   * 2028          ; White_Space # Zl       LINE SEPARATOR
+   * 2029          ; White_Space # Zp       PARAGRAPH SEPARATOR
+   * 202F          ; White_Space # Zs       NARROW NO-BREAK SPACE
+   * 205F          ; White_Space # Zs       MEDIUM MATHEMATICAL SPACE
+   * 3000          ; White_Space # Zs       IDEOGRAPHIC SPACE
    */
   static std::string Trim(const std::string &str);
   static std::string TrimLeft(const std::string &str);
@@ -586,8 +590,7 @@ public:
       const bool trimEnd);
 
   static std::vector<std::string> SplitMulti(const std::vector<std::string> &input,
-      const std::vector<std::string> &delimiters, const size_t iMaxStrings, const int flags =
-          to_underlying(RegexpFlag::UREGEX_LITERAL));
+      const std::vector<std::string> &delimiters, size_t iMaxStrings = 0);
 
   static std::tuple<std::string, int> FindCountAndReplace(const std::string &src, const std::string &oldText,
       const std::string &newText);
@@ -598,12 +601,12 @@ public:
   static size_t FindWord(const std::string &str, const std::string &word);
   /*
    * Replaces every occurrence of oldText with newText within the string.
-   * Does not return account. Should be more efficient than
+   * Should be more efficient than
    * FindCountAndReplace.
    *
    */
 
-  static std::string& FindAndReplace(std::string &str, const std::string oldText,
+  static std::string FindAndReplace(const std::string &str, const std::string oldText,
       const std::string newText);
 
   /**
@@ -658,56 +661,51 @@ public:
    \param d_first the beginning of the destination range
    \param input Input string to be split
    \param delimiter Delimiter to be used to split the input string
-   \param iMaxStrings (optional) Maximum number of splitted strings. 0 means infinite
+   \param iMaxStrings (optional) Maximum number of split strings. 0 means infinite
    \return output iterator to the element in the destination range, one past the last element
    *       that was put there
    */
-
   template<typename OutputIt>
-  static OutputIt SplitTo(OutputIt d_first, const std::string &input, const char delimiter,
-      size_t iMaxStrings)
+  static OutputIt SplitTo(OutputIt d_first, const std::string &input, const char delimiter, size_t iMaxStrings /*= 0*/)
   {
     return SplitTo(d_first, input, std::string(1, delimiter), iMaxStrings);
   }
+
   template<typename OutputIt>
   static OutputIt SplitTo(OutputIt d_first, const std::string &input,
-      const std::vector<std::string> &delimiters)
+      const std::vector<std::string> &delimiters, size_t iMaxStrings /* = 0 */)
   {
+    // TODO: Verify why this can not be done with plain string.
 
     OutputIt dest = d_first;
-
-    if (input.empty())
+    if (input.empty()) // Return nothing, not even empty string.
       return dest;
 
     if (delimiters.empty())
     {
-      *d_first++ = input;
+      *dest++ = input;
       return dest;
     }
-    icu::UnicodeString uInput = toUnicodeString(input);
-    icu::UnicodeString uDelimiter = toUnicodeString(delimiters[0]);
+    icu::UnicodeString uInput = ToUnicodeString(input);
+    icu::UnicodeString uDelimiter = ToUnicodeString(delimiters[0]);
 
     // First, transform every occurrence of delimiters in the string with the first delimiter
     /// Then, split using the first delimiter.
 
     for (size_t di = 1; di < delimiters.size(); di++)
     {
-      icu::UnicodeString uNextDelimiter = toUnicodeString(delimiters[di]);
+      icu::UnicodeString uNextDelimiter = ToUnicodeString(delimiters[di]);
       uInput.findAndReplace(uNextDelimiter, uDelimiter);
     }
 
-    if (uInput.isEmpty())
-    {
-      *d_first++ = input;
-      return dest;
-    }
-
     std::vector<icu::UnicodeString> uDest = std::vector<icu::UnicodeString>();
-    Unicode::SplitTo(std::back_inserter(uDest), uInput, uDelimiter);
+    constexpr bool omitEmptyStrings = false;
+    Unicode::SplitTo(std::back_inserter(uDest), uInput, uDelimiter, iMaxStrings, omitEmptyStrings);
 
+    std::string tempStr = std::string();
     for (size_t i = 0; i < uDest.size(); i++)
     {
-      std::string tempStr = std::string();
+      tempStr.clear();
       tempStr = uDest[i].toUTF8String(tempStr);
       *d_first++ = tempStr;
     }
@@ -721,13 +719,13 @@ public:
    \param d_first the beginning of the destination range
    \param input Input string to be split
    \param delimiter Delimiter to be used to split the input string
-   \param iMaxStrings (optional) Maximum number of splitted strings. 0 means infinite
+   \param iMaxStrings (optional) Maximum number of split strings. 0 means infinite
    \return output iterator to the element in the destination range, one past the last element
    *       that was put there
    */
   template<typename OutputIt>
   static OutputIt SplitTo(OutputIt d_first, const std::string &input, const std::string &delimiter,
-      unsigned int iMaxStrings = 0, int flags = to_underlying(RegexpFlag::UREGEX_LITERAL))
+      size_t iMaxStrings = 0)
   {
     // This is regex based. A simpler, faster one can be derived from unistr.h using u_strFindFirst and friends
 
@@ -741,11 +739,12 @@ public:
       return dest;
     }
 
-    icu::UnicodeString uInput = toUnicodeString(input);
-    icu::UnicodeString uDelimiter = toUnicodeString(delimiter);
+    icu::UnicodeString uInput = ToUnicodeString(input);
+    icu::UnicodeString uDelimiter = ToUnicodeString(delimiter);
     std::vector<icu::UnicodeString> uResult = std::vector<icu::UnicodeString>();
 
-    Unicode::SplitTo(std::back_inserter(uResult), uInput, uDelimiter, iMaxStrings, flags);
+    bool omitEmptyStrings = false;
+    Unicode::SplitTo(std::back_inserter(uResult), uInput, uDelimiter, iMaxStrings, omitEmptyStrings);
 
     // Convert back to utf-8
     // std::cout << "Unicode.SplitTo input: " << input << " delim: " << delimiter
@@ -775,7 +774,7 @@ public:
 private:
   static bool doneOnce;
 
-  static bool isLatinChar(UChar32 codepoint);
+  static bool IsLatinChar(UChar32 codepoint);
 
   /**
    * Calculates a 'reasonable' buffer size to give some room for growth in a utf-8
@@ -790,7 +789,7 @@ private:
    *
    */
 
-  static size_t getBasicUTF8BufferSize(size_t utf8_length, float scale);
+  static size_t GetBasicUTF8BufferSize(size_t utf8_length, float scale);
 
   /*!
    * \brief Calculates the maximum number of UChars (UTF-16) required by a wchar_t
@@ -801,7 +800,7 @@ private:
    * \return A size a bit larger than wchar_length, plus 200.
    */
 
-  static size_t getWcharToUCharBufferSize(size_t wchar_length, size_t scale);
+  static size_t GetWcharToUCharBufferSize(size_t wchar_length, size_t scale);
 
   /**
    * Calculates the maximum number of UChars (UTF-16) required by a UTF-8
@@ -816,7 +815,7 @@ private:
    * Note that a UTF-16 string will be at most as long as the UTF-8 string.
    */
 
-  static size_t getUCharBufferSize(size_t utf8_length, float scale);
+  static size_t GetUCharBufferSize(size_t utf8_length, float scale);
 
   /**
    * Calculates a reasonably sized UChar buffer based upon the size of existing
@@ -831,7 +830,7 @@ private:
    * Note that a UTF-16 string will be at most as long as the UTF-8 string.
    */
 
-  static size_t getUCharWorkingSize(size_t uchar_length, size_t scale);
+  static size_t GetUCharWorkingSize(size_t uchar_length, size_t scale);
 
   /**
    * Calculates the maximum number of UTF-8 bytes required by a UTF-16 string.
@@ -846,7 +845,7 @@ private:
    * room for the 'worst case' UTF-8  expansion required for Indic, Thai and CJK.
    */
 
-  static size_t getUTF8BufferSize(size_t uchar_length, size_t scale);
+  static size_t GetUTF8BufferSize(size_t uchar_length, size_t scale);
 
   /**
    * Calculates the maximum number of wchar_t code units required to
@@ -867,7 +866,7 @@ private:
    * Note that an additional 200 code units is added to the result to allow for growth
    *
    */
-  static size_t getWCharBufferSize(size_t uchar_length, size_t scale);
+  static size_t GetWCharBufferSize(size_t uchar_length, size_t scale);
 
   static UChar* StringToUChar(const std::string &src, UChar *buffer, size_t bufferSize,
       int32_t &destLength, const size_t src_offset = 0,
@@ -876,16 +875,16 @@ private:
   static UChar* StringToUChar(const char *src, UChar *buffer, size_t bufferSize,
       int32_t &destLength, const size_t length = std::string::npos);
 
-  static UChar* wchar_to_UChar(const wchar_t *src, UChar *buffer, size_t bufferSize,
+  static UChar* WcharToUChar(const wchar_t *src, UChar *buffer, size_t bufferSize,
       int32_t &destLength, const size_t length = std::string::npos);
 
   static std::string UCharToString(const UChar *u_str, char *buffer, size_t bufferSize,
       int32_t &destLength, const size_t u_str_length);
 
-  static wchar_t* UChar_to_wchar(const UChar *u_str, wchar_t *buffer, size_t bufferSize,
+  static wchar_t* UCharToWChar(const UChar *u_str, wchar_t *buffer, size_t bufferSize,
       int32_t &destLength, const size_t length = std::string::npos);
 
-  static icu::UnicodeString toUnicodeString(const std::wstring &wStr)
+  static icu::UnicodeString ToUnicodeString(const std::wstring &wStr)
   {
 #if U_SIZEOF_WCHAR_T==2
 			return icu::UnicodeString(wStr.data(), wStr.length());
@@ -894,12 +893,12 @@ private:
 #endif
   }
 
-  static icu::UnicodeString toUnicodeString(const std::string &src)
+  static icu::UnicodeString ToUnicodeString(const std::string &src)
   {
     return icu::UnicodeString::fromUTF8(src);
   }
 
-  static icu::UnicodeString toUnicodeString(const icu::StringPiece &src)
+  static icu::UnicodeString ToUnicodeString(const icu::StringPiece &src)
   {
     return icu::UnicodeString::fromUTF8(src);
   }
@@ -940,12 +939,13 @@ private:
 
   template<typename OutputIt>
   static OutputIt SplitTo(OutputIt d_first, const icu::UnicodeString &kInput,
-      const icu::UnicodeString &kDelimiter, unsigned int iMaxStrings = 0, const int flags =
-          to_underlying(RegexpFlag::UREGEX_LITERAL));
+      const icu::UnicodeString &kDelimiter, size_t iMaxStrings = 0, const bool omitEmptyStrings = false);
+
+  template<typename OutputIt>
+   static OutputIt SplitTo(OutputIt d_first, icu::UnicodeString uInput,
+       const std::vector<icu::UnicodeString> &uDelimiters,  size_t iMaxStrings = 0, const bool omitEmptyStrings = false);
 
   static std::vector<icu::UnicodeString> SplitMulti(const std::vector<icu::UnicodeString> &input,
-      const std::vector<icu::UnicodeString> &delimiters, size_t iMaxStrings = 0, const int flags =
-          to_underlying(RegexpFlag::UREGEX_LITERAL));
-
+      const std::vector<icu::UnicodeString> &delimiters, size_t iMaxStrings/* = 0 */);
 };
 
