@@ -959,93 +959,71 @@ public:
       *
       * This function is primarily used by Left, Right and Mid. See comment at end for details on use.
       *
+      *  Unicode characters may consist of multiple codepoints. This function's parameters
+      * are based on characters NOT bytes.
+      *
       * \param str UTF-8 string to get index from
-      * \param charCount character offset to find index for
-      * \param left + getBeginIndex define how character index is measured. See comment below
-      * \param getBeginIndex + left define how character index is measured. See comment below
+      * \param charCount number of characters from reference point to get byte index for
+      * \param left + keepLeft define how character index is measured. See comment below
+      * \param keepLeft + left define how character index is measured. See comment below
       * \param icuLocale fine-tunes character boundary rules
-      * \return code-unit index, relative to str (not the substr) for the given offset
-      *                   and character count
+      * \return code-unit index, relative to str for the given character count
       *                   std::string::npos is returned if charCount is outside of the string
       *
-      * left=true  getBeginIndex=true   Returns offset of last byte of nth character (0-n). Used by Left.
-      * left=true  getBeginIndex=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
-      * left=false getBeginIndex=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
-      * left=false getBeginIndex=false  Returns offset of first byte of nth char from right end (0-n). Used by Right(x)
+      * left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
+      * left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
+      * left=false keepLeft=true   Returns offset of first byte of (n-1)th character (0-n). Used by Right(x, false)
+      * left=false keepLeft=false  Returns offset of first byte of (n-1)th char from right end. Used by Right(x)
       */
     static size_t GetByteIndexForCharacter(const std::string &str, size_t charCount,
-        const bool left, const bool getBeginIndex, icu::Locale icuLocale);
+        const bool left, const bool keepLeft, icu::Locale icuLocale);
     /*!
       * \brief Gets the byte-offset of a Unicode character relative to a reference
       *
       * This function is primarily used by Left, Right and Mid. See comment at end for details on use.
       *
+      * Unicode characters may consist of multiple codepoints. This function's parameters
+      * are based on characters NOT bytes.
+      *
       * \param str UTF-8 string to get index from
-      * \param charCount character offset to find index for
-      * \param left + getBeginIndex define how character index is measured. See comment below
-      * \param getBeginIndex + left define how character index is measured. See comment below
+      * \param charCount number of characters from reference point to get byte index for
+      * \param left + keepLeft define how character index is measured. See comment below
+      * \param keepLeft + left define how character index is measured. See comment below
       * \param locale fine-tunes character boundary rules
-      * \return code-unit index, relative to str (not the substr) for the given offset
-      *                   and character count
+      * \return code-unit index, relative to str for the given character count
       *                   std::string::npos is returned if charCount is outside of the string
       *
-      * left=true  getBeginIndex=true   Returns offset of last byte of nth character (0-n). Used by Left.
-      * left=true  getBeginIndex=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
-      * left=false getBeginIndex=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
-      * left=false getBeginIndex=false  Returns offset of first byte of nth char from right end (0-n). Used by Right(x)
+      * left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
+      * left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
+      * left=false keepLeft=true   Returns offset of first byte of (n-1)th character (0-n). Used by Right(x, false)
+      * left=false keepLeft=false  Returns offset of first byte of (n-1)th char from right end. Used by Right(x)
       */
     static size_t GetByteIndexForCharacter(const std::string &str, size_t charCount,
-        const bool left, const bool getBeginIndex, std::locale locale);
+        const bool left, const bool keepLeft, std::locale locale);
 
     /*!
       * \brief Gets the byte-offset of a Unicode character relative to a reference
       *
       * This function is primarily used by Left, Right and Mid. See comment at end for details on use.
-      * The currently configured locale is used to tweak character boundaries
+      * The currently configured locale is used to tweak character boundaries.
+      *
+      * Unicode characters may consist of multiple codepoints. This function's parameters
+      * are based on characters NOT bytes.
       *
       * \param str UTF-8 string to get index from
-      * \param charCount character offset to find index for
-      * \param left + getBeginIndex define how character index is measured. See comment below
-      * \param getBeginIndex + left define how character index is measured. See comment below
-      * \return code-unit index, relative to str (not the substr) for the given offset
-      *                   and character count
+      * \param charCount number of characters from reference point to get byte index for
+      * \param left + keepLeft define how character index is measured. See comment below
+      * \param keepLeft + left define how character index is measured. See comment below
+      * \return code-unit index, relative to str for the given character count
       *                   std::string::npos is returned if charCount is outside of the string
       *
-      * left=true  getBeginIndex=true   Returns offset of last byte of nth character (0-n). Used by Left.
-      * left=true  getBeginIndex=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
-      * left=false getBeginIndex=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
-      * left=false getBeginIndex=false  Returns offset of first byte of nth char from right end (0-n). Used by Right(x)
+      * left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
+      * left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
+      * left=false keepLeft=true   Returns offset of first byte of (n-1)th character (0-n). Used by Right(x, false)
+      * left=false keepLeft=false  Returns offset of first byte of (n-1)th char from right end. Used by Right(x)
       */
-    /*!
-     * \brief Gets the byte-index of a Unicode character specified by character position.
-     *
-     * Unicode characters may consist of multiple codepoints. This function's parameters
-     * are based on characters NOT bytes.
-     *
-     * This signature uses the currently configured locale to tweak character boundaries
-     *
-     * \param str String to get index from
-     * \param charCount zero-based character index identifying the character of interest
-     * \param getBeginIndex  if true, then measure from the left end of the string
-     * \param left      if true, then start counting characters from the left end
-     *                  of str
-     *                  if false, then start counting characters from right end of str
-     *
-     * Examples:
-     *    str = "Where have all the flowers gone?" (32 chars)
-     *
-     *    GetByteIndexForCharacter(str, 0, true, getUSEnglishLocale()) => 0
-     *    GetByteIndexForCharacter(str, 0, false, getUSEnglishLocale()) => 31
-     *    GetByteIndexForCharacter(str, 5, true, getUSEnglishLocale()) => 5
-     *    GetByteIndexForCharacter(str, 5, false, getUSEnglishLocale()) => 26
-     *    GetByteIndexForCharacter(str, str.length()-1, false, getUSEnglishLocale()) => 0
-     *    GetByteIndexForCharacter(str, 0, false, getUSEnglishLocale()) => 31
-     *    GetByteIndexForCharacter(str, str.length(), true, getUSEnglishLocale()) => std::string::npos
-     *    GetByteIndexForCharacter(str, str.length(), false, getUSEnglishLocale()) => std::string::npos
-     *
-     */
     static size_t GetByteIndexForCharacter(const std::string &str, size_t charCount,
-        const bool left, const bool getBeginIndex);
+        const bool left, const bool keepLeft);
 
     /*!
      * \brief Get the rightmost side of a UTF-8 string, using character boundary
@@ -1421,10 +1399,6 @@ public:
    * TODO: Need Testcase!
    */
   static std::vector<std::string> SplitMulti(const std::vector<std::string>& input,
-                                             const std::vector<std::string>& delimiters,
-                                             size_t iMaxStrings = 0, bool omitEmptyStrings = false);
-
-  static std::vector<std::string> SplitMultiOrig(const std::vector<std::string>& input,
                                              const std::vector<std::string>& delimiters,
                                              size_t iMaxStrings = 0);
   /*! \brief Counts the occurrences of strFind in strInput

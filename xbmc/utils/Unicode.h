@@ -308,6 +308,10 @@ class Unicode
 {
 public:
 
+  static constexpr size_t BEFORE_START = std::string::npos - 1;
+  static constexpr size_t AFTER_END = std::string::npos - 2;
+  static constexpr size_t ERROR = std::string::npos;
+
   static std::wstring UTF8ToWString(const std::string &str);
   static std::string WStringToUTF8(const std::wstring &str);
   static icu::Locale GetDefaultICULocale();
@@ -498,7 +502,7 @@ public:
    * \return leftmost characters of string, length determined by charCount
    *
    */
-  static std::string Left(const std::string &str, const size_t charCount,
+  static std::string Left(const std::string &str, size_t charCount,
       const icu::Locale icuLocale, const bool keepLeft = true);
 
   /*!
@@ -513,8 +517,8 @@ public:
    * \return substring of str, beginning with character 'firstCharIndex',
    *         length determined by charCount
    */
-  static std::string Mid(const std::string &str, const size_t startCharIndex,
-      const size_t charCount = std::string::npos);
+  static std::string Mid(const std::string &str, size_t startCharIndex,
+      size_t charCount = std::string::npos);
 
   /*!
    * \brief Get the rightmost side of a UTF-8 string, using character boundary
@@ -537,31 +541,33 @@ public:
    *
    * std::string x = Right(str, 2, false, Unicode::GetDefaultICULocale());
    */
-  static std::string Right(const std::string &str, const size_t charCount,
+  static std::string Right(const std::string &str, size_t charCount,
       const icu::Locale &icuLocale, bool keepRight = true);
-
   /*!
    * \brief Gets the byte-offset of a Unicode character relative to a reference
    *
    * This function is primarily used by Left, Right and Mid. See comment at end for details on use.
+   * The currently configured locale is used to tweak character boundaries.
+   *
+   * Unicode characters may consist of multiple codepoints. This function's parameters
+   * are based on characters NOT bytes.
    *
    * \param str UTF-8 string to get index from
-   * \param charCount character offset to find index for
-   * \param left + getBeginIndex define how character index is measured. See comment below
-   * \param getBeginIndex + left define how character index is measured. See comment below
+   * \param charCount number of characters from reference point to get byte index for
+   * \param left + keepLeft define how character index is measured. See comment below
+   * \param keepLeft + left define how character index is measured. See comment below
    * \param icuLocale fine-tunes character boundary rules
-   * \return code-unit index, relative to str (not the substr) for the given offset
-   *                   and character count
-   *                   std::string::npos is returned if charCount is outside of the string
+   * \return code-unit index, relative to str for the given character count
+   *                   std::string::npos is returned if charCount is < 1 or > number of
+   *                   characters in str or if an error occurs
    *
-   * left=true  getBeginIndex=true   Returns offset of last byte of nth character (0-n). Used by Left.
-   * left=true  getBeginIndex=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
-   * left=false getBeginIndex=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
-   * left=false getBeginIndex=false  Returns offset of first byte of nth char from right end (0-n). Used by Right(x)
+   * left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
+   * left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
+   * left=false keepLeft=true   Returns offset of first byte of (n-1)th character (0-n). Used by Right(x, false)
+   * left=false keepLeft=false  Returns offset of first byte of (n-1)th char from right end. Used by Right(x)
    */
-
   static size_t GetCodeUnitIndex(const std::string &str, size_t charCount,
-                                 const bool left, const bool getBeginIndex, icu::Locale icuLocale);
+                                 const bool left, const bool keepLeft, icu::Locale icuLocale);
 
   /*!
    *

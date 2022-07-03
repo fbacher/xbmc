@@ -388,27 +388,27 @@ std::string UnicodeUtils::Right(const std::string &str, const size_t charCount,
 }
 
 size_t UnicodeUtils::GetByteIndexForCharacter(const std::string &str, size_t charCount,
-   const bool left, const bool getBeginIndex, icu::Locale icuLocale)
+   const bool left, const bool keepLeft, icu::Locale icuLocale)
 {
   size_t byteIndex;
-  byteIndex =  Unicode::GetCodeUnitIndex(str, charCount, left, getBeginIndex, icuLocale);
+  byteIndex =  Unicode::GetCodeUnitIndex(str, charCount, left, keepLeft, icuLocale);
   return byteIndex;
 }
 
 size_t UnicodeUtils::GetByteIndexForCharacter(const std::string &str, size_t charCount,
-    const bool left, const bool getBeginIndex, std::locale locale)
+    const bool left, const bool keepLeft, std::locale locale)
 {
   icu::Locale icuLocale = Unicode::GetICULocale(locale);
   size_t byteIndex;
-  byteIndex =  Unicode::GetCodeUnitIndex(str, charCount, left, getBeginIndex, icuLocale);
+  byteIndex =  Unicode::GetCodeUnitIndex(str, charCount, left, keepLeft, icuLocale);
   return byteIndex;
 }
 
 size_t UnicodeUtils::GetByteIndexForCharacter(const std::string &str, size_t charCount,
-    const bool left, const bool getBeginIndex)
+    const bool left, const bool keepLeft)
 {
   size_t byteIndex;
-  byteIndex =  Unicode::GetCodeUnitIndex(str, charCount, left, getBeginIndex, Unicode::GetDefaultICULocale());
+  byteIndex =  Unicode::GetCodeUnitIndex(str, charCount, left, keepLeft, Unicode::GetDefaultICULocale());
   return byteIndex;
 }
 
@@ -691,73 +691,10 @@ std::vector<std::string> UnicodeUtils::Split(const std::string &input,
 	return result;
 }
 
-std::vector<std::string> UnicodeUtils::SplitMultiOrig(const std::vector<std::string>& input,
-                                                 const std::vector<std::string>& delimiters,
-                                                 size_t iMaxStrings /* = 0 */)
-{
-  if (input.empty())
-    return std::vector<std::string>();
-
-  std::vector<std::string> results(input);
-
-  if (delimiters.empty() || (iMaxStrings > 0 && iMaxStrings <= input.size()))
-    return results;
-
-  std::vector<std::string> strings1;
-  if (iMaxStrings == 0)
-  {
-    for (size_t di = 0; di < delimiters.size(); di++)
-    {
-      for (size_t i = 0; i < results.size(); i++)
-      {
-        std::vector<std::string> substrings = UnicodeUtils::Split(results[i], delimiters[di]);
-        for (size_t j = 0; j < substrings.size(); j++)
-          strings1.push_back(substrings[j]);
-      }
-      results = strings1;
-      strings1.clear();
-    }
-    return results;
-  }
-
-  // Control the number of strings input is split into, keeping the original strings.
-  // Note iMaxStrings > input.size()
-  int64_t iNew = iMaxStrings - results.size();
-  for (size_t di = 0; di < delimiters.size(); di++)
-  {
-    for (size_t i = 0; i < results.size(); i++)
-    {
-      if (iNew > 0)
-      {
-        std::vector<std::string> substrings = UnicodeUtils::Split(results[i], delimiters[di], iNew + 1);
-        iNew = iNew - substrings.size() + 1;
-        for (size_t j = 0; j < substrings.size(); j++)
-          strings1.push_back(substrings[j]);
-      }
-      else
-        strings1.push_back(results[i]);
-    }
-    results = strings1;
-    iNew = iMaxStrings - results.size();
-    strings1.clear();
-    if ((iNew <= 0))
-      break;  //Stop trying any more delimiters
-  }
-  return results;
-}
-
-
-// TODO: Need test for this
 std::vector<std::string> UnicodeUtils::SplitMulti(
 		const std::vector<std::string> &input,
-		const std::vector<std::string> &delimiters, size_t iMaxStrings /* = 0 */,
-		bool omitEmptyStrings /* = false */) {
-	for (size_t i = 0; i < delimiters.size(); i++) {
-		if (ContainsNonAscii(delimiters[i])) {
-			CLog::Log(LOGWARNING, "UnicodeUtils::SplitMulti delimiter contains non-ASCII: {}\n",
-					delimiters[i]);
-		}
-	}
+		const std::vector<std::string> &delimiters, size_t iMaxStrings /* = 0 */)
+{
 	return Unicode::SplitMulti(input, delimiters, iMaxStrings);
 }
 
@@ -784,7 +721,7 @@ bool UnicodeUtils::InitializeCollator(const icu::Locale &icuLocale, bool Normali
   return Unicode::InitializeCollator(icuLocale, Normalize);
 }
 
-void Unicode::SortCompleted(int sortItems)
+void UnicodeUtils::SortCompleted(int sortItems)
 {
   Unicode::SortCompleted(sortItems);
 }

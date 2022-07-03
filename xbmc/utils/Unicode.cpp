@@ -36,7 +36,7 @@
 #include "log.h"
 #include "Locale.h"
 
-#undef DISABLE_OPTIMIZATION  // Used for testing. Code should behave the same way
+#define DISABLE_OPTIMIZATION 1 // Used for testing. Code should behave the same way
 
 // convert UTF-8 string to wstring
 std::wstring Unicode::UTF8ToWString(const std::string &str)
@@ -1407,13 +1407,49 @@ std::string Unicode::Left(const std::string &str, const size_t charCount,
   if (result.compare(str) != 0)
     CLog::Log(LOGINFO, "Unicode::GetCodeUnitIndex Normalized string different from original");
 
-  utf8Index = Unicode::GetCodeUnitIndex(result, charCount, true, keepLeft, icuLocale);
-  if (utf8Index == std::string::npos)
+  size_t referenceCharacter = charCount;
+  if (keepLeft)
+    referenceCharacter--;  // We need last byte of previous character
+
+  utf8Index = Unicode::GetCodeUnitIndex(result, referenceCharacter, true, keepLeft, icuLocale);
+
+  size_t bytesToCopy = 0;
+  if (keepLeft)
   {
-    return result;
+    if (utf8Index == std::string::npos) // Error
+    {
+      bytesToCopy = result.length();
+    }
+    else if (utf8Index == BEFORE_START)
+    {
+      bytesToCopy = 0;
+    }
+    else if (utf8Index == AFTER_END) // Not enough chars
+    {
+      bytesToCopy = result.length();
+    }
+    else
+      bytesToCopy = utf8Index + 1;
+  }
+  else // Remove chars from right end
+  {
+    if (utf8Index == std::string::npos) // Error
+    {
+      bytesToCopy = result.length();  // Remove none
+    }
+    else if (utf8Index == BEFORE_START)
+    {
+      bytesToCopy = 0;  // Remove none
+    }
+    else if (utf8Index == AFTER_END)
+    {
+      bytesToCopy = 0;
+    }
+    else
+      bytesToCopy = utf8Index + 1;
   }
 
-  return result.substr(0, utf8Index);
+  return result.substr(0, bytesToCopy);
 }
 
 /*!
@@ -1423,13 +1459,13 @@ std::string Unicode::Left(const std::string &str, const size_t charCount,
  * parameters are based on characters and NOT bytes.
  *
  * \param str string to extract substring from
- * \param startCharIndex leftmost character of substring [0 based]
+ * \param startCharCount leftmost character of substring [0 based]
  * \param charCount maximum number of characters to include in substring
  * \return substring of str, beginning with character 'firstCharIndex',
  *         length determined by charCount
  */
-std::string Unicode::Mid(const std::string &str, const size_t startCharIndex,
-    const size_t charCount /* = std::string::npos */)
+std::string Unicode::Mid(const std::string &str, size_t startCharCount,
+    size_t charCount /* = std::string::npos */)
 {
   size_t startUTF8Index;
   size_t endUTF8Index;
@@ -1438,23 +1474,80 @@ std::string Unicode::Mid(const std::string &str, const size_t startCharIndex,
   if (result.compare(str) != 0)
     CLog::Log(LOGINFO, "Unicode::GetCodeUnitIndex Normalized string different from original");
 
-  startUTF8Index = Unicode::GetCodeUnitIndex(result, startCharIndex, true, true,
-      Unicode::GetDefaultICULocale());
-  if (startUTF8Index == std::string::npos)
-  {
-    result = std::string();
-    return result;
-  }
-  result =  result.substr(startUTF8Index);
+  // We need the start byte to begin copy
+  //   left=false keepLeft=true   Return offset of first byte of (n - 1)th character
 
-  endUTF8Index = Unicode::GetCodeUnitIndex(result, charCount, true, true,
+  bool left = false;
+  bool keepLeft = true;
+
+  // Good 'old signed vs unsigned issues
+  if (startCharCount > str.length())
+    startCharCount = str.length() + 1;
+
+  if (startCharCount > str.length())
+    startCharCount = str.length() + 1;
+
+  startUTF8Index = Unicode::GetCodeUnitIndex(result, (startCharCount + 1), left, keepLeft,
       Unicode::GetDefaultICULocale());
-  return result.substr(0, endUTF8Index);
+  if (startUTF8Index == std::string::npos) // Error
+  {
+    return std::string();
+  }
+  else if (startUTF8Index == BEFORE_START) // Should not occur
+  {
+    return std::string();
+  }
+  else if (startUTF8Index == AFTER_END) // Not enough chars
+  {
+    return std::string();
+  }
+
+  result = result.substr(startUTF8Index);
+
+  // We specify here how many characters to copy from the first substring. But we have to translate
+  // the character count into a byteindex. It does look like we want the normal Left(xxx, n) copy:
+  //
+  //  left=true keepLeft=true  Return offset of last byte of nth character
+  //
+  // So, treat this second step just like left (we could just call Left, but that would add a bit of
+  // overhead
+
+  left = true;
+  keepLeft = true;
+  endUTF8Index = Unicode::GetCodeUnitIndex(result, charCount, left, keepLeft,
+      Unicode::GetDefaultICULocale());
+
+  size_t bytesToCopy = 0;
+  if (endUTF8Index == std::string::npos) // Error
+  {
+    bytesToCopy = result.length();
+  }
+  else if (endUTF8Index == BEFORE_START)
+  {
+    bytesToCopy = 0;
+  }
+  else if (endUTF8Index == AFTER_END) // Not enough chars
+  {
+    bytesToCopy = result.length();
+  }
+  else
+    bytesToCopy = endUTF8Index;
+
+  return result.substr(0, bytesToCopy);
 }
 
-std::string Unicode::Right(const std::string &str, const size_t charCount,
+std::string Unicode::Right(const std::string &str, size_t charCount,
     const icu::Locale &icuLocale, bool keepRight)
 {
+  /*
+      * left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
+      * left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
+      * left=false keepLeft=true   Returns offset of first byte of (n - 1)th character (0-n). Used by Right(x, false)
+      * left=false keepLeft=false  Returns offset of first byte of (n - 1)th char from right end (0-n). Used by Right(x)
+      *
+      * test right(3) => est == > x.last() - 3 ==>
+      * test right(1, false) => est == x[1...]  substr(1, npos) Omit left n chars
+      */
   if (charCount == 0)
   {
     if (keepRight)
@@ -1467,10 +1560,29 @@ std::string Unicode::Right(const std::string &str, const size_t charCount,
   if (result.compare(str) != 0)
     CLog::Log(LOGINFO, "Unicode::GetCodeUnitIndex Normalized string different from original");
 
-  utf8Index = Unicode::GetCodeUnitIndex(result, charCount, false, ! keepRight, icuLocale);
+  if (charCount > str.length()) // Good 'old signed/unsigned issues
+    charCount = str.length() + 1;
+  if (!keepRight)
+    charCount++;
 
-  if (utf8Index == std::string::npos)
-    utf8Index = result.length();
+  utf8Index = Unicode::GetCodeUnitIndex(result, charCount, false, ! keepRight, icuLocale);
+  // refstr = "est";
+  // varstr = UnicodeUtils::Right(origstr, 1, false);
+  // EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  // --> Test
+
+   if (utf8Index == std::string::npos) // Error
+   {
+     utf8Index = result.length();
+   }
+   else if (utf8Index == BEFORE_START)
+   {
+     utf8Index = 0;
+   }
+   else if (utf8Index == AFTER_END)
+   {
+     utf8Index = result.length();
+   }
 
   return result.substr(utf8Index, std::string::npos);
 }
@@ -1481,29 +1593,12 @@ std::string Unicode::Right(const std::string &str, const size_t charCount,
 
 thread_local icu::BreakIterator* m_cbi = nullptr;
 
-/*!
- * \brief Gets the code-unit index for the given Character Index
- *
- *
- *Unicode characters are of variable byte length. This function's
- * parameters are based on characters and NOT bytes.
- *
- * \param str string to extract substring from
- * \param charCount maximum number of characters to include in substring
- * \return substring of str, beginning with character 'firstCharIndex',
- *         length determined by charCount
- *
- * \return code-unit index for the given offset and character count.
- *                   std::string::npos is returned if charCount is outside of the string
- */
 size_t Unicode::GetCodeUnitIndex(const std::string &str, size_t charCount,
-    const bool left, const bool getBeginIndex, icu::Locale icuLocale)
+    const bool left, const bool keepLeft, icu::Locale icuLocale)
 {
   // TODO: Unicode: Note that this code is not yet able to reliably deal with
-  // malformed Unicode. Related to this, it is not yet ready to work on a substring.
-  // The most expeditious way to achieve these is to use UnicodeStrings.
+  // malformed Unicode. The most expeditious way to achieve these is to use UnicodeStrings.
 
-  size_t startOffset = 0;
 #ifndef DISABLE_OPTIMIZATION
   // Disable when we want to confirm that code behaves the same without
   // this shortcut.
@@ -1512,41 +1607,48 @@ size_t Unicode::GetCodeUnitIndex(const std::string &str, size_t charCount,
   // then quick calculation can give result. Humans wouldn't use this
   // codepath, but a loop or some such might.
 
-  size_t effectiveStrLength = str.length() - startOffset;
+  size_t effectiveStrLength = str.length();
   if (charCount == 0)
   {
-    if (left) // Return n code-units to copy starting from left end
+    /*
+     * left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
+     * left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
+     * left=false keepLeft=true   Returns offset of first byte of n th character (0-n). Used by Right(x, false)
+     * left=false keepLeft=false  Returns offset of first byte of (n - 1) th char from right end (0-n). Used by Right(x)
+     *
+     */
+    if (left)
     {
-      if (getBeginIndex)
-        return startOffset;
+      if (keepLeft)
+      //    left=true  keepLeft=true Return offset of last byte of nth character
+        return BEFORE_START;
       else
-        return str.length(); // Omit charCount chars from right end
+        return AFTER_END; // Last byte of nth char from right end (doesn't validate chars....)
     }
     else // right- Return starting code-unit to begin copying
     {
-      if (getBeginIndex) // User wants to omit charCount (0) chars from left end
-        return startOffset;
-      else
-        // User wants charCount (0) chars from right end
-        return str.length();
+      if (keepLeft) // left=false keepLeft=true Return offset of first byte of nth character (0-n).
+        return 0;
+      // else
+      // left=false keepLeft=false  Return offset of first byte of nth char from right end (0-n).
+      // Requires calculation
     }
   }
   if (charCount > effectiveStrLength) // Entire string, don't need to calculate char boundaries
   {
     if (left) // Return n code-units to copy starting from left end
     {
-      if (getBeginIndex)
+      if (keepLeft) //keepLeft=true Return offset of last byte of nth character (0-n)
         return str.length();
       else
-        return startOffset; // Omit charCount chars from right end
+        return BEFORE_START; // left=true  keepLeft=false Return offset of last byte of nth character from right end (0-n). Used by Left(x, false)
     }
     else // right- Return starting code-unit to begin copying
     {
-      if (getBeginIndex) // User wants to omit charCount (0) chars from left end
-        return str.length();
+      if (keepLeft)
+        return str.length(); // left=false keepLeft=true Return offset of first byte of nth character (0-n). Used by Right(x, false)
       else
-        // User wants charCount (0) chars from right end
-        return startOffset;
+        return BEFORE_START; // left=false keepLeft=false  Returns offset of first byte of nth char from right end (0-n). Used by Right(x)
     }
   }
 #endif
@@ -1554,12 +1656,36 @@ size_t Unicode::GetCodeUnitIndex(const std::string &str, size_t charCount,
   UErrorCode status = U_ZERO_ERROR;
   if (m_cbi != nullptr)
   {
-    icu::Locale previousLocale = m_cbi->getLocale(ULocDataLocaleType::ULOC_ACTUAL_LOCALE, status);
+    //icu::Locale previousLocale = m_cbi->getLocale(ULocDataLocaleType::ULOC_ACTUAL_LOCALE, status);
+    icu::Locale previousLocale = m_cbi->getLocale(ULocDataLocaleType::ULOC_VALID_LOCALE, status);
+
+    // bool isSame = Unicode::GetICULocaleId(previousLocale) == Unicode::GetICULocaleId(icuLocale);
+    // isSame = Unicode::GetICULocaleId(previousLocale2) == Unicode::GetICULocaleId(icuLocale);
+    // isSame = Unicode::GetICULocaleId(previousLocale) == Unicode::GetICULocaleId(GetDefaultICULocale());
+    // isSame = Unicode::GetICULocaleId(previousLocale2) == Unicode::GetICULocaleId(GetDefaultICULocale());
+
+    // icu::Locale eng_locale = icu::Locale::getEnglish();
+    // icu::Locale en_us_locale = icu::Locale::getUS();
+    // icu::Locale en_us_locale2 = icu::Locale::getUS();
+
+    // isSame = Unicode::GetICULocaleId(previousLocale) == Unicode::GetICULocaleId(en_us_locale);
+    // isSame = Unicode::GetICULocaleId(previousLocale2) == Unicode::GetICULocaleId(en_us_locale);
+
+    // isSame = Unicode::GetICULocaleId(en_us_locale) == Unicode::GetICULocaleId(en_us_locale);
+    // isSame = Unicode::GetICULocaleId(GetDefaultICULocale()) == Unicode::GetICULocaleId(en_us_locale);
+    // isSame = Unicode::GetICULocaleId(GetDefaultICULocale()) == Unicode::GetICULocaleId(en_us_locale);
+
+    // isSame = Unicode::GetICULocaleId(GetDefaultICULocale()) == Unicode::GetICULocaleId(GetDefaultICULocale());
+
+    // isSame = Unicode::GetICULocaleId(en_us_locale) == Unicode::GetICULocaleId(en_us_locale);
+
+    /// icu::Locale::getEnglish();
     if (Unicode::GetICULocaleId(previousLocale) != Unicode::GetICULocaleId(icuLocale))
     {
       delete m_cbi;
       m_cbi = nullptr;
     }
+
   }
   if (m_cbi == nullptr)
   {
@@ -1568,7 +1694,7 @@ size_t Unicode::GetCodeUnitIndex(const std::string &str, size_t charCount,
     {
       CLog::Log(LOGERROR, "Error in Unicode::GetCodeUnitIndex: {}", status);
       m_cbi = nullptr;
-      return startOffset;
+      return std::string::npos;
     }
   }
 
@@ -1577,7 +1703,7 @@ size_t Unicode::GetCodeUnitIndex(const std::string &str, size_t charCount,
   if (U_FAILURE(status))
   {
     CLog::Log(LOGERROR, "Error in Unicode::GetCodeUnitIndex: {}", status);
-    return 0;
+    return std::string::npos;
   }
   m_cbi->setText(ut, status);
 
@@ -1585,53 +1711,113 @@ size_t Unicode::GetCodeUnitIndex(const std::string &str, size_t charCount,
   {
     CLog::Log(LOGERROR, "Error in Unicode::GetCodeUnitIndex: {}", status);
     utext_close(ut);
-    return 0;
+    return std::string::npos;
   }
-  if (not m_cbi->isBoundary(startOffset))
+  if (not m_cbi->isBoundary(0))
   {
     // If was not on boundary, isBoundary advanced to next boundary (if there was one).
     // What happens if we were on last character of string?
 
-    if (startOffset == 0)
-    {
-      CLog::Log(LOGWARNING,
-          "Unicode::GetCodeUnitIndex string is malformed, does not start with valid character.");
-      utext_close(ut);
-      return str.length() - 1;
-    }
-    startOffset = m_cbi->current();
-
-    if (startOffset == std::string::npos)
-    {
-      CLog::Log(LOGWARNING, "Unicode::GetCodeUnitIndex startOffset NOT on character boundary."
-          " No valid boundary found after startOffset.");
-      utext_close(ut);
-      return str.length() - 1;
-    }
+    CLog::Log(LOGWARNING,
+        "Unicode::GetCodeUnitIndex string is malformed, does not start with valid character.");
+    utext_close(ut);
+    return str.length() - 1;
   }
 
-  int byteIndex = -1;
-  if (getBeginIndex)
+  size_t byteIndex = std::string::npos;
+  if (charCount > str.length()) // Deal with unsignededness...
+    charCount = INT_MAX;
+
+  if (left)
   {
-    m_cbi->preceding(startOffset + 1);
-    byteIndex = m_cbi->next(charCount);
-  }
-  else
-  {
-    size_t charsToDelete = charCount;
-    byteIndex = m_cbi->last();
-    while (charsToDelete > 0)
+    if (keepLeft)  // left=true keepLeft=true  Return offset of last byte of nth character
     {
-      size_t charIndex = m_cbi->next(-1);
-      if (charIndex == std::string::npos)
-        break;
-      byteIndex = charIndex;
-      charsToDelete--;
+      byteIndex = m_cbi->first();      // At charCount 0
+      //bool x = m_cbi->isBoundary(byteIndex);
+
+      byteIndex = m_cbi->next(charCount);
+      // There is a boundary between the last character and the end of string
+      // Have to check both against npos and length (sigh)
+      if (byteIndex != std::string::npos and byteIndex < str.length())
+      {
+        // At correct character, now get it's last byte
+        byteIndex = m_cbi->next();
+        if (byteIndex != std::string::npos)
+          byteIndex--;
+        else
+          byteIndex = str.length() - 1; // Ran off end of string, probably can't occur
+      }
+      else // String not long enough
+      {
+        if (charCount == 0)
+          byteIndex = Unicode::BEFORE_START;
+        else
+          byteIndex = Unicode::AFTER_END;
+      }
+    }
+    else // left=true  keepLeft=false  Returns offset of last byte of nth character from right end
+    {
+      if (charCount == 0)
+      {
+        byteIndex = str.length() - 1;
+      }
+      else
+      {
+        byteIndex = m_cbi->last();  // BEYOND last
+        size_t charsToDelete = charCount;
+        if (charsToDelete < INT_MAX)
+          charsToDelete++; // Backup to BEFORE last
+        while (charsToDelete > 0)
+        {
+          byteIndex = m_cbi->next(-1);
+          if (byteIndex == std::string::npos)
+            break;
+          charsToDelete--;
+        }
+        if (byteIndex == std::string::npos)
+          byteIndex = Unicode::BEFORE_START; // Not enough chars
+        else
+        {
+          // byteIndex is pointing to beginning of nth character from right end.
+          // Need to advance it until it is at last byte of nth char
+          byteIndex = m_cbi->next();
+          byteIndex--;
+        }
+      }
+    }
+  }
+  else // right
+  {
+    if (keepLeft) // left=false keepLeft=true   Return offset of first byte of (n - 1)th character
+    {
+      m_cbi->first();  // At charCount 0 (byteIndex 0)
+      if (charCount == 0)
+        byteIndex = Unicode::BEFORE_START;
+      else
+      {
+        byteIndex = m_cbi->next(charCount - 1); // first byte of n-1 th char (Right(x, false) Right test line 888
+        if (byteIndex == std::string::npos)
+          byteIndex = Unicode::AFTER_END;
+      }
+    }
+    else // left=false keepLeft=false  Returns offset of first byte of (n-1) th char from right end
+    {
+      size_t charsToDelete = charCount; // Unlike left=true keepleft=false, we want the (n-1)th char
+      byteIndex = m_cbi->last();  // BEYOND last
+      while (charsToDelete > 0)
+      {
+        byteIndex = m_cbi->next(-1);
+        if (byteIndex == std::string::npos)
+          break;
+        charsToDelete--;
+      }
+      if (byteIndex == std::string::npos)
+        byteIndex = BEFORE_START;
     }
   }
 
   utext_close(ut);
-  return byteIndex + startOffset;
+  return byteIndex;
 }
 
 std::string Unicode::Trim(const std::string &str)
@@ -2303,16 +2489,17 @@ OutputIt Unicode::SplitTo(OutputIt d_first, const icu::UnicodeString &kInput,
     }
 
     nextDelim = kInput.indexOf(kDelimiter, textPos);
-    int32_t uNextDelim = nextDelim; // std::string::npos / -1 handled differently
-    if (!omitEmptyStrings or (nextDelim > textPos))
+    size_t uNextDelim = nextDelim; // std::string::npos / -1 handled differently
+
+    // UnicodeString.tempSubstring changes any length < 0 (npos) to 0
+    // However, it will change any positive number that runs off the string
+    // to the maximum usable size (like std::string functions).
+
+    if (uNextDelim == std::string::npos)
+      uNextDelim = kInput.length();
+
+    if (!omitEmptyStrings or (uNextDelim > textPos))
     {
-      // UnicodeString.tempSubstring changes any length < 0 (npos) to 0
-      // However, it will change any positive number that runs off the string
-      // to the maximum usable size (like std::string functions).
-
-      if (uNextDelim == -1)
-        uNextDelim = kInput.length();
-
       *d_first++ = kInput.tempSubString(textPos, uNextDelim - textPos);
     }
     textPos = uNextDelim + delimLen;
