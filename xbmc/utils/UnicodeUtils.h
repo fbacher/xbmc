@@ -968,12 +968,15 @@ public:
       * \param keepLeft + left define how character index is measured. See comment below
       * \param icuLocale fine-tunes character boundary rules
       * \return code-unit index, relative to str for the given character count
-      *                   std::string::npos is returned if charCount is outside of the string
+      *                  Unicode::BEFORE_START or Unicode::AFTER::END is returned if
+      *                  charCount exceeds the string's length. std::string::npos is
+      *                  returned on other errors.
       *
       * left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
       * left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
-      * left=false keepLeft=true   Returns offset of first byte of (n-1)th character (0-n). Used by Right(x, false)
-      * left=false keepLeft=false  Returns offset of first byte of (n-1)th char from right end. Used by Right(x)
+      * left=false keepLeft=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
+      * left=false keepLeft=false  Returns offset of first byte of nth char from right end.
+      *                            Character 0 is AFTER the last character.  Used by Right(x)
       */
     static size_t GetByteIndexForCharacter(const std::string &str, size_t charCount,
         const bool left, const bool keepLeft, icu::Locale icuLocale);
@@ -989,14 +992,17 @@ public:
       * \param charCount number of characters from reference point to get byte index for
       * \param left + keepLeft define how character index is measured. See comment below
       * \param keepLeft + left define how character index is measured. See comment below
-      * \param locale fine-tunes character boundary rules
-      * \return code-unit index, relative to str for the given character count
       *                   std::string::npos is returned if charCount is outside of the string
+      * \return code-unit index, relative to str for the given character count
+      *                  Unicode::BEFORE_START or Unicode::AFTER::END is returned if
+      *                  charCount exceeds the string's length. std::string::npos is
+      *                  returned on other errors.
       *
       * left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
       * left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
-      * left=false keepLeft=true   Returns offset of first byte of (n-1)th character (0-n). Used by Right(x, false)
-      * left=false keepLeft=false  Returns offset of first byte of (n-1)th char from right end. Used by Right(x)
+      * left=false keepLeft=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
+      * left=false keepLeft=false  Returns offset of first byte of nth char from right end.
+      *                            Character 0 is AFTER the last character.  Used by Right(x)
       */
     static size_t GetByteIndexForCharacter(const std::string &str, size_t charCount,
         const bool left, const bool keepLeft, std::locale locale);
@@ -1015,12 +1021,15 @@ public:
       * \param left + keepLeft define how character index is measured. See comment below
       * \param keepLeft + left define how character index is measured. See comment below
       * \return code-unit index, relative to str for the given character count
-      *                   std::string::npos is returned if charCount is outside of the string
+      *                  Unicode::BEFORE_START or Unicode::AFTER::END is returned if
+      *                  charCount exceeds the string's length. std::string::npos is
+      *                  returned on other errors.
       *
       * left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
       * left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
-      * left=false keepLeft=true   Returns offset of first byte of (n-1)th character (0-n). Used by Right(x, false)
-      * left=false keepLeft=false  Returns offset of first byte of (n-1)th char from right end. Used by Right(x)
+      * left=false keepLeft=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
+      * left=false keepLeft=false  Returns offset of first byte of nth char from right end.
+      *                            Character 0 is AFTER the last character.  Used by Right(x)
       */
     static size_t GetByteIndexForCharacter(const std::string &str, size_t charCount,
         const bool left, const bool keepLeft);

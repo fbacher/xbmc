@@ -563,60 +563,60 @@ TEST(TestUnicodeUtils, EqualsNoCase_Normalize)
 TEST(TestUnicodeUtils, Left_Basic)
 {
   std::string refstr;
-   std::string varstr;
-   std::string origstr = "Test";
+  std::string varstr;
+  std::string origstr = "Test";
 
-   // First, request n chars to copy from left end
+  // First, request n chars to copy from left end
 
-   refstr = "";
-   varstr = UnicodeUtils::Left(origstr, 0);
-   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  refstr = "";
+  varstr = UnicodeUtils::Left(origstr, 0);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-   refstr = "T";
-   varstr = UnicodeUtils::Left(origstr, 1);
-   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  refstr = "T";
+  varstr = UnicodeUtils::Left(origstr, 1);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-   refstr = "Te";
-   varstr = UnicodeUtils::Left(origstr, 2);
-   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  refstr = "Te";
+  varstr = UnicodeUtils::Left(origstr, 2);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-   refstr = "Test";
-   varstr = UnicodeUtils::Left(origstr, 4);
-   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  refstr = "Test";
+  varstr = UnicodeUtils::Left(origstr, 4);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-   refstr = "Test";
-   varstr = UnicodeUtils::Left(origstr, 10);
-   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  refstr = "Test";
+  varstr = UnicodeUtils::Left(origstr, 10);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-   refstr = "Test";
-   varstr = UnicodeUtils::Left(origstr, std::string::npos);
-   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  refstr = "Test";
+  varstr = UnicodeUtils::Left(origstr, std::string::npos);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-   // # of characters to omit from right end
+  // # of characters to omit from right end
 
-   refstr = "Tes";
-   varstr = UnicodeUtils::Left(origstr, 1, false);
-   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  refstr = "Tes";
+  varstr = UnicodeUtils::Left(origstr, 1, false);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-   refstr = "Test";
-   varstr = UnicodeUtils::Left(origstr, 0, false);
-   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  refstr = "Test";
+  varstr = UnicodeUtils::Left(origstr, 0, false);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-   refstr = "T";
-   varstr = UnicodeUtils::Left(origstr, 3, false);
-   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  refstr = "T";
+  varstr = UnicodeUtils::Left(origstr, 3, false);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-   refstr = "";
-   varstr = UnicodeUtils::Left(origstr, 4, false);
-   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  refstr = "";
+  varstr = UnicodeUtils::Left(origstr, 4, false);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-   refstr = "";
-   varstr = UnicodeUtils::Left(origstr, 5, false);
-   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  refstr = "";
+  varstr = UnicodeUtils::Left(origstr, 5, false);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
-   refstr = "";
-   varstr = UnicodeUtils::Left(origstr, std::string::npos, false);
-   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+  refstr = "";
+  varstr = UnicodeUtils::Left(origstr, std::string::npos, false);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 
   // TODO: Add test to ensure count works properly for multi-codepoint characters
 }
@@ -792,19 +792,16 @@ TEST(TestUnicodeUtils, GetByteIndexForCharacter)
 
   icu::Locale icuLocale = icu::Locale::getEnglish();
 
-  // left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
-  bool left = true;
-  bool keepLeft = true;
   /*
    * left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
    * left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
    * left=false keepLeft=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
-   * left=false keepLeft=false  Returns offset of first byte of nth char from right end (0-n). Used by Right(x)
-   *
-   * true, true, 0 ; index of zeroith char
-   * true, true, 1 index = 0, index of first char
+   * left=false keepLeft=false  Returns offset of first byte of nth char from right end.
+   *                            Character 0 is AFTER the last character.  Used by Right(x)
    */
 
+  bool left = true;
+  bool keepLeft = true;
   testString = "Hello";
   testStringLength = testString.length();
   result = UnicodeUtils::GetByteIndexForCharacter(testString, 0, left, keepLeft, icuLocale);
@@ -860,16 +857,16 @@ TEST(TestUnicodeUtils, GetByteIndexForCharacter)
   expectedResult = Unicode::BEFORE_START;
   EXPECT_EQ(expectedResult, result);
 
-  //  left=false keepLeft=true  Return offset of first byte of (n - 1)th character
+  //  left=false keepLeft=true  Return offset of first byte of nth character
 
   left = false;
   keepLeft = true;
 
   result = UnicodeUtils::GetByteIndexForCharacter(testString, 0, left, keepLeft, icuLocale);
-  expectedResult = Unicode::BEFORE_START;
+  expectedResult = 0;
   EXPECT_EQ(expectedResult, result);
 
-  result = UnicodeUtils::GetByteIndexForCharacter(testString, 5, left, keepLeft, icuLocale);
+  result = UnicodeUtils::GetByteIndexForCharacter(testString, 4, left, keepLeft, icuLocale);
   expectedResult = 4;
   EXPECT_EQ(expectedResult, result);
 
@@ -881,19 +878,24 @@ TEST(TestUnicodeUtils, GetByteIndexForCharacter)
   expectedResult = Unicode::AFTER_END;
   EXPECT_EQ(expectedResult, result);
 
-  // left=false keepLeft=false  Returns offset of first byte of (n-1) th char from right end. Used by Right(x)
+  // left=false keepLeft=false  Returns offset of first byte of nth char from right end. Used by Right(x)
 
+  // Hello
   left = false;
   keepLeft = false;
   result = UnicodeUtils::GetByteIndexForCharacter(testString, 0, left, keepLeft, icuLocale);
-  expectedResult = testStringLength;
+  expectedResult = Unicode::AFTER_END;
+  EXPECT_EQ(expectedResult, result);
+
+  result = UnicodeUtils::GetByteIndexForCharacter(testString, 1, left, keepLeft, icuLocale);
+  expectedResult = 4;
   EXPECT_EQ(expectedResult, result);
 
   result = UnicodeUtils::GetByteIndexForCharacter(testString, 5, left, keepLeft, icuLocale);
   expectedResult = 0;
   EXPECT_EQ(expectedResult, result);
 
-  result = UnicodeUtils::GetByteIndexForCharacter(testString, 6, left, keepLeft, icuLocale);
+  result = UnicodeUtils::GetByteIndexForCharacter(testString, std::string::npos, left, keepLeft, icuLocale);
   expectedResult = Unicode::BEFORE_START;
   EXPECT_EQ(expectedResult, result);
 
@@ -911,56 +913,57 @@ TEST(TestUnicodeUtils, GetByteIndexForCharacter)
 
   icuLocale = icu::Locale::getGerman();
   left = true;
-    keepLeft = true;
-    result = UnicodeUtils::GetByteIndexForCharacter(testString, 0, left, keepLeft, icuLocale);
-    expectedResult = 2;  // Last byte of lower open double quote
-    EXPECT_EQ(expectedResult, result);
+  keepLeft = true;
+  result = UnicodeUtils::GetByteIndexForCharacter(testString, 0, left, keepLeft, icuLocale);
+  expectedResult = 2;  // Last byte of lower open double quote
+  EXPECT_EQ(expectedResult, result);
 
-    left = true;
-    keepLeft = true;
-    result = UnicodeUtils::GetByteIndexForCharacter(testString, 1, left, keepLeft, icuLocale);
-    expectedResult = 3;  // W after quote
-    EXPECT_EQ(expectedResult, result);
+  left = true;
+  keepLeft = true;
+  result = UnicodeUtils::GetByteIndexForCharacter(testString, 1, left, keepLeft, icuLocale);
+  expectedResult = 3;  // W after quote
+  EXPECT_EQ(expectedResult, result);
 
-    //  left=false keepLeft=true   Returns offset of first byte of (n-1)th character (0-n). Used by Right(x, false)
-    left = false;
-    keepLeft = true;
-    result = UnicodeUtils::GetByteIndexForCharacter(testString, 1, left, keepLeft, icuLocale);
-    expectedResult = 0; // First Byte of lower open double quote
-    EXPECT_EQ(expectedResult, result);
+  //  left=false keepLeft=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
+  left = false;
+  keepLeft = true;
+  result = UnicodeUtils::GetByteIndexForCharacter(testString, 0, left, keepLeft, icuLocale);
+  expectedResult = 0; // First Byte of lower open double quote
+  EXPECT_EQ(expectedResult, result);
 
-    //  left=false keepLeft=true   Returns offset of first byte of (n-1)th character (0-n). Used by Right(x, false)
+  //  left=false keepLeft=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
 
-    left = false;
-    keepLeft = true;
-    result = UnicodeUtils::GetByteIndexForCharacter(testString, 2, left, keepLeft, icuLocale);
-    expectedResult = 3; // First Byte of W
-    EXPECT_EQ(expectedResult, result);
+  left = false;
+  keepLeft = true;
+  result = UnicodeUtils::GetByteIndexForCharacter(testString, 1, left, keepLeft, icuLocale);
+  expectedResult = 3; // First Byte of W
+  EXPECT_EQ(expectedResult, result);
 
-    // left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
+  // left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
 
-    left = true;
-    keepLeft = false;
-    result = UnicodeUtils::GetByteIndexForCharacter(testString, 44, left, keepLeft, icuLocale);
-    expectedResult = 2; // Last Byte first char
-    EXPECT_EQ(expectedResult, result);
+  left = true;
+  keepLeft = false;
+  result = UnicodeUtils::GetByteIndexForCharacter(testString, 44, left, keepLeft, icuLocale);
+  expectedResult = 2; // Last Byte first char
+  EXPECT_EQ(expectedResult, result);
 
-    // left=false keepLeft=false  Returns offset of first byte of nth char from right end (0-n). Used by Right(x)
+  // left=false keepLeft=false  Returns offset of first byte of nth char from right end (0-n). Used by Right(x)
+  // Note that char 0 is BEYOND the last character, which is sad to say, different from char 0 from Left
+  // end which is the first character.
 
-    // TODO: Document or change that the charcount must be one more than other calls.
-    left = false;
-      keepLeft = false;
-      result = UnicodeUtils::GetByteIndexForCharacter(testString, 45, left, keepLeft, icuLocale);
-      expectedResult = 0; // First Byte first char
-      EXPECT_EQ(expectedResult, result);
+  left = false;
+  keepLeft = false;
+  result = UnicodeUtils::GetByteIndexForCharacter(testString, 45, left, keepLeft, icuLocale);
+  expectedResult = 0; // First Byte first char
+  EXPECT_EQ(expectedResult, result);
 
-    //  left=false keepLeft=true   Returns offset of first byte of (n -1)th character (0-n). Used by Right(x, false)
+  //  left=false keepLeft=true   Returns offset of first byte of (n -1)th character (0-n). Used by Right(x, false)
 
-     left = false;
-     keepLeft = true;
-     result = UnicodeUtils::GetByteIndexForCharacter(testString, 9, left, keepLeft, icuLocale);
-     expectedResult = 10;
-     EXPECT_EQ(expectedResult, result);
+  left = false;
+  keepLeft = true;
+  result = UnicodeUtils::GetByteIndexForCharacter(testString, 8, left, keepLeft, icuLocale);
+  expectedResult = 10;
+  EXPECT_EQ(expectedResult, result);
 
   //  left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
 
@@ -980,17 +983,17 @@ TEST(TestUnicodeUtils, GetByteIndexForCharacter)
 
   left = false;
   keepLeft = true;
-  result = UnicodeUtils::GetByteIndexForCharacter(testString, 9, left, keepLeft, icuLocale);
+  result = UnicodeUtils::GetByteIndexForCharacter(testString, 8, left, keepLeft, icuLocale);
   expectedResult = 10; // First Byte of U-umlaut
   EXPECT_EQ(expectedResult, result);
 
   // left=false keepLeft=false  Returns offset of first byte of nth char from right end (0-n). Used by Right(x)
 
-   left = false;
-   keepLeft = false;
-   result = UnicodeUtils::GetByteIndexForCharacter(testString, 10, left, keepLeft, icuLocale);
-   expectedResult = 39;
-   EXPECT_EQ(expectedResult, result);
+  left = false;
+  keepLeft = false;
+  result = UnicodeUtils::GetByteIndexForCharacter(testString, 10, left, keepLeft, icuLocale);
+  expectedResult = 39;
+  EXPECT_EQ(expectedResult, result);
 
   // left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n).
   // Used by Left(x, false)
@@ -1005,10 +1008,9 @@ TEST(TestUnicodeUtils, GetByteIndexForCharacter)
 
   left = false;
   keepLeft = true;
-  result = UnicodeUtils::GetByteIndexForCharacter(testString, 36, left, keepLeft, icuLocale); // S-sharp \xc3\x9f
+  result = UnicodeUtils::GetByteIndexForCharacter(testString, 35, left, keepLeft, icuLocale); // S-sharp \xc3\x9f
   expectedResult = 39;
   EXPECT_EQ(expectedResult, result);
-
 
   left = true;
   keepLeft = true;
@@ -1035,31 +1037,31 @@ TEST(TestUnicodeUtils, GetByteIndexForCharacter)
 
   icuLocale = icu::Locale::getChinese();
   left = true;
-     keepLeft = true;
-     result = UnicodeUtils::GetByteIndexForCharacter(testString, 0, left, keepLeft, icuLocale);
-     expectedResult = 2;  // Last byte of 诺 e8 af ba
-     EXPECT_EQ(expectedResult, result);
+  keepLeft = true;
+  result = UnicodeUtils::GetByteIndexForCharacter(testString, 0, left, keepLeft, icuLocale);
+  expectedResult = 2;  // Last byte of 诺 e8 af ba
+  EXPECT_EQ(expectedResult, result);
 
-     left = true;
-     keepLeft = true;
-     result = UnicodeUtils::GetByteIndexForCharacter(testString, 1, left, keepLeft, icuLocale);
-     expectedResult = 5;  // Last byte of 贝 e8 b4 9d
-     EXPECT_EQ(expectedResult, result);
+  left = true;
+  keepLeft = true;
+  result = UnicodeUtils::GetByteIndexForCharacter(testString, 1, left, keepLeft, icuLocale);
+  expectedResult = 5;  // Last byte of 贝 e8 b4 9d
+  EXPECT_EQ(expectedResult, result);
 
-     //  left=false keepLeft=true   Returns offset of first byte of (n - 1)th character (0-n). Used by Right(x, false)
-     left = false;
-     keepLeft = true;
-     result = UnicodeUtils::GetByteIndexForCharacter(testString, 1, left, keepLeft, icuLocale);
-     expectedResult = 0; // First Byte of 诺 e8 af ba
-     EXPECT_EQ(expectedResult, result);
+  //  left=false keepLeft=true   Returns offset of first byte of (n - 1)th character (0-n). Used by Right(x, false)
+  left = false;
+  keepLeft = true;
+  result = UnicodeUtils::GetByteIndexForCharacter(testString, 0, left, keepLeft, icuLocale);
+  expectedResult = 0; // First Byte of 诺 e8 af ba
+  EXPECT_EQ(expectedResult, result);
 
-     //  left=false keepLeft=true   Returns offset of first byte of (n - 1)th character (0-n). Used by Right(x, false)
+  //  left=false keepLeft=true   Returns offset of first byte of (n - 1)th character (0-n). Used by Right(x, false)
 
-     left = false;
-     keepLeft = true;
-     result = UnicodeUtils::GetByteIndexForCharacter(testString, 2, left, keepLeft, icuLocale);
-     expectedResult = 3; // First Byte of 贝 e8 b4 9d
-     EXPECT_EQ(expectedResult, result);
+  left = false;
+  keepLeft = true;
+  result = UnicodeUtils::GetByteIndexForCharacter(testString, 1, left, keepLeft, icuLocale);
+  expectedResult = 3; // First Byte of 贝 e8 b4 9d
+  EXPECT_EQ(expectedResult, result);
 
 }
 
@@ -1475,7 +1477,7 @@ TEST(TestUnicodeUtils, Split)
   }
 
   varresults = UnicodeUtils::Split(",-+a,,--++aa,,-+",
-  { ",", "-", "+" });
+      { ",", "-", "+" });
   expectedResult =
   { "", "", "", "a", "", "", "", "", "", "aa", "", "", "", "" };
   EXPECT_EQ(expectedResult.size(), varresults.size());
@@ -1489,7 +1491,7 @@ TEST(TestUnicodeUtils, Split)
     }
   }
   varresults = UnicodeUtils::Split(",-+a,,--++aa,,-+",
-  { "-", "+", "," });
+      { "-", "+", "," });
   expectedResult =
   { "", "", "", "a", "", "", "", "", "", "aa", "", "", "", "" };
   EXPECT_EQ(expectedResult.size(), varresults.size());
@@ -1503,7 +1505,7 @@ TEST(TestUnicodeUtils, Split)
     }
   }
   varresults = UnicodeUtils::Split(",-+a,,--++aa,,-+",
-  { "+", ",", "-" });
+      { "+", ",", "-" });
   expectedResult =
   { "", "", "", "a", "", "", "", "", "", "aa", "", "", "", "" };
   EXPECT_EQ(expectedResult.size(), varresults.size());
@@ -1518,24 +1520,24 @@ TEST(TestUnicodeUtils, Split)
   }
   // This result looks incorrect, but verified against Matrix 19.4 behavior
   varresults = UnicodeUtils::Split("a,,,a,,,,,,aa,,,a",
-    { ",", "-", "+" });
-    expectedResult =
-    { "a", "", "", "a", "", "", "", "", "", "aa", "", "", "a" };
-    EXPECT_EQ(expectedResult.size(), varresults.size());
-    idx = 0;
-    for (auto i : expectedResult)
+      { ",", "-", "+" });
+  expectedResult =
+  { "a", "", "", "a", "", "", "", "", "", "aa", "", "", "a" };
+  EXPECT_EQ(expectedResult.size(), varresults.size());
+  idx = 0;
+  for (auto i : expectedResult)
+  {
+    if (idx >= 0)
     {
-      if (idx >= 0)
-      {
-        EXPECT_STREQ(i.c_str(), varresults.at(idx).c_str());
-        idx++;
-      }
+      EXPECT_STREQ(i.c_str(), varresults.at(idx).c_str());
+      idx++;
     }
+  }
 
   varresults = UnicodeUtils::Split("a,-+a,,--++aa,-+a",
-  { ",", "-", "+" });
+      { ",", "-", "+" });
   expectedResult =
-    { "a", "", "", "a", "", "", "", "", "", "aa", "", "", "a" };
+  { "a", "", "", "a", "", "", "", "", "", "aa", "", "", "a" };
   EXPECT_EQ(expectedResult.size(), varresults.size());
   idx = 0;
   for (auto i : expectedResult)
@@ -1551,9 +1553,9 @@ TEST(TestUnicodeUtils, Split)
 
   EXPECT_EQ(4U, UnicodeUtils::Split("a bc  d ef ghi ", " ", 4).size());
   EXPECT_STREQ("d ef ghi ", UnicodeUtils::Split("a bc  d ef ghi ", " ", 4).at(3).c_str())
-      << "Last part must include rest of the input string";
+  << "Last part must include rest of the input string";
   EXPECT_EQ(7U, UnicodeUtils::Split("a bc  d ef ghi ", " ").size())
-      << "Result must be 7 strings including two empty strings";
+  << "Result must be 7 strings including two empty strings";
   EXPECT_STREQ("bc", UnicodeUtils::Split("a bc  d ef ghi ", " ").at(1).c_str());
   EXPECT_STREQ("", UnicodeUtils::Split("a bc  d ef ghi ", " ").at(2).c_str());
   EXPECT_STREQ("", UnicodeUtils::Split("a bc  d ef ghi ", " ").at(6).c_str());
@@ -1572,7 +1574,7 @@ TEST(TestUnicodeUtils, Split)
   EXPECT_EQ(4U, UnicodeUtils::Split("a bc  d ef ghi ", ' ', 4).size());
   EXPECT_STREQ("d ef ghi ", UnicodeUtils::Split("a bc  d ef ghi ", ' ', 4).at(3).c_str());
   EXPECT_EQ(7U, UnicodeUtils::Split("a bc  d ef ghi ", ' ').size())
-      << "Result must be 7 strings including two empty strings";
+  << "Result must be 7 strings including two empty strings";
   EXPECT_STREQ("bc", UnicodeUtils::Split("a bc  d ef ghi ", ' ').at(1).c_str());
   EXPECT_STREQ("", UnicodeUtils::Split("a bc  d ef ghi ", ' ').at(2).c_str());
   EXPECT_STREQ("", UnicodeUtils::Split("a bc  d ef ghi ", ' ').at(6).c_str());
@@ -1589,20 +1591,20 @@ TEST(TestUnicodeUtils, Split)
   input = "a/b#c/d/e/foo/g::h/"; // "#p/q/r:s/x&extraNarfy"};
   delimiters = {"/", "#", ":", "Narf"};
   expectedResult = {"a", "b", "c", "d", "e", "foo", "g", "", "h", ""}; // , "", "p", "q", "r", "s",
-                    // "x&extra", "y"};
+  // "x&extra", "y"};
   result.clear();
   Unicode::SplitTo(std::back_inserter(result), input, delimiters, 0);
 
   EXPECT_EQ(expectedResult.size(), result.size());
-   idx = 0;
-   for (auto i : expectedResult)
-   {
-     if (idx < result.size())
-     {
-       EXPECT_STREQ(i.c_str(), result.at(idx).c_str());
-       idx++;
-     }
-   }
+  idx = 0;
+  for (auto i : expectedResult)
+  {
+    if (idx < result.size())
+    {
+      EXPECT_STREQ(i.c_str(), result.at(idx).c_str());
+      idx++;
+    }
+  }
 
   input = {"a/b#c/d/e/foo/g::h/", "#p/q/r:s/x&extraNarfy"};
   delimiters = {"/", "#", ":", "Narf"};
@@ -1627,21 +1629,21 @@ static void compareStrings(std::vector<std::string> result, std::vector<std::str
 TEST(TestUnicodeUtils, SplitMulti)
 {
   /*
-  * Delimiter strings are applied in order, so once the iMaxStrings
-  * items is produced no other delimiters are applied. This produces different results
-  * than applying all delimiters at once e.g. "a/b#c/d" becomes "a", "b#c", "d" rather
-  * than "a", "b", "c/d"
-  *
-  * \param input vector of strings each to be split
-  * \param delimiters strings to be used to split the input strings
-  * \param iMaxStrings (optional) Maximum number of resulting split strings
-  *
-  * TODO: Need Testcase!
-  *
-  * static std::vector<std::string> SplitMulti(const std::vector<std::string>& input,
-  *                                           const std::vector<std::string>& delimiters,
-  *                                           size_t iMaxStrings = 0);
-  */
+   * Delimiter strings are applied in order, so once the iMaxStrings
+   * items is produced no other delimiters are applied. This produces different results
+   * than applying all delimiters at once e.g. "a/b#c/d" becomes "a", "b#c", "d" rather
+   * than "a", "b", "c/d"
+   *
+   * \param input vector of strings each to be split
+   * \param delimiters strings to be used to split the input strings
+   * \param iMaxStrings (optional) Maximum number of resulting split strings
+   *
+   * TODO: Need Testcase!
+   *
+   * static std::vector<std::string> SplitMulti(const std::vector<std::string>& input,
+   *                                           const std::vector<std::string>& delimiters,
+   *                                           size_t iMaxStrings = 0);
+   */
   size_t idx;
   std::vector<std::string> expectedResult;
   std::vector<std::string> input;
@@ -1676,7 +1678,7 @@ TEST(TestUnicodeUtils, SplitMulti)
   result = UnicodeUtils::Split("abcde", delimiters);
   result = UnicodeUtils::Split("Where is the beef?", delimiters);
   result = UnicodeUtils::Split("cbcefa", delimiters);
-   result = UnicodeUtils::Split("aaaa", "a");
+  result = UnicodeUtils::Split("aaaa", "a");
   result = UnicodeUtils::SplitMulti(input, delimiters);
   // Matrix 4 result = {"de", "Where is the be", "?", "", ""}
   // Convert "bc" to "a"
@@ -1714,72 +1716,72 @@ TEST(TestUnicodeUtils, SplitMulti)
 
   result = UnicodeUtils::SplitMulti(input, delimiters);
 
-    EXPECT_EQ(expectedResult.size(), result.size());
-    idx = 0;
-    for (auto i : expectedResult)
+  EXPECT_EQ(expectedResult.size(), result.size());
+  idx = 0;
+  for (auto i : expectedResult)
+  {
+    if (idx < result.size())
     {
-      if (idx < result.size())
-      {
-        EXPECT_STREQ(i.c_str(), result.at(idx).c_str());
-        idx++;
-      }
+      EXPECT_STREQ(i.c_str(), result.at(idx).c_str());
+      idx++;
     }
+  }
 
-    // These two tests verify the example in UnicodeUtils documentation for
-    // SplitMulti.
+  // These two tests verify the example in UnicodeUtils documentation for
+  // SplitMulti.
 
-    input = {"a/b#c/d/e/foo/g::h/", "#p/q/r:s/x&extraNarfy"};
-    delimiters = {"/", "#", ":", "Narf"};
+  input = {"a/b#c/d/e/foo/g::h/", "#p/q/r:s/x&extraNarfy"};
+  delimiters = {"/", "#", ":", "Narf"};
 
-    // Legacy (Matrix 19.4) result does not remove all null strings
-    // expectedResult = {"a", "b", "c", "d", "e", "foo", "g", "", "h", "", "", "p", "q", "r", "s",
-    //                  "x&extra", "y"};
-    expectedResult = {"a", "b", "c", "d", "e", "foo", "g", "h", "p", "q", "r", "s",
-                      "x&extra", "y"};
-     result = UnicodeUtils::SplitMulti(input, delimiters, 0);
-        EXPECT_EQ(expectedResult.size(), result.size());
-         idx = 0;
-         for (auto i : expectedResult)
-         {
-           if (idx < result.size())
-           {
-             EXPECT_STREQ(i.c_str(), result.at(idx).c_str());
-             idx++;
-           }
-         }
+  // Legacy (Matrix 19.4) result does not remove all null strings
+  // expectedResult = {"a", "b", "c", "d", "e", "foo", "g", "", "h", "", "", "p", "q", "r", "s",
+  //                  "x&extra", "y"};
+  expectedResult = {"a", "b", "c", "d", "e", "foo", "g", "h", "p", "q", "r", "s",
+      "x&extra", "y"};
+  result = UnicodeUtils::SplitMulti(input, delimiters, 0);
+  EXPECT_EQ(expectedResult.size(), result.size());
+  idx = 0;
+  for (auto i : expectedResult)
+  {
+    if (idx < result.size())
+    {
+      EXPECT_STREQ(i.c_str(), result.at(idx).c_str());
+      idx++;
+    }
+  }
 
-    input = {"a/b#c/d/e/foo/g::h/", "#p/q/r:s/x&extraNarfy"};
-    delimiters = {"/", "#", ":", "Narf"};
-    expectedResult = {"a", "b#c", "d", "e", "foo", "g::h/", "#p/q/r:s/x&extraNarfy"};
-     result = UnicodeUtils::SplitMulti(input, delimiters, 7);
-        EXPECT_EQ(expectedResult.size(), result.size());
-         idx = 0;
-         for (auto i : expectedResult)
-         {
-           if (idx < result.size())
-           {
-             EXPECT_STREQ(i.c_str(), result.at(idx).c_str());
-             idx++;
-           }
-         }
+  input = {"a/b#c/d/e/foo/g::h/", "#p/q/r:s/x&extraNarfy"};
+  delimiters = {"/", "#", ":", "Narf"};
+  expectedResult = {"a", "b#c", "d", "e", "foo", "g::h/", "#p/q/r:s/x&extraNarfy"};
+  result = UnicodeUtils::SplitMulti(input, delimiters, 7);
+  EXPECT_EQ(expectedResult.size(), result.size());
+  idx = 0;
+  for (auto i : expectedResult)
+  {
+    if (idx < result.size())
+    {
+      EXPECT_STREQ(i.c_str(), result.at(idx).c_str());
+      idx++;
+    }
+  }
 
   input = {" a,b-e e-f,c d-", "-sworn enemy, is not here"};
-   delimiters = {",", " ", "-"};
-   // The following has a minor bug and is present in Matrix 19.4. Should not return null strings
-   // expectedResult =  {"a", "b", "e", "e", "f", "c", "d", "", "", "sworn", "enemy", "is", "not", "here"};
-   expectedResult =  {"a", "b", "e", "e", "f", "c", "d", "sworn", "enemy", "is", "not", "here"};
+  delimiters = {",", " ", "-"};
+  // The following has a minor bug and is present in Matrix 19.4. Should not return null strings
+  // expectedResult =  {"a", "b", "e", "e", "f", "c", "d", "", "", "sworn", "enemy", "is", "not", "here"};
+  expectedResult =  {"a", "b", "e", "e", "f", "c", "d", "sworn", "enemy", "is", "not", "here"};
 
-   result = UnicodeUtils::SplitMulti(input, delimiters);
-   EXPECT_EQ(expectedResult.size(), result.size());
-   idx = 0;
-   for (auto i : expectedResult)
-   {
-     if (idx < result.size())
-     {
-       EXPECT_STREQ(i.c_str(), result.at(idx).c_str());
-       idx++;
-     }
-   }
+  result = UnicodeUtils::SplitMulti(input, delimiters);
+  EXPECT_EQ(expectedResult.size(), result.size());
+  idx = 0;
+  for (auto i : expectedResult)
+  {
+    if (idx < result.size())
+    {
+      EXPECT_STREQ(i.c_str(), result.at(idx).c_str());
+      idx++;
+    }
+  }
 }
 
 TEST(TestUnicodeUtils, FindNumber)

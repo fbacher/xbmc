@@ -547,7 +547,7 @@ public:
    * \brief Gets the byte-offset of a Unicode character relative to a reference
    *
    * This function is primarily used by Left, Right and Mid. See comment at end for details on use.
-   * The currently configured locale is used to tweak character boundaries.
+   * The locale is used by underlying icuc4 library to tweak character boundaries.
    *
    * Unicode characters may consist of multiple codepoints. This function's parameters
    * are based on characters NOT bytes.
@@ -558,13 +558,15 @@ public:
    * \param keepLeft + left define how character index is measured. See comment below
    * \param icuLocale fine-tunes character boundary rules
    * \return code-unit index, relative to str for the given character count
-   *                   std::string::npos is returned if charCount is < 1 or > number of
-   *                   characters in str or if an error occurs
+   *                  Unicode::BEFORE_START or Unicode::AFTER::END is returned if
+   *                  charCount exceeds the string's length. std::string::npos is
+   *                  returned on other errors.
    *
    * left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
    * left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
-   * left=false keepLeft=true   Returns offset of first byte of (n-1)th character (0-n). Used by Right(x, false)
-   * left=false keepLeft=false  Returns offset of first byte of (n-1)th char from right end. Used by Right(x)
+   * left=false keepLeft=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
+   * left=false keepLeft=false  Returns offset of first byte of nth char from right end.
+   *                            Character 0 is AFTER the last character.  Used by Right(x)
    */
   static size_t GetCodeUnitIndex(const std::string &str, size_t charCount,
                                  const bool left, const bool keepLeft, icu::Locale icuLocale);

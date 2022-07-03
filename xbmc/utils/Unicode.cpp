@@ -36,7 +36,6 @@
 #include "log.h"
 #include "Locale.h"
 
-#define DISABLE_OPTIMIZATION 1 // Used for testing. Code should behave the same way
 
 // convert UTF-8 string to wstring
 std::wstring Unicode::UTF8ToWString(const std::string &str)
@@ -1475,19 +1474,12 @@ std::string Unicode::Mid(const std::string &str, size_t startCharCount,
     CLog::Log(LOGINFO, "Unicode::GetCodeUnitIndex Normalized string different from original");
 
   // We need the start byte to begin copy
-  //   left=false keepLeft=true   Return offset of first byte of (n - 1)th character
+  //   left=false keepLeft=true   Return offset of first byte of nth character
 
   bool left = false;
   bool keepLeft = true;
 
-  // Good 'old signed vs unsigned issues
-  if (startCharCount > str.length())
-    startCharCount = str.length() + 1;
-
-  if (startCharCount > str.length())
-    startCharCount = str.length() + 1;
-
-  startUTF8Index = Unicode::GetCodeUnitIndex(result, (startCharCount + 1), left, keepLeft,
+  startUTF8Index = Unicode::GetCodeUnitIndex(result, startCharCount, left, keepLeft,
       Unicode::GetDefaultICULocale());
   if (startUTF8Index == std::string::npos) // Error
   {
@@ -1542,35 +1534,31 @@ std::string Unicode::Right(const std::string &str, size_t charCount,
   /*
       * left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
       * left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
-      * left=false keepLeft=true   Returns offset of first byte of (n - 1)th character (0-n). Used by Right(x, false)
-      * left=false keepLeft=false  Returns offset of first byte of (n - 1)th char from right end (0-n). Used by Right(x)
+      * left=false keepLeft=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
+      * left=false keepLeft=false  Returns offset of first byte of nth char from right end (0-n). Used by Right(x)
       *
       * test right(3) => est == > x.last() - 3 ==>
       * test right(1, false) => est == x[1...]  substr(1, npos) Omit left n chars
       */
-  if (charCount == 0)
-  {
-    if (keepRight)
-      return std::string();
-    return std::string(str);
-  }
+
   size_t utf8Index;
   std::string result;
+  /* Disable during testing
+  if (charCount == 0)
+    if (keepRight)
+      return std::string();
+    else
+      return std::string(str);
+   */
+
   result = Unicode::Normalize(str, StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFC);
   if (result.compare(str) != 0)
     CLog::Log(LOGINFO, "Unicode::GetCodeUnitIndex Normalized string different from original");
 
-  if (charCount > str.length()) // Good 'old signed/unsigned issues
-    charCount = str.length() + 1;
-  if (!keepRight)
-    charCount++;
-
   utf8Index = Unicode::GetCodeUnitIndex(result, charCount, false, ! keepRight, icuLocale);
-  // refstr = "est";
-  // varstr = UnicodeUtils::Right(origstr, 1, false);
-  // EXPECT_STREQ(refstr.c_str(), varstr.c_str());
-  // --> Test
 
+  if (keepRight)
+  {
    if (utf8Index == std::string::npos) // Error
    {
      utf8Index = result.length();
@@ -1581,8 +1569,24 @@ std::string Unicode::Right(const std::string &str, size_t charCount,
    }
    else if (utf8Index == AFTER_END)
    {
-     utf8Index = result.length();
+     utf8Index = str.length();
    }
+  }
+  else
+  {
+   if (utf8Index == std::string::npos) // Error
+   {
+     utf8Index = 0;
+   }
+   else if (utf8Index == BEFORE_START)
+   {
+     utf8Index = 0;;
+   }
+   else if (utf8Index == AFTER_END)
+   {
+     utf8Index = str.length();
+   }
+  }
 
   return result.substr(utf8Index, std::string::npos);
 }
@@ -1598,60 +1602,6 @@ size_t Unicode::GetCodeUnitIndex(const std::string &str, size_t charCount,
 {
   // TODO: Unicode: Note that this code is not yet able to reliably deal with
   // malformed Unicode. The most expeditious way to achieve these is to use UnicodeStrings.
-
-#ifndef DISABLE_OPTIMIZATION
-  // Disable when we want to confirm that code behaves the same without
-  // this shortcut.
-  //
-  // If Requested # characters is 0 or > available code units (here bytes)
-  // then quick calculation can give result. Humans wouldn't use this
-  // codepath, but a loop or some such might.
-
-  size_t effectiveStrLength = str.length();
-  if (charCount == 0)
-  {
-    /*
-     * left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
-     * left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
-     * left=false keepLeft=true   Returns offset of first byte of n th character (0-n). Used by Right(x, false)
-     * left=false keepLeft=false  Returns offset of first byte of (n - 1) th char from right end (0-n). Used by Right(x)
-     *
-     */
-    if (left)
-    {
-      if (keepLeft)
-      //    left=true  keepLeft=true Return offset of last byte of nth character
-        return BEFORE_START;
-      else
-        return AFTER_END; // Last byte of nth char from right end (doesn't validate chars....)
-    }
-    else // right- Return starting code-unit to begin copying
-    {
-      if (keepLeft) // left=false keepLeft=true Return offset of first byte of nth character (0-n).
-        return 0;
-      // else
-      // left=false keepLeft=false  Return offset of first byte of nth char from right end (0-n).
-      // Requires calculation
-    }
-  }
-  if (charCount > effectiveStrLength) // Entire string, don't need to calculate char boundaries
-  {
-    if (left) // Return n code-units to copy starting from left end
-    {
-      if (keepLeft) //keepLeft=true Return offset of last byte of nth character (0-n)
-        return str.length();
-      else
-        return BEFORE_START; // left=true  keepLeft=false Return offset of last byte of nth character from right end (0-n). Used by Left(x, false)
-    }
-    else // right- Return starting code-unit to begin copying
-    {
-      if (keepLeft)
-        return str.length(); // left=false keepLeft=true Return offset of first byte of nth character (0-n). Used by Right(x, false)
-      else
-        return BEFORE_START; // left=false keepLeft=false  Returns offset of first byte of nth char from right end (0-n). Used by Right(x)
-    }
-  }
-#endif
 
   UErrorCode status = U_ZERO_ERROR;
   if (m_cbi != nullptr)
@@ -1788,22 +1738,18 @@ size_t Unicode::GetCodeUnitIndex(const std::string &str, size_t charCount,
   }
   else // right
   {
-    if (keepLeft) // left=false keepLeft=true   Return offset of first byte of (n - 1)th character
+    if (keepLeft) // left=false keepLeft=true   Return offset of first byte of nth character
     {
       m_cbi->first();  // At charCount 0 (byteIndex 0)
-      if (charCount == 0)
-        byteIndex = Unicode::BEFORE_START;
-      else
-      {
-        byteIndex = m_cbi->next(charCount - 1); // first byte of n-1 th char (Right(x, false) Right test line 888
-        if (byteIndex == std::string::npos)
-          byteIndex = Unicode::AFTER_END;
-      }
+      byteIndex = m_cbi->next(charCount); // first byte of nth char (Right(x, false)
+      if (byteIndex == std::string::npos)
+        byteIndex = Unicode::AFTER_END;
     }
-    else // left=false keepLeft=false  Returns offset of first byte of (n-1) th char from right end
+    else // left=false keepLeft=false  Returns offset of first byte of nth char from right end
     {
-      size_t charsToDelete = charCount; // Unlike left=true keepleft=false, we want the (n-1)th char
-      byteIndex = m_cbi->last();  // BEYOND last
+      size_t charsToDelete = charCount;
+      byteIndex = m_cbi->last(); // AFTER last character
+      byteIndex = AFTER_END;
       while (charsToDelete > 0)
       {
         byteIndex = m_cbi->next(-1);
