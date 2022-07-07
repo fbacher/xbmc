@@ -49,6 +49,9 @@
  *   perform dictionary lookups.
  *
  *   Properly handles any change of string (byte) lengths during the capitalization.
+ *
+ * Limitations: Uses the current user's locale. Call ToTitle directly to be able
+ *   to specify locale.
  */
 #undef USE_TO_TITLE_FOR_CAPITALIZE
 
@@ -63,7 +66,6 @@
 #undef FMT_DEPRECATED
 #define FMT_DEPRECATED
 #endif
-#include <fmt/format.h>
 
 #if FMT_VERSION >= 80000
 #include <fmt/xchar.h>
@@ -71,78 +73,78 @@
 
 #include "LangInfo.h"
 #include "utils/params_check_macros.h"
-#include "Unicode.h"
+#include "utils/Unicode.h"
 #include "XBDateTime.h"
 
 class UnicodeUtils
 {
 public:
 
-	/**
-	 *  A Brief description of some of the Unicode issues:
-	 *
-	 *  Working with Unicode and multiple languages greatly complicates
-	 *  string operations. ToLower prompted the creation of this class. Turkic
-	 *  has 4 versions of the letter I (two of which are the Roman ones "I"
-	 *  and "i". A number of languages do something like this and it is not normally
-	 *  a huge deal. However, in Turkic, changing the case of the Roman "I" (same
-	 *  as English I) results in the Turkic, lower case dotless I, "ı". This
-	 *  broke tons of code and prevented Kodi from woking at all in Turkic and
-	 *  a similar language. Other problems were discovered that were more subtle.
-	 *
-	 *  Changing the case of strings can change their byte AND character lengths,
-	 *  depending upon locale. Example, German sharp-s 'ß' is equivalent to two
-	 *  lower-case 's' characters. UpperCasing a sharp-s becomes 'SS' because
-	 *  there is no upper-case sharp-S.
-	 *
-	 *  FoldCase is normally what you want to use instead of ToLower (when you
-	 *  want to 'normalize' a string for use as an index, etc.). (This resolved
-	 *  the Turkic-I problem mentioned above.)
-	 *
-	 *  UTF-8, UTF-16, etc. are all encodings for 4-byte Unicode codepoints.
-	 *  A codepoint is frequently a 'character' but not necessarily. Codepoints
-	 *  can represent character variations, such as accent marks. Emojiis are
-	 *  also included in the Unicode standard. (The flag of Scotland (🏴󠁧󠁢󠁳󠁣󠁴󠁿) requires
-	 *  seven-codepoint sequence)). Unicode frequently uses the terms "character"
-	 *  and "Grapheme" interchangeably, if not a bit loosely.
-	 *
-	 *  In addition to some characters being composed of multiple codepoints, the
-	 *  order of all but the first codepoint can get scrambled a bit during
-	 *  processing. They visually look the same (who cares if the left upper dot
-	 *  is specified before the right upper dot), they can wreak havoc with the
-	 *  code. To solve this are various Normalizations that can be applied. Fortunately
-	 *  Normalization is not required in many cases. The only problem is, I haven't
-	 *  figured out the rules yet. Normalization may be required before & after a
-	 *  FoldCase operation, for example. When possible, this function does this
-	 *  for you.
-	 *
-	 *  C++ has some rudimentary Unicode support but has gaping holes:
-	 *  Many g++ systems define wchar_t as unsigned 32 bits, which maps
-	 *  nicely to a Unicode codepoint. However, the standard does NOT specify
-	 *  a length for wchar_t. Newer C++ versions adds several new character
-	 *  types that move in the right direction, but there is no support for
-	 *  Normalizing, working with multi-codepoint "characters" and many other
-	 *  capabilities.
-	 *
-	 *  Implications of C++ limitations:
-	 *  * You can't compare two strings one byte or even codepoint at a time
-	 *  * Two strings of different, non-zero lengths does not tell you if
-	 *    strings are not-equal! (Not without knowing that the strings are Normalized
-	 *    for the same locale).
-	 *  * When iterating the characters of a string, you frequently have
-	 *    to know where the character boundaries are, which there is no support
-	 *    for
-	 *  * You may have to copy or alter strings simply to compare them
-	 *
+  /**
+   *  A Brief description of some of the Unicode issues:
+   *
+   *  Working with Unicode and multiple languages greatly complicates
+   *  string operations. ToLower prompted the creation of this class. Turkic
+   *  has 4 versions of the letter I (two of which are the Roman ones "I"
+   *  and "i". A number of languages do something like this and it is not normally
+   *  a huge deal. However, in Turkic, changing the case of the Roman "I" (same
+   *  as English I) results in the Turkic, lower case dotless I, "ı". This
+   *  broke tons of code and prevented Kodi from woking at all in Turkic and
+   *  a similar language. Other problems were discovered that were more subtle.
+   *
+   *  Changing the case of strings can change their byte AND character lengths,
+   *  depending upon locale. Example, German sharp-s 'ß' is equivalent to two
+   *  lower-case 's' characters. UpperCasing a sharp-s becomes 'SS' because
+   *  there is no upper-case sharp-S.
+   *
+   *  FoldCase is normally what you want to use instead of ToLower (when you
+   *  want to 'normalize' a string for use as an index, etc.). (This resolved
+   *  the Turkic-I problem mentioned above.)
+   *
+   *  UTF-8, UTF-16, etc. are all encodings for 4-byte Unicode codepoints.
+   *  A codepoint is frequently a 'character' but not necessarily. Codepoints
+   *  can represent character variations, such as accent marks. Emojiis are
+   *  also included in the Unicode standard. (The flag of Scotland (🏴󠁧󠁢󠁳󠁣󠁴󠁿) requires
+   *  seven-codepoint sequence)). Unicode frequently uses the terms "character"
+   *  and "Grapheme" interchangeably, if not a bit loosely.
+   *
+   *  In addition to some characters being composed of multiple codepoints, the
+   *  order of all but the first codepoint can get scrambled a bit during
+   *  processing. They visually look the same (who cares if the left upper dot
+   *  is specified before the right upper dot), they can wreak havoc with the
+   *  code. To solve this are various Normalizations that can be applied. Fortunately
+   *  Normalization is not required in many cases. The only problem is, I haven't
+   *  figured out the rules yet. Normalization may be required before & after a
+   *  FoldCase operation, for example. When possible, this function does this
+   *  for you.
+   *
+   *  C++ has some rudimentary Unicode support but has gaping holes:
+   *  Many g++ systems define wchar_t as unsigned 32 bits, which maps
+   *  nicely to a Unicode codepoint. However, the standard does NOT specify
+   *  a length for wchar_t. Newer C++ versions adds several new character
+   *  types that move in the right direction, but there is no support for
+   *  Normalizing, working with multi-codepoint "characters" and many other
+   *  capabilities.
+   *
+   *  Implications of C++ limitations:
+   *  * You can't compare two strings one byte or even codepoint at a time
+   *  * Two strings of different, non-zero lengths does not tell you if
+   *    strings are not-equal! (Not without knowing that the strings are Normalized
+   *    for the same locale).
+   *  * When iterating the characters of a string, you frequently have
+   *    to know where the character boundaries are, which there is no support
+   *    for
+   *  * You may have to copy or alter strings simply to compare them
+   *
    * ICU library
-	 *  * The ICU library, while complicated and pretty heavy, can reliably
-	 *    handle many localization and Unicode issues.
-	 *  * Frequently strings are Normalized. Normalizing isn't that expensive.
-	 *  * While it is simpler/faster to keep everything in Unicode (32-bit),
-	 *    it is not overly expensive to use utf-8, utf-16.
-	 *  * ICU tries to be as efficient as possible, assumes the most common,
-	 *    cheaper case first, resorting to more expensive solutions only when
-	 *    needed.
+   *  * The ICU library, while complicated and pretty heavy, can reliably
+   *    handle many localization and Unicode issues.
+   *  * Frequently strings are Normalized. Normalizing isn't that expensive.
+   *  * While it is simpler/faster to keep everything in Unicode (32-bit),
+   *    it is not overly expensive to use utf-8, utf-16.
+   *  * ICU tries to be as efficient as possible, assumes the most common,
+   *    cheaper case first, resorting to more expensive solutions only when
+   *    needed.
    *
    * The string methods here are definitely more expensive than those in StringUtils.
    * There is a lot of opportunity for improvement:
@@ -311,7 +313,7 @@ public:
    *       eliminating this problem. Below are the four "I" characters in
    *       Turkic and the result of FoldCase for each:
    *
-	 * Locale                    Unicode                                      Unicode
+   * Locale                    Unicode                                      Unicode
    *                           codepoint                                    (hex 32-bit codepoint(s))
    * en_US I (Dotless I)       \u0049 -> i (Dotted small I)                 \u0069
    * tr_TR I (Dotless I)       \u0049 -> ı (Dotless small I)                \u0131
@@ -365,24 +367,24 @@ public:
       const StringOptions opt = StringOptions::FOLD_CASE_DEFAULT);
 
   /*!
-   *  \brief Capitalizes a wstring using locale.
+   *  \brief Capitalizes a wstring using Legacy Kodi rules
    *
    * Uses a simplistic approach familiar to English speakers.
    * See TitleCase for a more locale aware solution.
    *
    * \param str string to capitalize in place
-   * \return str converted to "Title Case"
+   * \return str capitalized
    */
   static void ToCapitalize(std::wstring &str);
 
   /*!
-   *  \brief Capitalizes a string using LangInfo::GetSystemLocale.
+   *  \brief Capitalizes a string using Legacy Kodi rules
    *
    * Uses a simplistic approach familiar to English speakers.
    * See TitleCase for a more locale aware solution.
    *
    * \param str string to capitalize in place
-   * \return str converted to "Title Case"
+   * \return str capitalized
    */
   static void ToCapitalize(std::string &str);
 
@@ -586,6 +588,8 @@ public:
   /*!
    * \brief Compares two wstrings using codepoint order. Locale does not matter.
    *
+   * DO NOT USE for collation
+   *
    * \param str1 one of the strings to compare
    * \param str2 one of the strings to compare
    * \return <0 or 0 or >0 as usual for string comparisons
@@ -595,6 +599,7 @@ public:
   /*!
    * \brief Compares two strings using codepoint order. Locale does not matter.
    *
+   * DO NOT USE for collation
    * \param str1 one of the strings to compare
    * \param str2 one of the strings to compare
    * \return <0 or 0 or >0 as usual for string comparisons
@@ -905,158 +910,158 @@ public:
    * \return substring of str, beginning with character 'startChar',
    *         length determined by charCount
    */
-    static std::string Mid(const std::string &str, const size_t startChar,
-        const size_t charCount = std::string::npos);
+  static std::string Mid(const std::string &str, const size_t startChar,
+      const size_t charCount = std::string::npos);
 
-    /*!
-     * \brief Get the rightmost end of a UTF-8 string, using character boundary
-     * rules defined by the current icu Locale.
-     *
-     * Unicode characters may consist of multiple codepoints. This function's
-     * parameters are based on characters and NOT bytes. Due to normalization,
-     * the byte-length of the strings may change, although the character counts
-     * will not.
-     *
-     * \param str to get a substring of
-     * \param charCount if keepRight: charCount is number of characters to
-     *                  copy from right end (limited by str length)
-     *                  if ! keepRight: charCount number of characters to omit from right end
-     * \param keepRight controls how charCount is interpreted
-     * \return rightmost characters of string, length determined by charCount
-     *
-     * Ex: Copy all but the leftmost two characters from str:
-     *
-     * std::string x = Right(str, 2, false);
-     */
-    static std::string Right(const std::string &str, const size_t charCount, bool keepRight = true);
+  /*!
+   * \brief Get the rightmost end of a UTF-8 string, using character boundary
+   * rules defined by the current icu Locale.
+   *
+   * Unicode characters may consist of multiple codepoints. This function's
+   * parameters are based on characters and NOT bytes. Due to normalization,
+   * the byte-length of the strings may change, although the character counts
+   * will not.
+   *
+   * \param str to get a substring of
+   * \param charCount if keepRight: charCount is number of characters to
+   *                  copy from right end (limited by str length)
+   *                  if ! keepRight: charCount number of characters to omit from right end
+   * \param keepRight controls how charCount is interpreted
+   * \return rightmost characters of string, length determined by charCount
+   *
+   * Ex: Copy all but the leftmost two characters from str:
+   *
+   * std::string x = Right(str, 2, false);
+   */
+  static std::string Right(const std::string &str, const size_t charCount, bool keepRight = true);
 
-    /*!
-       * \brief Get the rightmost end of a UTF-8 string, using character boundary
-       * rules defined by the given locale.
-       *
-       * Unicode characters may consist of multiple codepoints. This function's
-       * parameters are based on characters and NOT bytes. Due to normalization,
-       * the byte-length of the strings may change, although the character counts
-       * will not.
-       *
-       * \param str to get a substring of
-       * \param charCount if keepRight: charCount is number of characters to
-       *                  copy from right end (limited by str length)
-       *                  if ! keepRight: charCount number of characters to omit from right end
-       * \param icuLocale determines character boundaries
-       * \param keepRight controls how charCount is interpreted
-       * \return rightmost characters of string, length determined by charCount
-       *
-       * Ex: Copy all but the leftmost two characters from str:
-       *
-       * std::string x = Right(str, 2, false, Unicode::GetDefaultICULocale());
-       */
-      static std::string Right(const std::string &str, const size_t charCount,
-          const icu::Locale &icuLocale, bool keepRight = true);
+  /*!
+   * \brief Get the rightmost end of a UTF-8 string, using character boundary
+   * rules defined by the given locale.
+   *
+   * Unicode characters may consist of multiple codepoints. This function's
+   * parameters are based on characters and NOT bytes. Due to normalization,
+   * the byte-length of the strings may change, although the character counts
+   * will not.
+   *
+   * \param str to get a substring of
+   * \param charCount if keepRight: charCount is number of characters to
+   *                  copy from right end (limited by str length)
+   *                  if ! keepRight: charCount number of characters to omit from right end
+   * \param icuLocale determines character boundaries
+   * \param keepRight controls how charCount is interpreted
+   * \return rightmost characters of string, length determined by charCount
+   *
+   * Ex: Copy all but the leftmost two characters from str:
+   *
+   * std::string x = Right(str, 2, false, Unicode::GetDefaultICULocale());
+   */
+  static std::string Right(const std::string &str, const size_t charCount,
+      const icu::Locale &icuLocale, bool keepRight = true);
 
-    /*!
-      * \brief Gets the byte-offset of a Unicode character relative to a reference
-      *
-      * This function is primarily used by Left, Right and Mid. See comment at end for details on use.
-      *
-      *  Unicode characters may consist of multiple codepoints. This function's parameters
-      * are based on characters NOT bytes.
-      *
-      * \param str UTF-8 string to get index from
-      * \param charCount number of characters from reference point to get byte index for
-      * \param left + keepLeft define how character index is measured. See comment below
-      * \param keepLeft + left define how character index is measured. See comment below
-      * \param icuLocale fine-tunes character boundary rules
-      * \return code-unit index, relative to str for the given character count
-      *                  Unicode::BEFORE_START or Unicode::AFTER::END is returned if
-      *                  charCount exceeds the string's length. std::string::npos is
-      *                  returned on other errors.
-      *
-      * left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
-      * left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
-      * left=false keepLeft=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
-      * left=false keepLeft=false  Returns offset of first byte of nth char from right end.
-      *                            Character 0 is AFTER the last character.  Used by Right(x)
-      */
-    static size_t GetByteIndexForCharacter(const std::string &str, size_t charCount,
-        const bool left, const bool keepLeft, icu::Locale icuLocale);
-    /*!
-      * \brief Gets the byte-offset of a Unicode character relative to a reference
-      *
-      * This function is primarily used by Left, Right and Mid. See comment at end for details on use.
-      *
-      * Unicode characters may consist of multiple codepoints. This function's parameters
-      * are based on characters NOT bytes.
-      *
-      * \param str UTF-8 string to get index from
-      * \param charCount number of characters from reference point to get byte index for
-      * \param left + keepLeft define how character index is measured. See comment below
-      * \param keepLeft + left define how character index is measured. See comment below
-      *                   std::string::npos is returned if charCount is outside of the string
-      * \return code-unit index, relative to str for the given character count
-      *                  Unicode::BEFORE_START or Unicode::AFTER::END is returned if
-      *                  charCount exceeds the string's length. std::string::npos is
-      *                  returned on other errors.
-      *
-      * left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
-      * left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
-      * left=false keepLeft=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
-      * left=false keepLeft=false  Returns offset of first byte of nth char from right end.
-      *                            Character 0 is AFTER the last character.  Used by Right(x)
-      */
-    static size_t GetByteIndexForCharacter(const std::string &str, size_t charCount,
-        const bool left, const bool keepLeft, std::locale locale);
+  /*!
+   * \brief Gets the byte-offset of a Unicode character relative to a reference
+   *
+   * This function is primarily used by Left, Right and Mid. See comment at end for details on use.
+   *
+   *  Unicode characters may consist of multiple codepoints. This function's parameters
+   * are based on characters NOT bytes.
+   *
+   * \param str UTF-8 string to get index from
+   * \param charCount number of characters from reference point to get byte index for
+   * \param left + keepLeft define how character index is measured. See comment below
+   * \param keepLeft + left define how character index is measured. See comment below
+   * \param icuLocale fine-tunes character boundary rules
+   * \return code-unit index, relative to str for the given character count
+   *                  Unicode::BEFORE_START or Unicode::AFTER::END is returned if
+   *                  charCount exceeds the string's length. std::string::npos is
+   *                  returned on other errors.
+   *
+   * left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
+   * left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
+   * left=false keepLeft=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
+   * left=false keepLeft=false  Returns offset of first byte of nth char from right end.
+   *                            Character 0 is AFTER the last character.  Used by Right(x)
+   */
+  static size_t GetByteIndexForCharacter(const std::string &str, size_t charCount,
+      const bool left, const bool keepLeft, const icu::Locale& icuLocale);
+  /*!
+   * \brief Gets the byte-offset of a Unicode character relative to a reference
+   *
+   * This function is primarily used by Left, Right and Mid. See comment at end for details on use.
+   *
+   * Unicode characters may consist of multiple codepoints. This function's parameters
+   * are based on characters NOT bytes.
+   *
+   * \param str UTF-8 string to get index from
+   * \param charCount number of characters from reference point to get byte index for
+   * \param left + keepLeft define how character index is measured. See comment below
+   * \param keepLeft + left define how character index is measured. See comment below
+   *                   std::string::npos is returned if charCount is outside of the string
+   * \return code-unit index, relative to str for the given character count
+   *                  Unicode::BEFORE_START or Unicode::AFTER::END is returned if
+   *                  charCount exceeds the string's length. std::string::npos is
+   *                  returned on other errors.
+   *
+   * left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
+   * left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
+   * left=false keepLeft=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
+   * left=false keepLeft=false  Returns offset of first byte of nth char from right end.
+   *                            Character 0 is AFTER the last character.  Used by Right(x)
+   */
+  static size_t GetByteIndexForCharacter(const std::string &str, size_t charCount,
+      const bool left, const bool keepLeft, const std::locale& locale);
 
-    /*!
-      * \brief Gets the byte-offset of a Unicode character relative to a reference
-      *
-      * This function is primarily used by Left, Right and Mid. See comment at end for details on use.
-      * The currently configured locale is used to tweak character boundaries.
-      *
-      * Unicode characters may consist of multiple codepoints. This function's parameters
-      * are based on characters NOT bytes.
-      *
-      * \param str UTF-8 string to get index from
-      * \param charCount number of characters from reference point to get byte index for
-      * \param left + keepLeft define how character index is measured. See comment below
-      * \param keepLeft + left define how character index is measured. See comment below
-      * \return code-unit index, relative to str for the given character count
-      *                  Unicode::BEFORE_START or Unicode::AFTER::END is returned if
-      *                  charCount exceeds the string's length. std::string::npos is
-      *                  returned on other errors.
-      *
-      * left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
-      * left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
-      * left=false keepLeft=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
-      * left=false keepLeft=false  Returns offset of first byte of nth char from right end.
-      *                            Character 0 is AFTER the last character.  Used by Right(x)
-      */
-    static size_t GetByteIndexForCharacter(const std::string &str, size_t charCount,
-        const bool left, const bool keepLeft);
+  /*!
+   * \brief Gets the byte-offset of a Unicode character relative to a reference
+   *
+   * This function is primarily used by Left, Right and Mid. See comment at end for details on use.
+   * The currently configured locale is used to tweak character boundaries.
+   *
+   * Unicode characters may consist of multiple codepoints. This function's parameters
+   * are based on characters NOT bytes.
+   *
+   * \param str UTF-8 string to get index from
+   * \param charCount number of characters from reference point to get byte index for
+   * \param left + keepLeft define how character index is measured. See comment below
+   * \param keepLeft + left define how character index is measured. See comment below
+   * \return code-unit index, relative to str for the given character count
+   *                  Unicode::BEFORE_START or Unicode::AFTER::END is returned if
+   *                  charCount exceeds the string's length. std::string::npos is
+   *                  returned on other errors.
+   *
+   * left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
+   * left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
+   * left=false keepLeft=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
+   * left=false keepLeft=false  Returns offset of first byte of nth char from right end.
+   *                            Character 0 is AFTER the last character.  Used by Right(x)
+   */
+  static size_t GetByteIndexForCharacter(const std::string &str, size_t charCount,
+      const bool left, const bool keepLeft);
 
-    /*!
-     * \brief Get the rightmost side of a UTF-8 string, using character boundary
-     * rules defined by the given locale.
-     *
-     * Unicode characters may consist of multiple codepoints. This function's
-     * parameters are based on characters and NOT bytes. Due to normalization,
-     * the byte-length of the strings may change, although the character counts
-     * will not.
-     *
-     * \param str to get a substring of
-     * \param charCount if rightReference: charCount is number of characters to
-     *                  copy from right end (limited by str length)
-     *                  if ! rightReference: number of characters to omit from left end
-     * \param rightReference controls how charCount is interpreted
-     * \param icuLocale determines how character breaks are made
-     * \return rightmost characters of string, length determined by charCount
-     *
-     * Ex: Copy all but the leftmost two characters from str:
-     *
-     * std::string x = Right(str, 2, false, Unicode::GetDefaultICULocale());
-     */
-    static std::string Right(const std::string &str, const size_t charCount, bool rightReference,
-        const icu::Locale &icuLocale);
+  /*!
+   * \brief Get the rightmost side of a UTF-8 string, using character boundary
+   * rules defined by the given locale.
+   *
+   * Unicode characters may consist of multiple codepoints. This function's
+   * parameters are based on characters and NOT bytes. Due to normalization,
+   * the byte-length of the strings may change, although the character counts
+   * will not.
+   *
+   * \param str to get a substring of
+   * \param charCount if rightReference: charCount is number of characters to
+   *                  copy from right end (limited by str length)
+   *                  if ! rightReference: number of characters to omit from left end
+   * \param rightReference controls how charCount is interpreted
+   * \param icuLocale determines how character breaks are made
+   * \return rightmost characters of string, length determined by charCount
+   *
+   * Ex: Copy all but the leftmost two characters from str:
+   *
+   * std::string x = Right(str, 2, false, Unicode::GetDefaultICULocale());
+   */
+  static std::string Right(const std::string &str, const size_t charCount, bool rightReference,
+      const icu::Locale &icuLocale);
 
 
   /*!
@@ -1161,7 +1166,8 @@ public:
    * \param newChar character to replace with
    * \return Count of the number of changes
    */
-  static int Replace(std::string &str, char oldChar, char newChar);
+  [[deprecated("FindAndReplace is faster, returned count not used.") ]]
+   static int Replace(std::string &str, char oldChar, char newChar);
 
   /*!
    * \brief Replaces every occurrence of a string within another string.
@@ -1174,7 +1180,8 @@ public:
    * \param newStr string to replace with
    * \return Count of the number of changes
    */
-  static int Replace(std::string &str, const std::string &oldStr, const std::string &newStr);
+  [[deprecated("FindAndReplace is faster, returned count not used.") ]]
+   static int Replace(std::string &str, const std::string &oldStr, const std::string &newStr);
 
   /*!
    * \brief Replaces every occurrence of a wstring within another wstring in-place
@@ -1187,7 +1194,8 @@ public:
    * \parm newStr string to replace with
    * \return Count of the number of changes
    */
-  static int Replace(std::wstring &str, const std::wstring &oldStr, const std::wstring &newStr);
+  [[deprecated("FindAndReplace is faster, returned count not used.") ]]
+   static int Replace(std::wstring &str, const std::wstring &oldStr, const std::wstring &newStr);
 
   /*!
    * \brief Replaces every occurrence of a string within another string
@@ -1201,7 +1209,7 @@ public:
    * \return the modified string.
    */
   static std::string FindAndReplace(const std::string &str, const std::string oldText,
-  		const std::string newText);
+      const std::string newText);
 
   /*!
    * \brief Replaces every occurrence of a string within another string.
@@ -1215,7 +1223,7 @@ public:
    * \return the modified string
    */
   static std::string FindAndReplace(const std::string &str, const char * oldText,
-  		const char * newText);
+      const char * newText);
 
   /*!
    * \brief Replaces every occurrence of a regex pattern with a string in another string.
@@ -1230,7 +1238,7 @@ public:
    * \return result of regular expression
    */
   std::string RegexReplaceAll(const std::string &str, const std::string pattern,
-  		const std::string newStr, const int flags);
+      const std::string newStr, const int flags);
 
   /*!
    * \brief Determines if a string begins with another string
@@ -1270,7 +1278,7 @@ public:
    * \return true if str1 starts with str2, otherwise false
    */
   static bool StartsWithNoCase(const std::string &str1, const std::string &str2,
-  		StringOptions opt = StringOptions::FOLD_CASE_DEFAULT);
+      StringOptions opt = StringOptions::FOLD_CASE_DEFAULT);
 
   /*!
    * \brief Determines if a string begins with another string, ignoring their case
@@ -1283,7 +1291,7 @@ public:
    * \return true if str1 starts with s2, otherwise false
    */
   static bool StartsWithNoCase(const std::string &str1, const char *s2,
-  		StringOptions opt = StringOptions::FOLD_CASE_DEFAULT);
+      StringOptions opt = StringOptions::FOLD_CASE_DEFAULT);
 
   /*!
    * \brief Determines if a string begins with another string, ignoring their case
@@ -1376,12 +1384,46 @@ public:
    */
   static std::vector<std::string> Split(const std::string& input, const std::vector<std::string>& delimiters);
 
-
   /*!
-   * \brief Splits multiple input strings using the the same set of delimiters.
+   * \brief Splits each input string with each delimiter string producing a vector of split strings
+   * omitting any null strings.
+   *
+   * \param input vector of strings to be split
+   * \param delimiters when found in a string, a delimiter splits a string into two strings
+   * \param iMaxStrings (optional) Maximum number of resulting split strings
+   * \result the accumulation of all split strings (and any unfinished splits, due to iMaxStrings
+   *          being exceeded) omitting null strings
+   *
+   *
+   * SplitMulti is essentially equivalent to running Split(string, vector<delimiters>, maxstrings) over multiple
+   * strings with the same delimiters and returning the aggregate results. Null strings are not returned.
+   *
+   * There are some significant differences when maxstrings alters the process. Here are the boring details:
+   *
+   * For each delimiter, Split(string<n> input, delimiter, maxstrings) is called for each input string.
+   * The results are appended to results <vector<string>>
+   *
+   * After a delimiter has been applied to all input strings, the process is repeated with the
+   * next delimiter, but this time with the vector<string> input being replaced with the
+   * results of the previous pass.
+   *
+   * If the maxstrings limit is not reached, then, as stated above, the results are similar to
+   * running Split(string, vector<delimiters> maxstrings) over multiple strings. But when the limit is reached
+   * differences emerge.
+   *
+   * Before a delimiter is applied to a string a check is made to see if maxstrings is exceeded. If so,
+   * then splitting stops and all split string results are returned, including any strings that have not
+   * been split by as many delimiters as others, leaving the delimiters in the results.
+   *
+   * Differences between current behavior and prior versions: Earlier versions removed most empty strings,
+   * but a few slipped past. Now, all empty strings are removed. This means not as many empty strings
+   * will count against the maxstrings limit. This change should cause no harm since there is no reliable
+   * way to correlate a result with an input; they all get thrown in together.
    *
    * If an input vector element is empty the result will be an empty vector element (not
    * an empty string).
+   *
+   * Examples:
    *
    * Delimiter strings are applied in order, so once iMaxStrings
    * items is produced no other delimiters are applied. This produces different results
@@ -1404,12 +1446,10 @@ public:
    * \param iMaxStrings limits number of resulting split strings. A value of 0
    *        means no limit.
    * \return vector of split strings
-   *
-   * TODO: Need Testcase!
    */
   static std::vector<std::string> SplitMulti(const std::vector<std::string>& input,
-                                             const std::vector<std::string>& delimiters,
-                                             size_t iMaxStrings = 0);
+      const std::vector<std::string>& delimiters,
+      size_t iMaxStrings = 0);
   /*! \brief Counts the occurrences of strFind in strInput
    *
    * \param strInput string to be searched
@@ -1449,64 +1489,76 @@ public:
   static int64_t AlphaNumericCompare(const wchar_t *left, const wchar_t *right);
 
   /*!
-     * SQLite collating function, see sqlite3_create_collation
-     * The equivalent of AlphaNumericCompare() but for comparing UTF8 encoded data using
-     * LangInfo::GetSystemLocale
-     *
-     * This only processes enough data to find a difference, and avoids expensive data conversions.
-     * When sorting in memory item data is converted once to wstring in advance prior to sorting, the
-     * SQLite callback function can not do that kind of preparation. Instead, in order to use
-     * AlphaNumericCompare(), it would have to repeatedly convert the full input data to wstring for
-     * every pair comparison made. That approach was found to be 10 times slower than using this
-     * separate routine.
-     *
-     * /param nKey1 byte-length of first UTF-8 string
-     * /param pKey1 pointer to byte array for the first UTF-8 string to compare
-     * /param nKey2 byte-length of second UTF-8 string
-  	 * /param pKey2 pointer to byte array for the second UTF-8 string to compare
-  	 * /return 0 if strings are the same,
-  	 *       < 0 if first string should come before the second
-  	 *       > 0 if the first string should come after the second
-     */
+   * SQLite collating function, see sqlite3_create_collation
+   * The equivalent of AlphaNumericCompare() but for comparing UTF8 encoded data using
+   * LangInfo::GetSystemLocale
+   *
+   * This only processes enough data to find a difference, and avoids expensive data conversions.
+   * When sorting in memory item data is converted once to wstring in advance prior to sorting, the
+   * SQLite callback function can not do that kind of preparation. Instead, in order to use
+   * AlphaNumericCompare(), it would have to repeatedly convert the full input data to wstring for
+   * every pair comparison made. That approach was found to be 10 times slower than using this
+   * separate routine.
+   *
+   * /param nKey1 byte-length of first UTF-8 string
+   * /param pKey1 pointer to byte array for the first UTF-8 string to compare
+   * /param nKey2 byte-length of second UTF-8 string
+   * /param pKey2 pointer to byte array for the second UTF-8 string to compare
+   * /return 0 if strings are the same,
+   *       < 0 if first string should come before the second
+   *       > 0 if the first string should come after the second
+   */
   static int AlphaNumericCollation(int nKey1, const void* pKey1, int nKey2, const void* pKey2);
 
-  /*! \brief converts timeString (hh:mm:ss or nnn min) to seconds.
-   *
-   * timeString is expected to be of the form:
-   *  <opt whitespace>hh:mm:ss<opt whitespace> | <opt_whitespace>number min
-   *
-   *  ex: " 14:57 " or "  23 min"
+  /*!
+   * \brief converts timeString (hh:mm:ss or nnn min) to seconds.
    *
    * \param timeString string to convert to seconds may be in "hh:mm:ss" or "nnn min" format
    *                   missing values are assumed zero. Whitespace is trimmed first.
    * \return parsed value in seconds
+   *
+   *   ex: " 14:57 " or "  23 min"
    */
   static long TimeStringToSeconds(const std::string &timeString);
 
-  /*! \brief Strip any trailing \n or \r characters.
+  /*!
+   * \brief Strip any trailing \n and \r characters.
    *
-   * \param strLine
+   * \param strLine input string to have consecutive trailing \n and \r characters removed in-place
    */
   static void RemoveCRLF(std::string& strLine);
 
-  /*! \brief convert a time in seconds to a string based on the given time format
-   \param seconds time in seconds
-   \param format the format we want the time in.
-   \return the formatted time
-   \sa TIME_FORMAT
+  /*!
+   * \brief convert a time in seconds to a string based on the given time format
+   *
+   * \param seconds time in seconds
+   * \param format the format to use to convert seconds to a time
+   * \return the formatted time
    */
   static std::string SecondsToTimeString(long seconds, TIME_FORMAT format = TIME_FORMAT_GUESS);
 
+  /*!
+   * \brief detects when a string contains non-ASCII to aide in debugging or error reporting
+   *
+   * \param str String to be examined for non-ASCII
+   * \return true if non-ASCII characters found, otherwise false
+   */
   inline static bool ContainsNonAscii(std::string str)
   {
-  	for (size_t i = 0; i < str.length(); i++) {
-  		if (not isascii(str[i])) {
-  			return true;
-  		}
-  	}
-  	return false;
+    for (size_t i = 0; i < str.length(); i++) {
+      if (not isascii(str[i])) {
+        return true;
+      }
+    }
+    return false;
   }
 
+  /*!
+   * \brief detects when a wstring contains non-ASCII to aide in debugging or error reporting
+   *
+   * \param str String to be examined for non-ASCII
+   * \return true if non-ASCII characters found, otherwise false
+   */
   inline static bool ContainsNonAscii(std::wstring str)
   {
     for (size_t i = 0; i < str.length(); i++) {
@@ -1517,8 +1569,10 @@ public:
     return false;
   }
 
+ static size_t FindWords(const char *str, const char *wordLowerCase);
+
   /**
-   * Scans the str for the occurrence of word.
+   * \brief Scans str for the occurrence of word.
    *
    * Word is either all letters or all digits. Words must be
    * separated by spaces.
@@ -1529,13 +1583,14 @@ public:
 
   static void WordToDigits(std::string &word);
 
-  /*! \brief Escapes the given string to be able to be used as a parameter.
-
-   Escapes backslashes and double-quotes with an additional backslash and
-   adds double-quotes around the whole string.
-
-   \param param String to escape/paramify
-   \return Escaped/Paramified string
+  /*!
+   * \brief Escapes the given string to be able to be used as a parameter.
+   *
+   * Escapes backslashes and double-quotes with an additional backslash and
+   * adds double-quotes around the whole string.
+   *
+   * \param param String to escape/paramify
+   * \return Escaped/Paramified string
    */
   static std::string Paramify(const std::string &param);
 

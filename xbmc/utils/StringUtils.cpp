@@ -18,6 +18,8 @@
 //  Modified to use J O'Leary's std::string class by kraqh3d
 //
 //------------------------------------------------------------------------
+#include "StringUtils.h"
+
 #include <unicode/utf8.h>
 #include <cctype>
 #include <cstdio>
@@ -26,7 +28,7 @@
 #include <iterator>
 
 #include "../commons/ilog.h"
-// #include "UnicodeUtils.h"
+#include "UnicodeUtils.h"
 
 #ifdef HAVE_NEW_CROSSGUID
 #include <crossguid/guid.hpp>
@@ -40,7 +42,6 @@
 
 #include "CharsetConverter.h"
 #include "LangInfo.h"
-#include "StringUtils.h"
 #include <tuple>
 #include "Util.h"
 
@@ -58,15 +59,13 @@
 #include <time.h>
 #include <fstrcmp.h>
 
-// #include <unicode/utf8.h>
 #include "utils/log.h"
 
 // don't move or std functions end up in PCRE namespace
 // clang-format off
 #include "utils/RegExp.h"
 // clang-format on
-// #include "utils/Unicode.h"
-// #include "unicode/uregex.h"
+
 
 #define FORMAT_BLOCK_SIZE 512 // # of bytes for initial allocation for printf
 

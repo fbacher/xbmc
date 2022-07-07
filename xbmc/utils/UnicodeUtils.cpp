@@ -18,6 +18,17 @@
 //  Modified to use J O'Leary's std::string class by kraqh3d
 //
 //------------------------------------------------------------------------
+#include <bits/std_abs.h>
+#include <bits/stdint-intn.h>
+#include <stddef.h>
+#include <unicode/uversion.h>
+#include <cctype>
+#include <iterator>
+#include <locale>
+#include <vector>
+
+#include "../commons/ilog.h"
+#include "StringUtils.h"
 
 #ifdef HAVE_NEW_CROSSGUID
 #include <crossguid/guid.hpp>
@@ -49,8 +60,9 @@
 #include <time.h>
 #include <fstrcmp.h>
 
-#include <unicode/utf8.h>
 #include <unicode/locid.h>
+// #include "unicode/uregex.h"
+#include <unicode/utf8.h>
 #include "utils/log.h"
 
 // DO NOT MOVE or std functions end up in PCRE namespace
@@ -58,7 +70,6 @@
 #include "utils/RegExp.h"
 // clang-format on
 #include "utils/Unicode.h"
-#include "unicode/uregex.h"
 
 void UnicodeUtils::ToUpper(std::string &str, const icu::Locale &locale) {
 	if (str.length() == 0)
@@ -388,19 +399,19 @@ std::string UnicodeUtils::Right(const std::string &str, const size_t charCount,
 }
 
 size_t UnicodeUtils::GetByteIndexForCharacter(const std::string &str, size_t charCount,
-   const bool left, const bool keepLeft, icu::Locale icuLocale)
+   const bool left, const bool keepLeft, const icu::Locale& icuLocale)
 {
   size_t byteIndex;
-  byteIndex =  Unicode::GetCodeUnitIndex(str, charCount, left, keepLeft, icuLocale);
+  byteIndex =  Unicode::GetCharPosition(str, charCount, left, keepLeft, icuLocale);
   return byteIndex;
 }
 
 size_t UnicodeUtils::GetByteIndexForCharacter(const std::string &str, size_t charCount,
-    const bool left, const bool keepLeft, std::locale locale)
+    const bool left, const bool keepLeft, const std::locale& locale)
 {
   icu::Locale icuLocale = Unicode::GetICULocale(locale);
   size_t byteIndex;
-  byteIndex =  Unicode::GetCodeUnitIndex(str, charCount, left, keepLeft, icuLocale);
+  byteIndex =  Unicode::GetCharPosition(str, charCount, left, keepLeft, icuLocale);
   return byteIndex;
 }
 
@@ -408,7 +419,7 @@ size_t UnicodeUtils::GetByteIndexForCharacter(const std::string &str, size_t cha
     const bool left, const bool keepLeft)
 {
   size_t byteIndex;
-  byteIndex =  Unicode::GetCodeUnitIndex(str, charCount, left, keepLeft, Unicode::GetDefaultICULocale());
+  byteIndex =  Unicode::GetCharPosition(str, charCount, left, keepLeft, Unicode::GetDefaultICULocale());
   return byteIndex;
 }
 
@@ -421,8 +432,6 @@ std::string& UnicodeUtils::Trim(std::string &str) {
 std::string& UnicodeUtils::Trim(std::string &str, const char *const chars) {
 	std::string delChars = std::string(chars);
 	std::string result = Unicode::Trim(str, delChars, true, true);
-	 //+CLog::Log(LOGINFO, "UnicodeUtils::Trim str: {} delChars: {} result: {}\n",
-	//+		 orig, delChars, str);
   str.swap(result);
 	return str;
 }
@@ -430,8 +439,6 @@ std::string& UnicodeUtils::Trim(std::string &str, const char *const chars) {
 std::string& UnicodeUtils::TrimLeft(std::string &str) {
 	std::string orig = std::string(str);
 	std::string result = Unicode::TrimLeft(str);
-	 //+ CLog::Log(LOGINFO, "UnicodeUtils::TrimLeft str: {} result: {}\n", orig, str);
-
 	str.swap(result);
 	 return str;
 }
@@ -462,7 +469,7 @@ std::string& UnicodeUtils::TrimRight(std::string &str, const char *const chars) 
  * Differs from Replace in that it does not return the number of changes
  * made, which makes this version a little more efficient.
  *
- *UnicodeUtils::FindAndReplace(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >)'
+ * UnicodeUtils::FindAndReplace(std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >&, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >, std::__cxx11::basic_string<char, std::char_traits<char>, std::allocator<char> >)'
  *
  */
 
@@ -827,6 +834,56 @@ void UnicodeUtils::RemoveCRLF(std::string &strLine) {
 	UnicodeUtils::TrimRight(strLine, "\n\r");
 }
 
+/*
+size_t UnicodeUtils::FindWords(const char *str, const char *wordLowerCase)
+{
+  // NOTE: This assumes word is lowercase!
+  const unsigned char* s = (const unsigned char*) str;
+  do
+  {
+    // start with a compare
+    const unsigned char* c = s;
+    const unsigned char* w = (const unsigned char*) wordLowerCase;
+    bool same = true;
+    while (same && *c && *w)
+    {
+      unsigned char lc = *c++;
+      if (lc >= 'A' && lc <= 'Z')
+        lc += 'a' - 'A';
+
+      if (lc != *w++) // different
+        same = false;
+    }
+    if (same && *w == 0)  // only the same if word has been exhausted
+      return (const char*) s - str;
+
+    // otherwise, skip current word (composed by latin letters) or number
+    int l;
+    if (*s >= '0' && *s <= '9')
+    {
+      ++s;
+      while (*s >= '0' && *s <= '9')
+        ++s;
+    }
+    else if ((l = StringUtils::IsUTF8Letter(s)) > 0)
+    {
+      s += l;
+      while ((l = StringUtils::IsUTF8Letter(s)) > 0)
+        s += l;
+    }
+    else
+      ++s;
+    while (*s && *s == ' ')
+      s++;
+
+    // and repeat until we're done
+  }
+  while (*s);
+
+  return std::string::npos;
+}
+*/
+
 size_t UnicodeUtils::FindWord(const std::string &str, const std::string &word)
 {
   size_t index;
@@ -870,12 +927,12 @@ void UnicodeUtils::WordToDigits(std::string &word)
 }
 
 std::string UnicodeUtils::Paramify(const std::string &param) {
-	std::string result = param;
    //std::cout << "UnicodeUtils.Paramify param: " << param << std::endl;
 	// escape backspaces
-	UnicodeUtils::Replace(result, "\\", "\\\\");
+	std::string result = Unicode::FindAndReplace(param,  "\\", "\\\\");
+
 	// escape double quotes
-	UnicodeUtils::Replace(result, "\"", "\\\"");
+	result = Unicode::FindAndReplace(result, "\"", "\\\"");
 
 	// add double quotes around the whole string
 	return "\"" + result + "\"";

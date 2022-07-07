@@ -884,14 +884,14 @@ TEST(TestUnicodeUtils, GetByteIndexForCharacter)
   left = false;
   keepLeft = false;
   result = UnicodeUtils::GetByteIndexForCharacter(testString, 0, left, keepLeft, icuLocale);
-  expectedResult = Unicode::AFTER_END;
+  expectedResult = 4; // Unicode::AFTER_END;
   EXPECT_EQ(expectedResult, result);
 
   result = UnicodeUtils::GetByteIndexForCharacter(testString, 1, left, keepLeft, icuLocale);
-  expectedResult = 4;
+  expectedResult = 3; //4;
   EXPECT_EQ(expectedResult, result);
 
-  result = UnicodeUtils::GetByteIndexForCharacter(testString, 5, left, keepLeft, icuLocale);
+  result = UnicodeUtils::GetByteIndexForCharacter(testString, 4, left, keepLeft, icuLocale);
   expectedResult = 0;
   EXPECT_EQ(expectedResult, result);
 
@@ -904,7 +904,8 @@ TEST(TestUnicodeUtils, GetByteIndexForCharacter)
   expectedResult = Unicode::BEFORE_START;
   EXPECT_EQ(expectedResult, result);
 
-  testString = "„Wiener Übereinkommen über den Straßenverkehr""";
+  testString = "„Wiener Übereinkommen über den Straßenverkehr\"";
+  //testString = UnicodeUtils::Normalize(testString,  StringOptions::FOLD_CASE_DEFAULT, NormalizerType::NFC);
   // At 0 \xe2\x80\x9e
   // Ü \xc3\x9c
   // ü \xc3\xbc
@@ -943,8 +944,8 @@ TEST(TestUnicodeUtils, GetByteIndexForCharacter)
 
   left = true;
   keepLeft = false;
-  result = UnicodeUtils::GetByteIndexForCharacter(testString, 44, left, keepLeft, icuLocale);
-  expectedResult = 2; // Last Byte first char
+  result = UnicodeUtils::GetByteIndexForCharacter(testString, 45, left, keepLeft, icuLocale);
+  expectedResult = 2; // Last Byte of \xe2\x80\x9e
   EXPECT_EQ(expectedResult, result);
 
   // left=false keepLeft=false  Returns offset of first byte of nth char from right end (0-n). Used by Right(x)
@@ -1000,11 +1001,11 @@ TEST(TestUnicodeUtils, GetByteIndexForCharacter)
 
   left = true;
   keepLeft = false;
-  result = UnicodeUtils::GetByteIndexForCharacter(testString, 9, left, keepLeft, icuLocale); // S-sharp \xc3\x9f
+  result = UnicodeUtils::GetByteIndexForCharacter(testString, 10, left, keepLeft, icuLocale); // S-sharp \xc3\x9f
   expectedResult = 40;  // Last Byte of S-Sharp
   EXPECT_EQ(expectedResult, result);
 
-  //  left=false keepLeft=true   Returns offset of first byte of (n -1)th character (0-n). Used by Right(x, false)
+  //  left=false keepLeft=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
 
   left = false;
   keepLeft = true;
@@ -1127,6 +1128,49 @@ TEST(TestUnicodeUtils, TrimRight)
   result = UnicodeUtils::TrimRight(varstr, "$? \t");
   EXPECT_STREQ(refstr.c_str(), result.c_str());
 }
+
+
+TEST(TestUnicodeUtils, Trim_Multiple)
+{
+  std::string input;
+  std::string trimmableChars;
+  std::string result;
+  std::string expectedResult;
+
+  input = " Test Test   ";
+  trimmableChars = " Tt";
+  expectedResult = "est Tes";
+
+  result = UnicodeUtils::Trim(input, trimmableChars.data());
+  EXPECT_STREQ(result.c_str(), expectedResult.c_str());
+
+  input = " \n\r\t   ";
+  trimmableChars = "\t \n \r";
+  expectedResult = "";
+  result = UnicodeUtils::Trim(input, trimmableChars.data());
+  EXPECT_STREQ(result.c_str(), expectedResult.c_str());
+
+  input = "$ \nx\r\t  x?\t";
+  trimmableChars = "$\n?";
+  expectedResult = " \nx\r\t  x?\t";
+  result = UnicodeUtils::Trim(input, trimmableChars.data());
+  EXPECT_STREQ(result.c_str(), expectedResult.c_str());
+
+  // "„Wiener Übereinkommen über den Straßenverkehr\"";
+
+  bool trimStart;
+  bool trimEnd;
+
+  input = "„ßÜ„Wiener Übereinkommen über den Straßenverkehrüß\"";
+  trimmableChars = "„ßÜ\"";
+  std::vector<std::string> trimmableStrs = {"„", "ß", "Ü", "\""};
+  trimStart = true;
+  trimEnd = true;
+  expectedResult = "Wiener Übereinkommen über den Straßenverkehrü";
+  result = Unicode::Trim(input, trimmableStrs, trimStart, trimEnd);
+  EXPECT_STREQ(result.c_str(), expectedResult.c_str());
+}
+
 
 TEST(TestUnicodeUtils, Replace)
 {
@@ -1629,17 +1673,35 @@ static void compareStrings(std::vector<std::string> result, std::vector<std::str
 TEST(TestUnicodeUtils, SplitMulti)
 {
   /*
-   * Delimiter strings are applied in order, so once the iMaxStrings
-   * items is produced no other delimiters are applied. This produces different results
-   * than applying all delimiters at once e.g. "a/b#c/d" becomes "a", "b#c", "d" rather
-   * than "a", "b", "c/d"
+   * SplitMulti is essentially equivalent to running Split(string, vector<delimiters>, maxstrings) over multiple
+   * strings with the same delimiters and returning the aggregate results. Null strings are not returned.
    *
-   * \param input vector of strings each to be split
+   * There are some significant differences when maxstrings alters the process. Here are the boring details:
+   *
+   * For each delimiter, Split(string<n> input, delimiter, maxstrings) is called for each input string.
+   * The results are appended to results <vector<string>>
+   *
+   * After a delimiter has been applied to all input strings, the process is repeated with the
+   * next delimiter, but this time with the vector<string> input being replaced with the
+   * results of the previous pass.
+   *
+   * If the maxstrings limit is not reached, then, as stated above, the results are similar to
+   *  running Split(string, vector<delimiters> maxstrings) over multiple strings. But when the limit is reached
+   *  differences emerge.
+   *
+   *  Before a delimiter is applied to a string a check is made to see if maxstrings is exceeded. If so,
+   *  then splitting stops and all split string results are returned, including any strings that have not
+   *  been split by as many delimiters as others, leaving the delimiters in the results.
+   *
+   *  Differences between current behavior and prior versions: Earlier versions removed most empty strings,
+   *  but a few slipped past. Now, all empty strings are removed. This means not as many empty strings
+   *  will count against the maxstrings limit. This change should cause no harm since there is no reliable
+   *  way to correlate a result with an input; they all get thrown in together.
+   *
+   * \param input vector of strings to be split
    * \param delimiters strings to be used to split the input strings
    * \param iMaxStrings (optional) Maximum number of resulting split strings
-   *
-   * TODO: Need Testcase!
-   *
+   *   *
    * static std::vector<std::string> SplitMulti(const std::vector<std::string>& input,
    *                                           const std::vector<std::string>& delimiters,
    *                                           size_t iMaxStrings = 0);
@@ -1668,54 +1730,11 @@ TEST(TestUnicodeUtils, SplitMulti)
 
   input.clear();
   delimiters.clear();
-  input.push_back("abcde");
-  input.push_back("Where is the beef?");
-  input.push_back("cbcefa");
-  delimiters.push_back("a");
-  delimiters.push_back("bc");
-  delimiters.push_back("ef");
-  delimiters.push_back("c");
-  result = UnicodeUtils::Split("abcde", delimiters);
-  result = UnicodeUtils::Split("Where is the beef?", delimiters);
-  result = UnicodeUtils::Split("cbcefa", delimiters);
-  result = UnicodeUtils::Split("aaaa", "a");
+  input = {"abcde", "Where is the beef?", "cbcefa"};
+  delimiters = {"a", "bc", "ef", "c"};
   result = UnicodeUtils::SplitMulti(input, delimiters);
-  // Matrix 4 result = {"de", "Where is the be", "?", "", ""}
-  // Convert "bc" to "a"
-  // "abcde" => "aade"
-  // "Where is the beef?" => "Where is the beef?"
-  // "cbcefa" => "caefa"
-  //
-  // Convert "ef" to "a"
-  // "aade" => "aade"
-  // "Where is the beef?" => "Where is the bea?"
-  // "caefa" => "caaa"
-  //
-  // Convert "c" to "a"
-  // "aade" => "aade"
-  // "Where is the bea?" => "Where is the bea?"
-  // "caaa" => "aaaa"
-
-  // Finally, Split on a
-  // "aade" => {"", "", "de"} // 1 null because delim at beginning of line, 2nd null because no non-delim before it
-  // "Where is the bea?" => {"Where is the be", "?"}
-  // "aaaa" => {"", "", "", ""}
-
-  std::vector<std::string> expectedResult1;
-  std::vector<std::string> expectedResult2;
-  std::vector<std::string> expectedResult3;
-
-  expectedResult1 = {"", "", "de"};
-  expectedResult2 = {"Where is the be", "?"};
-  expectedResult3 = {"", "", "", "", "", ""};  // Matrix 4
-  expectedResult = std::vector<std::string>(expectedResult1);
-  expectedResult.insert(expectedResult.end(), expectedResult2.begin(), expectedResult2.end());
-  expectedResult.insert(expectedResult.end(), expectedResult3.begin(), expectedResult3.end());
-
   expectedResult = {"de", "Where is the be", "?"};
-
   result = UnicodeUtils::SplitMulti(input, delimiters);
-
   EXPECT_EQ(expectedResult.size(), result.size());
   idx = 0;
   for (auto i : expectedResult)
@@ -1940,4 +1959,44 @@ TEST(TestUnicodeUtils, sortstringbyname)
   EXPECT_STREQ("a", strarray[0].c_str());
   EXPECT_STREQ("B", strarray[1].c_str());
   EXPECT_STREQ("c", strarray[2].c_str());
+}
+
+TEST(TestUnicodeUtils, Paramify)
+{
+  std::string input;
+  std::string expectedResult;
+  std::string result;
+
+  /*
+   * std::string UnicodeUtils::Paramify(const std::string &param) {
+   //std::cout << "UnicodeUtils.Paramify param: " << param << std::endl;
+  // escape backspaces
+  std::string result = Unicode::FindAndReplace(param,  "\\", "\\\\");
+
+  // escape double quotes
+  result = Unicode::FindAndReplace(result, "\"", "\\\"");
+
+  // add double quotes around the whole string
+  return "\"" + result + "\"";
+   */
+
+  input = "Vanilla string";
+  expectedResult = R"("Vanilla string")";
+  result = UnicodeUtils::Paramify(input);
+  EXPECT_STREQ(result.c_str(), expectedResult.c_str());
+
+  input = "\\";
+  expectedResult = R"("\\")";
+  result = UnicodeUtils::Paramify(input);
+  EXPECT_STREQ(result.c_str(), expectedResult.c_str());
+
+  input = R"(")";
+  expectedResult = R"("\"")";
+  result = UnicodeUtils::Paramify(input);
+  EXPECT_STREQ(result.c_str(), expectedResult.c_str());
+
+  input = R"("""Three quotes \\\ Three slashes "\"\\""\\\""")";
+  expectedResult = R"("\"\"\"Three quotes \\\\\\ Three slashes \"\\\"\\\\\"\"\\\\\\\"\"\"")";
+  result = UnicodeUtils::Paramify(input);
+  EXPECT_STREQ(result.c_str(), expectedResult.c_str());
 }
