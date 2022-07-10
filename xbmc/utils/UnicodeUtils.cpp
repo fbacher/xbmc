@@ -757,7 +757,6 @@ int64_t UnicodeUtils::AlphaNumericCompare(const wchar_t *left, const wchar_t *ri
 }
 
 int UnicodeUtils::DateStringToYYYYMMDD(const std::string &dateString) {
-	// TODO: I assume this is a fixed format for a database or something?
 	std::vector < std::string > days = UnicodeUtils::Split(dateString, '-');
 	if (days.size() == 1)
 		return atoi(days[0].c_str());
@@ -790,140 +789,13 @@ long UnicodeUtils::TimeStringToSeconds(const std::string &timeString) {
 	}
 }
 
-std::string UnicodeUtils::SecondsToTimeString(long lSeconds, TIME_FORMAT format)
-{
-  bool isNegative = lSeconds < 0;
-  lSeconds = std::abs(lSeconds);
-
-  std::string strHMS;
-  if (format == TIME_FORMAT_SECS)
-    strHMS = std::to_string(lSeconds);
-  else if (format == TIME_FORMAT_MINS)
-    strHMS = std::to_string(lrintf(static_cast<float>(lSeconds) / 60.0f));
-  else if (format == TIME_FORMAT_HOURS)
-    strHMS = std::to_string(lrintf(static_cast<float>(lSeconds) / 3600.0f));
-  else if (format & TIME_FORMAT_M)
-    strHMS += std::to_string(lSeconds % 3600 / 60);
-  else
-  {
-    int hh = lSeconds / 3600;
-    lSeconds = lSeconds % 3600;
-    int mm = lSeconds / 60;
-    int ss = lSeconds % 60;
-
-    if (format == TIME_FORMAT_GUESS)
-      format = (hh >= 1) ? TIME_FORMAT_HH_MM_SS : TIME_FORMAT_MM_SS;
-    if (format & TIME_FORMAT_HH)
-      strHMS += StringUtils::Format("{:02}", hh);
-    else if (format & TIME_FORMAT_H)
-      strHMS += std::to_string(hh);
-    if (format & TIME_FORMAT_MM)
-      strHMS += StringUtils::Format(strHMS.empty() ? "{:02}" : ":{:02}", mm);
-    if (format & TIME_FORMAT_SS)
-      strHMS += StringUtils::Format(strHMS.empty() ? "{:02}" : ":{:02}", ss);
-  }
-
-  if (isNegative)
-    strHMS = "-" + strHMS;
-
-  return strHMS;
-
-}
-
 void UnicodeUtils::RemoveCRLF(std::string &strLine) {
 	UnicodeUtils::TrimRight(strLine, "\n\r");
 }
 
-/*
-size_t UnicodeUtils::FindWords(const char *str, const char *wordLowerCase)
+bool UnicodeUtils::FindWord(const std::string &str, const std::string &word)
 {
-  // NOTE: This assumes word is lowercase!
-  const unsigned char* s = (const unsigned char*) str;
-  do
-  {
-    // start with a compare
-    const unsigned char* c = s;
-    const unsigned char* w = (const unsigned char*) wordLowerCase;
-    bool same = true;
-    while (same && *c && *w)
-    {
-      unsigned char lc = *c++;
-      if (lc >= 'A' && lc <= 'Z')
-        lc += 'a' - 'A';
-
-      if (lc != *w++) // different
-        same = false;
-    }
-    if (same && *w == 0)  // only the same if word has been exhausted
-      return (const char*) s - str;
-
-    // otherwise, skip current word (composed by latin letters) or number
-    int l;
-    if (*s >= '0' && *s <= '9')
-    {
-      ++s;
-      while (*s >= '0' && *s <= '9')
-        ++s;
-    }
-    else if ((l = StringUtils::IsUTF8Letter(s)) > 0)
-    {
-      s += l;
-      while ((l = StringUtils::IsUTF8Letter(s)) > 0)
-        s += l;
-    }
-    else
-      ++s;
-    while (*s && *s == ' ')
-      s++;
-
-    // and repeat until we're done
-  }
-  while (*s);
-
-  return std::string::npos;
-}
-*/
-
-size_t UnicodeUtils::FindWord(const std::string &str, const std::string &word)
-{
-  size_t index;
-  // Ensure searched for word begins on a "word" boundary.
-  // \b matches boundary between word and non-word character
-  // std::string pattern = "((\d+)|([a-z]+|.)\s*)(\\Q" + word + "\\E)";  // \\Q does not interpret as regex \\E
-#ifdef USE_FINDWORD_REGEX
-  std::string pattern = "((\\Q" + word + "\\E)|(((?:(?:\\d++(?=[^\\d]))|(?:[a-z]++(?=[^a-z]))|(?:[^\\d\\sa-z]))\\s*+(?=[^\\s]))(\\Q" + word + "\\E)))";
-  int flags = to_underlying(RegexpFlag::UREGEX_CASE_INSENSITIVE);
-  index = Unicode::RegexFind(str, pattern, flags);
-#else
-  index = Unicode::FindWord(str, word);
-#endif
-	return index;
-}
-
-void UnicodeUtils::WordToDigits(std::string &word)
-{
-
-	// Works ONLY with ASCII!
-
-  static const char word_to_letter[] = "22233344455566677778889999";
-  UnicodeUtils::ToLower(word);
-  for (unsigned int i = 0; i < word.size(); ++i)
-  { // NB: This assumes ascii, which probably needs extending at some  point.
-    char letter = word[i];
-		if (letter > 0x7f) {
-	    CLog::Log(LOGWARNING, "UnicodeUtils.WordToDigits: Non-ASCII input: {}\n",
-	    		word);
-		}
-
-    if ((letter >= 'a' && letter <= 'z')) // assume contiguous letter range
-    {
-      word[i] = word_to_letter[letter-'a'];
-    }
-    else if (letter < '0' || letter > '9') // We want to keep 0-9!
-    {
-      word[i] = ' ';  // replace everything else with a space
-    }
-  }
+  return Unicode::FindWord(str, word);
 }
 
 std::string UnicodeUtils::Paramify(const std::string &param) {

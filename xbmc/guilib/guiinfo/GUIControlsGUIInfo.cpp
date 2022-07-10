@@ -219,7 +219,7 @@ bool CGUIControlsGUIInfo::GetLabel(std::string& value, const CFileItem *item, in
         }
         if (info.m_info == CONTAINER_TOTALTIME && count > 0)
         {
-          value = UnicodeUtils::SecondsToTimeString(count);
+          value = StringUtils::SecondsToTimeString(count);
           return true;
         }
         else if (info.m_info == CONTAINER_TOTALWATCHED || info.m_info == CONTAINER_TOTALUNWATCHED)

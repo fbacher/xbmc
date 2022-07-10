@@ -1085,6 +1085,11 @@ TEST(TestUnicodeUtils, Trim)
   varstr = "$ \nx\r\t   x?\t";
   result = UnicodeUtils::Trim(varstr, "$? \t");
   EXPECT_STREQ(result.c_str(), refstr.c_str());
+
+  refstr = "";
+  varstr=" ";
+  result = UnicodeUtils::Trim(varstr, " \t");
+  EXPECT_STREQ(result.c_str(), refstr.c_str());
 }
 
 TEST(TestUnicodeUtils, TrimLeft)
@@ -1868,22 +1873,12 @@ TEST(TestUnicodeUtils, RemoveCRLF)
   EXPECT_STREQ(refstr.c_str(), varstr.c_str());
 }
 
-TEST(TestUnicodeUtils, SecondsToTimeString)
-{
-  std::string refstr;
-  std::string varstr;
-
-  refstr = "21:30:55";
-  varstr = UnicodeUtils::SecondsToTimeString(77455);
-  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
-}
-
 TEST(TestUnicodeUtils, FindWord)
 {
-  size_t ref;
-  size_t var;
+  bool ref;
+  bool var;
 
-  ref = 5;
+  ref = true;
   var = UnicodeUtils::FindWord("test string", "string");
   EXPECT_EQ(ref, var);
   var = UnicodeUtils::FindWord("12345string", "string");
@@ -1891,7 +1886,7 @@ TEST(TestUnicodeUtils, FindWord)
   var = UnicodeUtils::FindWord("apple2012", "2012");
   EXPECT_EQ(ref, var);
 
-  ref = std::string::npos;
+  ref = false;
   var = UnicodeUtils::FindWord("12345string", "ring");
   EXPECT_EQ(ref, var);
   var = UnicodeUtils::FindWord("12345string", "345");
@@ -1901,51 +1896,69 @@ TEST(TestUnicodeUtils, FindWord)
   var = UnicodeUtils::FindWord("apple2012", "12");
   EXPECT_EQ(ref, var);
   var = UnicodeUtils::FindWord("anyt]h(z_iILi234#!? 1a34#56bbc7 ", "1a34#56bbc7");
-  ref = 20;
+  ref = true;
   EXPECT_EQ(ref, var);
 }
 
 TEST(TestUnicodeUtils, FindWord_NonAscii)
 {
-  size_t ref;
-  size_t var;
+  bool ref;
+  bool var;
 
-  ref = 2;
+  ref = true;
   var = UnicodeUtils::FindWord("我的视频", "视频");
   EXPECT_EQ(ref, var);
   var = UnicodeUtils::FindWord("我的视频", "视");
   EXPECT_EQ(ref, var);
-  ref = 6;
+  ref = true;
   var = UnicodeUtils::FindWord("Apple ple", "ple");
   EXPECT_EQ(ref, var);
-  ref = 6;
+  ref = false;
+  var = UnicodeUtils::FindWord("Apple ple", "le");
+  EXPECT_EQ(ref, var);
+
+  ref = true;
+  var = UnicodeUtils::FindWord(" Apple ple", " Apple");
+  EXPECT_EQ(ref, var);
+
+  ref = true;
+  var = UnicodeUtils::FindWord(" Apple ple", "Apple");
+  EXPECT_EQ(ref, var);
+
+  ref = true;
   var = UnicodeUtils::FindWord("Äpfel.pfel", "pfel");
   EXPECT_EQ(ref, var);
 
+  ref = false;
+  var = UnicodeUtils::FindWord("Äpfel.pfel", "pfeldumpling");
+  EXPECT_EQ(ref, var);
+
+  ref = true;
+  var = UnicodeUtils::FindWord("Äpfel.pfel", "Äpfel.pfel");
+  EXPECT_EQ(ref, var);
+
   // Yea old Turkic I problem....
-  ref = 11;
+  ref = true;
   var = UnicodeUtils::FindWord("abcçdefgğh ıİi jklmnoöprsştuüvyz", "ıiİ jklmnoöprsştuüvyz");
 }
 
 TEST(TestUnicodeUtils, DateStringToYYYYMMDD)
 {
+  // Must accept: YYYY, YYYY-MM, YYYY-MM-DD
   int ref;
   int var;
 
   ref = 20120706;
   var = UnicodeUtils::DateStringToYYYYMMDD("2012-07-06");
   EXPECT_EQ(ref, var);
-}
 
-TEST(TestUnicodeUtils, WordToDigits)
-{
-  std::string ref;
-  std::string var;
+  ref = 201207;
+  var = UnicodeUtils::DateStringToYYYYMMDD("2012-07");
+  EXPECT_EQ(ref, var);
 
-  ref = "8378 787464";
-  var = "test string";
-  UnicodeUtils::WordToDigits(var);
-  EXPECT_STREQ(ref.c_str(), var.c_str());
+  ref = 2012;
+  var = UnicodeUtils::DateStringToYYYYMMDD("2012");
+  EXPECT_EQ(ref, var);
 }
 
 TEST(TestUnicodeUtils, sortstringbyname)

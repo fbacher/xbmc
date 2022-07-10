@@ -12680,7 +12680,7 @@ void CMusicDatabase::SetPropertiesFromAlbum(CFileItem& item, const CAlbum& album
   item.SetProperty("album_totaldiscs", album.iTotalDiscs);
   item.SetProperty("album_releasetype", CAlbum::ReleaseTypeToString(album.releaseType));
   item.SetProperty("album_duration",
-                   UnicodeUtils::SecondsToTimeString(album.iAlbumDuration,
+      StringUtils::SecondsToTimeString(album.iAlbumDuration,
                                                     static_cast<TIME_FORMAT>(TIME_FORMAT_GUESS)));
 }
 

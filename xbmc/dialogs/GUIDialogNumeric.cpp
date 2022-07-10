@@ -492,7 +492,7 @@ bool CGUIDialogNumeric::ShowAndGetSeconds(std::string &timeString, const std::st
     return false;
   time = pDialog->GetOutput();
   seconds = time.hour * 3600 + time.minute * 60 + time.second;
-  timeString = UnicodeUtils::SecondsToTimeString(seconds);
+  timeString = StringUtils::SecondsToTimeString(seconds);
   return true;
 }
 

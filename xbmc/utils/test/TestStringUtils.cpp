@@ -113,6 +113,16 @@ TEST(TestStringUtils, utf8_strlen)
   EXPECT_EQ(ref, var);
 }
 
+TEST(TestStringUtils, SecondsToTimeString)
+{
+  std::string refstr;
+  std::string varstr;
+
+  refstr = "21:30:55";
+  varstr = StringUtils::SecondsToTimeString(77455);
+  EXPECT_STREQ(refstr.c_str(), varstr.c_str());
+}
+
 TEST(TestStringUtils, IsNaturalNumber)
 {
   EXPECT_TRUE(StringUtils::IsNaturalNumber("10"));
@@ -259,4 +269,23 @@ TEST(TestStringUtils, ToHexadecimal)
   std::string ff
   { "\xFF", 1 };
   EXPECT_STREQ("ff", StringUtils::ToHexadecimal(ff).c_str());
+}
+
+TEST(TestStringUtils, WordToDigits)
+{
+  // abc def ghi jkl mno pqrs tuv wxyz
+  //"222 333 444 555 666 7777 888 9999";
+
+  std::string ref;
+  std::string var;
+
+  ref = "8378 787464";
+  var = "test string";
+  StringUtils::WordToDigits(var);
+  EXPECT_STREQ(ref.c_str(), var.c_str());
+
+   ref = "83 8  8 464";
+   var = "Te?t @t\tinG";
+   StringUtils::WordToDigits(var);
+   EXPECT_STREQ(ref.c_str(), var.c_str());
 }

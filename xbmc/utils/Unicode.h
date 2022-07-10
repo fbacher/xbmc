@@ -1008,10 +1008,10 @@ public:
      *  Ex: TrimLeft("abc1234bxa", "acb") ==> "1234bxa"
      *
      * \param str to trim
-     * \param deleteChars (characters) to remove from str
+     * \param trimChars (characters) to remove from str
      * \return trimmed string
      */
-  static std::string TrimLeft(const std::string &str, const std::string deleteChars);
+  static std::string TrimLeft(const std::string &str, const std::string trimChars);
 
   /*!
    * \brief Removes trailing whitespace from a string
@@ -1031,10 +1031,10 @@ public:
    *  Ex: TrimRight("abc1234bxa", "acb") ==> "abc1234bx"
      *
      * \param str to trim
-     * \param deleteChars (characters) to remove from str
+     * \param trimChars (characters) to remove from str
      * \return trimmed string
      */
-  static std::string TrimRight(const std::string &str, const std::string deleteChars);
+  static std::string TrimRight(const std::string &str, const std::string trimChars);
 
   /*!
      * \brief Remove a set of characters from middle of str
@@ -1043,14 +1043,14 @@ public:
      *  Ex: TrimLeft("abc1234bxa", "acb") ==> "1234bxa"
      *
      * \param str to trim
-     * \param deleteChars (characters) to remove from str
+     * \param trimStrings (characters) to remove from str
      * \return trimmed string
      */
-  static std::string Trim(const std::string &str, const std::string &deleteChars, const bool trimStart,
+  static std::string Trim(const std::string &str, const std::string &trimStrings, const bool trimStart,
       const bool trimEnd);
 
   static std::string Trim(const std::string &str,
-      const std::vector<std::string> &deleteChars, const bool trimStart, const bool trimEnd);
+      const std::vector<std::string> &trimChars, const bool trimStart, const bool trimEnd);
 
   /*!
    * \brief Splits each input string with each delimiter string producing a vector of split strings
@@ -1121,10 +1121,25 @@ public:
   static std::tuple<std::string, int> FindCountAndReplace(const std::string &src, const std::string &oldText,
       const std::string &newText);
 
-  /**
-   * Returns true of the given word is find in str, using a caseless search.
+  /*!
+   * \brief Determine if "word" is present in string
+   *
+   * \param str string to search
+   * \param word to search for in str
+   * \return true if word found, otherwise false
+   *
+   * Search algorithm:
+   *   Both str and word are case-folded (see FoldCase)
+   *   For each character in str
+   *     Return false if word not found in str
+   *     Return true if word found starting at beginning of substring
+   *     If partial match found:
+   *      If non-matching character is a digit, then skip past every
+   *      digit in str. Same for Latin letters. Otherwise, skip one character
+   *      Skip any whitespace characters
    */
-  static size_t FindWord(const std::string &str, const std::string &word);
+  static bool FindWord(const std::string &str, const std::string &word);
+
   /*
    * Replaces every occurrence of oldText with newText within the string.
    * Should be more efficient than
@@ -1439,11 +1454,11 @@ private:
   static void Normalize(const icu::StringPiece strPiece, icu::CheckedArrayByteSink &sink,
       UErrorCode &status, const int32_t options, const NormalizerType NormalizerType);
 
-  static icu::UnicodeString Trim(const icu::UnicodeString &str, const icu::UnicodeString &deleteChars,
+  static icu::UnicodeString Trim(const icu::UnicodeString &str, const icu::UnicodeString &trimChars,
       const bool trimStart, const bool trimEnd);
 
   static icu::UnicodeString Trim(const icu::UnicodeString &uStr,
-      const std::vector<icu::UnicodeString> &deleteChars, const bool trimStart, const bool trimEnd);
+      const std::vector<icu::UnicodeString> &trimChars, const bool trimStart, const bool trimEnd);
 
   static icu::UnicodeString Trim(const icu::UnicodeString &str, const bool trimStart,
       const bool trimEnd);
@@ -1463,7 +1478,7 @@ private:
    * flags:  See enum RegexpFlag in uregex.h
    *
    */
-  icu::UnicodeString RegexReplaceAll(const icu::UnicodeString &kString,
+  icu::UnicodeString RegexReplaceAll(const icu::UnicodeString &uString,
       const icu::UnicodeString kPattern, const icu::UnicodeString kReplace, const int flags);
 
   template<typename OutputIt>

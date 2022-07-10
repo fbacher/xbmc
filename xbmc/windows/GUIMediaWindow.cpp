@@ -2051,9 +2051,9 @@ bool CGUIMediaWindow::GetFilteredItems(const std::string &filter, CFileItemList 
     match = item->GetLabel(); // Filter label only for now
 
     if (numericMatch)
-      UnicodeUtils::WordToDigits(match);
+      StringUtils::WordToDigits(match);
 
-    if (UnicodeUtils::FindWord(match, trimmedFilter) != std::string::npos)
+    if (UnicodeUtils::FindWord(match, trimmedFilter))
       filteredItems.Add(item);
   }
 

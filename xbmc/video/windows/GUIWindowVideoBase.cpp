@@ -791,7 +791,7 @@ std::string CGUIWindowVideoBase::GetResumeString(const CFileItem &item)
   {
     resumeString =
         StringUtils::Format(g_localizeStrings.Get(12022),
-                            UnicodeUtils::SecondsToTimeString(
+                            StringUtils::SecondsToTimeString(
                                 static_cast<long>(CUtil::ConvertMilliSecsToSecsInt(startOffset)),
                                 TIME_FORMAT_HH_MM_SS));
     if (startPart > 0)

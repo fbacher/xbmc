@@ -1298,7 +1298,7 @@ void CVideoPlayer::Prepare()
       if (advancedSettings && advancedSettings->m_EdlDisplayCommbreakNotifications)
       {
         const std::string timeString =
-            UnicodeUtils::SecondsToTimeString(edit.end / 1000, TIME_FORMAT_MM_SS);
+            StringUtils::SecondsToTimeString(edit.end / 1000, TIME_FORMAT_MM_SS);
         CGUIDialogKaiToast::QueueNotification(g_localizeStrings.Get(25011), timeString);
       }
     }
@@ -2399,7 +2399,7 @@ void CVideoPlayer::CheckAutoSceneSkip()
       if (advancedSettings && advancedSettings->m_EdlDisplayCommbreakNotifications)
       {
         const std::string timeString =
-            UnicodeUtils::SecondsToTimeString((edit.end - edit.start) / 1000, TIME_FORMAT_MM_SS);
+            StringUtils::SecondsToTimeString((edit.end - edit.start) / 1000, TIME_FORMAT_MM_SS);
         CGUIDialogKaiToast::QueueNotification(g_localizeStrings.Get(25011), timeString);
       }
 

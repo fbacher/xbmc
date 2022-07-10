@@ -251,7 +251,7 @@ void CGUIDialogVideoBookmarks::OnRefreshList()
                                          m_bookmarks[i].seasonNumber, g_localizeStrings.Get(20359),
                                          m_bookmarks[i].episodeNumber);
     else
-      bookmarkTime = UnicodeUtils::SecondsToTimeString((long)m_bookmarks[i].timeInSeconds, TIME_FORMAT_HH_MM_SS);
+      bookmarkTime = StringUtils::SecondsToTimeString((long)m_bookmarks[i].timeInSeconds, TIME_FORMAT_HH_MM_SS);
 
     CFileItemPtr item(new CFileItem(StringUtils::Format(g_localizeStrings.Get(299), i + 1)));
     item->SetLabel2(bookmarkTime);
@@ -269,7 +269,7 @@ void CGUIDialogVideoBookmarks::OnRefreshList()
     g_application.GetAppPlayer().GetChapterName(chapterName, i);
 
     int64_t pos = g_application.GetAppPlayer().GetChapterPos(i);
-    std::string time = UnicodeUtils::SecondsToTimeString((long) pos, TIME_FORMAT_HH_MM_SS);
+    std::string time = StringUtils::SecondsToTimeString((long) pos, TIME_FORMAT_HH_MM_SS);
 
     if (chapterName.empty() ||
         UnicodeUtils::StartsWithNoCase(chapterName, time) ||

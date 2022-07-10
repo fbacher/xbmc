@@ -185,7 +185,7 @@ bool CApplicationSettingsHandling::OnSettingUpdate(const std::shared_ptr<CSettin
     // Gotham and older didn't enumerate audio devices per stream on osx
     // add stream0 per default which should be ok for all old settings.
     if (!UnicodeUtils::EqualsNoCase(audioDevice->GetValue(), "DARWINOSX:default") &&
-        UnicodeUtils::FindWords(audioDevice->GetValue().c_str(), ":stream") == std::string::npos)
+        ! UnicodeUtils::FindWord(audioDevice->GetValue().c_str(), ":stream"))
     {
       std::string newSetting = audioDevice->GetValue();
       newSetting += ":stream0";

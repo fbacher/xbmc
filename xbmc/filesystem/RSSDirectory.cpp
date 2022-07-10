@@ -498,7 +498,7 @@ static void ParseItem(CFileItem* item, TiXmlElement* root, const std::string& pa
     item->m_dwSize  = best->size;
 
     if(best->duration)
-      item->SetProperty("duration", UnicodeUtils::SecondsToTimeString(best->duration));
+      item->SetProperty("duration", StringUtils::SecondsToTimeString(best->duration));
 
     /* handling of mimetypes fo directories are sub optimal at best */
     if(best->mime == "application/rss+xml" && UnicodeUtils::StartsWithNoCase(item->GetPath(), "http://"))
@@ -537,7 +537,7 @@ static void ParseItem(CFileItem* item, TiXmlElement* root, const std::string& pa
     }
 
     if(!vtag->GetDuration())
-      item->SetLabel2(UnicodeUtils::SecondsToTimeString(vtag->GetDuration()));
+      item->SetLabel2(StringUtils::SecondsToTimeString(vtag->GetDuration()));
   }
 }
 

@@ -1186,7 +1186,7 @@ namespace PVR
       if (positionInSeconds > 0)
         resumeString = StringUtils::Format(
             g_localizeStrings.Get(12022),
-            UnicodeUtils::SecondsToTimeString(positionInSeconds, TIME_FORMAT_HH_MM_SS));
+            StringUtils::SecondsToTimeString(positionInSeconds, TIME_FORMAT_HH_MM_SS));
     }
     return resumeString;
   }

@@ -228,7 +228,7 @@ std::string CLabelFormatter::GetMaskContent(const CMaskString &mask, const CFile
       if (movie)
         nDuration = movie->GetDuration();
       if (nDuration > 0)
-        value = UnicodeUtils::SecondsToTimeString(nDuration, (nDuration >= 3600) ? TIME_FORMAT_H_MM_SS : TIME_FORMAT_MM_SS);
+        value = StringUtils::SecondsToTimeString(nDuration, (nDuration >= 3600) ? TIME_FORMAT_H_MM_SS : TIME_FORMAT_MM_SS);
       else if (item->m_dwSize > 0)
         value = StringUtils::SizeToString(item->m_dwSize);
     }

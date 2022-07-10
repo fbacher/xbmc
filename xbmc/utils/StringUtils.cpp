@@ -793,6 +793,47 @@ std::string StringUtils::ISODateToLocalizedDate(const std::string &strIsoDate) {
 	return formattedDate;
 }
 
+
+std::string StringUtils::SecondsToTimeString(long lSeconds, TIME_FORMAT format)
+{
+  bool isNegative = lSeconds < 0;
+  lSeconds = std::abs(lSeconds);
+
+  std::string strHMS;
+  if (format == TIME_FORMAT_SECS)
+    strHMS = std::to_string(lSeconds);
+  else if (format == TIME_FORMAT_MINS)
+    strHMS = std::to_string(lrintf(static_cast<float>(lSeconds) / 60.0f));
+  else if (format == TIME_FORMAT_HOURS)
+    strHMS = std::to_string(lrintf(static_cast<float>(lSeconds) / 3600.0f));
+  else if (format & TIME_FORMAT_M)
+    strHMS += std::to_string(lSeconds % 3600 / 60);
+  else
+  {
+    int hh = lSeconds / 3600;
+    lSeconds = lSeconds % 3600;
+    int mm = lSeconds / 60;
+    int ss = lSeconds % 60;
+
+    if (format == TIME_FORMAT_GUESS)
+      format = (hh >= 1) ? TIME_FORMAT_HH_MM_SS : TIME_FORMAT_MM_SS;
+    if (format & TIME_FORMAT_HH)
+      strHMS += StringUtils::Format("{:02}", hh);
+    else if (format & TIME_FORMAT_H)
+      strHMS += std::to_string(hh);
+    if (format & TIME_FORMAT_MM)
+      strHMS += StringUtils::Format(strHMS.empty() ? "{:02}" : ":{:02}", mm);
+    if (format & TIME_FORMAT_SS)
+      strHMS += StringUtils::Format(strHMS.empty() ? "{:02}" : ":{:02}", ss);
+  }
+
+  if (isNegative)
+    strHMS = "-" + strHMS;
+
+  return strHMS;
+
+}
+
 bool StringUtils::IsNaturalNumber(const std::string& str)
 {
 	// Since this function is only looking for whitespace and
@@ -927,6 +968,32 @@ std::string StringUtils::ToHexadecimal(const std::string& in)
     ss << std::setw(2) << std::setfill('0') << static_cast<unsigned long> (ch);
   }
   return ss.str();
+}
+
+void StringUtils::WordToDigits(std::string &word)
+{
+
+  // Works ONLY with ASCII!
+
+  static const char word_to_letter[] = "22233344455566677778889999";
+  UnicodeUtils::ToLower(word);
+  for (unsigned int i = 0; i < word.size(); ++i)
+  { // NB: This assumes ascii, which probably needs extending at some  point.
+    char letter = word[i];
+    if (letter > 0x7f) {
+      CLog::Log(LOGWARNING, "StringUtils.WordToDigits: Non-ASCII input: {}\n",
+          word);
+    }
+
+    if ((letter >= 'a' && letter <= 'z')) // assume contiguous letter range
+    {
+      word[i] = word_to_letter[letter-'a'];
+    }
+    else if (letter < '0' || letter > '9') // We want to keep 0-9!
+    {
+      word[i] = ' ';  // replace everything else with a space
+    }
+  }
 }
 
 /*

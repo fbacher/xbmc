@@ -247,6 +247,15 @@ public:
   static size_t utf8_strlen(const char *s);
 
   /*!
+   * \brief convert a time in seconds to a string based on the given time format
+   *
+   * \param seconds time in seconds
+   * \param format the format to use to convert seconds to a time
+   * \return the formatted time
+   */
+  static std::string SecondsToTimeString(long seconds, TIME_FORMAT format = TIME_FORMAT_GUESS);
+
+  /*!
    * \brief check whether a string is a natural number.
    *
    * Matches [ \t]*[0-9]+[ \t]*
@@ -388,6 +397,23 @@ public:
   static int FindEndBracket(const std::string &str, char opener, char closer, int startPos = 0);
 
   static std::string ISODateToLocalizedDate (const std::string& strIsoDate);
+
+  /*!
+   * \brief Converts ASCII string to digits using a specialized mapping that
+   * can not be reversed to the original.
+   *
+   * \param word Converted to digits and spaces in place
+   *
+   * Convert rules:
+   *    lower case all characters
+   *    Digits are left alone
+   *    Non letters are converted to spaces
+   *    letters are converted as follows:
+   *
+   *       abc def ghi jkl mno pqrs tuv wxyz
+   *       222 333 444 555 666 7777 888 9999
+   */
+  static void WordToDigits(std::string &word);
 
   static std::string CreateUUID();
   static bool ValidateUUID(const std::string &uuid); // NB only validates syntax

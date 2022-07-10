@@ -661,6 +661,16 @@ public:
   static bool InitializeCollator(bool Normalize = false);
 
   /*!
+   * \brief Provides the ability to collect basic performance info for the previous sort
+   *
+   * Must be run in the same thread that InitializeCollator was run. May require some setting
+   * or #define to be set to enable recording of data in log.
+   *
+   * \param sortItems simple count of how many items sorted.
+   */
+  static void SortCompleted(int sortItems);
+
+  /*!
    * \brief Performs locale sensitive string comparison.
    *
    * Must be run in the same thread that InitializeCollator that configured the Collator
@@ -673,20 +683,10 @@ public:
    *          > 0 if left collates > right
    */
 
-  /*!
-   * \brief Provides the ability to collect basic performance info for the previous sort
-   *
-   * Must be run in the same thread that InitializeCollator was run. May require some setting
-   * or #define to be set to enable recording of data in log.
-   *
-   * \param sortItems simple count of how many items sorted.
-   */
-  static void SortCompleted(int sortItems);
-
   static int32_t Collate(const std::wstring &left, const std::wstring &right);
 
   /*!
-   * \brief Performs locale sensitive wstring comparison.
+   * \brief Performs locale sensitive wchar_t* comparison.
    *
    * Must be run in the same thread that InitializeCollator that configured the Collator
    * for this was run.
@@ -1529,15 +1529,6 @@ public:
   static void RemoveCRLF(std::string& strLine);
 
   /*!
-   * \brief convert a time in seconds to a string based on the given time format
-   *
-   * \param seconds time in seconds
-   * \param format the format to use to convert seconds to a time
-   * \return the formatted time
-   */
-  static std::string SecondsToTimeString(long seconds, TIME_FORMAT format = TIME_FORMAT_GUESS);
-
-  /*!
    * \brief detects when a string contains non-ASCII to aide in debugging or error reporting
    *
    * \param str String to be examined for non-ASCII
@@ -1569,19 +1560,42 @@ public:
     return false;
   }
 
- static size_t FindWords(const char *str, const char *wordLowerCase);
-
-  /**
-   * \brief Scans str for the occurrence of word.
+  /*!
+   * \brief Determine if "word" is present in string
    *
-   * Word is either all letters or all digits. Words must be
-   * separated by spaces.
+   * \param str string to search
+   * \param word to search for in str
+   * \return true if word found, otherwise false
+   *
+   * Search algorithm:
+   *   Both str and word are case-folded (see FoldCase)
+   *   For each character in str
+   *     Return false if word not found in str
+   *     Return true if word found starting at beginning of substring
+   *     If partial match found:
+   *      If non-matching character is a digit, then skip past every
+   *      digit in str. Same for Latin letters. Otherwise, skip one character
+   *      Skip any whitespace characters
    */
-  static size_t FindWord(const std::string &str, const std::string &word);
 
+  static bool FindWord(const std::string &str, const std::string &word);
+
+  /*!
+   * \brief Converts a date string into an integer format
+   *
+   * \param dateString to be converted. See note
+   * \return integer format of dateString. See note
+   *
+   * No validation of dateString is performed. It is assumed to be
+   * in one of the following formats:
+   *    YYYY-DD-MM, YYYY--DD, YYYY
+   *
+   *    Examples:
+   *      1974-10-18 => 19741018
+   *      1974-10    => 197410
+   *      1974       => 1974
+   */
   static int DateStringToYYYYMMDD(const std::string &dateString);
-
-  static void WordToDigits(std::string &word);
 
   /*!
    * \brief Escapes the given string to be able to be used as a parameter.
