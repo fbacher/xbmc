@@ -53,7 +53,7 @@ CInputStreamAddon::CInputStreamAddon(const AddonInfoPtr& addonInfo,
       addonInfo->Type(ADDON_INPUTSTREAM)->GetValue("@listitemprops").asString();
   std::string name(addonInfo->ID());
 
-  m_fileItemProps = UnicodeUtils::Tokenize(listitemprops, "|");
+  m_fileItemProps = StringUtils::Tokenize(listitemprops, "|");
   for (auto &key : m_fileItemProps)
   {
     UnicodeUtils::Trim(key);
@@ -91,7 +91,7 @@ bool CInputStreamAddon::Supports(const AddonInfoPtr& addonInfo, const CFileItem&
     std::string protocols = addonInfo->Type(ADDON_INPUTSTREAM)->GetValue("@protocols").asString();
     if (!protocols.empty())
     {
-      std::vector<std::string> protocolsList = UnicodeUtils::Tokenize(protocols, "|");
+      std::vector<std::string> protocolsList = StringUtils::Tokenize(protocols, "|");
       for (auto& value : protocolsList)
       {
         UnicodeUtils::Trim(value);
@@ -107,7 +107,7 @@ bool CInputStreamAddon::Supports(const AddonInfoPtr& addonInfo, const CFileItem&
     std::string extensions = addonInfo->Type(ADDON_INPUTSTREAM)->GetValue("@extension").asString();
     if (!extensions.empty())
     {
-      std::vector<std::string> extensionsList = UnicodeUtils::Tokenize(extensions, "|");
+      std::vector<std::string> extensionsList = StringUtils::Tokenize(extensions, "|");
       for (auto& value : extensionsList)
       {
         UnicodeUtils::Trim(value);

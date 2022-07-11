@@ -341,6 +341,249 @@ public:
    */
   static std::string WStringToUTF8(const std::wstring &str);
 
+private:
+  /*!
+   * \brief Convert a string into a UChar buffer
+   *
+   * \param src UTF-8 sting to convert to UChars and write to a UChar buffer
+   * \param buffer to write to
+   * \param bufferSize maximum number of UChars that can be written to
+   *         the buffer.
+   * \param destLength set to the actual number of UChars written when complete
+   * \param src_offset offset (in bytes) to begin the conversion to UChars
+   * \param  src_length maximum number of UTF-8 bytes to convert to UChars
+   * \return a reference to buffer
+   *
+   * This is meant to be used to avoid allocating temp space from the heap by
+   * having buffer be a local (stack-based) array.
+   *
+   * Note that malformed Unicode codepoints will be converted to place-holder
+   * "substitute" Unicode codepoints.
+   */
+  static UChar* StringToUChar(const std::string &src, UChar *buffer, size_t bufferSize,
+      int32_t &destLength, const size_t src_offset = 0,
+      const size_t src_length = std::string::npos);
+
+  /*!
+   * \brief Convert a UTF-8 string into a UChar buffer
+   *
+   * \param src char array to convert to UChars and write to a UChar buffer
+   * \param buffer to write to
+   * \param bufferSize maximum number of UChars that can be written to
+   *         the buffer.
+   * \param destLength set to the actual number of UChars written when complete
+   * \param  length maximum number of UTF-8 bytes to convert to UChars
+   * \return a reference to buffer
+   *
+   * This is meant to be used to avoid allocating temp space from the heap by
+   * having buffer be a local (stack-based) array.
+   *
+   * Note that malformed Unicode codepoints will be converted to place-holder
+   * "substitute" Unicode codepoints.
+   */
+  static UChar* StringToUChar(const char *src, UChar *buffer, size_t bufferSize,
+      int32_t &destLength, const size_t length = std::string::npos);
+
+  /*!
+   * \brief Convert a wchar_t array into a UChar buffer
+   *
+   * \param src wchar_t array to convert to UChars and write to a UChar buffer
+   * \param buffer to write to
+   * \param bufferSize maximum number of UChars that can be written to
+   *         the buffer.
+   * \param destLength set to the actual number of UChars written when complete
+   * \param length maximum number of Unicode codepoints (wchar_t) to convert to UChars
+   * \return a reference to buffer
+   *
+   * This is meant to be used to avoid allocating temp space from the heap by
+   * having buffer be a local (stack-based) array.
+   *
+   * Note that malformed Unicode codepoints will be converted to place-holder
+   * "substitute" Unicode codepoints.
+   */
+  static UChar* WcharToUChar(const wchar_t *src, UChar *buffer, size_t bufferSize,
+      int32_t &destLength, const size_t length = std::string::npos);
+
+  /*!
+   * \brief Convert a UChar (UTF-16) array into a UTF-8 std::string
+   *
+   * \param u_str UChar (UTF-16) array to convert to UTF-8 and write to a std::string
+   * \param buffer scratch char* to write UTF-8 characters to
+   * \param bufferSize maximum number of bytes that can be written to
+   *         the buffer.
+   * \param destLength set to the actual number of bytes written when complete
+   * \param str_length maximum number of UChars to convert to UTF-8
+   * \return buffer copied to a std::string
+   *
+   * This is meant to be used to avoid allocating temp space from the heap by
+   * having buffer be a local (stack-based) array.
+   *
+   * Note that malformed Unicode codepoints will be converted to place-holder
+   * "substitute" Unicode codepoints.
+   */
+  static std::string UCharToString(const UChar *u_str, char *buffer, size_t bufferSize,
+      int32_t &destLength, const size_t u_str_length);
+
+  /*!
+   * \brief Convert a UChar (UTF-16) array into a wchar_t (Unicode, UChar32) buffer
+   *
+   * \param u_str UChar (UTF-16) array to convert to UTF-32 and write to a UChar buffer
+   * \param buffer scratch wchar_t* to write Unicode characters to
+   * \param bufferSize maximum number of codepoints (32-bit) that can be written to
+   *         the buffer.
+   * \param destLength set to the actual number of codepoints written when complete
+   * \param str_length maximum number UChars to convert to WChar (Unicode)
+   * \return a reference to buffer
+   *
+   * This is meant to be used to avoid allocating temp space from the heap by
+   * having buffer be a local (stack-based) array.
+   *
+   * Note that malformed Unicode codepoints will be converted to place-holder
+   * "substitute" Unicode codepoints.
+   */
+  static wchar_t* UCharToWChar(const UChar *u_str, wchar_t *buffer, size_t bufferSize,
+      int32_t &destLength, const size_t length = std::string::npos);
+
+  /*!
+   * \brief convert a wstring to a UnicodeString
+   *
+   * \param wStr wstring to convert
+   * \return UnicodeString containing UChar* encoding of wstring (Unicode), or
+   *         for the rare machine that defines wchar_t as 16 bits then it is
+   *         converted to UChar* or something similar
+   */
+  static icu::UnicodeString ToUnicodeString(const std::wstring &wStr)
+  {
+#if U_SIZEOF_WCHAR_T==2
+    return icu::UnicodeString(wStr.data(), wStr.length());
+#else
+    return icu::UnicodeString::fromUTF32((int32_t*) wStr.data(), wStr.length());
+#endif
+  }
+
+  /*!
+   * Convert a std::string to a UnicodeString
+   *
+   * \param src UTF-8 string to convert
+   * \return UnicodeString
+   */
+
+  static icu::UnicodeString ToUnicodeString(const std::string &src)
+  {
+    return icu::UnicodeString::fromUTF8(src);
+  }
+
+  /*!
+   * Convert an icu::StringPiece to a UnicodeString
+   *
+   * \param src a UTF-8 StringPiece to convert
+   * \return UnicodeString
+   *
+   * A StringPiece can be a std:string or a char*
+   */
+  static icu::UnicodeString ToUnicodeString(const icu::StringPiece &src)
+  {
+    return icu::UnicodeString::fromUTF8(src);
+  }
+
+  /*!
+   * Calculates a 'reasonable' buffer size to give some room for growth in a utf-8
+   * string to accommodate some basic transformations (folding, normalization, etc.).
+   * Not guaranteed to be sufficient for all needs.
+   *
+   * param utf8_length byte-length of UTF-8 string to be converted
+   * param scale multiplier to apply to get larger buffer
+   *
+   * Note that the returned size has a pad of 200 bytes added to leave room
+   * for growth.
+   *
+   */
+  static size_t GetBasicUTF8BufferSize(const size_t utf8_length, const float scale);
+
+  /*!
+   * \brief Calculates the maximum number of UChars (UTF-16) required by a wchar_t
+   * string.
+   *
+   * \param wchar_length Char32 codepoints to be converted to UTF-16.
+   * \param scale multiplier to apply to get larger buffer
+   * \return A size a bit larger than wchar_length, plus 200.
+   */
+  static size_t GetWcharToUCharBufferSize(const size_t wchar_length, const size_t scale);
+
+  /*!
+   * \brief Calculates the maximum number of UChars (UTF-16) required by a UTF-8
+   * string.
+   *
+   * \param utf8_length byte-length of UTF-8 string to be converted
+   * \param scale multiplier to apply to get larger buffer
+   * \return a fairly generous estimate of the number of UChars that will
+   *         be required for a string of the given length with
+   *         room for growth
+   *
+   * Note that the returned size has a pad of 200 UChars added to leave room
+   * for growth.
+   *
+   * Note that a UTF-16 string will be at most as long as the UTF-8 string.
+   */
+  static size_t GetUCharBufferSize(const size_t utf8_length, const float scale);
+
+  /*!
+   * \brief Calculates a reasonably sized UChar buffer based upon the size of existing
+   * UChar string.
+   *
+   * \param uchar_length byte-length of UTF-8 string to be converted
+   * \param scale multiplier to apply to get larger buffer
+   * \return a fairly generous estimate of the nmberu of UChars that will
+   *         be required to contained a string of the given length with
+   *         room for growth
+   *
+   * Note that the returned size has a pad of 200 UChars added to leave room
+   * for growth.
+   *
+   * Note that a UTF-16 string will be at most as long as the UTF-8 string.
+   */
+  static size_t GetUCharWorkingSize(const size_t uchar_length, const size_t scale);
+
+  /*!
+   * \brief Calculates the maximum number of UTF-8 bytes required by a UTF-16 string.
+   *
+   * \param uchar_length Number of UTF-16 code units to convert
+   * \param scale multiplier to apply to get a larger buffer
+   * \return a fairly generous estimate of the number of bytes that will
+   *         be required to contained a string of the given length with
+   *         room for growth
+   *
+   * Note that 200 bytes is added to the result to give some room for growth.
+   *
+   * Note that in addition to any scale factor, the number of UTF-8 bytes
+   * returned is 3 times the number of UTF-16 code unites. This leaves enough
+   * room for the 'worst case' UTF-8  expansion required for Indic, Thai and CJK.
+   */
+  static size_t GetUTF8BufferSize(const size_t uchar_length, const size_t scale);
+
+  /*!
+   * \brief Calculates the maximum number of wchar_t code units required to
+   * represent UTF-16 code units.
+   *
+   * On most systems a wchar_t represents a 32-bit Unicode codepoint. For such machines
+   * a wchar_t string will require at most the same number of 32-bit codepoints as the
+   * 16-bit has code-units (i.e. twice as many bytes).
+   *
+   * On the systems with a wchar_t representing a 16-bit UTF-16 code unit, then the
+   * number of code units (and bytes) required to represent a UTF-16 UChar in wchar_t
+   * will bhe the same as the original string.
+   *
+   * \param uchar_length number of UTF-16 code units in original string
+   * \param scale scale factor to multiply uchar_length by to allow for growth
+   * \returns Number of wchar_t characters to allocate for the desired buffer
+   *          with a fairly generous amount of room for growth
+   *
+   * Note that an additional 200 code units is added to the result to allow for growth
+   *
+   */
+  static size_t GetWCharBufferSize(const size_t uchar_length, const size_t scale);
+
+public:
   /*!
    * \brief Get the icu::Locale for g_langInfo.GetLocale()
    *
@@ -405,23 +648,20 @@ public:
    * \param str string to fold in place.
    * \param opt StringOptions to fine-tune behavior. For most purposes, leave at
    *            default value, 0 (same as FOLD_CASE_DEFAULT)
-   * \return UTF-8 src.
+   * \return UTF-8 same as src.
    *
    * Notes: length and number of bytes in string may change during folding/normalization
    *
    * When FOLD_CASE_DEFAULT is used, the Turkic Dotted I and Dotless
    * i follow the "en" locale rules for ToLower.
    *
-   * DEVELOPERS who use non-ASCII keywords should be aware that it may not
-   * always work as expected. Testing is important.
-   *
-   * Changes will have to be made to keywords that don't work as expected. One solution is
-   * to try to always use lower-case in the first place.
+   * While the case folding works very well, it is a good idea to test when
+   * using non-ASCII characters.
    *
    * See StringOptions for the more details.
    */
 
-  static const std::wstring ToFold(std::wstring &src, const StringOptions options);
+  static const std::wstring FoldCase(const std::wstring &src, const StringOptions options);
 
   /*!
    *  \brief Folds the case of a wstring, independent of Locale.
@@ -430,27 +670,55 @@ public:
    * and other transformations are made (such as German sharp-S is converted to ss).
    * The transformation is independent of locale.
    *
-   * \param str string to fold in place.
+   * \param str string to fold.
    * \param opt StringOptions to fine-tune behavior. For most purposes, leave at
    *            default value, 0 (same as FOLD_CASE_DEFAULT)
-   * \return UTF-8 src.
+   * \return UTF-8 folded wstring.
    *
    * Notes: length and number of bytes in string may change during folding/normalization
    *
    * When FOLD_CASE_DEFAULT is used, the Turkic Dotted I and Dotless
    * i follow the "en" locale rules for ToLower.
    *
-   * DEVELOPERS who use non-ASCII keywords should be aware that it may not
-   * always work as expected. Testing is important.
-   *
-   * Changes will have to be made to keywords that don't work as expected. One solution is
-   * to try to always use lower-case in the first place.
+   * While the case folding works very well, it is a good idea to test when
+   * using non-ASCII characters.
    *
    * See StringOptions for the more details.
    */
+  static const std::string FoldCase(const std::string &src, const StringOptions options);
 
-  static const std::string ToFold(std::string &src, const StringOptions options);
+private:
 
+  /*!
+   *  \brief Folds the case of a StringPiece (UTF-8), independent of Locale.
+   *
+   * Similar to ToLower except in addition, insignificant accents are stripped
+   * and other transformations are made (such as German sharp-S is converted to ss).
+   * The transformation is independent of locale.
+   *
+   * \param strPiece StringPiece to fold.
+   * \param sink a ByteSink to accept the folded string
+   * \param status UErrorCode indicating the status of the operation. Make sure to
+   *        set to U_ZERO_ERROR before calling this function
+   * \param options StringOptions to fine-tune behavior. For most purposes, leave at
+   *            default value, 0 (same as FOLD_CASE_DEFAULT)
+   *
+   * Notes: length and number of bytes in string may change during folding/normalization
+   *
+   * A ByteSink wraps a buffer to give added flexibility on storage management, etc.
+   *
+   * When FOLD_CASE_DEFAULT is used, the Turkic Dotted I and Dotless
+   * i follow the "en" locale rules for ToLower.
+   *
+   * While the case folding works very well, it is a good idea to test when
+   * using non-ASCII characters.
+   *
+   * See StringOptions for the more details.
+   */
+  static void FoldCase(const icu::StringPiece strPiece, icu::CheckedArrayByteSink &sink,
+      UErrorCode &status, const int32_t options);
+
+public:
   /*!
    *  \brief Normalizes a wstring. Not expected to be used outside of UnicodeUtils.
    *
@@ -487,6 +755,26 @@ public:
   static const std::string Normalize(const std::string &src, const StringOptions options,
       const NormalizerType NormalizerType = NormalizerType::NFKC);
 
+private:
+  /*!
+   *  \brief Normalizes a StringPiece (utf-8). Not expected to be used outside of
+   *   Unicode.
+   *
+   * There are multiple Normalizations that can be performed on Unicode. Fortunately
+   * normalization is not needed in many situations. An introduction can be found
+   * at: https://unicode-org.github.io/icu/userguide/transforms/normalization/
+   *
+   * \param strPiece UTF-8 string to Normalize.
+   * \param sink a CheckedArrayByteSink that wraps the output UTF-8 buffer
+   * \param status UErrorCode indicating the status of the operation. Make sure to
+   *        set to U_ZERO_ERROR before calling this function
+   * \param options fine tunes behavior. See StringOptions. Frequently can leave
+   *        at default value.
+   * \param NormalizerType select the appropriate Normalizer for the job
+   */
+  static void Normalize(const icu::StringPiece strPiece, icu::CheckedArrayByteSink &sink,
+      UErrorCode &status, const int32_t options, const NormalizerType NormalizerType);
+public:
   /*!
    * \brief Converts a string to Upper case according to locale.
    *
@@ -499,6 +787,29 @@ public:
    * \return str with every character changed to upper case
    */
   static const std::string ToUpper(const std::string &src, const icu::Locale &locale);
+
+private:
+
+  /*!
+   * \brief Converts a UChar buffer to Upper case according to locale.
+   *
+   * Note: The length of the string can change, depending upon the underlying
+   * icu::locale.
+   *
+   * \param p_u_src_buffer UChar buffer to change case on
+   * \param u_src_length length of p_u_src in UChars
+   * \param icu::Locale governs the ToUpper behavior
+   * \param p_u_toupper_buffer buffer to write the results of ToUpper on p_u_src_buffer
+   * \param u_toupper_buffer_size size in UChars of p_u_toupper_buffer
+   * \param to_upper_length the actual number of UChars written to p_u_toupper_buffer
+   * \param status UErrorCode indicating the status of the operation. Make sure to
+   *        set to U_ZERO_ERROR before calling this function
+   */
+  static void ToUpper(UChar *p_u_src_buffer, int32_t u_src_length, const icu::Locale locale,
+      UChar *p_u_toupper_buffer, const int32_t u_toupper_buffer_size, int32_t &to_upper_length,
+      UErrorCode &status);
+
+public:
 
   /*!
    * \brief Converts a string to Lower case according to icu:Locale.
@@ -610,8 +921,8 @@ public:
   /*!
    * \brief Performs a bit-wise comparison of two wstrings, after case folding each.
    *
-   * Logically equivalent to StrCmp(ToFold(str1, opt)), ToFold(str2, opt))
-   * or, if Normalize == true: Strcmp(NFD(ToFold(NFD(str1))), NFD(ToFold(NFD(str2))))
+   * Logically equivalent to StrCmp(FoldCase(str1, opt)), FoldCase(str2, opt))
+   * or, if Normalize == true: Strcmp(NFD(FoldCase(NFD(str1))), NFD(FoldCase(NFD(str2))))
    * (NFD is a type of normalization)
    *
    * Note: When normalization = true, the string comparison is done incrementally
@@ -637,8 +948,8 @@ public:
   /*!
    * \brief Performs a bit-wise comparison of two strings, after case folding each.
    *
-   * Logically equivalent to StrCmp(ToFold(str1, opt)), ToFold(str2, opt))
-   * or, if Normalize == true: Strcmp(NFD(ToFold(NFD(str1))), NFD(ToFold(NFD(str2))))
+   * Logically equivalent to StrCmp(FoldCase(str1, opt)), FoldCase(str2, opt))
+   * or, if Normalize == true: Strcmp(NFD(FoldCase(NFD(str1))), NFD(FoldCase(NFD(str2))))
    * (NFD is a type of normalization)
    *
    * Note: When normalization = true, the string comparison is done incrementally
@@ -664,8 +975,8 @@ public:
   /*!
    * \brief Performs a bit-wise comparison of two strings, after case folding each.
    *
-   * Logically equivalent to StrCmp(ToFold(str1, options)), 0, n, ToFold(str2, options), 0, n)
-   * or, if Normalize == true: Strcmp(NFD(ToFold(NFD(str1))), 0, n,  NFD(ToFold(NFD(str2))), 0, n)
+   * Logically equivalent to StrCmp(FoldCase(str1, options)), 0, n, FoldCase(str2, options), 0, n)
+   * or, if Normalize == true: Strcmp(NFD(FoldCase(NFD(str1))), 0, n,  NFD(FoldCase(NFD(str2))), 0, n)
    * (NFD is a type of normalization)
    *
    * Note: When normalization = true, the string comparison is done incrementally
@@ -692,8 +1003,8 @@ public:
   /*!
    * \brief Performs a bit-wise comparison of two strings, after case folding each.
    *
-   * Logically equivalent to StrCmp(ToFold(str1, opt)), ToFold(str2, opt))
-   * or, if Normalize == true: Strcmp(NFD(ToFold(NFD(str1))), NFD(ToFold(NFD(str2))))
+   * Logically equivalent to StrCmp(FoldCase(str1, opt)), FoldCase(str2, opt))
+   * or, if Normalize == true: Strcmp(NFD(FoldCase(NFD(str1))), NFD(FoldCase(NFD(str2))))
    * (NFD is a type of normalization)
    *
    * Note: When normalization = true, the string comparison is done incrementally
@@ -989,7 +1300,7 @@ public:
    * /
   static size_t GetCharPosition(const icu::UnicodeString &str, const size_t charCount,
       const bool left, const bool keepLeft, const icu::Locale& icuLocale);
-  */
+   */
 
   /*!
    * \brief Removes leading and trailing whitespace from the string
@@ -1059,21 +1370,70 @@ public:
   static std::string TrimRight(const std::string &str, const std::string trimChars);
 
   /*!
-   * \brief Remove a set of characters from middle of str
+   * \brief Remove a set of characters from ends of str
    *
-   *
-   *  Ex: TrimLeft("abc1234bxa", "acb") ==> "1234bxa"
+   *  Ex: Trim("abc1234bxa", "acb", true, true) ==> "1234bxa"
    *
    * \param str to trim
    * \param trimStrings (characters) to remove from str
+   * \param trimLeft if true, then trim from left end of string
+   * \param trimRight if true, then trim from right end of string
    * \return trimmed string
    */
   static std::string Trim(const std::string &str, const std::string &trimStrings, const bool trimLeft,
       const bool trimRight);
 
+  /*!
+   * \brief Remove a set of strings from ends of str
+   *
+   *  Ex: Trim("abc1234bxa", {"acb", "12"}, true, true) ==> "abc34bxa"
+   *
+   * \param str to trim
+   * \param trimStrings strings to remove from str
+   * \param trimLeft if true, then trim from left end of string
+   * \param trimRight if true, then trim from right end of string
+   * \return trimmed string
+   */
   static std::string Trim(const std::string &str,
-      const std::vector<std::string> &trimChars, const bool trimLeft, const bool trimRight);
+      const std::vector<std::string> &trimStrings, const bool trimLeft, const bool trimRight);
 
+private:
+  /*!
+   * \brief Remove a set of characters from ends of a UnicodeString
+   *
+   * \param str UnicodeString to trim
+   * \param trimChars set of characters to remove from str
+   * \param trimLeft if true, then trim from left end of string
+   * \param trimRight if true, then trim from right end of string
+   * \return trimmed UnicodeString
+   */
+  static icu::UnicodeString Trim(const icu::UnicodeString &str, const icu::UnicodeString &trimChars,
+      const bool trimLeft, const bool trimRight);
+
+  /*!
+   * \brief Remove a set of UnicodeStrings from ends of a UnicodeString
+   *
+   * \param str UnicodeString to trim
+   * \param trimStrings set of strings to remove from str
+   * \param trimLeft if true, then trim from left end of string
+   * \param trimRight if true, then trim from right end of string
+   * \return trimmed UnicodeString
+   */
+  static icu::UnicodeString Trim(const icu::UnicodeString &uStr,
+      const std::vector<icu::UnicodeString> &trimStrings, const bool trimLeft, const bool trimRight);
+
+  /*!
+   * \brief Remove whitespace from a UnicodeString
+   *
+   * \param str to trim
+   * \param trimLeft if true, then trim from left end of string
+   * \param trimRight if true, then trim from right end of string
+   * \return trimmed string
+   */
+  static icu::UnicodeString Trim(const icu::UnicodeString &str, const bool trimLeft,
+      const bool trimRight);
+
+public:
   /*!
    * \brief Splits each input string with each delimiter string producing a vector of split strings
    * omitting any null strings.
@@ -1140,6 +1500,72 @@ public:
   static std::vector<std::string> SplitMulti(const std::vector<std::string> &input,
       const std::vector<std::string> &delimiters, size_t iMaxStrings = 0);
 
+private:
+  /*!
+   * \brief Splits each input UnicodeString with each delimiter UnicodeString
+   * producing a vector of split UnicodeStrings  omitting any null strings.
+   *
+   * \param input vector of UnicodeStrings to be split
+   * \param delimiters when found in a UnicodeString, a delimiter splits a string into two strings
+   * \param iMaxStrings (optional) Maximum number of resulting split strings
+   * \result the accumulation of all split strings (and any unfinished splits, due to iMaxStrings
+   *          being exceeded) omitting null strings
+   *
+   * SplitMulti is essentially equivalent to running Split(string, vector<delimiters>, maxstrings) over multiple
+   * strings with the same delimiters and returning the aggregate results. Null strings are not returned.
+   *
+   * There are some significant differences when maxstrings alters the process. Here are the boring details:
+   *
+   * For each delimiter, Split(string<n> input, delimiter, maxstrings) is called for each input string.
+   * The results are appended to results <vector<string>>
+   *
+   * After a delimiter has been applied to all input strings, the process is repeated with the
+   * next delimiter, but this time with the vector<string> input being replaced with the
+   * results of the previous pass.
+   *
+   * If the maxstrings limit is not reached, then, as stated above, the results are similar to
+   * running Split(string, vector<delimiters> maxstrings) over multiple strings. But when the limit is reached
+   * differences emerge.
+   *
+   * Before a delimiter is applied to a string a check is made to see if maxstrings is exceeded. If so,
+   * then splitting stops and all split string results are returned, including any strings that have not
+   * been split by as many delimiters as others, leaving the delimiters in the results.
+   *
+   * Differences between current behavior and prior versions: Earlier versions removed most empty strings,
+   * but a few slipped past. Now, all empty strings are removed. This means not as many empty strings
+   * will count against the maxstrings limit. This change should cause no harm since there is no reliable
+   * way to correlate a result with an input; they all get thrown in together.
+   *
+   * If an input vector element is empty the result will be an empty vector element (not
+   * an empty string).
+   *
+   * Examples:
+   *
+   * Delimiter strings are applied in order, so once iMaxStrings
+   * items is produced no other delimiters are applied. This produces different results
+   * than applying all delimiters at once:
+   *
+   * Ex: input = {"a/b#c/d/e/foo/g::h/", "#p/q/r:s/x&extraNarfy"}
+   *     delimiters = {"/", "#", ":", "Narf"}
+   *     if iMaxStrings=7
+   *        return value = {"a", "b#c", "d" "e", "foo", "/g::h/", "p", "q", "/r:s/x&extraNarfy}"
+   *
+   *     if iMaxStrings=0
+   *        return value = {"a", "b", "c", "d", "e", "f", "g", "", "h", "", "", "p", "q", "r", "s",
+   *                        "x&extra", "y"}
+   *
+   * e.g. "a/b#c/d" becomes "a", "b#c", "d" rather
+   * than "a", "b", "c/d"
+   *
+   * \param input vector of strings each to be split
+   * \param delimiters strings to be used to split the input strings
+   * \param iMaxStrings limits number of resulting split strings. A value of 0
+   *        means no limit.
+   * \return vector of split strings
+   */
+  static std::vector<icu::UnicodeString> SplitMulti(const std::vector<icu::UnicodeString> &input,
+      const std::vector<icu::UnicodeString> &delimiters, size_t iMaxStrings/* = 0 */);
+public:
   /*!
    * \brief Replaces every occurrence of a substring in string and returns the count of replacements
    *
@@ -1152,9 +1578,54 @@ public:
    * \return Count of the number of changes
    */
   [[deprecated("FindAndReplace is faster, returned count not used.") ]]
-  static std::tuple<std::string, int> FindCountAndReplace(const std::string &src, const std::string &oldText,
-      const std::string &newText);
+   static std::tuple<std::string, int> FindCountAndReplace(const std::string &src, const std::string &oldText,
+       const std::string &newText);
 
+private:
+
+  /*!
+   * \brief Replace all occurrences of characters in oldText with the characters
+   *        in newText
+   * \param oldText the text containing the search text
+   * \param newText the text containing the replacement text
+   * \return a Tuple with a reference to the modified src and an int containing
+   *         the number of times the oldText was replaced.
+   */
+  static std::tuple<icu::UnicodeString, int> FindCountAndReplace(const icu::UnicodeString &kSrc,
+      const icu::UnicodeString &kOldText, const icu::UnicodeString &kNewText);
+
+  /*!
+   * \brief Replace all occurrences of characters in oldText with the characters
+   *        in newText
+   * \param srcText the text containing the search text
+   * \param start offset in UChar units (16-bit) in srcText to begin searching for
+   *        substrings to replace
+   * \param length number of Uchar codeunits (16-bit) in srcText to allow to be
+   *        replaced (provided the substring of this part of srcText matches the
+   *        oldText
+   * \param oldText contains the search string to look for in srcText substing
+   *        specified by start and length
+   * \param oldStart offset in Uchar units (16-bit) in oldText which will form
+   *        the start of the substring of oldText to be used for the search
+   * \param oldLength number of UChar units (16-bit) that will be in the
+   *         substring of oldText for the search
+   * \param newText contains the replacement text for each occurrence of the
+   *        oldText substring found in the srcText substring
+   * \param newStart the offset in UChar units (16-bit) in newText which will
+   *        form the start of the substring of newText that will serve as
+   *        the replacement text in the srcText substring
+   * \param newLength the number of UChar units (16-bit) in newText which will
+   *        be in the substring of newText that will replace any occurrences
+   *        of the oldText substring in the srcText substring.
+   * \return a Tuple with a reference to the modified src and an int containing
+   *         the number of times the oldText was replaced.
+   */
+  static std::tuple<icu::UnicodeString, int>
+  FindCountAndReplace(const icu::UnicodeString &srcText, const int32_t start, const int32_t length,
+      const icu::UnicodeString &oldText, const int32_t oldStart, const int32_t oldLength,
+      const icu::UnicodeString &newText, const int32_t newStart, const int32_t newLength);
+
+public:
   /*!
    * \brief Determine if "word" is present in string
    *
@@ -1189,35 +1660,18 @@ public:
       const std::string newText);
 
   /*!
-   * \brief Not required at this time since 'brackets' are confined to ASCII characters.
+   * \brief Find a regular expressoin pattern in a str
    *
-   * Finds the position of the open bracket in a substring.
+   * \param str string to search
+   * \param pattern icu::regex pattern
+   * \param flags that control behavior of regex. See enum RegexpFlag
+   * \return byte offset at beginning of first match of the pattern or
+   *         string::npos if no match found
    *
-   * The startPos is already advanced after the open bracket which we
-   * are looking for the close bracket for.
-   *
-   * str string to scan
-   * opener the open-bracket character to look for
-   * closer the close-bracket character to look for
-   * startPos offset into string, after the first opener  to begin searching.
-   *
-   * return If the brackets are paired, then the position of the last
-   *        close-bracket will be returned.
-   *        Otherwise, string.np is returned.
-   *
-   static size_t FindEndBracket(const std::string& str,
-   char opener,
-   char closer,
-   size_t startPos = 0);
-   */
-  /*
    * Regular expression patterns for this lib can be found at:
    * https://unicode-org.github.io/icu/userguide/strings/regexp.html
    *
-   * flags:  See enum RegexpFlag in uregex.h
-   *
    */
-
   static size_t RegexFind(const std::string &str, const std::string pattern, const int flags);
 
   /*!
@@ -1235,6 +1689,25 @@ public:
   static std::string RegexReplaceAll(const std::string &str, const std::string pattern,
       const std::string replace, const int flags);
 
+private:
+
+  /*!
+   * \brief Replace all occurrences of a regular expression in a string
+   *
+   * Regular expression patterns for this lib can be found at:
+   * https://unicode-org.github.io/icu/userguide/strings/regexp.html
+   *
+   * \param uString string which will be copied and then modified before being returned
+   * \param uPattern regular expression to search for in the copy of uString
+   * \param uReplace each occurrence of uPattern in the copy of uString will be replaced
+   *        by this string
+   * \param flags see enum Unicode::RegexpFlag
+   * \return copy of UString modified as necessary according to the parameters
+   */
+  icu::UnicodeString RegexReplaceAll(const icu::UnicodeString &uString,
+      const icu::UnicodeString uPattern, const icu::UnicodeString uReplace, const int flags);
+
+public:
   /*!
    * \brief Count the number of occurances of strFind within strInput
    *
@@ -1243,8 +1716,8 @@ public:
    * \param strInput input string to search
    * \param strFind substring to search for in strInput
    * \param flags which influence the call to RegexFind. The default is UREGEX_LITERAL,
-   *        which prevents interpreting strFind as a regular expressoin.
-   * \return a count of the number of occurrances found.
+   *        which prevents interpreting strFind as a regular expression.
+   * \return a count of the number of occurrences found.
    */
   static int32_t countOccurances(const std::string &strInput, const std::string &strFind,
       const int flags);
@@ -1266,6 +1739,32 @@ public:
     return SplitTo(d_first, input, std::string(1, delimiter), iMaxStrings);
   }
 
+  /*!
+   * \brief Splits the given input string at each delimiter in the set delimiters
+   *
+   * An algorithm that can be used to explain the behavior:
+   *   For the second .. n delimiters, replace every occurrence of that delimiter
+   *   in uInput with the first delimiter
+   *   Finally, split uInput using the first delimiter
+   *
+   * \param d_first output iterator to send split strings as they are created
+   * \param uInput is the string to be searched to make split strings
+   * \param uDelimiters contains a set of strings which cause uInput to split.
+   *        First, follow the algorithm outlined above. then split the remaining
+   *        uInput using the first delimiter. If found in uInput will cause any text
+   *        preceding it to be sent as a string to d_first. If no text proceeds
+   *        d_first, then an empty string will be sent, unless omitEmptyStrings
+   *        is true. In addition, if no characters follow the last uDelimiter, an
+   *        empty string will be sent to d_first
+   * \param iMaxStrings, if non-zero, limits the number of splits that will be
+   *        created. Once reached, the remaining un-split text in uInput will be copied
+   *        as a string to d_first
+   * \param omitEmptyStrings controls whether empty strings are sent to d_first or not
+   * \return output iterator to the element in the destination range, one past the last element
+   *       that was put there
+   *
+   *  A Few examples can be found in UnicodeUtils as well as TestUnicodeUtils
+   */
   template<typename OutputIt>
   static OutputIt SplitTo(OutputIt d_first, const std::string &input,
       const std::vector<std::string> &delimiters, size_t iMaxStrings /* = 0 */)
@@ -1307,23 +1806,24 @@ public:
     return dest;
   }
 
-  /*! \brief Splits the given input string using the given delimiter into separate strings.
-
-   If the given input string is empty nothing will be put into the target iterator.
-
-   \param d_first the beginning of the destination range
-   \param input Input string to be split
-   \param delimiter Delimiter to be used to split the input string
-   \param iMaxStrings (optional) Maximum number of split strings. 0 means infinite
-   \return output iterator to the element in the destination range, one past the last element
+  /*!
+   * \brief Splits the given input string using the given delimiter into separate strings.
+   *
+   * If the given input string is empty nothing will be put into the target iterator.
+   *
+   * \param d_first the beginning of the destination range
+   * \param input string to be split
+   * \param delimiter Delimiter to be used to split the input string
+   * \param iMaxStrings (optional) Maximum number of split strings. 0 means infinite
+   * \return output iterator to the element in the destination range, one past the last element
    *       that was put there
+   *
+   *  A Few examples can be found in UnicodeUtils as well as TestUnicodeUtils
    */
   template<typename OutputIt>
   static OutputIt SplitTo(OutputIt d_first, const std::string &input, const std::string &delimiter,
       size_t iMaxStrings = 0)
   {
-    // This is regex based. A simpler, faster one can be derived from unistr.h using u_strFindFirst and friends
-
     OutputIt dest = d_first;
 
     if (input.empty())
@@ -1354,193 +1854,72 @@ public:
     return dest;
   }
 
-  /**
-   * Not required at this time since delimiters are confined to ASCII characters
-   *
-   static void Tokenize(const std::string &input,
-   std::vector<std::string> &tokens, const std::string &delimiters);
-   */
-
-  static bool Contains(const std::string &str, const std::vector<std::string> &keywords);
-
 private:
-  static bool doneOnce;
-
-  static bool IsLatinChar(UChar32 codepoint);
-
-  /**
-   * Calculates a 'reasonable' buffer size to give some room for growth in a utf-8
-   * string to accommodate some basic transformations (folding, normalization, etc.).
-   * Not guaranteed to be sufficient for all needs.
-   *
-   * param utf8_length byte-length of UTF-8 string to be converted
-   * param scale multiplier to apply to get larger buffer
-   *
-   * Note that the returned size has a pad of 200 bytes added to leave room
-   * for growth.
-   *
-   */
-
-  static size_t GetBasicUTF8BufferSize(size_t utf8_length, float scale);
 
   /*!
-   * \brief Calculates the maximum number of UChars (UTF-16) required by a wchar_t
-   * string.
+   * \brief Splits the given input string at each delimiter
    *
-   * \param wchar_length Char32 codepoints to be converted to UTF-16.
-   * \param scale multiplier to apply to get larger buffer
-   * \return A size a bit larger than wchar_length, plus 200.
+   * \param d_first output iterator to send split strings as they are created
+   * \param uInput is the string to be searched to make split strings
+   * \param uDelimiter contains a string which if found in uInput will cause any text
+   *        preceding it to be sent as a string to d_first. If no text proceeds
+   *        d_first, then an empty string will be sent, unless omitEmptyStrings
+   *        is true. In addition, if no characters follow the last uDelimiter, an
+   *        empty string will be sent to d_first
+   * \param iMaxStrings, if non-zero, limits the number of splits that will be
+   *        created. Once reached, the remaining un-split text in uInput will be copied
+   *        as a string to d_first
+   * \param omitEmptyStrings controls whether empty strings are sent to d_first or not
    */
-
-  static size_t GetWcharToUCharBufferSize(size_t wchar_length, size_t scale);
-
-  /**
-   * Calculates the maximum number of UChars (UTF-16) required by a UTF-8
-   * string.
-   *
-   * param utf8_length byte-length of UTF-8 string to be converted
-   * param scale multiplier to apply to get larger buffer
-   *
-   * Note that the returned size has a pad of 200 UChars added to leave room
-   * for growth.
-   *
-   * Note that a UTF-16 string will be at most as long as the UTF-8 string.
-   */
-
-  static size_t GetUCharBufferSize(size_t utf8_length, float scale);
-
-  /**
-   * Calculates a reasonably sized UChar buffer based upon the size of existing
-   * UChar string.
-   *
-   * param uchar_length byte-length of UTF-8 string to be converted
-   * param scale multiplier to apply to get larger buffer
-   *
-   * Note that the returned size has a pad of 200 UChars added to leave room
-   * for growth.
-   *
-   * Note that a UTF-16 string will be at most as long as the UTF-8 string.
-   */
-
-  static size_t GetUCharWorkingSize(size_t uchar_length, size_t scale);
-
-  /**
-   * Calculates the maximum number of UTF-8 bytes required by a UTF-16 string.
-   *
-   * param uchar_length Number of UTF-16 code units to convert
-   * param scale multiplier to apply to get a larger buffer
-   *
-   * Note that 200 bytes is added to the result to give some room for growth.
-   *
-   * Note that in addition to any scale factor, the number of UTF-8 bytes
-   * returned is 3 times the number of UTF-16 code unites. This leaves enough
-   * room for the 'worst case' UTF-8  expansion required for Indic, Thai and CJK.
-   */
-
-  static size_t GetUTF8BufferSize(size_t uchar_length, size_t scale);
-
-  /**
-   * Calculates the maximum number of wchar_t code units required to
-   * represent UTF-16 code units.
-   *
-   * On most systems a wchar_t represents a 32-bit Unicode codepoint. For such machines
-   * a wchar_t string will require at most the same number of 32-bit codepoints as the
-   * 16-bit has code-units (i.e. twice as many bytes).
-   *
-   * On the systems with a wchar_t representing a 16-bit UTF-16 code unit, then the
-   * number of code units (and bytes) required to represent a UTF-16 UChar in wchar_t
-   * will bhe the same as the original string.
-   *
-   * param uchar_length number of UTF-16 code units in original string
-   * param scale scale factor to multiply uchar_length by to allow for growth
-   * returns Number of wchar_t to allocate for the desired buffer.
-   *
-   * Note that an additional 200 code units is added to the result to allow for growth
-   *
-   */
-  static size_t GetWCharBufferSize(size_t uchar_length, size_t scale);
-
-  static UChar* StringToUChar(const std::string &src, UChar *buffer, size_t bufferSize,
-      int32_t &destLength, const size_t src_offset = 0,
-      const size_t src_length = std::string::npos);
-
-  static UChar* StringToUChar(const char *src, UChar *buffer, size_t bufferSize,
-      int32_t &destLength, const size_t length = std::string::npos);
-
-  static UChar* WcharToUChar(const wchar_t *src, UChar *buffer, size_t bufferSize,
-      int32_t &destLength, const size_t length = std::string::npos);
-
-  static std::string UCharToString(const UChar *u_str, char *buffer, size_t bufferSize,
-      int32_t &destLength, const size_t u_str_length);
-
-  static wchar_t* UCharToWChar(const UChar *u_str, wchar_t *buffer, size_t bufferSize,
-      int32_t &destLength, const size_t length = std::string::npos);
-
-  static icu::UnicodeString ToUnicodeString(const std::wstring &wStr)
-  {
-#if U_SIZEOF_WCHAR_T==2
-    return icu::UnicodeString(wStr.data(), wStr.length());
-#else
-    return icu::UnicodeString::fromUTF32((int32_t*) wStr.data(), wStr.length());
-#endif
-  }
-
-  static icu::UnicodeString ToUnicodeString(const std::string &src)
-  {
-    return icu::UnicodeString::fromUTF8(src);
-  }
-
-  static icu::UnicodeString ToUnicodeString(const icu::StringPiece &src)
-  {
-    return icu::UnicodeString::fromUTF8(src);
-  }
-
-  static void ToUpper(UChar *p_u_src_buffer, int32_t u_src_length, const icu::Locale locale,
-      UChar *p_u_toupper_buffer, const int32_t u_toupper_buffer_size, int32_t &to_upper_length,
-      UErrorCode &status);
-
-  static void ToFold(const icu::StringPiece strPiece, icu::CheckedArrayByteSink &sink,
-      UErrorCode &status, const int32_t options);
-
-  static void Normalize(const icu::StringPiece strPiece, icu::CheckedArrayByteSink &sink,
-      UErrorCode &status, const int32_t options, const NormalizerType NormalizerType);
-
-  static icu::UnicodeString Trim(const icu::UnicodeString &str, const icu::UnicodeString &trimChars,
-      const bool trimLeft, const bool trimRight);
-
-  static icu::UnicodeString Trim(const icu::UnicodeString &uStr,
-      const std::vector<icu::UnicodeString> &trimChars, const bool trimLeft, const bool trimRight);
-
-  static icu::UnicodeString Trim(const icu::UnicodeString &str, const bool trimLeft,
-      const bool trimRight);
-
-  static std::tuple<icu::UnicodeString, int> FindCountAndReplace(const icu::UnicodeString &kSrc,
-      const icu::UnicodeString &kOldText, const icu::UnicodeString &kNewText);
-
-  static std::tuple<icu::UnicodeString, int>
-  FindCountAndReplace(const icu::UnicodeString &srcText, const int32_t start, const int32_t length,
-      const icu::UnicodeString &oldText, const int32_t oldStart, const int32_t oldLength,
-      const icu::UnicodeString &newText, const int32_t newStart, const int32_t newLength);
-
-  /*
-   * Regular expression patterns for this lib can be found at:
-   * https://unicode-org.github.io/icu/userguide/strings/regexp.html
-   *
-   * flags:  See enum RegexpFlag in uregex.h
-   *
-   */
-  icu::UnicodeString RegexReplaceAll(const icu::UnicodeString &uString,
-      const icu::UnicodeString kPattern, const icu::UnicodeString kReplace, const int flags);
-
   template<typename OutputIt>
-  static OutputIt SplitTo(OutputIt d_first, const icu::UnicodeString &kInput,
-      const icu::UnicodeString &kDelimiter, size_t iMaxStrings = 0, const bool omitEmptyStrings = false);
+  static OutputIt SplitTo(OutputIt d_first, const icu::UnicodeString &uInput,
+      const icu::UnicodeString &uDelimiter, size_t iMaxStrings = 0, const bool omitEmptyStrings = false);
 
+  /*!
+   * \brief Splits the given input string at each of the delimiters
+   *
+   * \param d_first output iterator to send split strings as they are created
+   * \param uInput is the string to be searched to make split strings
+   * \param uDelimiters contains a set of strings which if any are found in
+   *        uInput will cause any text
+   *        preceding it to be sent as a string to d_first. If no text proceeds
+   *        d_first, then an empty string will be sent, unless omitEmptyStrings
+   *        is true. In addition, if no characters follow the last uDelimiter, an
+   *        empty string will be sent to d_first
+   * \param iMaxStrings, if non-zero, limits the number of splits that will be
+   *        created. Once reached, the remaining un-split text in uInput will be copied
+   *        as a string to d_first
+   * \param omitEmptyStrings controls whether empty strings are sent to d_first or not
+   */
   template<typename OutputIt>
   static OutputIt SplitTo(OutputIt d_first, icu::UnicodeString uInput,
       const std::vector<icu::UnicodeString> &uDelimiters,  size_t iMaxStrings = 0, const bool omitEmptyStrings = false);
 
-  static std::vector<icu::UnicodeString> SplitMulti(const std::vector<icu::UnicodeString> &input,
-      const std::vector<icu::UnicodeString> &delimiters, size_t iMaxStrings/* = 0 */);
-};
+  /*!
+   * \brief indicates whether a string contains any of a vector of keywords
+   *
+   * \param str string to check
+   * \param keywords if any of these keywords are contained in str, then true is
+   * returned
+   * \return true of str contains any of the strings in keywords
+   */
+  static bool Contains(const std::string &str, const std::vector<std::string> &keywords);
 
+private:
+
+  /*!
+   * \brief detects whether a codepoint is a latin character or not
+   *
+   * Normally a character can fit in a single codepoint, but even if not,
+   * the first codepoint is always the most important one,
+   * it specifies the base character, any other codepoints add information.
+   * Therefore, with one codepoint you can determine if it is a Latin
+   * character or not
+   *
+   * \param codepoint to examine
+   * \return true if the codepoint is proof that this is a Latin character,
+   *         otherwise false
+   */
+  static bool IsLatinChar(const UChar32 codepoint);
+
+};

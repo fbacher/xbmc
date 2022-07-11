@@ -502,7 +502,7 @@ void GUIFontManager::GetStyle(const TiXmlNode* fontNode, int& iStyle)
   iStyle = FONT_STYLE_NORMAL;
   if (XMLUtils::GetString(fontNode, "style", style))
   {
-    std::vector<std::string> styles = UnicodeUtils::Tokenize(style, " ");
+    std::vector<std::string> styles = StringUtils::Tokenize(style, " ");
     for (const std::string& i : styles)
     {
       if (i == "bold")

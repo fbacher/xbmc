@@ -86,7 +86,7 @@ bool CHTTPWebinterfaceHandler::ResolveAddon(const std::string &url, ADDON::Addon
   if (url.find("/addons/") == 0 && url.size() > 8)
   {
     std::vector<std::string> components;
-    UnicodeUtils::Tokenize(path, components, WEBSERVER_DIRECTORY_SEPARATOR);
+    StringUtils::Tokenize(path, components, WEBSERVER_DIRECTORY_SEPARATOR);
     if (components.size() <= 1)
       return false;
 

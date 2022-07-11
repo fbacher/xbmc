@@ -78,7 +78,7 @@ OverlayMessage CDVDOverlayCodecSSA::Decode(DemuxPacket* pPacket)
     size_t pos;
     std::string line, line2;
     std::vector<std::string> lines;
-    UnicodeUtils::Tokenize((const char*)data, lines, "\r\n");
+    StringUtils::Tokenize((const char*)data, lines, "\r\n");
     for (size_t i = 0; i < lines.size(); i++)
     {
       line = lines[i];

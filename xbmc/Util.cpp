@@ -2094,7 +2094,7 @@ ExternalStreamInfo CUtil::GetExternalStreamDetailsFromFilename(const std::string
     std::string inputString(result, toParse.end());
     std::string delimiters(" .-");
     std::vector<std::string> tokens;
-    UnicodeUtils::Tokenize(inputString, tokens, delimiters);
+    StringUtils::Tokenize(inputString, tokens, delimiters);
 
     for (auto it = tokens.rbegin(); it != tokens.rend(); ++it)
     {

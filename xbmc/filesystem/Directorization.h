@@ -63,7 +63,7 @@ namespace XFILE
 
     std::vector<std::string> filePathTokens;
     if (!filePath.empty())
-      UnicodeUtils::Tokenize(filePath, filePathTokens, "/");
+      StringUtils::Tokenize(filePath, filePathTokens, "/");
 
     bool fastLookup = items.GetFastLookup();
     items.SetFastLookup(true);
@@ -83,7 +83,7 @@ namespace XFILE
         continue;
 
       std::vector<std::string> pathTokens;
-      UnicodeUtils::Tokenize(entryFileName, pathTokens, "/");
+      StringUtils::Tokenize(entryFileName, pathTokens, "/");
 
       // ignore any entries in lower directory hierarchies
       if (pathTokens.size() < filePathTokens.size() + 1)

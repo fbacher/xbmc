@@ -70,7 +70,7 @@ extern "C" int debug_callback(CURL_HANDLE *handle, curl_infotype info, char *out
   std::string strLine;
   strLine.append(output, size);
   std::vector<std::string> vecLines;
-  UnicodeUtils::Tokenize(strLine, vecLines, "\r\n");
+  StringUtils::Tokenize(strLine, vecLines, "\r\n");
   std::vector<std::string>::const_iterator it = vecLines.begin();
 
   const char *infotype;
@@ -797,7 +797,7 @@ void CCurlFile::ParseAndCorrectUrl(CURL &url2)
       g_charsetConverter.utf8ToStringCharset(filename);
 
     //! @todo create a tokenizer that doesn't skip empty's
-    UnicodeUtils::Tokenize(filename, array, "/");
+    StringUtils::Tokenize(filename, array, "/");
     filename.clear();
     for(std::vector<std::string>::iterator it = array.begin(); it != array.end(); it++)
     {
@@ -2037,7 +2037,7 @@ bool CCurlFile::GetCookies(const CURL &url, std::string &cookies)
     {
       // tokenize the CURL cookie string
       std::vector<std::string> valuesVec;
-      UnicodeUtils::Tokenize(curlCookieIter->data, valuesVec, "\t");
+      StringUtils::Tokenize(curlCookieIter->data, valuesVec, "\t");
 
       // ensure the length is valid
       if (valuesVec.size() < 7)

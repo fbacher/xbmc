@@ -1312,7 +1312,7 @@ std::string URIUtils::CanonicalizePath(const std::string& path, const char slash
 
   const std::string slashStr(1, slashCharacter);
   std::vector<std::string> pathVec, resultVec;
-  UnicodeUtils::Tokenize(path, pathVec, slashStr);
+  StringUtils::Tokenize(path, pathVec, slashStr);
 
   for (std::vector<std::string>::const_iterator it = pathVec.begin(); it != pathVec.end(); ++it)
   {

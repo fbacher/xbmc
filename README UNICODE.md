@@ -70,6 +70,7 @@ Here are a few design decisions that I am not happy about and searching for a be
     - AFTER_END = std::string::npos - 2;
 Probably should change to return a class containing position, status.
 2. Need to eliminate thread_local for icu::Collator instance in Unicode.cpp. Either move to some pool or change SortUtils to save as instance variable which is a fair amount of work given that SortUtils is all static.
+3. Perhaps being overly aggressive at converting functions to Unicode that we may not have to do at this time. I did this for two reasons: one, sometimes it is difficult to know if it is safe to not convert to Unicode, two, I tend to think it is best to consistently move to Unicode processing rather than special case things.
 
 # Future
 
@@ -422,7 +423,7 @@ Should be reviewed to see if formatting is sufficient. Probably not.
 
 Almost all of the code which interacts directly with the ICU library is contained in utils/Unicode. It attempts to isolate ICU from the rest of the code. There are several cases in which another new class, UnicodeUtils, access ICU classes, but with only several other exceptions, UnicodeUtils is the only one that does.
    
-The code in Unicode is a work in progress since I'm still learning the various APIs and the best ways to go about accomplishing things. In particular there are several ways to represent Unicode data that has performance and complexity impacts:
+The code in Unicode is a **work in progress and subject to change** since I'm still learning the various APIs and the best ways to go about accomplishing things. In particular there are several ways to represent Unicode data that has performance and complexity impacts:
 
 1. UnicodeString
 Roughly equivalent to std::string. It has the most comprehensive support throughout the API and is easiest to use. It does involve more overhead to create since data must be converted to native UChar (UTF-16). There is a way to cause data to be stack allocated instead of heap, which I will be leveraging soon.
@@ -461,7 +462,13 @@ These constants discussed elsewhere. Probably a bad design. Need to be able to d
 These methods provide data character conversion
 - UTF8ToWString
 - WStringToUTF8
-
+- StringToUChar
+- WcharToUChar
+- UCharToString
+- UCharToWChar
+- ToUnicodeString(wstring)
+- ToUnicodeString(string)
+- ToUnicodeString(StringPiece
 
 ### icu::Locale
 
@@ -475,13 +482,13 @@ GetICULocaleId returns a string containing the language and country in a familia
 
 ### Case Folding
 
-See the description in UnicodeUtils class.
+See the description in UnicodeUtils class. Note that the implementations here do not alter the passed in string.
 
 ### Normalization
 
 See the description in UnicodeUtils class.
 
-#### ToUpper
+### ToUpper
 
 See the description in UnicodeUtils class.
 
@@ -563,7 +570,11 @@ See UnicodeUtils for a description.
 
 ### FindAndReplace
 
-Deprecated. See UnicodeUtils::Replace for more information
+
+### FindCountAndReplace
+
+back-end for deprecated function UnicodeUtils::Replace. Also deprecated
+
 
 ### FindWord
 
@@ -587,7 +598,6 @@ The SplitTo methods are the workers for the Split methods. SplitTo uses an itera
 
 ### Contains
    
-
   static bool Contains(const std::string &str, const std::vector<std::string> &keywords);
 
 ### IsLatinChar
@@ -599,185 +609,22 @@ private:
 
 ### Buffer Size Utilities
 
-  /**
-   * Calculates a 'reasonable' buffer size to give some room for growth in a utf-8
-   * string to accommodate some basic transformations (folding, normalization, etc.).
-   * Not guaranteed to be sufficient for all needs.
-   *
-   * param utf8_length byte-length of UTF-8 string to be converted
-   * param scale multiplier to apply to get larger buffer
-   *
-   * Note that the returned size has a pad of 200 bytes added to leave room
-   * for growth.
-   *
-   */
+These utilities calculate a buffer large enough to accommodate the given
+string size, plus some generous room for growth. These are short lived buffers
+which generally live on the stack so the oversize is not a big deal.
 
-  static size_t GetBasicUTF8BufferSize(size_t utf8_length, float scale);
+- GetBasicUTF8BufferSize
+- GetWcharToUCharBufferSize
+- GetUCharBufferSize
+- GetUCharWorkingSize
+- GetUTF8BufferSize
+- GetWCharBufferSize
 
-  /*!
-   * \brief Calculates the maximum number of UChars (UTF-16) required by a wchar_t
-   * string.
-   *
-   * \param wchar_length Char32 codepoints to be converted to UTF-16.
-   * \param scale multiplier to apply to get larger buffer
-   * \return A size a bit larger than wchar_length, plus 200.
-   */
+### Regex functions
 
-  static size_t GetWcharToUCharBufferSize(size_t wchar_length, size_t scale);
+Created these initially since they seemed likely to be able to be flexible enough to use in multiple situations. Not all of these are currently in use. However, there is code in Kodi that uses regex.
 
-  /**
-   * Calculates the maximum number of UChars (UTF-16) required by a UTF-8
-   * string.
-   *
-   * param utf8_length byte-length of UTF-8 string to be converted
-   * param scale multiplier to apply to get larger buffer
-   *
-   * Note that the returned size has a pad of 200 UChars added to leave room
-   * for growth.
-   *
-   * Note that a UTF-16 string will be at most as long as the UTF-8 string.
-   */
-
-  static size_t GetUCharBufferSize(size_t utf8_length, float scale);
-
-  /**
-   * Calculates a reasonably sized UChar buffer based upon the size of existing
-   * UChar string.
-   *
-   * param uchar_length byte-length of UTF-8 string to be converted
-   * param scale multiplier to apply to get larger buffer
-   *
-   * Note that the returned size has a pad of 200 UChars added to leave room
-   * for growth.
-   *
-   * Note that a UTF-16 string will be at most as long as the UTF-8 string.
-   */
-
-  static size_t GetUCharWorkingSize(size_t uchar_length, size_t scale);
-
-  /**
-   * Calculates the maximum number of UTF-8 bytes required by a UTF-16 string.
-   *
-   * param uchar_length Number of UTF-16 code units to convert
-   * param scale multiplier to apply to get a larger buffer
-   *
-   * Note that 200 bytes is added to the result to give some room for growth.
-   *
-   * Note that in addition to any scale factor, the number of UTF-8 bytes
-   * returned is 3 times the number of UTF-16 code unites. This leaves enough
-   * room for the 'worst case' UTF-8  expansion required for Indic, Thai and CJK.
-   */
-
-  static size_t GetUTF8BufferSize(size_t uchar_length, size_t scale);
-
-  /**
-   * Calculates the maximum number of wchar_t code units required to
-   * represent UTF-16 code units.
-   *
-   * On most systems a wchar_t represents a 32-bit Unicode codepoint. For such machines
-   * a wchar_t string will require at most the same number of 32-bit codepoints as the
-   * 16-bit has code-units (i.e. twice as many bytes).
-   *
-   * On the systems with a wchar_t representing a 16-bit UTF-16 code unit, then the
-   * number of code units (and bytes) required to represent a UTF-16 UChar in wchar_t
-   * will bhe the same as the original string.
-   *
-   * param uchar_length number of UTF-16 code units in original string
-   * param scale scale factor to multiply uchar_length by to allow for growth
-   * returns Number of wchar_t to allocate for the desired buffer.
-   *
-   * Note that an additional 200 code units is added to the result to allow for growth
-   *
-   */
-  static size_t GetWCharBufferSize(size_t uchar_length, size_t scale);
-
-
-### More Conversion Utilities
-
-  static UChar* StringToUChar(const std::string &src, UChar *buffer, size_t bufferSize,
-      int32_t &destLength, const size_t src_offset = 0,
-      const size_t src_length = std::string::npos);
-
-  static UChar* StringToUChar(const char *src, UChar *buffer, size_t bufferSize,
-      int32_t &destLength, const size_t length = std::string::npos);
-
-  static UChar* WcharToUChar(const wchar_t *src, UChar *buffer, size_t bufferSize,
-      int32_t &destLength, const size_t length = std::string::npos);
-
-  static std::string UCharToString(const UChar *u_str, char *buffer, size_t bufferSize,
-      int32_t &destLength, const size_t u_str_length);
-
-  static wchar_t* UCharToWChar(const UChar *u_str, wchar_t *buffer, size_t bufferSize,
-      int32_t &destLength, const size_t length = std::string::npos);
-
-  static icu::UnicodeString ToUnicodeString(const std::wstring &wStr)
-  {
-#if U_SIZEOF_WCHAR_T==2
-    return icu::UnicodeString(wStr.data(), wStr.length());
-#else
-    return icu::UnicodeString::fromUTF32((int32_t*) wStr.data(), wStr.length());
-#endif
-  }
-
-  static icu::UnicodeString ToUnicodeString(const std::string &src)
-  {
-    return icu::UnicodeString::fromUTF8(src);
-  }
-
-  static icu::UnicodeString ToUnicodeString(const icu::StringPiece &src)
-  {
-    return icu::UnicodeString::fromUTF8(src);
-  }
-
-  static void ToUpper(UChar *p_u_src_buffer, int32_t u_src_length, const icu::Locale locale,
-      UChar *p_u_toupper_buffer, const int32_t u_toupper_buffer_size, int32_t &to_upper_length,
-      UErrorCode &status);
-
-  static void ToFold(const icu::StringPiece strPiece, icu::CheckedArrayByteSink &sink,
-      UErrorCode &status, const int32_t options);
-
-  static void Normalize(const icu::StringPiece strPiece, icu::CheckedArrayByteSink &sink,
-      UErrorCode &status, const int32_t options, const NormalizerType NormalizerType);
-
-  static icu::UnicodeString Trim(const icu::UnicodeString &str, const icu::UnicodeString &trimChars,
-      const bool trimLeft, const bool trimRight);
-
-  static icu::UnicodeString Trim(const icu::UnicodeString &uStr,
-      const std::vector<icu::UnicodeString> &trimChars, const bool trimLeft, const bool trimRight);
-
-  static icu::UnicodeString Trim(const icu::UnicodeString &str, const bool trimLeft,
-      const bool trimRight);
-
-  static std::tuple<icu::UnicodeString, int> FindCountAndReplace(const icu::UnicodeString &kSrc,
-      const icu::UnicodeString &kOldText, const icu::UnicodeString &kNewText);
-
-  static std::tuple<icu::UnicodeString, int>
-  FindCountAndReplace(const icu::UnicodeString &srcText, const int32_t start, const int32_t length,
-      const icu::UnicodeString &oldText, const int32_t oldStart, const int32_t oldLength,
-      const icu::UnicodeString &newText, const int32_t newStart, const int32_t newLength);
-
-  /*
-   * Regular expression patterns for this lib can be found at:
-   * https://unicode-org.github.io/icu/userguide/strings/regexp.html
-   *
-   * flags:  See enum RegexpFlag in uregex.h
-   *
-   */
-  icu::UnicodeString RegexReplaceAll(const icu::UnicodeString &uString,
-      const icu::UnicodeString kPattern, const icu::UnicodeString kReplace, const int flags);
-
-  template<typename OutputIt>
-  static OutputIt SplitTo(OutputIt d_first, const icu::UnicodeString &kInput,
-      const icu::UnicodeString &kDelimiter, size_t iMaxStrings = 0, const bool omitEmptyStrings = false);
-
-  template<typename OutputIt>
-  static OutputIt SplitTo(OutputIt d_first, icu::UnicodeString uInput,
-      const std::vector<icu::UnicodeString> &uDelimiters,  size_t iMaxStrings = 0, const bool omitEmptyStrings = false);
-
-  static std::vector<icu::UnicodeString> SplitMulti(const std::vector<icu::UnicodeString> &input,
-      const std::vector<icu::UnicodeString> &delimiters, size_t iMaxStrings/* = 0 */);
-};
-### 
+- RegexReplaceAll
 
    
 ## StringUtils

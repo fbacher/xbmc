@@ -54,7 +54,7 @@ CPosixTimezone::CPosixTimezone()
          if (s[0] == '#')
             continue;
 
-         UnicodeUtils::Tokenize(s, tokens, " \t");
+         StringUtils::Tokenize(s, tokens, " \t");
          if (tokens.size() < 3)
             continue;
 

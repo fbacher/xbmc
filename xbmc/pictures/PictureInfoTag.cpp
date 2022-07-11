@@ -729,7 +729,7 @@ void CPictureInfoTag::SetInfo(const std::string &key, const std::string& value)
   case SLIDESHOW_RESOLUTION:
     {
       std::vector<std::string> dimension;
-      UnicodeUtils::Tokenize(value, dimension, ",");
+      StringUtils::Tokenize(value, dimension, ",");
       if (dimension.size() == 2)
       {
         m_exifInfo.Width = atoi(dimension[0].c_str());

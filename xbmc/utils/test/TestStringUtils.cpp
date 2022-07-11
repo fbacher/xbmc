@@ -192,6 +192,47 @@ TEST(TestStringUtils, ValidateUUID)
   EXPECT_TRUE(StringUtils::ValidateUUID(StringUtils::CreateUUID()));
 }
 
+TEST(TestStringUtils, Tokenize)
+{
+  // \brief Split a string by the specified delimiters.
+
+  //Splits a string using one or more delimiting characters, ignoring empty tokens.
+  //Differs from Split() in two ways:
+  //  1. The delimiters are treated as individual characters, rather than a single delimiting string.
+  //  2. Empty tokens are ignored.
+  // \return a vector of tokens
+
+  std::vector<std::string> result;
+
+  std::string input = "All good men:should not die!";
+  std::string delimiters = "";
+  result = StringUtils::Tokenize(input, delimiters);
+  EXPECT_EQ(1, result.size());
+  EXPECT_STREQ("All good men:should not die!", result[0].c_str());
+
+  delimiters = " :!";
+  result = StringUtils::Tokenize(input, delimiters);
+  EXPECT_EQ(result.size(), 6);
+
+  EXPECT_STREQ("All", result[0].c_str());
+  EXPECT_STREQ("good", result[1].data());
+  EXPECT_STREQ("men", result[2].data());
+  EXPECT_STREQ("should", result[3].data());
+  EXPECT_STREQ("not", result[4].data());
+  EXPECT_STREQ("die", result[5].data());
+
+  input = ":! All good men:should not die! :";
+  result = StringUtils::Tokenize(input, delimiters);
+  EXPECT_EQ(result.size(), 6);
+
+  EXPECT_STREQ("All", result[0].c_str());
+  EXPECT_STREQ("good", result[1].data());
+  EXPECT_STREQ("men", result[2].data());
+  EXPECT_STREQ("should", result[3].data());
+  EXPECT_STREQ("not", result[4].data());
+  EXPECT_STREQ("die", result[5].data());
+}
+
 TEST(TestStringUtils, FileSizeFormat)
 {
   EXPECT_STREQ("0B", StringUtils::FormatFileSize(0).c_str());
