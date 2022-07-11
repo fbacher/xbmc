@@ -758,56 +758,6 @@ const std::wstring Unicode::ToFold(std::wstring &src, const StringOptions option
 
 /*! \brief Folds the case of a string.
 
- Similar to ToLower except in addition, all accents are stripped
- and other transformations are made (such as German sharp-S is converted to ss).
- The transformation is independent of locale.
-
- \param str string to fold
- \param options fine tunes behavior. See StringOptions.
- \return folded string
- */
-// Called by Python code: ModuleXbmc.cpp Unicode::utf8Fold(src, options);
-const std::string Unicode::UTF8Fold(const std::string &src, const int32_t options)
-{
-  // Note: very similar to using ucasemap_utf8FoldCase
-
-  if (src.length() == 0)
-    return src;
-
-  UErrorCode status = U_ZERO_ERROR;
-  // Create buffer on stack
-  int32_t bufferSize = Unicode::GetBasicUTF8BufferSize(src.length(), 1.5);
-  char buffer[bufferSize];
-  icu::CheckedArrayByteSink sink = icu::CheckedArrayByteSink(buffer, bufferSize);
-
-  Unicode::ToFold(icu::StringPiece(src), sink, status, options);
-  std::string result;
-
-  if (U_FAILURE(status))
-  {
-    // Buffer should be big enough.
-    if (sink.NumberOfBytesAppended() > bufferSize)
-    {
-      CLog::Log(LOGERROR, "Error in Unicode::utf8Fold: buffer not large enough need: {}\n",
-          toString(sink.NumberOfBytesAppended()));
-      return src;
-    }
-    else
-    {
-      CLog::Log(LOGERROR, "Error in Unicode::utf8Fold: {}\n", status);
-    }
-    result = src;
-  }
-  else
-  {
-    size_t size = sink.NumberOfBytesWritten();
-    result = std::string(buffer, size);
-  }
-  return result;
-}
-
-/*! \brief Folds the case of a string.
-
  Similar to ToLower except in addition, insignificant accents are stripped
  and other transformations are made (such as German sharp-S is converted to ss).
  The transformation is independent of locale.

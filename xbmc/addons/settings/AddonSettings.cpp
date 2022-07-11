@@ -1414,12 +1414,12 @@ bool CAddonSettings::ParseOldCondition(const std::shared_ptr<const CSetting>& se
   std::vector<std::string> conditions;
   if (condition.find('+') != std::string::npos)
   {
-    StringUtils::Tokenize(condition, conditions, '+');
+    UnicodeUtils::Tokenize(condition, conditions, '+');
     dependencyCombination = dependeny.And();
   }
   else
   {
-    StringUtils::Tokenize(condition, conditions, '|');
+    UnicodeUtils::Tokenize(condition, conditions, '|');
     dependencyCombination = dependeny.Or();
   }
 

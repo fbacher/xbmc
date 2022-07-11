@@ -609,7 +609,7 @@ void CPeripherals::GetSettingsFromMappingsFile(
       {
         TranslatableIntegerSettingOptions enums;
         std::vector<std::string> valuesVec;
-        StringUtils::Tokenize(strEnums, valuesVec, "|");
+        UnicodeUtils::Tokenize(strEnums, valuesVec, "|");
         for (unsigned int i = 0; i < valuesVec.size(); i++)
           enums.emplace_back(atoi(valuesVec[i].c_str()), atoi(valuesVec[i].c_str()));
         int iValue = currentNode->Attribute("value") ? atoi(currentNode->Attribute("value")) : 0;

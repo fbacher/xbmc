@@ -170,10 +170,6 @@ namespace XBMCAddon
       return label;
     }
 
-	String UTF8Fold(const std::string &src, const int options) {
-		return Unicode::UTF8Fold(src, options);
-	}
-
     String getSkinDir()
     {
       XBMC_TRACE;

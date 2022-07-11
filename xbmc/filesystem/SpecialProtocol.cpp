@@ -220,7 +220,7 @@ std::string CSpecialProtocol::TranslatePathConvertCase(const std::string& path)
 
   std::string result;
   std::vector<std::string> tokens;
-  StringUtils::Tokenize(translatedPath, tokens, "/");
+  UnicodeUtils::Tokenize(translatedPath, tokens, "/");
   std::string file;
   DIR* dir;
   struct dirent* de;

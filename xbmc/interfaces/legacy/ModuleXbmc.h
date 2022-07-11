@@ -290,48 +290,6 @@ static const String LOCALE_ENGLISH_NAME = "english_name";
 #ifdef DOXYGEN_SHOULD_USE_THIS
     ///
     /// \ingroup python_xbmc
-    /// @brief \python_func{ xbmc.UTF8Fold(str, options) }
-    /// Fold the case of the given string using unicode rules
-    ///
-    /// @param src   String to have folded
-    /// @param options Controls how the Turkic dotted I and dotless i are
-    ///                are treated.
-    ///        0     All four forms of the letter 'i' (Latin and Turkic)
-    ///              are folded to the Latin lower case 'i' character.
-    ///              This allows for all forms of 'i' to be treated the same
-    ///
-    ///        1     The Turkic upper (dotted I) is converted to the
-    ///              lower case (dotless I) while the Latin upper case
-    ///              (dotless I) is converted to the Latin lower case
-    ///              (dotted i) (as is generally done).
-    ///
-    ///
-    /// @return      The folded-case version of src and status
-    ///
-    ///
-    /// @note Current Python versions have a fold case function which
-    ///       behaves as if option 1 were given. This frequently causes
-    ///       surprises when a Turic I is present in something like a,
-    ///       key to a map which is normally lower-cased to normalize it.
-    ///
-    ///
-    /// ------------------------------------------------------------------------
-    ///
-    /// **Example:**
-    /// ~~~~~~~~~~~~~{.py}
-    /// ..
-    /// msg = xbmc.UTF8Fold('Hi mom!', 0)
-    /// ..
-    /// ~~~~~~~~~~~~~
-    ///
-    UTF8Fold(...);
-#else
-    std::string UTF8Fold(const std::string& src, const int options);
-#endif
-
-#ifdef DOXYGEN_SHOULD_USE_THIS
-    ///
-    /// \ingroup python_xbmc
     /// @brief \python_func{ xbmc.getSkinDir() }
     /// Get the active skin directory.
     ///

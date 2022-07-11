@@ -673,6 +673,79 @@ std::vector<std::string> UnicodeUtils::SplitMulti(
 	return Unicode::SplitMulti(input, delimiters, iMaxStrings);
 }
 
+/**
+ * Note: delimiters is a string of one or more ASCII single-character delimiters.
+ *       input may be utf-8.
+ */
+std::vector<std::string> UnicodeUtils::Tokenize(const std::string &input,
+    const std::string &delimiters) {
+  // TODO:  Need Tests!!
+  // TODO: Convert to Unicode
+
+  std::vector < std::string > tokens = std::vector<std::string>();
+  Tokenize(input, tokens, delimiters);
+  return tokens;
+}
+
+/**
+ * Note: delimiters is a string of one or more ASCII single-character delimiters.
+ *       Should work with non-ASCII input
+ */
+
+void UnicodeUtils::Tokenize(const std::string& input, std::vector<std::string>& tokens, const std::string& delimiters)
+{
+  if (UnicodeUtils::ContainsNonAscii(delimiters)) {
+    CLog::Log(LOGWARNING, "UnicodeUtils::Tokenize contains non-ASCII delimiter: {}\n", delimiters);
+  }
+  tokens.clear();
+  // Skip delimiters at beginning.
+  std::string::size_type dataPos = input.find_first_not_of(delimiters);
+  while (dataPos != std::string::npos)
+  {
+    // Find next delimiter
+    const std::string::size_type nextDelimPos = input.find_first_of(delimiters, dataPos);
+    // Found a token, add it to the vector.
+    tokens.push_back(input.substr(dataPos, nextDelimPos - dataPos));
+    // Skip delimiters.  Note the "not_of"
+    dataPos = input.find_first_not_of(delimiters, nextDelimPos);
+  }
+}
+
+/**
+ * Note: delimiter is a single ASCII character that separates tokens.
+ *       input may be utf-8.
+ */
+std::vector<std::string> UnicodeUtils::Tokenize(const std::string &input,
+    const char delimiter) {
+  std::vector < std::string > tokens;
+  Tokenize(input, tokens, delimiter);
+  return tokens;
+}
+
+/**
+ * Note: delimiter is a single ASCII character that separates tokens.
+ *       input may be utf-8.
+ */
+
+void UnicodeUtils::Tokenize(const std::string& input, std::vector<std::string>& tokens, const char delimiter)
+{
+  tokens.clear();
+  if (not isascii(delimiter)) {
+    CLog::Log(LOGWARNING, "UnicodeUtils::Tokenize contains non-ASCII delimiter: {}s\n", delimiter);
+  }
+  // Skip delimiters at beginning.
+  std::string::size_type dataPos = input.find_first_not_of(delimiter);
+  while (dataPos != std::string::npos)
+  {
+    // Find next delimiter
+    const std::string::size_type nextDelimPos = input.find(delimiter, dataPos);
+    // Found a token, add it to the vector.
+    tokens.push_back(input.substr(dataPos, nextDelimPos - dataPos));
+    // Skip delimiters.  Note the "not_of"
+    dataPos = input.find_first_not_of(delimiter, nextDelimPos);
+  }
+}
+
 // returns the number of occurrences of strFind in strInput.
 int UnicodeUtils::FindNumber(const std::string &strInput,
 		const std::string &strFind) {

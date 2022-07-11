@@ -1441,6 +1441,61 @@ public:
   static std::vector<std::string> SplitMulti(const std::vector<std::string>& input,
       const std::vector<std::string>& delimiters,
       size_t iMaxStrings = 0);
+
+
+  // TODO: Could rewrite to use Unicode delimiters using icu::UnicodeSet::spanUTF8(), and friends
+  /*!
+   *  \brief Splits a string using one or more delimiting ASCII characters,
+   *  ignoring empty tokens.
+   *
+   *  Missing delimiters results in a match of entire string.
+   *
+   *  Differs from Split() in two ways:
+   *    1. The delimiters are treated as individual ASCII characters, rather than a single
+   *       delimiting string.
+   *    2. Empty tokens are ignored.
+   *
+   * \param input string to split into tokens
+   * \param delimiters one or more ASCII characters to use as token separators
+   * \return a vector of non-empty tokens.
+   *
+   */
+  static std::vector<std::string> Tokenize(const std::string& input, const std::string& delimiters);
+
+  /*!
+   *  \brief Splits a string using one or more delimiting ASCII characters,
+   *  ignoring empty tokens.
+   *
+   *  Instead of returning the tokens as a return value, they are returned via the first
+   *  argument, 'tokens'.
+   *
+   * \param tokens Vector that found, non-empty tokens are returned by
+   * \param input string to split into tokens
+   * \param delimiters one or more ASCII characters to use as token separators
+   *
+   */
+  static void Tokenize(const std::string& input, std::vector<std::string>& tokens, const std::string& delimiters);
+
+  /*!
+   * \brief Splits a string into tokens delimited by a single ASCII character.
+   *
+   * \param input string to split into tokens
+   * \param delimiter an ASCII character to use as a token separator
+   * \return a vector of non-empty tokens.
+   *
+   */
+  static std::vector<std::string> Tokenize(const std::string& input, const char delimiter);
+
+  /*!
+   * \brief Splits a string into tokens delimited by a single ASCII character.
+   *
+   * \param tokens Vector that found, non-empty tokens are returned by
+   * \param input string to split into tokens
+   * \param delimiter an ASCII character to use as a token separator
+   *
+   */
+  static void Tokenize(const std::string& input, std::vector<std::string>& tokens, const char delimiter);
+
   /*! \brief Counts the occurrences of strFind in strInput
    *
    * \param strInput string to be searched

@@ -261,7 +261,7 @@ std::string CSMB::URLEncode(const CURL &url)
 
   /* okey sadly since a slash is an invalid name we have to tokenize */
   std::vector<std::string> parts;
-  StringUtils::Tokenize(url.GetFileName(), parts, "/");
+  UnicodeUtils::Tokenize(url.GetFileName(), parts, "/");
   for (const std::string& it : parts)
   {
     flat += "/";

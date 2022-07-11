@@ -69,7 +69,7 @@ Here are a few design decisions that I am not happy about and searching for a be
     - BEFORE_START = std::string::npos - 1;
     - AFTER_END = std::string::npos - 2;
 Probably should change to return a class containing position, status.
-
+2. Need to eliminate thread_local for icu::Collator instance in Unicode.cpp. Either move to some pool or change SortUtils to save as instance variable which is a fair amount of work given that SortUtils is all static.
 
 # Future
 
@@ -142,13 +142,11 @@ Also, while not as pretty, code which calls xxNoCase functions multiple times wi
 
 ## Major Changes.
    
-### Unicode
-
-Almost all of the code which interacts directly with the ICU library is contained in utils/Unicode. It attempts to isolate ICU from the rest of the code. There are several cases in which another new class, UnicodeUtils, access ICU classes, but with only several other exceptions, UnicodeUtils is the only one that does.
-
 ### UnicodeUtils
 
-With all of the changes, many which, to varying degrees, alter the existing API behavior, I have moved all of the changed apis to a new class, UnicodeUtils. This allows more latitude in changing the api, including bringing into conformance with Kodi coding guidelines.
+With all of the changes, many which, to varying degrees, alter the existing API behavior, I have moved all of the changed apis from StringUtils to a new class, UnicodeUtils. This allows more latitude in changing the api, including bringing into conformance with Kodi coding guidelines.
+
+Another class, Unicode, discussed after UnicodeUtils, is responsible for interacting with the icu library. It hides almost all ICU functions from the rest of the code. UnicodeUtils sits on top of Unicode.
    
 Many StringUtils functions now use Unicode and moved to UnicodeUtils. I left functions that appeared to work ok or that I did not understand very well alone. Several functions were converted to Unicode, but some arguments are restricted to ASCII. This was done for practical reasons because changing would require changing the API. Further, searches through code revealed no cases where non-ASCII was passed. Added WARNING if arguments were non-ASCII.
    
@@ -420,35 +418,404 @@ Should be reviewed to see if it is sufficient
 
 Should be reviewed to see if formatting is sufficient. Probably not.
    
-## Functions not changed and appear safe
+## Unicode.cpp
 
-### FindNumber
+Almost all of the code which interacts directly with the ICU library is contained in utils/Unicode. It attempts to isolate ICU from the rest of the code. There are several cases in which another new class, UnicodeUtils, access ICU classes, but with only several other exceptions, UnicodeUtils is the only one that does.
+   
+The code in Unicode is a work in progress since I'm still learning the various APIs and the best ways to go about accomplishing things. In particular there are several ways to represent Unicode data that has performance and complexity impacts:
+
+1. UnicodeString
+Roughly equivalent to std::string. It has the most comprehensive support throughout the API and is easiest to use. It does involve more overhead to create since data must be converted to native UChar (UTF-16). There is a way to cause data to be stack allocated instead of heap, which I will be leveraging soon.
+2. UChar*
+Roughly equivalent to char*.
+Still requires conversion to UChar, like UnicodeString. Does not appear too useful
+3. UText
+Newest API and intended the preferred way to go. Eventually. Very little of the API uses it now.
+4. UTF-8
+A few APIs allow for UTF-8 to be used with the intent that it is either used without conversion to UChar, or is converted to UChar on the fly as needed.
+5. Other
+Other encodings and APIs are supported, but without much support. 
+
+With all of these different ways to do things means that it may take a while to settle on the best approach for the various tasks. Up until now the priority has been to have correct code to solve a problem with a secondary priority on performance, consistency, simplicity. I tend to think that the best approach is to utilize UnicodeStrings the most and to advocate that Kodi represent all non-ASCII in UnicodeStrings, or possibly a wrapper, adapter or facade around a UnicodeString. This follows Best Practices of converting to UnicodeString (or similar) as soon as data is read. Doing otherwise leads to repeated conversions to/from UTF8 and other madness. You quickly loose whatever small gain that you have in memory footprint and other advantages by UTF8. 
+
+But I digress (again)....
+
+What follows is a brief rundown of the Unicode functions and some of the details which may be of interest to those working on the PR.
+
+### Enums
+
+Borrowed some enums from ICU to bring in my namespace. Not highly likely that others
+will need more than a couple of these. The Normalizer is the least likely for the casual user to use since 1) it is not often needed and 2) not easy to figure out when and how to use
+
+1. StringOptions
+2. RegexpFlag
+3. NormalizerType
+
+These constants discussed elsewhere. Probably a bad design. Need to be able to distinguish when character break iterator runs off left or right end of string so a simple string::npos is not enough. Perhaps should create class to contain return value of byte index as well as error status.
+
+ ERROR = std::string::npos;
+  static constexpr size_t BEFORE_START = std::string::npos - 1;
+  static constexpr size_t AFTER_END = std::string::npos - 2;
+  
+### Data Conversion
+These methods provide data character conversion
+- UTF8ToWString
+- WStringToUTF8
+
+
+### icu::Locale
+
+These methods get the icu::Locale. 
+- The default icu::Locale is derived from g_langInfo.GetLocale(). The language and country values are used to create the icu::Locale
+-- Similarly, the icu::Locale can be derived from a std::locale
+-- Or from passed in values
+
+GetICULocaleId returns a string containing the language and country in a familiar format. Example: "en_US"
+
+
+### Case Folding
+
+See the description in UnicodeUtils class.
+
+### Normalization
+
+See the description in UnicodeUtils class.
+
+#### ToUpper
+
+See the description in UnicodeUtils class.
+
+### ToLower
+
+See the description in UnicodeUtils class.
+
+### ToCapitalize
+
+See the description in UnicodeUtils class.
+
+### ToTitle
+
+See the description in UnicodeUtils class.
+
+### StrCmp
+
+Performs the work for UnicodeUtils string comparisons (except for caseless compare). Numerous options are provided 
+
+### StrCaseCmp
+
+Similar to StrCmp, except caseless comparisions are performed. Note that if Normalization is selected then the case folding is performed by the normalizer as the strings are compared, so theoretically only a partial string needs to be processed if the comparison fails early. Whereas with the default case folding the entire string is folded prior to the comparison.
+      
+### Collator
+
+Several methods initialize and call a Collator for a configurable sort based on locale and other things. The Collator currently tries to mimic the Kodi legacy AlphaNumericCompare which basically sorts strings as you would expect, but numeric values as numbers and not strings (ex. "10" comes after "5"). The Legacy Collator does not take locale into account.
+
+### StartsWith
+
+See UnicodeUtils for a description.
+  
+### StartsWithNoCase
+
+ See UnicodeUtils for a description.
+
+### EndsWith
+
+See UnicodeUtils for a description.
+
+### EndsWithNoCase
+
+See UnicodeUtils for a description.
+
+### Left, Right, Mid
+
+ See UnicodeUtils for a description. These all use Character BreakIterator and friends.
+
+### Character BreakIterator
+
+The next few methods create and use a Character BreakIterator
+
+### ConfingUText
+
+Configures a UText object to wrap a UTF-8 string. Currently only used for use with a Character BreakIterator
+
+### ConfigCharBreakIter
+
+Creates and initializes a Character BreakIterator for the given UText or UnicodeString
+
+### ReconfigCharBreakIter
+
+Updates the Character BreakIterator to use a new or modified string value
+
+### GetCharPosition
+
+Gets the code-unit (byte, codepoint or UChar) index value for the given character count and reference point in the given string
+
+### Trim, TrimLeft, Trim
+
+See UnicodeUtils for a description.
+
+### Split
+
+See UnicodeUtils::Split functions for more information
+
+### SplitMulti
+
+See UnicodeUtils for a description.
+
+### FindAndReplace
+
+Deprecated. See UnicodeUtils::Replace for more information
+
+### FindWord
+
+See UnicodeUtils for more information
+
+### RegexFind
+
+Used internally to process regular expressions. Regular expression patterns for this lib can be found at: https://unicode-org.github.io/icu/userguide/strings/regexp.html
+
+### RegexReplaceAll
+
+See UnicodeUtils for more information.
+
+### CountOccurances
+
+See UnicodeUtils for more information.
+
+### SplitTo
+
+The SplitTo methods are the workers for the Split methods. SplitTo uses an iterator instead of an input string. EGLUtils uses this iterator SplitTo API. See UnicodeUtils for more info.
+
+### Contains
+   
+
+  static bool Contains(const std::string &str, const std::vector<std::string> &keywords);
+
+### IsLatinChar
+
+private:
+  static bool doneOnce;
+
+  static bool IsLatinChar(UChar32 codepoint);
+
+### Buffer Size Utilities
+
+  /**
+   * Calculates a 'reasonable' buffer size to give some room for growth in a utf-8
+   * string to accommodate some basic transformations (folding, normalization, etc.).
+   * Not guaranteed to be sufficient for all needs.
+   *
+   * param utf8_length byte-length of UTF-8 string to be converted
+   * param scale multiplier to apply to get larger buffer
+   *
+   * Note that the returned size has a pad of 200 bytes added to leave room
+   * for growth.
+   *
+   */
+
+  static size_t GetBasicUTF8BufferSize(size_t utf8_length, float scale);
+
+  /*!
+   * \brief Calculates the maximum number of UChars (UTF-16) required by a wchar_t
+   * string.
+   *
+   * \param wchar_length Char32 codepoints to be converted to UTF-16.
+   * \param scale multiplier to apply to get larger buffer
+   * \return A size a bit larger than wchar_length, plus 200.
+   */
+
+  static size_t GetWcharToUCharBufferSize(size_t wchar_length, size_t scale);
+
+  /**
+   * Calculates the maximum number of UChars (UTF-16) required by a UTF-8
+   * string.
+   *
+   * param utf8_length byte-length of UTF-8 string to be converted
+   * param scale multiplier to apply to get larger buffer
+   *
+   * Note that the returned size has a pad of 200 UChars added to leave room
+   * for growth.
+   *
+   * Note that a UTF-16 string will be at most as long as the UTF-8 string.
+   */
+
+  static size_t GetUCharBufferSize(size_t utf8_length, float scale);
+
+  /**
+   * Calculates a reasonably sized UChar buffer based upon the size of existing
+   * UChar string.
+   *
+   * param uchar_length byte-length of UTF-8 string to be converted
+   * param scale multiplier to apply to get larger buffer
+   *
+   * Note that the returned size has a pad of 200 UChars added to leave room
+   * for growth.
+   *
+   * Note that a UTF-16 string will be at most as long as the UTF-8 string.
+   */
+
+  static size_t GetUCharWorkingSize(size_t uchar_length, size_t scale);
+
+  /**
+   * Calculates the maximum number of UTF-8 bytes required by a UTF-16 string.
+   *
+   * param uchar_length Number of UTF-16 code units to convert
+   * param scale multiplier to apply to get a larger buffer
+   *
+   * Note that 200 bytes is added to the result to give some room for growth.
+   *
+   * Note that in addition to any scale factor, the number of UTF-8 bytes
+   * returned is 3 times the number of UTF-16 code unites. This leaves enough
+   * room for the 'worst case' UTF-8  expansion required for Indic, Thai and CJK.
+   */
+
+  static size_t GetUTF8BufferSize(size_t uchar_length, size_t scale);
+
+  /**
+   * Calculates the maximum number of wchar_t code units required to
+   * represent UTF-16 code units.
+   *
+   * On most systems a wchar_t represents a 32-bit Unicode codepoint. For such machines
+   * a wchar_t string will require at most the same number of 32-bit codepoints as the
+   * 16-bit has code-units (i.e. twice as many bytes).
+   *
+   * On the systems with a wchar_t representing a 16-bit UTF-16 code unit, then the
+   * number of code units (and bytes) required to represent a UTF-16 UChar in wchar_t
+   * will bhe the same as the original string.
+   *
+   * param uchar_length number of UTF-16 code units in original string
+   * param scale scale factor to multiply uchar_length by to allow for growth
+   * returns Number of wchar_t to allocate for the desired buffer.
+   *
+   * Note that an additional 200 code units is added to the result to allow for growth
+   *
+   */
+  static size_t GetWCharBufferSize(size_t uchar_length, size_t scale);
+
+
+### More Conversion Utilities
+
+  static UChar* StringToUChar(const std::string &src, UChar *buffer, size_t bufferSize,
+      int32_t &destLength, const size_t src_offset = 0,
+      const size_t src_length = std::string::npos);
+
+  static UChar* StringToUChar(const char *src, UChar *buffer, size_t bufferSize,
+      int32_t &destLength, const size_t length = std::string::npos);
+
+  static UChar* WcharToUChar(const wchar_t *src, UChar *buffer, size_t bufferSize,
+      int32_t &destLength, const size_t length = std::string::npos);
+
+  static std::string UCharToString(const UChar *u_str, char *buffer, size_t bufferSize,
+      int32_t &destLength, const size_t u_str_length);
+
+  static wchar_t* UCharToWChar(const UChar *u_str, wchar_t *buffer, size_t bufferSize,
+      int32_t &destLength, const size_t length = std::string::npos);
+
+  static icu::UnicodeString ToUnicodeString(const std::wstring &wStr)
+  {
+#if U_SIZEOF_WCHAR_T==2
+    return icu::UnicodeString(wStr.data(), wStr.length());
+#else
+    return icu::UnicodeString::fromUTF32((int32_t*) wStr.data(), wStr.length());
+#endif
+  }
+
+  static icu::UnicodeString ToUnicodeString(const std::string &src)
+  {
+    return icu::UnicodeString::fromUTF8(src);
+  }
+
+  static icu::UnicodeString ToUnicodeString(const icu::StringPiece &src)
+  {
+    return icu::UnicodeString::fromUTF8(src);
+  }
+
+  static void ToUpper(UChar *p_u_src_buffer, int32_t u_src_length, const icu::Locale locale,
+      UChar *p_u_toupper_buffer, const int32_t u_toupper_buffer_size, int32_t &to_upper_length,
+      UErrorCode &status);
+
+  static void ToFold(const icu::StringPiece strPiece, icu::CheckedArrayByteSink &sink,
+      UErrorCode &status, const int32_t options);
+
+  static void Normalize(const icu::StringPiece strPiece, icu::CheckedArrayByteSink &sink,
+      UErrorCode &status, const int32_t options, const NormalizerType NormalizerType);
+
+  static icu::UnicodeString Trim(const icu::UnicodeString &str, const icu::UnicodeString &trimChars,
+      const bool trimLeft, const bool trimRight);
+
+  static icu::UnicodeString Trim(const icu::UnicodeString &uStr,
+      const std::vector<icu::UnicodeString> &trimChars, const bool trimLeft, const bool trimRight);
+
+  static icu::UnicodeString Trim(const icu::UnicodeString &str, const bool trimLeft,
+      const bool trimRight);
+
+  static std::tuple<icu::UnicodeString, int> FindCountAndReplace(const icu::UnicodeString &kSrc,
+      const icu::UnicodeString &kOldText, const icu::UnicodeString &kNewText);
+
+  static std::tuple<icu::UnicodeString, int>
+  FindCountAndReplace(const icu::UnicodeString &srcText, const int32_t start, const int32_t length,
+      const icu::UnicodeString &oldText, const int32_t oldStart, const int32_t oldLength,
+      const icu::UnicodeString &newText, const int32_t newStart, const int32_t newLength);
+
+  /*
+   * Regular expression patterns for this lib can be found at:
+   * https://unicode-org.github.io/icu/userguide/strings/regexp.html
+   *
+   * flags:  See enum RegexpFlag in uregex.h
+   *
+   */
+  icu::UnicodeString RegexReplaceAll(const icu::UnicodeString &uString,
+      const icu::UnicodeString kPattern, const icu::UnicodeString kReplace, const int flags);
+
+  template<typename OutputIt>
+  static OutputIt SplitTo(OutputIt d_first, const icu::UnicodeString &kInput,
+      const icu::UnicodeString &kDelimiter, size_t iMaxStrings = 0, const bool omitEmptyStrings = false);
+
+  template<typename OutputIt>
+  static OutputIt SplitTo(OutputIt d_first, icu::UnicodeString uInput,
+      const std::vector<icu::UnicodeString> &uDelimiters,  size_t iMaxStrings = 0, const bool omitEmptyStrings = false);
+
+  static std::vector<icu::UnicodeString> SplitMulti(const std::vector<icu::UnicodeString> &input,
+      const std::vector<icu::UnicodeString> &delimiters, size_t iMaxStrings/* = 0 */);
+};
+### 
+
+   
+## StringUtils
+   
+### Functions not changed and appear safe
+
+  
+### Tokenize
+
+Very similar to Split. The delimiters must be ASCII. All know calls use ASCII. Could easily change to accept Unicode.
+
+#### FindNumber
    
 FindNumber seems very specialized and only used in TestStringUtils. Candidate for removal after further investigation.
 
-### DateStringToYYYYMMDD
+#### DateStringToYYYYMMDD
 
 Does not appear to be for human consumption
 
-### IsNaturalNumber
+#### IsNaturalNumber
 
 Just checks to see if string matches [ \t]*[0-9]+[ \t]*
 
-### IsInteger
+#### IsInteger
 
 Just checks to see if string matches [ \t]*[\-]*[0-9]+[ \t]*
 
-### Join
+#### Join
 
 Builds a string by appending every string from a container, separated by a delimiter string.
 
 This looks Unicode safe since the code simply performs appends and erase of strings. It is not important to know what is in the strings.
 
-### asciixdigitvalue
+#### asciixdigitvalue
 
 Tiny function. Probably duplicates c++ builtin
 
-### BinaryStringToString
+#### BinaryStringToString
 
 Converts a string of escaped digits into a string of digits:
 
@@ -460,29 +827,29 @@ Does not seem bullet-proof, but probably ok for its use case.
 
 Converts tabs to spaces and then removes duplicate space characters from str in-place. Has no Unicode impact.
 
-### ToHexadecimal
+#### ToHexadecimal
 
 Converts hex string into properly formatted hex string (adds /x and 0 fills).
 
-### WordToDigits
+#### WordToDigits
 
 Converts ASCII letters and digits to a digits, perhaps for indexing? Need to
 study what it does more, but not biggest priority.
 
-### CreateUUID
+#### CreateUUID
 
 UUID creator. No Unicode
 
-### ValidateUUID
+#### ValidateUUID
 
 No Unicode
 
-### ToUint64
+#### ToUint64
 
 Not quite sure what this is doing. Converts a string to a 64-bit uint. 
 Anyway, doesn't appear to be impacted by Unicode.
 
-### CreateFromCString
+#### CreateFromCString
 
 Simple helper class to create std::string from char*. Added value is to
 set to empty string if char* is null.
@@ -498,8 +865,6 @@ Modified to always set python to use utf8 file paths. This was one of the proble
 **Added several APIs**
 
 The first is experimental. I should move this to my private branch.
-
-**UTF8Fold** Added to give Python addons access to ICU CaseFold. The builtin Python CaseFold has the Turkic I problem. I need to experiment and see if this is needed and what the cost is.
 
 **getICULanguage** provides much basic info about the current Locale. It makes up for a buggy and insufficient getLanguage API that follows it. Fixing getLanguage would require changing its API. getICULanguage gets all of its information from icu::Locale. getLanguage gets its info from various Kodi sources and is incomplete and inaccurate.
 

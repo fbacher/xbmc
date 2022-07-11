@@ -402,35 +402,6 @@ public:
    * and other transformations are made (such as German sharp-S is converted to ss).
    * The transformation is independent of locale.
    *
-   * \param str string to fold (not modified).
-   * \param opt StringOptions to fine-tune behavior. For most purposes, leave at
-   *            default value, 0 (same as FOLD_CASE_DEFAULT)
-   * \return UTF-8 folded string
-   *
-   * Notes: length and number of bytes in string may change during folding/normalization
-   *
-   * When FOLD_CASE_DEFAULT is used, the Turkic Dotted I and Dotless
-   * i follow the "en" locale rules for ToLower.
-   *
-   * DEVELOPERS who use non-ASCII keywords should be aware that it may not
-   * always work as expected. Testing is important.
-   *
-   * Changes will have to be made to keywords that don't work as expected. One solution is
-   * to try to always use lower-case in the first place.
-   *
-   * See StringOptions for the numeric values to use for options as well as descriptions.
-   * StringOptions is not used directly so that this API can be by used by Python.
-   */
-
-  static const std::string UTF8Fold(const std::string &src, const int32_t options);
-
-  /*!
-   *  \brief Folds the case of a string, independent of Locale.
-   *
-   * Similar to ToLower except in addition, insignificant accents are stripped
-   * and other transformations are made (such as German sharp-S is converted to ss).
-   * The transformation is independent of locale.
-   *
    * \param str string to fold in place.
    * \param opt StringOptions to fine-tune behavior. For most purposes, leave at
    *            default value, 0 (same as FOLD_CASE_DEFAULT)
@@ -1249,16 +1220,32 @@ public:
 
   static size_t RegexFind(const std::string &str, const std::string pattern, const int flags);
 
-  /*
-   * Regular expression patterns for this lib can be found at:
-   * https://unicode-org.github.io/icu/userguide/strings/regexp.html
+  /*!
+   * \brief Replace a matching pattern in a string with another value
    *
-   * flags:  See enum RegexpFlag in uregex.h
+   *  Regular expression patterns for this lib can be found at:
+   *  https://unicode-org.github.io/icu/userguide/strings/regexp.html
+   *
+   * \param str string to copy and apply changes to (original not changed)
+   * \param icu::Regex pattern to use to identify what substring to change (see uregex.h)
+   * \param replace New string value to use in place of the matching pattern
+   * \param flags:  See enum RegexpFlag in uregex.h
    *
    */
   static std::string RegexReplaceAll(const std::string &str, const std::string pattern,
       const std::string replace, const int flags);
 
+  /*!
+   * \brief Count the number of occurances of strFind within strInput
+   *
+   * Used by UnicodeUtils::FindNumber
+   *
+   * \param strInput input string to search
+   * \param strFind substring to search for in strInput
+   * \param flags which influence the call to RegexFind. The default is UREGEX_LITERAL,
+   *        which prevents interpreting strFind as a regular expressoin.
+   * \return a count of the number of occurrances found.
+   */
   static int32_t countOccurances(const std::string &strInput, const std::string &strFind,
       const int flags);
 
@@ -1375,9 +1362,6 @@ public:
    */
 
   static bool Contains(const std::string &str, const std::vector<std::string> &keywords);
-
-  int64_t AlphaNumericCompare_new(const std::wstring &left, const std::wstring &right,
-      const icu::Locale locale);
 
 private:
   static bool doneOnce;
