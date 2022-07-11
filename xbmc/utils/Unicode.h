@@ -516,6 +516,17 @@ public:
   static const std::string Normalize(const std::string &src, const StringOptions options,
       const NormalizerType NormalizerType = NormalizerType::NFKC);
 
+  /*!
+   * \brief Converts a string to Upper case according to locale.
+   *
+   * Note: The length of the string can change, depending upon the underlying
+   * icu::locale.
+   *
+   * \param str string to change case on
+   * \param locale the underlying icu::Locale is created using the language,
+   *        country, etc. from this locale
+   * \return str with every character changed to upper case
+   */
   static const std::string ToUpper(const std::string &src, const icu::Locale &locale);
 
   /*!
@@ -541,14 +552,14 @@ public:
    */
   static const std::string ToCapitalize(const std::string &src, const icu::Locale &locale);
   /*!
-    *  \brief Capitalizes a wstring using Legacy Kodi rules.
-    *
-    * Uses a simplistic approach familiar to English speakers.
-    * See TitleCase for a more locale aware solution.
-    *
-    * \param src string to capitalize
-    * \return src capitalized
-    */
+   *  \brief Capitalizes a wstring using Legacy Kodi rules.
+   *
+   * Uses a simplistic approach familiar to English speakers.
+   * See TitleCase for a more locale aware solution.
+   *
+   * \param src string to capitalize
+   * \return src capitalized
+   */
   static const std::wstring ToCapitalize(const std::wstring &src, const icu::Locale &locale);
 
   /*!
@@ -566,17 +577,17 @@ public:
   static const std::wstring ToTitle(const std::wstring &src, const icu::Locale &locale);
 
   /*!
-    *  \brief TitleCase a string using icu::Locale.
-    *
-    *  Similar too, but more language friendly version of ToCapitalize. Uses ICU library.
-    *
-    *  Best results are when a complete sentence/paragraph is TitleCased rather than
-    *  individual words.
-    *
-    *  \param src string to TitleCase
-    *  \param locale
-    *  \return src in TitleCase
-    */
+   *  \brief TitleCase a string using icu::Locale.
+   *
+   *  Similar too, but more language friendly version of ToCapitalize. Uses ICU library.
+   *
+   *  Best results are when a complete sentence/paragraph is TitleCased rather than
+   *  individual words.
+   *
+   *  \param src string to TitleCase
+   *  \param locale
+   *  \return src in TitleCase
+   */
   static const std::string ToTitle(const std::string &src, const icu::Locale &locale);
 
   /*!
@@ -704,8 +715,8 @@ public:
    * = 0 if str1 contains the same characters as s2,
    * > 0 if the characters in s1 are bitwise greater than the characters in s2.
    */
-   static int StrCaseCmp(const std::string &s1, const std::string &s2, size_t n,
-       const StringOptions options, const bool Normalize = false);
+  static int StrCaseCmp(const std::string &s1, const std::string &s2, size_t n,
+      const StringOptions options, const bool Normalize = false);
 
   /*!
    * \brief Performs a bit-wise comparison of two strings, after case folding each.
@@ -805,41 +816,41 @@ public:
   static int32_t Collate(const std::wstring &left, const std::wstring &right);
 
   /*!
-     * \brief Determines if a string begins with another string
-     *
-     * \param s1 string to be searched
-     * \param s2 string to find at beginning of s1
-     * \return true if s1 starts with s2, otherwise false
-     */
+   * \brief Determines if a string begins with another string
+   *
+   * \param s1 string to be searched
+   * \param s2 string to find at beginning of s1
+   * \return true if s1 starts with s2, otherwise false
+   */
   static bool StartsWith(const std::string &s1, const std::string &s2);
   /*
-  * \brief Determines if a string begins with another string, ignoring case
-  *
-  * \param s1 string to be searched
-  * \param s2 string to find at beginning of s1
-  * \param options controls behavior of case folding, normally leave at default
-  * \return true if s1 starts with s2, otherwise false
-  */
+   * \brief Determines if a string begins with another string, ignoring case
+   *
+   * \param s1 string to be searched
+   * \param s2 string to find at beginning of s1
+   * \param options controls behavior of case folding, normally leave at default
+   * \return true if s1 starts with s2, otherwise false
+   */
   static bool StartsWithNoCase(const std::string &s1, const std::string &s2,
       const StringOptions options);
 
   /*!
-     * \brief Determines if a string ends with another string
-     *
-     * \param s1 string to be searched
-     * \param s2 string to find at end of s1
-     * \return true if s1 ends with s2, otherwise false
-     */
+   * \brief Determines if a string ends with another string
+   *
+   * \param s1 string to be searched
+   * \param s2 string to find at end of s1
+   * \return true if s1 ends with s2, otherwise false
+   */
   static bool EndsWith(const std::string &s1, const std::string &s2);
 
   /*!
-     * \brief Determines if a string ends with another string, ignoring case
-     *
-     * \param s1 string to be searched
-     * \param s2 string to find at end of s1
-     * \param options controls behavior of case folding, normally leave at default
-     * \return true if s1 ends with s2, otherwise false
-     */
+   * \brief Determines if a string ends with another string, ignoring case
+   *
+   * \param s1 string to be searched
+   * \param s2 string to find at end of s1
+   * \param options controls behavior of case folding, normally leave at default
+   * \return true if s1 ends with s2, otherwise false
+   */
   static bool EndsWithNoCase(const std::string &s1, const std::string &s2,
       const StringOptions options);
 
@@ -855,7 +866,6 @@ public:
    *                  if ! keepLeft: number of characters to omit from right end
    * \param keepLeft controls how charCount is interpreted
    * \return leftmost characters of string, length determined by charCount
-   *
    */
   static std::string Left(const std::string &str, size_t charCount,
       const icu::Locale icuLocale, const bool keepLeft = true);
@@ -900,18 +910,55 @@ public:
       const icu::Locale &icuLocale, bool keepRight = true);
 
 private:
-  static UText * ConfigCharBreakIter(const std::string&, const icu::Locale& icuLocale);
 
-  static bool ConfigCharBreakIter(const icu::UnicodeString& str, const icu::Locale& icuLocale);
+  /*!
+   * \brief configures UText for a UTF-8 string
+   *
+   * For those methods which can take a UText, this allows for a UTF-8 string to be
+   * used without converting it to UTF-16/UnicodeString up-front. Instead it can be done
+   * on demand as the string is iterated. Having to manually free one or more pointers can
+   * be a pain. Further, some methods have to scan the entire string up-front, depending upon
+   * what is being done.
+   *
+   * \param str UTF-8 string to create the UText for
+   * \return a UText object that contains the passed UTF8 string for the iterator
+   *           On error, nullptr is returned
+   *
+   * *** Note: utext_close(<return value>) MUST be called when finished using the iterator
+   * or there will be a memory leak.
+   */
+  static UText * ConfigUText(const std::string& str, UText* ut = nullptr);
 
-  static size_t GetCharPosition(size_t stringLength, size_t charCount, const bool left, const bool keepLeft);
+  /*!
+   * \brief Configures a Character BreakIterator for use
+   *
+   * \param str UTF-8 string to create the Character BreakIterator for
+   * \icuLocale locale to configure the iterator for
+   * \return a Character BreakIterator object that uses the passed UTF8 string for the iterator
+   *           On error, nullptr is returned.
+   *
+   * *** Note: utext_close(<return value>) MUST be called when finished using the iterator, including
+   * when this method returns nullptr, or there will be a memory leak.
+   */
+  static icu::BreakIterator* ConfigCharBreakIter(UText* ut, const icu::Locale& icuLocale);
+
+  static icu::BreakIterator* ReConfigCharBreakIter(UText* ut, icu::BreakIterator* cbi);
+
+  /*!
+   * \brief Configures a Character BreakIterator for use
+   *
+   * \param str String to create the Character BreakIterator for
+   * \icuLocale locale to configure the iterator for
+   * \return true is returned on success, otherwise false.
+   */
+  static icu::BreakIterator* ConfigCharBreakIter(const icu::UnicodeString& str, const icu::Locale& icuLocale);
+
+
+  static size_t GetCharPosition(icu::BreakIterator* cbi, size_t stringLength, size_t charCount, const bool left, const bool keepLeft);
 
 public:
 
-  static size_t GetCharPositionOrig(const std::string &str, size_t charCount,
-      const bool left, const bool keepLeft, icu::Locale icuLocale);
-
-  static size_t GetCharPosition(const std::string &str, const size_t charCount,
+  static size_t GetCharPosition(icu::BreakIterator * cbi, const std::string &str, const size_t charCount,
       const bool left, const bool keepLeft, const icu::Locale& icuLocale);
 
   /*!
@@ -939,35 +986,39 @@ public:
    * left=false keepLeft=false  Returns offset of first byte of nth char from right end.
    *                            Character 0 is AFTER the last character.  Used by Right(x)
    */
-  static size_t GetCharPosition(const std::string &str, const size_t charCount,
-      const bool left, const bool keepLeft);
+  static size_t GetCharPosition(const std::string &str, const size_t charCountArg, const bool left,
+      const bool keepLeft, const icu::Locale &icuLocale);
+
+  size_t GetCharPosition(const icu::UnicodeString &uStr, const size_t charCountArg, const bool left,
+      const bool keepLeft, const icu::Locale &icuLocale);
   /*!
-    * \brief Gets the byte-offset of a Unicode character relative to a reference
-    *
-    * This function is primarily used by Left, Right and Mid. See comment at end for details on use.
-    * The locale is used by underlying icuc4 library to tweak character boundaries.
-    *
-    * Unicode characters may consist of multiple codepoints. This function's parameters
-    * are based on characters NOT bytes.
-    *
-    * \param str UTF-8 string to get index from
-    * \param charCount number of characters from reference point to get byte index for
-    * \param left + keepLeft define how character index is measured. See comment below
-    * \param keepLeft + left define how character index is measured. See comment below
-    * \param icuLocale fine-tunes character boundary rules
-    * \return code-unit index, relative to str for the given character count
-    *                  Unicode::BEFORE_START or Unicode::AFTER::END is returned if
-    *                  charCount exceeds the string's length. std::string::npos is
-    *                  returned on other errors.
-    *
-    * left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
-    * left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
-    * left=false keepLeft=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
-    * left=false keepLeft=false  Returns offset of first byte of nth char from right end.
-    *                            Character 0 is AFTER the last character.  Used by Right(x)
-    */
-   static size_t GetCharPosition(const icu::UnicodeString &str, const size_t charCount,
-       const bool left, const bool keepLeft, const icu::Locale& icuLocale);
+   * \brief Gets the byte-offset of a Unicode character relative to a reference
+   *
+   * This function is primarily used by Left, Right and Mid. See comment at end for details on use.
+   * The locale is used by underlying icuc4 library to tweak character boundaries.
+   *
+   * Unicode characters may consist of multiple codepoints. This function's parameters
+   * are based on characters NOT bytes.
+   *
+   * \param str UTF-8 string to get index from
+   * \param charCount number of characters from reference point to get byte index for
+   * \param left + keepLeft define how character index is measured. See comment below
+   * \param keepLeft + left define how character index is measured. See comment below
+   * \param icuLocale fine-tunes character boundary rules
+   * \return code-unit index, relative to str for the given character count
+   *                  Unicode::BEFORE_START or Unicode::AFTER::END is returned if
+   *                  charCount exceeds the string's length. std::string::npos is
+   *                  returned on other errors.
+   *
+   * left=true  keepLeft=true   Returns offset of last byte of nth character (0-n). Used by Left.
+   * left=true  keepLeft=false  Returns offset of last byte of nth character from right end (0-n). Used by Left(x, false)
+   * left=false keepLeft=true   Returns offset of first byte of nth character (0-n). Used by Right(x, false)
+   * left=false keepLeft=false  Returns offset of first byte of nth char from right end.
+   *                            Character 0 is AFTER the last character.  Used by Right(x)
+   * /
+  static size_t GetCharPosition(const icu::UnicodeString &str, const size_t charCount,
+      const bool left, const bool keepLeft, const icu::Locale& icuLocale);
+  */
 
   /*!
    * \brief Removes leading and trailing whitespace from the string
@@ -1001,16 +1052,16 @@ public:
   static std::string TrimLeft(const std::string &str);
 
   /*!
-     * \brief Remove a set of characters from beginning of str
-     *
-     *  Remove any leading characters from the set chars from str.
-     *
-     *  Ex: TrimLeft("abc1234bxa", "acb") ==> "1234bxa"
-     *
-     * \param str to trim
-     * \param trimChars (characters) to remove from str
-     * \return trimmed string
-     */
+   * \brief Remove a set of characters from beginning of str
+   *
+   *  Remove any leading characters from the set chars from str.
+   *
+   *  Ex: TrimLeft("abc1234bxa", "acb") ==> "1234bxa"
+   *
+   * \param str to trim
+   * \param trimChars (characters) to remove from str
+   * \return trimmed string
+   */
   static std::string TrimLeft(const std::string &str, const std::string trimChars);
 
   /*!
@@ -1024,33 +1075,33 @@ public:
   static std::string TrimRight(const std::string &str);
 
   /*!
-     * \brief Remove a set of characters from end of str
-     *
-     *  Remove any trailing characters from the set chars from str.
-     *
+   * \brief Remove a set of characters from end of str
+   *
+   *  Remove any trailing characters from the set chars from str.
+   *
    *  Ex: TrimRight("abc1234bxa", "acb") ==> "abc1234bx"
-     *
-     * \param str to trim
-     * \param trimChars (characters) to remove from str
-     * \return trimmed string
-     */
+   *
+   * \param str to trim
+   * \param trimChars (characters) to remove from str
+   * \return trimmed string
+   */
   static std::string TrimRight(const std::string &str, const std::string trimChars);
 
   /*!
-     * \brief Remove a set of characters from middle of str
-     *
-     *
-     *  Ex: TrimLeft("abc1234bxa", "acb") ==> "1234bxa"
-     *
-     * \param str to trim
-     * \param trimStrings (characters) to remove from str
-     * \return trimmed string
-     */
-  static std::string Trim(const std::string &str, const std::string &trimStrings, const bool trimStart,
-      const bool trimEnd);
+   * \brief Remove a set of characters from middle of str
+   *
+   *
+   *  Ex: TrimLeft("abc1234bxa", "acb") ==> "1234bxa"
+   *
+   * \param str to trim
+   * \param trimStrings (characters) to remove from str
+   * \return trimmed string
+   */
+  static std::string Trim(const std::string &str, const std::string &trimStrings, const bool trimLeft,
+      const bool trimRight);
 
   static std::string Trim(const std::string &str,
-      const std::vector<std::string> &trimChars, const bool trimStart, const bool trimEnd);
+      const std::vector<std::string> &trimChars, const bool trimLeft, const bool trimRight);
 
   /*!
    * \brief Splits each input string with each delimiter string producing a vector of split strings
@@ -1118,6 +1169,18 @@ public:
   static std::vector<std::string> SplitMulti(const std::vector<std::string> &input,
       const std::vector<std::string> &delimiters, size_t iMaxStrings = 0);
 
+  /*!
+   * \brief Replaces every occurrence of a substring in string and returns the count of replacements
+   *
+   * Somewhat less efficient than FindAndReplace because this one returns a count
+   * of the number of changes.
+   *
+   * \param str String to make changes to in-place
+   * \param oldText string to be replaced
+   * \param newText string to replace with
+   * \return Count of the number of changes
+   */
+  [[deprecated("FindAndReplace is faster, returned count not used.") ]]
   static std::tuple<std::string, int> FindCountAndReplace(const std::string &src, const std::string &oldText,
       const std::string &newText);
 
@@ -1140,18 +1203,22 @@ public:
    */
   static bool FindWord(const std::string &str, const std::string &word);
 
-  /*
-   * Replaces every occurrence of oldText with newText within the string.
-   * Should be more efficient than
-   * FindCountAndReplace.
+  /*!
+   * \brief Replaces every occurrence of a string within another string
    *
+   * Should be more efficient than Replace since it directly uses an icu library
+   * routine and does not have to count changes.
+   *
+   * \param str String to make changes to
+   * \param oldStr string to be replaced
+   * \parm newStr string to replace with
+   * \return the modified string.
    */
-
   static std::string FindAndReplace(const std::string &str, const std::string oldText,
       const std::string newText);
 
-  /**
-   * Not required at this time since 'brackets' are confined to ASCII characters.
+  /*!
+   * \brief Not required at this time since 'brackets' are confined to ASCII characters.
    *
    * Finds the position of the open bracket in a substring.
    *
@@ -1455,13 +1522,13 @@ private:
       UErrorCode &status, const int32_t options, const NormalizerType NormalizerType);
 
   static icu::UnicodeString Trim(const icu::UnicodeString &str, const icu::UnicodeString &trimChars,
-      const bool trimStart, const bool trimEnd);
+      const bool trimLeft, const bool trimRight);
 
   static icu::UnicodeString Trim(const icu::UnicodeString &uStr,
-      const std::vector<icu::UnicodeString> &trimChars, const bool trimStart, const bool trimEnd);
+      const std::vector<icu::UnicodeString> &trimChars, const bool trimLeft, const bool trimRight);
 
-  static icu::UnicodeString Trim(const icu::UnicodeString &str, const bool trimStart,
-      const bool trimEnd);
+  static icu::UnicodeString Trim(const icu::UnicodeString &str, const bool trimLeft,
+      const bool trimRight);
 
   static std::tuple<icu::UnicodeString, int> FindCountAndReplace(const icu::UnicodeString &kSrc,
       const icu::UnicodeString &kOldText, const icu::UnicodeString &kNewText);

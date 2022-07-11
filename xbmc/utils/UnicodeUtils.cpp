@@ -398,7 +398,8 @@ std::string UnicodeUtils::Right(const std::string &str, const size_t charCount,
   return result;
 }
 
-size_t UnicodeUtils::GetByteIndexForCharacter(const std::string &str, size_t charCount,
+
+size_t UnicodeUtils::GetCharPosition(const std::string &str, size_t charCount,
    const bool left, const bool keepLeft, const icu::Locale& icuLocale)
 {
   size_t byteIndex;
@@ -406,7 +407,7 @@ size_t UnicodeUtils::GetByteIndexForCharacter(const std::string &str, size_t cha
   return byteIndex;
 }
 
-size_t UnicodeUtils::GetByteIndexForCharacter(const std::string &str, size_t charCount,
+size_t UnicodeUtils::GetCharPosition(const std::string &str, size_t charCount,
     const bool left, const bool keepLeft, const std::locale& locale)
 {
   icu::Locale icuLocale = Unicode::GetICULocale(locale);
@@ -415,7 +416,7 @@ size_t UnicodeUtils::GetByteIndexForCharacter(const std::string &str, size_t cha
   return byteIndex;
 }
 
-size_t UnicodeUtils::GetByteIndexForCharacter(const std::string &str, size_t charCount,
+size_t UnicodeUtils::GetCharPosition(const std::string &str, size_t charCount,
     const bool left, const bool keepLeft)
 {
   size_t byteIndex;
@@ -495,40 +496,6 @@ std::string UnicodeUtils::RegexReplaceAll(const std::string &str, const std::str
 		const std::string newStr, const int flags)  {
 	 std::string result = Unicode::RegexReplaceAll(str, pattern, newStr, flags);
 	 return result;
-}
-
-
-std::string& UnicodeUtils::RemoveDuplicatedSpacesAndTabs(std::string& str)
-{
-	// Since removing only ASCII spaces and tabs there is no need to convert to/from
-	// Unicode.
-
-  // TODO: Write generic remove whitespace function with constants defining different
-  //       types of whitespace. Perhaps utilize regex
-  //
-  std::string::iterator it = str.begin();
-  bool onSpace = false;
-  while(it != str.end())
-  {
-    if (*it == '\t')
-      *it = ' ';
-
-    if (*it == ' ')
-    {
-      if (onSpace)
-      {
-        it = str.erase(it);
-        continue;
-      }
-      else
-        onSpace = true;
-    }
-    else
-      onSpace = false;
-
-    ++it;
-  }
-  return str;
 }
 
 /**
@@ -677,6 +644,7 @@ std::vector<std::string> UnicodeUtils::Split(const std::string &input,
 
 std::vector<std::string> UnicodeUtils::Split(const std::string &input,
 		const std::vector<std::string> &delimiters) {
+  // TODO: Need tests for splitting in middle of multi-codepoint characters.
 	for (size_t i = 0; i < delimiters.size(); i++) {
 		if (ContainsNonAscii(delimiters[i])) {
 			CLog::Log(LOGWARNING, "UnicodeUtils::Split delimiter contains non-ASCII: {}\n",
@@ -799,8 +767,6 @@ bool UnicodeUtils::FindWord(const std::string &str, const std::string &word)
 }
 
 std::string UnicodeUtils::Paramify(const std::string &param) {
-   //std::cout << "UnicodeUtils.Paramify param: " << param << std::endl;
-	// escape backspaces
 	std::string result = Unicode::FindAndReplace(param,  "\\", "\\\\");
 
 	// escape double quotes

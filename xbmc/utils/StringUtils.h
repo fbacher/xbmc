@@ -176,22 +176,20 @@ public:
    */
   static int ReturnDigits(const std::string &str);
 
-  /*! \brief Converts all tabs to spaces. Removes duplicate spaces
-   *
-   * \param str to cleanup
-   * \return trimmed string, same as str argument.
-   */
-  static std::string& RemoveDuplicatedSpacesAndTabs(std::string& str);
+  /*!
+    * \brief Converts tabs to spaces and then removes duplicate space characters
+    * from str in-place
+    *
+    * \param str to modify
+    * \return trimmed string, same as str argument.
+    */
+   static std::string& RemoveDuplicatedSpacesAndTabs(std::string& str);
 
   /*! \brief Builds a string by appending every string from a container, separated by a delimiter
    *
    * \param strings a container of a number of strings
    * \param delimiter will separate each member of strings
    * \return the concatenation of every string in the container, separated by the delimiter
-   *
-   * TODO: This looks like it is Unicode safe, but more research required to be sure.
-   *       Most likely this is okay if the delimiter is a simple separator (space, comma,
-   *       etc.).
    */
   template<typename CONTAINER>
   static std::string Join(const CONTAINER &strings, const std::string& delimiter)

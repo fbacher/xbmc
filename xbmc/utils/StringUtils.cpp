@@ -190,9 +190,6 @@ std::string& StringUtils::RemoveDuplicatedSpacesAndTabs(std::string& str)
 	// Since removing only ASCII spaces and tabs there is no need to convert to/from
 	// Unicode.
 
-  // TODO: Multiple erases slower than replacing chars as you go and then erase trailing
-  // at end
-
   std::string::iterator it = str.begin();
   bool onSpace = false;
   while(it != str.end())

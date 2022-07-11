@@ -168,7 +168,7 @@ public:
    * Note: The length of the string can change, depending upon the underlying
    * icu::locale.
    *
-   * \param str string to change case on
+   * \param str string to change case on in-place
    * \param locale the underlying icu::Locale is created using the language,
    *        country, etc. from this locale
    */
@@ -179,7 +179,7 @@ public:
    *
    * Note: the length of the string can change, depending upon locale.
    *
-   * \param str string to change case on
+   * \param str string to change case on in-place
    * \param locale controls the conversion rules
    */
   static void ToUpper(std::string &str, const icu::Locale &locale);
@@ -189,7 +189,7 @@ public:
    *
    * Note: the length of the string can change, depending upon locale.
    *
-   * \param str string to change case on
+   * \param str string to change case on in-place
    */
   static void ToUpper(std::string &str);
 
@@ -199,7 +199,7 @@ public:
    * Note: The length of the string can change, depending upon the underlying
    * icu::locale.
    *
-   * \param str string to change case on
+   * \param str string to change case on in-place
    * \param locale the underlying icu::Locale is created using the language,
    *        country, etc. from this locale
    */
@@ -210,7 +210,7 @@ public:
    *
    * Note: the length of the string can change, depending upon locale.
    *
-   * \param str string to change case on
+   * \param str string to change case on in-place
    * \param locale controls the conversion rules
    */
   static void ToUpper(std::wstring &str, const icu::Locale &locale);
@@ -220,7 +220,7 @@ public:
    *
    * Note: the length of the string can change, depending upon locale.
    *
-   * \param str string to change case on
+   * \param str string to change case on in-place
    */
   static void ToUpper(std::wstring &str);
 
@@ -241,7 +241,7 @@ public:
    *
    * Note: the length of the string can change, depending upon locale.
    *
-   * \param str string to change case on
+   * \param str string to change case on in-place
    * \param locale controls the conversion rules
    */
   static void ToLower(std::string &str, const icu::Locale &locale);
@@ -251,7 +251,7 @@ public:
    *
    * Note: the length of the string can change, depending upon locale.
    *
-   * \param str string to change case on
+   * \param str string to change case on in-place
    */
   static void ToLower(std::string &str);
 
@@ -261,7 +261,7 @@ public:
    * Note: The length of the string can change, depending upon the underlying
    * icu::locale.
    *
-   * \param str string to change case on
+   * \param str string to change case on in-place
    * \param locale the underlying icu::Locale is created using the language,
    *        country, etc. from this locale
    */
@@ -272,7 +272,7 @@ public:
    *
    * Note: the length of the string can change, depending upon locale.
    *
-   * \param str string to change case on
+   * \param str string to change case on in-place
    * \param locale controls the conversion rules
    */
   static void ToLower(std::wstring &str, const icu::Locale &locale);
@@ -282,7 +282,7 @@ public:
    *
    * Note: the length of the string can change, depending upon locale.
    *
-   * \param str string to change case on
+   * \param str string to change case on in-place
    */
   static void ToLower(std::wstring &str);
 
@@ -983,7 +983,7 @@ public:
    * left=false keepLeft=false  Returns offset of first byte of nth char from right end.
    *                            Character 0 is AFTER the last character.  Used by Right(x)
    */
-  static size_t GetByteIndexForCharacter(const std::string &str, size_t charCount,
+  static size_t GetCharPosition(const std::string &str, size_t charCount,
       const bool left, const bool keepLeft, const icu::Locale& icuLocale);
   /*!
    * \brief Gets the byte-offset of a Unicode character relative to a reference
@@ -1009,7 +1009,7 @@ public:
    * left=false keepLeft=false  Returns offset of first byte of nth char from right end.
    *                            Character 0 is AFTER the last character.  Used by Right(x)
    */
-  static size_t GetByteIndexForCharacter(const std::string &str, size_t charCount,
+  static size_t GetCharPosition(const std::string &str, size_t charCount,
       const bool left, const bool keepLeft, const std::locale& locale);
 
   /*!
@@ -1036,7 +1036,7 @@ public:
    * left=false keepLeft=false  Returns offset of first byte of nth char from right end.
    *                            Character 0 is AFTER the last character.  Used by Right(x)
    */
-  static size_t GetByteIndexForCharacter(const std::string &str, size_t charCount,
+  static size_t GetCharPosition(const std::string &str, size_t charCount,
       const bool left, const bool keepLeft);
 
   /*!
@@ -1145,15 +1145,6 @@ public:
    * This implementation allows for chars to be any utf-8 characters. (Does NOT Normalize).
    */
   static std::string& TrimRight(std::string &str, const char* const chars);
-
-  /*!
-   * \brief Converts tabs to spaces and then removes duplicate space characters
-   * from str in-place
-   *
-   * \param str to modify
-   * \return trimmed string, same as str argument.
-   */
-  static std::string& RemoveDuplicatedSpacesAndTabs(std::string& str);
 
   /*!
    * \brief Replaces every occurrence of a char in string.
