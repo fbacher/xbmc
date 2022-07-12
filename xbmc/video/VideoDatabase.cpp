@@ -9548,7 +9548,7 @@ void CVideoDatabase::CleanDatabase(CGUIDialogProgressBarHandle* handle,
       if (!tvshowsToDelete.empty())
       {
         sql = "DELETE FROM tvshow WHERE idShow IN (" +
-              StringUtils::TrimRight(tvshowsToDelete, ",") + ")";
+              UnicodeUtils::TrimRight(tvshowsToDelete, ",") + ")";
         m_pDS->exec(sql);
       }
 
