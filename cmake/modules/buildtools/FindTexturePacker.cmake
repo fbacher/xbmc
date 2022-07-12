@@ -23,7 +23,7 @@ if(NOT TARGET TexturePacker::TexturePacker::Executable)
                                           IMPORTED_LOCATION "${TEXTUREPACKER_EXECUTABLE}")
     message(STATUS "External TexturePacker for KODI_DEPENDSBUILD will be executed during build: ${TEXTUREPACKER_EXECUTABLE}")
   elseif(WIN32)
-    get_filename_component(_tppath "${DEPENDENCIES_DIR}/tools/TexturePacker" ABSOLUTE)
+    get_filename_component(_tppath "${DEPENDS_PATH}/tools/TexturePacker" ABSOLUTE)
     find_program(TEXTUREPACKER_EXECUTABLE NAMES "${APP_NAME_LC}-TexturePacker.exe" TexturePacker.exe
                                           HINTS ${_tppath})
 
@@ -50,11 +50,11 @@ if(NOT TARGET TexturePacker::TexturePacker::Executable)
         # and unset TEXTUREPACKER_EXECUTABLE variable
         message(WARNING "Could not find '${APP_NAME_LC}-TexturePacker' or 'TexturePacker' executable in ${_tppath} supplied by -DWITH_TEXTUREPACKER. Make sure the executable file name matches these names!")
       endif()
-    endif()
-
-    # Ship TexturePacker only on Linux and FreeBSD
-    if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD" OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
-      set(INTERNAL_TEXTUREPACKER_INSTALLABLE TRUE)
+    else()
+      # Ship TexturePacker only on Linux and FreeBSD
+      if(CMAKE_SYSTEM_NAME STREQUAL "FreeBSD" OR CMAKE_SYSTEM_NAME STREQUAL "Linux")
+        set(INTERNAL_TEXTUREPACKER_INSTALLABLE TRUE CACHE BOOL "" FORCE)
+      endif()
     endif()
 
     # Use it during build if build architecture can be executed on host

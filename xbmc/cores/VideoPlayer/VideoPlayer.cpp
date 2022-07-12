@@ -676,8 +676,6 @@ bool CVideoPlayer::OpenFile(const CFileItem& file, const CPlayerOptions &options
 
   m_item = file;
   m_playerOptions = options;
-  // Try to resolve the correct mime type
-  m_item.SetMimeTypeForInternetFile();
 
   m_processInfo->SetPlayTimes(0,0,0,0);
   m_bAbortRequest = false;
@@ -1337,6 +1335,11 @@ void CVideoPlayer::Prepare()
 
 void CVideoPlayer::Process()
 {
+  // Try to resolve the correct mime type. This can take some time, for example if a requested
+  // item is located at a slow/not reachable remote source. So, do mime type detection in vp worker
+  // thread, not directly when initalizing the player to keep GUI responsible.
+  m_item.SetMimeTypeForInternetFile();
+
   CServiceBroker::GetWinSystem()->RegisterRenderLoop(this);
 
   Prepare();
@@ -3337,14 +3340,6 @@ void CVideoPlayer::LoadPage(int p, int sp, unsigned char* buffer)
       return;
 
   return m_VideoPlayerTeletext->LoadPage(p, sp, buffer);
-}
-
-std::string CVideoPlayer::GetRadioText(unsigned int line)
-{
-  if (m_CurrentRadioRDS.id < 0)
-      return "";
-
-  return m_VideoPlayerRadioRDS->GetRadioText(line);
 }
 
 void CVideoPlayer::SeekTime(int64_t iTime)

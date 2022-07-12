@@ -510,8 +510,29 @@ public:
    */
   static void Tokenize(const std::string& input, std::vector<std::string>& tokens, const char delimiter);
 
+  /*!
+   * \brief Converts a string to a unsigned int number.
+   * \param str The string to convert
+   * \param fallback [OPT] The number to return when the conversion fails
+   * \return The converted number, otherwise fallback if conversion fails
+   */
+  static uint32_t ToUint32(std::string_view str, uint32_t fallback = 0) noexcept;
 
-  static uint64_t ToUint64(const std::string& str, uint64_t fallback) noexcept;
+  /*!
+   * \brief Converts a string to a unsigned long long number.
+   * \param str The string to convert
+   * \param fallback [OPT] The number to return when the conversion fails
+   * \return The converted number, otherwise fallback if conversion fails
+   */
+  static uint64_t ToUint64(std::string_view str, uint64_t fallback = 0) noexcept;
+
+  /*!
+   * \brief Converts a string to a float number.
+   * \param str The string to convert
+   * \param fallback [OPT] The number to return when the conversion fails
+   * \return The converted number, otherwise fallback if conversion fails
+   */
+  static float ToFloat(std::string_view str, float fallback = 0.0f) noexcept;
 
   /*!
    * \brief Formats a file-size into human a human-friendly form

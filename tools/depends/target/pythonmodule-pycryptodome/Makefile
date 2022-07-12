@@ -14,19 +14,13 @@ ifeq (darwin, $(findstring darwin, $(HOST)))
     # Work around an issue with xcode 11 stripping -arch arm64 flags.
     # Not required for xcode 12+, but doesnt hurt either.
     CFLAGS+= -target arm64-apple-darwin
+    LDFLAGS+= -target arm64-apple-darwin
   endif
-  LDSHARED:=$(CC) -bundle -undefined dynamic_lookup
+  LDSHARED:=$(CC) -bundle -undefined dynamic_lookup $(LDFLAGS)
 endif
 
-ifeq ($(TARGET_PLATFORM),appletvos)
-  # We cant export CFLAGS directly for tvos
-  # CFLAGS are added to linker command, having -bundle (LDSHARED) and -fembed_bitcode (CFLAGS)
-  # causes a failure: ld: -bundle and -bitcode_bundle (Xcode setting ENABLE_BITCODE=YES) cannot be used together
-  export CC:=$(CC) $(CFLAGS)
-else
-  export CC CFLAGS
-endif
 
+export CC CFLAGS
 export LDSHARED LDFLAGS
 export PYTHONPATH=$(PYTHON_SITE_PKG)
 
