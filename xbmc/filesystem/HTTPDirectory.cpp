@@ -78,7 +78,7 @@ bool CHTTPDirectory::GetDirectory(const CURL& url, CFileItemList &items)
   {
     /* if Content-Length is found and its not text/html, URL is pointing to file so don't treat URL as HTTPDirectory */
     if (!http.GetHttpHeader().GetValue("Content-Length").empty() &&
-        !StringUtils::StartsWithNoCase(http.GetHttpHeader().GetValue("Content-type"), "text/html"))
+        !UnicodeUtils::StartsWithNoCase(http.GetHttpHeader().GetValue("Content-type"), "text/html"))
     {
       return false;
     }
