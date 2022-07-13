@@ -10,7 +10,6 @@
 
 #include "utils/StringUtils.h"
 #include "utils/UnicodeUtils.h"
-#include "utils/UnicodeUtils.h"
 
 #include <iostream>
 #include <memory>

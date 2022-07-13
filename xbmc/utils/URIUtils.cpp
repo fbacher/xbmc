@@ -21,7 +21,6 @@
 #include "utils/StringUtils.h"
 #include "utils/UnicodeUtils.h"
 #include "utils/log.h"
-#include "utils/UnicodeUtils.h"
 
 #if defined(TARGET_WINDOWS)
 #include "platform/win32/CharsetConverter.h"

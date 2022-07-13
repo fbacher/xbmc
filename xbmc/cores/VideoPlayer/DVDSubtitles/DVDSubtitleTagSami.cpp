@@ -152,7 +152,6 @@ void CDVDSubtitleTagSami::ConvertLine(std::string& strUTF8, const char* langClas
       {
         std::string tagOptionName = m_tagOptions->GetMatch(1);
         std::string tagOptionValue = m_tagOptions->GetMatch(2);
-        UnicodeUtils::FoldCase(tagOptionValue);
 
         pos2 += static_cast<int>(tagOptionName.length() + tagOptionValue.length());
         if (tagOptionName == "class")

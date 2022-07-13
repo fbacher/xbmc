@@ -230,6 +230,13 @@ std::string& StringUtils::RemoveDuplicatedSpacesAndTabs(std::string& str)
     ++it;
   }
   return str;
+#if defined(STRINGUTILS_UNICODE_ENABLE)
+
+
+#endif
+#if defined(STRINGUTILS_UNICODE_ENABLE)
+
+#endif
 }
 
 // Plane maps for MySQL utf8_general_ci (now known as utf8mb3_general_ci) collation
@@ -473,6 +480,9 @@ static const uint16_t* const planemap[256] = {
 };
 // clang-format on
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
+
+#endif
 static wchar_t GetCollationWeight(const wchar_t &r) {
 	// Lookup the "weight" of a UTF8 char, equivalent lowercase ascii letter, in the plane map,
 	// the character comparison value used by using "accent folding" collation utf8_general_ci
@@ -486,6 +496,8 @@ static wchar_t GetCollationWeight(const wchar_t &r) {
 	return static_cast<wchar_t>(plane[r & 0xFF]);
 }
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
+
 // Not sure what the real goal is here. I think it is just to see if the
 // strings are the same after case folding. (Normalizing might be a good
 // idea too.)
@@ -494,7 +506,8 @@ static wchar_t GetCollationWeight(const wchar_t &r) {
 // returns negative if left < right, positive if left > right
 // and 0 if they are identical.
 // See also the equivalent StringUtils::AlphaNumericCollation() for UFT8 data
-int64_t StringUtils::AlphaNumericCompare(const wchar_t *left,
+#endif
+int64_t StringUtils::AlphaNumericCompare_orig(const wchar_t *left,
 		const wchar_t *right) {
 	const wchar_t *l = left;
 	const wchar_t *r = right;
@@ -775,6 +788,9 @@ int StringUtils::AlphaNumericCollation(int nKey1, const void* pKey1, int nKey2, 
   return (nKey1 - nKey2);
 }
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
+
+#endif
 std::string StringUtils::ISODateToLocalizedDate(const std::string &strIsoDate) {
 	// Convert ISO8601 date strings YYYY, YYYY-MM, or YYYY-MM-DD to (partial) localized date strings
 	// TODO: ICU has date formatters for many locales
@@ -806,6 +822,8 @@ std::string StringUtils::ISODateToLocalizedDate(const std::string &strIsoDate) {
 	}
 	return formattedDate;
 }
+
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
 
 std::string StringUtils::SecondsToTimeString(long lSeconds, TIME_FORMAT format)
@@ -847,6 +865,7 @@ std::string StringUtils::SecondsToTimeString(long lSeconds, TIME_FORMAT format)
   return strHMS;
 
 }
+#endif
 
 bool StringUtils::IsNaturalNumber(const std::string& str)
 {
@@ -922,6 +941,9 @@ int StringUtils::asciixdigitvalue(char chr) {
 	return -1;
 }
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
+
+#endif
 std::string StringUtils::SizeToString(int64_t size)
 {
   std::string strLabel;
@@ -1035,7 +1057,9 @@ int StringUtils::FindEndBracket(const std::string &str, char opener, char closer
   }
 
   return (int)std::string::npos;
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 }
+#endif
 
 std::string StringUtils::CreateUUID()
 {
@@ -1108,7 +1132,10 @@ size_t StringUtils::utf8_strlen(const char *s) {
 	return length;
 }
 
+#if defined(STRINGUTILS_UNICODE_ENABLE)
 
+
+#endif
 /**
  * Note: delimiters is a string of one or more ASCII single-character delimiters.
  *       input may be utf-8.

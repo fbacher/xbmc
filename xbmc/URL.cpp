@@ -140,7 +140,7 @@ void CURL::Parse(const std::string& strURL1)
   if (IsProtocol("udf") || IsProtocol("iso9660"))
   {
     std::string lower(strURL);
-    UnicodeUtils::FoldCase(lower);
+    StringUtils::ToLower(lower);
     size_t isoPos = lower.find(".iso\\", iPos);
     if (isoPos == std::string::npos)
       isoPos = lower.find(".udf\\", iPos);
@@ -331,13 +331,13 @@ void CURL::SetFileName(const std::string& strFileName)
     m_strShareName = m_strFileName.substr(0, slash);
 
   UnicodeUtils::Trim(m_strFileType);
-  UnicodeUtils::FoldCase(m_strFileType);
+  StringUtils::ToLower(m_strFileType);
 }
 
 void CURL::SetProtocol(const std::string& strProtocol)
 {
   m_strProtocol = strProtocol;
-  UnicodeUtils::FoldCase(m_strProtocol);
+  StringUtils::ToLower(m_strProtocol);
 }
 
 void CURL::SetOptions(const std::string& strOptions)
