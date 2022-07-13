@@ -201,7 +201,6 @@ int StringUtils::ReturnDigits(const std::string &str)
   }
   return atoi(ss.str().c_str());
 }
-
 std::string& StringUtils::RemoveDuplicatedSpacesAndTabs(std::string& str)
 {
 	// Since removing only ASCII spaces and tabs there is no need to convert to/from
@@ -485,15 +484,6 @@ static wchar_t GetCollationWeight(const wchar_t &r) {
 		return r;
 	return static_cast<wchar_t>(plane[r & 0xFF]);
 }
-
-// Not sure what the real goal is here. I think it is just to see if the
-// strings are the same after case folding. (Normalizing might be a good
-// idea too.)
-//
-// Compares separately the numeric and alphabetic parts of a wide string.
-// returns negative if left < right, positive if left > right
-// and 0 if they are identical.
-// See also the equivalent StringUtils::AlphaNumericCollation() for UFT8 data
 int64_t StringUtils::AlphaNumericCompare(const wchar_t *left,
 		const wchar_t *right) {
 	const wchar_t *l = left;
@@ -845,7 +835,6 @@ std::string StringUtils::SecondsToTimeString(long lSeconds, TIME_FORMAT format)
     strHMS = "-" + strHMS;
 
   return strHMS;
-
 }
 
 bool StringUtils::IsNaturalNumber(const std::string& str)

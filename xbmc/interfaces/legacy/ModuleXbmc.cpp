@@ -291,18 +291,7 @@ std::vector<Tuple<String, String>> getICULanguage(std::vector<String>& propertyN
   return result;
 }
 
-    /*
-     * TODO: This appears to be a bit buggy and has not-fully documented behavior. The fix is complicated
-     *       and would require careful review and research to ensure dependent code is not harmed.
-     *       *** It is possible that some of the odd behaviors occurred due to the "Turkic-I" patch
-     *
-     *       Instead, implemented getICULanguage, above.
-     *
-     *       Some of the issues:
-     *         - Sometimes, when you ask for language code & region, only the region ("-US") is returned
-     *         - If a ISO language code, it may return the region instead, if it can't find the language
-     *         - There is no control whether the region/country (ISO 3166) is 2 or 3 chars long
-     */
+   
     String getLanguage(int format /* = CLangCodeExpander::ENGLISH_NAME */, bool region /*= false*/)
     {
       XBMC_TRACE;

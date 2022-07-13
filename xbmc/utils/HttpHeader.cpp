@@ -187,10 +187,8 @@ std::string CHttpHeader::GetCharset(void) const
     return strValue;
 
   // TODO: Unicode Verify
+  // Using ToUpper runs more risk of mangling text that FoldCase
   
-  if (UnicodeUtils::ContainsNonAscii(strValue)) {
-    CLog::Log(LOGWARNING, "CHttpHeader::GetCharset strValue contains non-ASCII: {}", strValue);
-  }
   UnicodeUtils::ToUpper(strValue, icu::Locale::getEnglish());
   const size_t len = strValue.length();
 

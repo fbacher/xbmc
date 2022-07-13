@@ -166,8 +166,8 @@ set(HEADERS ActorProtocol.h
             TextSearch.h
             TimeUtils.h
             TransformMatrix.h
-	    	Unicode.h
-	    	UnicodeUtils.h
+	    Unicode.h
+	    UnicodeUtils.h
             URIUtils.h
             UrlOptions.h
             Utf8Utils.h

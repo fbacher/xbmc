@@ -3259,9 +3259,6 @@ std::string CFileItem::GetUserMusicThumb(bool alwaysCheckRemote /* = false */, b
 		
 		// TODO: Unicode, verify. Is this really needed?
 		
-        if (UnicodeUtils::ContainsNonAscii(ext)) {
-          CLog::Log(LOGWARNING, "CFileItem::GetUserMusicThumb ext contains non-ASCII: {}", ext);
-        }
         UnicodeUtils::ToUpper(ext, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
         UnicodeUtils::Replace(folderThumb1, strFileName, name + ext);
         if (CFile::Exists(folderThumb1)) // folder.JPG
@@ -3272,9 +3269,6 @@ std::string CFileItem::GetUserMusicThumb(bool alwaysCheckRemote /* = false */, b
 		
 		// TODO: Unicode, verify. Is this really needed?
 		
-        if (UnicodeUtils::ContainsNonAscii(firstletter)) {
-          CLog::Log(LOGWARNING, "CFileItem::GetUserMusicThumb firstletter contains non-ASCII: {}", firstletter);
-        }
         UnicodeUtils::ToUpper(firstletter, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
         name.replace(0, 1, firstletter);
         UnicodeUtils::Replace(folderThumb1, strFileName, name + ext);

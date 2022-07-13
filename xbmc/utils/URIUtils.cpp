@@ -21,7 +21,6 @@
 #include "utils/StringUtils.h"
 #include "utils/UnicodeUtils.h"
 #include "utils/log.h"
-#include "utils/UnicodeUtils.h"
 
 #if defined(TARGET_WINDOWS)
 #include "platform/win32/CharsetConverter.h"
@@ -144,9 +143,6 @@ void URIUtils::RemoveExtension(std::string& strFileName)
 	
 	// TODO: Unicode, verify
 	
-    if (UnicodeUtils::ContainsNonAscii(strExtension)) {
-      CLog::Log(LOGWARNING, "URIUtils::RemoveExtension strExtension contains non-ASCII: {}", strExtension);
-    }
     UnicodeUtils::ToLower(strExtension, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
     strExtension += "|";
 
@@ -1094,11 +1090,6 @@ bool URIUtils::IsNetworkFilesystem(const std::string& strPath)
 
   return false;
 }
-
-  // Check for "internet" streaming protocols/filesystems
-
-  // "Normal" network filesystems
-
 
 bool URIUtils::IsUPnP(const std::string& strFile)
 {

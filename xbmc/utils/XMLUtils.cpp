@@ -10,7 +10,6 @@
 #include "URL.h"
 #include "utils/StringUtils.h"
 #include "utils/UnicodeUtils.h"
-#include "utils/UnicodeUtils.h"
 
 bool XMLUtils::GetHex(const TiXmlNode* pRootNode, const char* strTag, uint32_t& hexValue)
 {
