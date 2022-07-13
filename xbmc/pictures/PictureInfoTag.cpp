@@ -134,11 +134,6 @@ bool CPictureInfoTag::Load(const std::string &path)
   // Get file extensions to find addon related to it.
   std::string strExtension = URIUtils::GetExtension(path);
 
-  // TODO: Unicode, looks like trouble
-
-  if (UnicodeUtils::ContainsNonAscii(strExtension)) {
-       CLog::Log(LOGWARNING, "CPictureInfoTag::Load strExtension contains non-ASCII: {}", strExtension);
-     }
   UnicodeUtils::ToLower(strExtension, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
   if (!strExtension.empty() && CServiceBroker::IsBinaryAddonCacheUp())
   {

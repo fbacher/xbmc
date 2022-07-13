@@ -100,7 +100,7 @@ bool CGUIWindow::Load(const std::string& strFileName, bool bContainsPath)
   {
     // FIXME: strLowerPath needs to eventually go since resToUse can get incorrectly overridden
     std::string strFileNameLower = strFileName;
-    UnicodeUtils::FoldCase(strFileNameLower);  // FYI, fold case avoids strange side-effects of FoldCase for some locales.
+    UnicodeUtils::FoldCase(strFileNameLower);  // FYI, fold case avoids strange side-effects of ToLower for some locales.
     strLowerPath =  g_SkinInfo->GetSkinPath(strFileNameLower, &m_coordsRes);
     strPath = g_SkinInfo->GetSkinPath(strFileName, &m_coordsRes);
   }

@@ -98,12 +98,6 @@ std::string CLocale::ToStringLC() const
     return "";
 
   std::string locale = ToString();
-  
-  // TODO: Unicode Verify
-  
-  if (UnicodeUtils::ContainsNonAscii(locale)) {
-       CLog::Log(LOGWARNING, "CLocale::ToStringLC locale contains non-ASCII: {}", locale);
-     }
   UnicodeUtils::ToLower(locale, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
 
   return locale;
@@ -248,24 +242,12 @@ bool CLocale::ParseLocale(const std::string &locale, std::string &language, std:
   if (pos != std::string::npos)
   {
     territory = tmp.substr(pos + 1);
-  
-     // TODO: Unicode Verify
-  
-    if (UnicodeUtils::ContainsNonAscii(territory)) {
-      CLog::Log(LOGWARNING, "CLocale::ParseLocale territory contains non-ASCII: {}", territory);
-    }
     UnicodeUtils::ToUpper(territory, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
     tmp = tmp.substr(0, pos);
   }
 
   // what remains is the language
   language = tmp;
-    
-  // TODO: Unicode Verify
-  
-  if (UnicodeUtils::ContainsNonAscii(language)) {
-       CLog::Log(LOGWARNING, "CLocale::ParseLocale language contains non-ASCII: {}", language);
-     }
   UnicodeUtils::ToLower(language, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
 
   return CheckValidity(language, territory, codeset, modifier);
@@ -276,15 +258,6 @@ void CLocale::Initialize()
   m_valid = CheckValidity(m_language, m_territory, m_codeset, m_modifier);
   if (m_valid)
   {
-    
-    // TODO: Unicode Verify
-  
-    if (UnicodeUtils::ContainsNonAscii(m_language)) {
-      CLog::Log(LOGWARNING, " CLocale::Initialize m_language contains non-ASCII: {}", m_language);
-    }
-    if (UnicodeUtils::ContainsNonAscii(m_territory)) {
-      CLog::Log(LOGWARNING, " CLocale::Initialize m_territory contains non-ASCII: {}", m_territory);
-    }
     UnicodeUtils::ToLower(m_language, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
     UnicodeUtils::ToUpper(m_territory, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
   }

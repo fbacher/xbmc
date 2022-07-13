@@ -1195,7 +1195,7 @@ bool CTagLoaderTagLib::Load(const std::string& strFileName, CMusicInfoTag& tag, 
       return false;
   }
 
-  StringUtils::ToLower(strExtension);
+  UnicodeUtils::FoldCase(strExtension);
   TagLibVFSStream*           stream = new TagLibVFSStream(strFileName, true);
   if (!stream)
   {

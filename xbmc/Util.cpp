@@ -1384,7 +1384,7 @@ void CUtil::ForceForwardSlashes(std::string& strPath)
 
 double CUtil::AlbumRelevance(const std::string& strAlbumTemp1, const std::string& strAlbum1, const std::string& strArtistTemp1, const std::string& strArtist1)
 {
-	// TODO: Unicode Need fuzzy search
+	// TODO: Unicode Need fuzzy search that is locale sensitive
 
   // case-insensitive fuzzy string comparison on the album and artist for relevance
   // weighting is identical, both album and artist are 50% of the total relevance
@@ -1533,8 +1533,6 @@ void CUtil::GetSkinThemes(std::vector<std::string>& vecTheme)
       std::string strExtension = URIUtils::GetExtension(pItem->GetPath());
       std::string strLabel = pItem->GetLabel();
       if ((strExtension == ".xbt" && !UnicodeUtils::EqualsNoCase(strLabel, TexturesXbt)))
-        // TODO: Unicode BROKEN Left operates on character counts, not bytes
-        // Only works if strExtension is single-byte chars
         vecTheme.push_back(UnicodeUtils::Left(strLabel, strExtension.size(), false));
     }
     else
@@ -1546,8 +1544,6 @@ void CUtil::GetSkinThemes(std::vector<std::string>& vecTheme)
 
       std::string strLabel = URIUtils::GetFileName(itemUrl.GetHostName());
       if (!UnicodeUtils::EqualsNoCase(strLabel, TexturesXbt))
-        // TODO: Unicode BROKEN Left operates on character counts, not bytes
-        // Only works if strExtension is single-byte chars
         vecTheme.push_back(UnicodeUtils::Left(strLabel, URIUtils::GetExtension(strLabel).size(), false));
     }
   }

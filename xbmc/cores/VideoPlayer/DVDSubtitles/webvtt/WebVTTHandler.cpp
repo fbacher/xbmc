@@ -903,7 +903,7 @@ void CWebVTTHandler::ConvertSubtitle(std::string& text)
     if (UnicodeUtils::ContainsNonAscii(fullTag)) {
       CLog::Log(LOGWARNING, "CWebVTTHandler::ConvertSubtitle fullTag is non-ASCII: {}\n", fullTag);
     }
-    UnicodeUtils::ToLower(fullTag, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues.
+    UnicodeUtils::FoldCase(fullTag);
 
     // Get tag name only (e.g. full tag is "</c>", tagName will be "c")
     std::string tagName = m_tagsRegex.GetMatch(1);

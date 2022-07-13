@@ -120,7 +120,6 @@ My reading discourages trying to patch yourself around multi-lingual issues. It 
 
 I took advantage of Kodi centralizing much text processing in StringUtils and set about changing it to use ICU and then making any necessary changes to the code that used StringUtils. This reduced the impact to the Kodi code as a whole. Keep in mind that there are many places in the code that does NOT call StringUtils and I did not investigate these much. It will take considerable effort to go through them all.
 
-
 ## Common programming mistakes
 
 - ToUpper, ToLower (and other operations) are Locale sensitive
@@ -139,6 +138,9 @@ Also, while not as pretty, code which calls xxNoCase functions multiple times wi
 - fold case of each argument (the minimum number of times)
 - call StringUtils.compare (folded_1, folded_2) instead of compareNoCase. This would avoid cost of redundant case folds. Note that this would work for StrtsWith, EndsWith, etc.
    
+# How I Build it
+
+There are three fairly short bash build scripts that I use. You should only have to modify several lines in build_confg.sh to specify the build path. The build_icu.sh script downloads, configures and builds icu. I think a much better approach is to use     
 # Overview of Code changes:
 
 ## Major Changes.

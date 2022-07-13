@@ -263,11 +263,7 @@ bool CMediaSourceSettings::AddShare(const std::string &type, const CMediaSource 
     CLog::Log(LOGERROR, "CMediaSourceSettings: unable to add empty path");
     return false;
   }
-  // TODO: fpf Unicode Looks like trouble
 
-  if (UnicodeUtils::ContainsNonAscii(strPath1)) {
-    CLog::Log(LOGWARNING, "CMediaSourceSettings::AddShare strPath1 contains non-ASCII: {}", strPath1);
-  }
   UnicodeUtils::ToUpper(strPath1, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
 
   CMediaSource shareToAdd = share;

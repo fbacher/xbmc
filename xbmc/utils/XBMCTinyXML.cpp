@@ -39,11 +39,8 @@ CXBMCTinyXML::CXBMCTinyXML(const std::string& documentName)
 CXBMCTinyXML::CXBMCTinyXML(const std::string& documentName, const std::string& documentCharset)
 : TiXmlDocument(documentName), m_SuggestedCharset(documentCharset)
 {
-  // TODO: Unicode, verify
+  // TODO: Unicode, Why upper case? Why not Fold case?
   
-  if (UnicodeUtils::ContainsNonAscii(documentCharset)) {
-    CLog::Log(LOGWARNING, "CXBMCTinyXML::CXBMCTinyXML documentCharset contains non-ASCII: {}", documentCharset);
-  }
   UnicodeUtils::ToUpper(m_SuggestedCharset, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
 }
 
@@ -91,11 +88,8 @@ bool CXBMCTinyXML::LoadFile(const std::string& _filename, const std::string& doc
 {
   m_SuggestedCharset = documentCharset;
   
-  // TODO: Unicode, verify
+  // TODO: Unicode, Why uppercase? Why not FoldCase?
   
-  if (UnicodeUtils::ContainsNonAscii(documentCharset)) {
-    CLog::Log(LOGWARNING, "CXBMCTinyXML::LoadFile documentCharset contains non-ASCII: {}", documentCharset);
-  }
   UnicodeUtils::ToUpper(m_SuggestedCharset, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
   return LoadFile(_filename, TIXML_ENCODING_UNKNOWN);
 }
@@ -135,11 +129,8 @@ bool CXBMCTinyXML::Parse(const std::string& data, const std::string& dataCharset
 {
   m_SuggestedCharset = dataCharset;
   
-  // TODO: Unicode, verify
-  
-  if (UnicodeUtils::ContainsNonAscii(dataCharset)) {
-    CLog::Log(LOGWARNING, "CXBMCTinyXML::Parse dataCharset contains non-ASCII: {}", dataCharset);
-  }
+  // TODO: Unicode, verify. Why upper case? Why not FoldCase?
+ 
   UnicodeUtils::ToUpper(m_SuggestedCharset, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues
 
   return Parse(data, TIXML_ENCODING_UNKNOWN);

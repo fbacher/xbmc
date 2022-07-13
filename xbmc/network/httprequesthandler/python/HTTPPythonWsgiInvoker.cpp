@@ -386,9 +386,6 @@ std::map<std::string, std::string> CHTTPPythonWsgiInvoker::createCgiEnvironment(
   for (headerIt = httpRequest->headerValues.begin(); headerIt != httpRequest->headerValues.end(); ++headerIt)
   {
     std::string headerName = headerIt->first;
-    if (UnicodeUtils::ContainsNonAscii(headerName)) {
-      CLog::Log(LOGWARNING, "CHTTPPythonWsgiInvoker::createCgiEnvironment headerName contains non-ASCII: {}", headerName);
-    }
     UnicodeUtils::ToUpper(headerName, icu::Locale::getEnglish()); // Avoids Turkic-I and other issues.
     environment.insert(std::make_pair("HTTP_" + headerName, headerIt->second));
   }
