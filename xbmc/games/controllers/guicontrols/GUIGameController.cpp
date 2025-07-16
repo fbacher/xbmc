@@ -16,6 +16,7 @@
 #include "games/controllers/Controller.h"
 #include "games/controllers/ControllerLayout.h"
 #include "guilib/GUIListItem.h"
+#include "guilib/GUITexture.h"
 #include "utils/log.h"
 
 #include <algorithm>
@@ -36,6 +37,9 @@ CGUIGameController::CGUIGameController(int parentID,
 {
   // Initialize CGUIControl
   ControlType = GUICONTROL_GAMECONTROLLER;
+
+  // Initialize CGUIImage
+  SetAspectRatio(CAspectRatio::AR_KEEP);
 }
 
 CGUIGameController::CGUIGameController(const CGUIGameController& from)
@@ -51,6 +55,9 @@ CGUIGameController::CGUIGameController(const CGUIGameController& from)
 {
   // Initialize CGUIControl
   ControlType = GUICONTROL_GAMECONTROLLER;
+
+  // Initialize CGUIImage
+  SetAspectRatio(CAspectRatio::AR_KEEP);
 }
 
 CGUIGameController* CGUIGameController::Clone(void) const
@@ -88,6 +95,8 @@ void CGUIGameController::DoProcess(unsigned int currentTime, CDirtyRegionList& d
 void CGUIGameController::UpdateInfo(const CGUIListItem* item /* = nullptr */)
 {
   CGUIImage::UpdateInfo(item);
+
+  m_controllerDiffuse.Update(item);
 
   if (item != nullptr)
   {

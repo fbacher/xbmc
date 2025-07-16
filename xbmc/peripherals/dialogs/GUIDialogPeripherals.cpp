@@ -96,7 +96,7 @@ void CGUIDialogPeripherals::Show(CPeripherals& manager)
 
       // Show an error if the peripheral doesn't have any settings
       PeripheralPtr peripheral = manager.GetByPath(pItem->GetPath());
-      if (!peripheral || peripheral->GetSettings().empty())
+      if (!peripheral || !peripheral->HasConfigurableSettings())
       {
         MESSAGING::HELPERS::ShowOKDialogText(CVariant{35000}, CVariant{35004});
         continue;
@@ -133,14 +133,26 @@ bool CGUIDialogPeripherals::OnMessage(CGUIMessage& message)
     case GUI_MSG_REFRESH_LIST:
     {
       if (m_manager && message.GetControlId() == -1)
+      {
         UpdatePeripheralsSync();
-      return true;
+        return true;
+      }
     }
     default:
       break;
   }
 
   return CGUIDialogSelect::OnMessage(message);
+}
+
+void CGUIDialogPeripherals::FreeResources(bool immediately /* = false */)
+{
+  // Free GUI resources
+  for (auto it = m_peripherals.begin(); it != m_peripherals.end(); ++it)
+    (*it)->FreeMemory();
+
+  // Free ancestor resources
+  CGUIDialogSelect::FreeResources(immediately);
 }
 
 void CGUIDialogPeripherals::Notify(const Observable& obs, const ObservableMessage msg)
@@ -174,13 +186,4 @@ void CGUIDialogPeripherals::UpdatePeripheralsSync()
   m_peripherals.Clear();
   m_manager->GetDirectory("peripherals://all/", m_peripherals);
   SetItems(m_peripherals);
-
-  if (selectedItem)
-  {
-    for (int i = 0; i < m_peripherals.Size(); i++)
-    {
-      if (m_peripherals[i]->GetPath() == selectedItem->GetPath())
-        SetSelected(i);
-    }
-  }
 }
